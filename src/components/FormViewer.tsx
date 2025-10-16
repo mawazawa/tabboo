@@ -1,13 +1,17 @@
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
+import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
+import 'react-pdf/dist/esm/Page/TextLayer.css';
+
+// Configure PDF.js worker
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 interface FormData {
-  // Text fields
   partyName?: string;
   streetAddress?: string;
   city?: string;
@@ -24,8 +28,6 @@ interface FormData {
   facts?: string;
   signatureDate?: string;
   signatureName?: string;
-  
-  // Boolean fields
   noOrders?: boolean;
   agreeOrders?: boolean;
   consentCustody?: boolean;
@@ -34,220 +36,112 @@ interface FormData {
 
 export const FormViewer = () => {
   const [formData, setFormData] = useState<FormData>({});
+  const [numPages, setNumPages] = useState<number>(0);
+  const [pageWidth, setPageWidth] = useState<number>(850);
 
   const updateField = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
+    setNumPages(numPages);
+  };
+
+  // Form field overlay positions (adjust these based on actual PDF coordinates)
+  const fieldOverlays = [
+    {
+      page: 1,
+      fields: [
+        { type: 'input', field: 'partyName', top: '11%', left: '5%', width: '40%', placeholder: 'NAME' },
+        { type: 'input', field: 'streetAddress', top: '14.5%', left: '5%', width: '40%', placeholder: 'STREET ADDRESS' },
+        { type: 'input', field: 'city', top: '18%', left: '5%', width: '25%', placeholder: 'CITY' },
+        { type: 'input', field: 'state', top: '18%', left: '31%', width: '6%', placeholder: 'STATE' },
+        { type: 'input', field: 'zipCode', top: '18%', left: '38%', width: '7%', placeholder: 'ZIP' },
+        { type: 'input', field: 'telephoneNo', top: '21.5%', left: '5%', width: '19%', placeholder: 'TELEPHONE' },
+        { type: 'input', field: 'faxNo', top: '21.5%', left: '26%', width: '19%', placeholder: 'FAX' },
+        { type: 'input', field: 'email', top: '25%', left: '5%', width: '40%', placeholder: 'EMAIL' },
+        { type: 'input', field: 'attorneyFor', top: '28.5%', left: '5%', width: '40%', placeholder: 'ATTORNEY FOR' },
+        { type: 'input', field: 'county', top: '11%', left: '55%', width: '40%', placeholder: 'COUNTY' },
+        { type: 'input', field: 'petitioner', top: '18%', left: '55%', width: '40%', placeholder: 'PETITIONER' },
+        { type: 'input', field: 'respondent', top: '22%', left: '55%', width: '40%', placeholder: 'RESPONDENT' },
+        { type: 'input', field: 'caseNumber', top: '30%', left: '55%', width: '40%', placeholder: 'CASE NUMBER' },
+        { type: 'checkbox', field: 'noOrders', top: '39%', left: '8%' },
+        { type: 'checkbox', field: 'agreeOrders', top: '42%', left: '8%' },
+        { type: 'checkbox', field: 'consentCustody', top: '48%', left: '8%' },
+        { type: 'checkbox', field: 'consentVisitation', top: '51%', left: '8%' },
+        { type: 'textarea', field: 'facts', top: '60%', left: '5%', width: '90%', height: '20%' },
+        { type: 'input', field: 'signatureDate', top: '88%', left: '5%', width: '20%', placeholder: 'DATE' },
+        { type: 'input', field: 'signatureName', top: '88%', left: '50%', width: '40%', placeholder: 'SIGNATURE' },
+      ]
+    }
+  ];
+
   return (
     <Card className="h-full border-2 shadow-medium">
-      <ScrollArea className="h-full p-6">
-        <div className="max-w-3xl mx-auto space-y-6">
-          {/* Header */}
-          <div className="text-center space-y-2 pb-4 border-b-2">
-            <h1 className="text-2xl font-bold">FL-320</h1>
-            <h2 className="text-lg font-semibold text-muted-foreground">
-              RESPONSIVE DECLARATION TO REQUEST FOR ORDER
-            </h2>
-          </div>
-
-          {/* Party Information */}
-          <div className="space-y-4 bg-accent/5 p-4 rounded-lg">
-            <h3 className="font-semibold text-lg">Party Without Attorney or Attorney Information</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2 col-span-2">
-                <Label>NAME:</Label>
-                <Input
-                  value={formData.partyName || ''}
-                  onChange={(e) => updateField('partyName', e.target.value)}
-                  className="font-medium"
-                />
-              </div>
-              <div className="space-y-2 col-span-2">
-                <Label>STREET ADDRESS:</Label>
-                <Input
-                  value={formData.streetAddress || ''}
-                  onChange={(e) => updateField('streetAddress', e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>CITY:</Label>
-                <Input
-                  value={formData.city || ''}
-                  onChange={(e) => updateField('city', e.target.value)}
-                />
-              </div>
-              <div className="space-y-2 grid grid-cols-2 gap-2">
-                <div>
-                  <Label>STATE:</Label>
-                  <Input
-                    value={formData.state || ''}
-                    onChange={(e) => updateField('state', e.target.value)}
+      <ScrollArea className="h-full">
+        <div className="relative">
+          <Document
+            file="/fl320.pdf"
+            onLoadSuccess={onDocumentLoadSuccess}
+            className="flex flex-col items-center"
+          >
+            {Array.from(new Array(numPages), (el, index) => {
+              const pageNum = index + 1;
+              const pageOverlays = fieldOverlays.find(o => o.page === pageNum);
+              
+              return (
+                <div key={`page_${pageNum}`} className="relative mb-4">
+                  <Page
+                    pageNumber={pageNum}
+                    width={pageWidth}
+                    renderTextLayer={true}
+                    renderAnnotationLayer={false}
                   />
+                  
+                  {pageOverlays && (
+                    <div className="absolute inset-0 pointer-events-none">
+                      {pageOverlays.fields.map((overlay, idx) => (
+                        <div
+                          key={idx}
+                          className="absolute pointer-events-auto"
+                          style={{
+                            top: overlay.top,
+                            left: overlay.left,
+                            width: overlay.width || 'auto',
+                            height: overlay.height || 'auto',
+                          }}
+                        >
+                          {overlay.type === 'input' && (
+                            <Input
+                              value={formData[overlay.field as keyof FormData] as string || ''}
+                              onChange={(e) => updateField(overlay.field, e.target.value)}
+                              placeholder={overlay.placeholder}
+                              className="h-8 bg-white/90 border-primary/50 text-sm"
+                            />
+                          )}
+                          {overlay.type === 'textarea' && (
+                            <Textarea
+                              value={formData[overlay.field as keyof FormData] as string || ''}
+                              onChange={(e) => updateField(overlay.field, e.target.value)}
+                              placeholder={overlay.placeholder}
+                              className="bg-white/90 border-primary/50 text-sm resize-none"
+                            />
+                          )}
+                          {overlay.type === 'checkbox' && (
+                            <Checkbox
+                              checked={!!formData[overlay.field as keyof FormData]}
+                              onCheckedChange={(checked) => updateField(overlay.field, checked as boolean)}
+                              className="bg-white/90 border-2 border-primary"
+                            />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <div>
-                  <Label>ZIP:</Label>
-                  <Input
-                    value={formData.zipCode || ''}
-                    onChange={(e) => updateField('zipCode', e.target.value)}
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>TELEPHONE NO.:</Label>
-                <Input
-                  value={formData.telephoneNo || ''}
-                  onChange={(e) => updateField('telephoneNo', e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>FAX NO.:</Label>
-                <Input
-                  value={formData.faxNo || ''}
-                  onChange={(e) => updateField('faxNo', e.target.value)}
-                />
-              </div>
-              <div className="space-y-2 col-span-2">
-                <Label>E-MAIL ADDRESS:</Label>
-                <Input
-                  type="email"
-                  value={formData.email || ''}
-                  onChange={(e) => updateField('email', e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Case Information */}
-          <div className="space-y-4 bg-primary/5 p-4 rounded-lg">
-            <h3 className="font-semibold text-lg">Superior Court Information</h3>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>SUPERIOR COURT OF CALIFORNIA, COUNTY OF:</Label>
-                <Input
-                  value={formData.county || ''}
-                  onChange={(e) => updateField('county', e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>PETITIONER:</Label>
-                <Input
-                  value={formData.petitioner || ''}
-                  onChange={(e) => updateField('petitioner', e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>RESPONDENT:</Label>
-                <Input
-                  value={formData.respondent || ''}
-                  onChange={(e) => updateField('respondent', e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>CASE NUMBER:</Label>
-                <Input
-                  value={formData.caseNumber || ''}
-                  onChange={(e) => updateField('caseNumber', e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Form Sections */}
-          <div className="space-y-6">
-            {/* Section 1 */}
-            <div className="space-y-3 border-l-4 border-primary pl-4">
-              <h4 className="font-semibold">1. RESTRAINING ORDER INFORMATION</h4>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="no-orders"
-                    checked={!!formData.noOrders}
-                    onCheckedChange={(checked) => updateField('noOrders', checked as boolean)}
-                  />
-                  <Label htmlFor="no-orders">
-                    No domestic violence restraining/protective orders are now in effect
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="agree-orders"
-                    checked={!!formData.agreeOrders}
-                    onCheckedChange={(checked) => updateField('agreeOrders', checked as boolean)}
-                  />
-                  <Label htmlFor="agree-orders">
-                    I agree that one or more domestic violence restraining/protective orders are in effect
-                  </Label>
-                </div>
-              </div>
-            </div>
-
-            {/* Section 2 */}
-            <div className="space-y-3 border-l-4 border-primary pl-4">
-              <h4 className="font-semibold">2. CHILD CUSTODY VISITATION (PARENTING TIME)</h4>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="consent-custody"
-                    checked={!!formData.consentCustody}
-                    onCheckedChange={(checked) => updateField('consentCustody', checked as boolean)}
-                  />
-                  <Label htmlFor="consent-custody">
-                    I consent to the order requested for child custody
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="consent-visitation"
-                    checked={!!formData.consentVisitation}
-                    onCheckedChange={(checked) => updateField('consentVisitation', checked as boolean)}
-                  />
-                  <Label htmlFor="consent-visitation">
-                    I consent to the order requested for visitation
-                  </Label>
-                </div>
-              </div>
-            </div>
-
-            {/* Section 10 - Facts */}
-            <div className="space-y-3 border-l-4 border-accent pl-4">
-              <h4 className="font-semibold">10. FACTS TO SUPPORT MY RESPONSIVE DECLARATION</h4>
-              <p className="text-sm text-muted-foreground">
-                Cannot be longer than 10 pages, unless the court gives permission
-              </p>
-              <Textarea
-                placeholder="Enter facts supporting your responsive declaration..."
-                value={formData.facts || ''}
-                onChange={(e) => updateField('facts', e.target.value)}
-                className="min-h-[200px]"
-              />
-            </div>
-          </div>
-
-          {/* Signature Section */}
-          <div className="space-y-4 bg-muted/30 p-4 rounded-lg mt-8">
-            <p className="text-sm italic">
-              I declare under penalty of perjury under the laws of the State of California that the information provided in this form and all attachments is true and correct.
-            </p>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Date:</Label>
-                <Input 
-                  type="date"
-                  value={formData.signatureDate || ''}
-                  onChange={(e) => updateField('signatureDate', e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Signature:</Label>
-                <Input 
-                  placeholder="(TYPE OR PRINT NAME)"
-                  value={formData.signatureName || ''}
-                  onChange={(e) => updateField('signatureName', e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
+              );
+            })}
+          </Document>
         </div>
       </ScrollArea>
     </Card>
