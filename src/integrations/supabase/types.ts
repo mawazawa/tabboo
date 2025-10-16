@@ -502,6 +502,60 @@ export type Database = {
         }
         Relationships: []
       }
+      personal_info: {
+        Row: {
+          attorney_name: string | null
+          bar_number: string | null
+          city: string | null
+          created_at: string
+          email_address: string | null
+          fax_no: string | null
+          firm_name: string | null
+          full_name: string | null
+          id: string
+          state: string | null
+          street_address: string | null
+          telephone_no: string | null
+          updated_at: string
+          user_id: string
+          zip_code: string | null
+        }
+        Insert: {
+          attorney_name?: string | null
+          bar_number?: string | null
+          city?: string | null
+          created_at?: string
+          email_address?: string | null
+          fax_no?: string | null
+          firm_name?: string | null
+          full_name?: string | null
+          id?: string
+          state?: string | null
+          street_address?: string | null
+          telephone_no?: string | null
+          updated_at?: string
+          user_id: string
+          zip_code?: string | null
+        }
+        Update: {
+          attorney_name?: string | null
+          bar_number?: string | null
+          city?: string | null
+          created_at?: string
+          email_address?: string | null
+          fax_no?: string | null
+          firm_name?: string | null
+          full_name?: string | null
+          id?: string
+          state?: string | null
+          street_address?: string | null
+          telephone_no?: string | null
+          updated_at?: string
+          user_id?: string
+          zip_code?: string | null
+        }
+        Relationships: []
+      }
       refund_requests: {
         Row: {
           clerk_user_id: string
