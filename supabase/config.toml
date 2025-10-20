@@ -1,4 +1,4 @@
 project_id = "sbwgkocarqvonkdlitdx"
 
 [functions.ai-form-assistant]
-verify_jwt = false
+verify_jwt = true

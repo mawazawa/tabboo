@@ -7,6 +7,7 @@ import { Send, Loader2 } from "lucide-react";
 import { useAIStream } from "@/hooks/useAIStream";
 import { toast } from "sonner";
 import aiAssistant from "@/assets/ai-assistant.png";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -42,9 +43,15 @@ export const AIAssistant = () => {
 
     setMessages(prev => [...prev, tempAssistantMessage]);
 
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast.error("Please log in to use AI assistant");
+      setMessages(prev => prev.slice(0, -1));
+      return;
+    }
+
     await streamChat({
       messages: [...messages, userMessage],
-      userId: 'demo-user', // In production, use actual user ID from auth
       onDelta: (chunk) => {
         assistantContent += chunk;
         setMessages(prev => {

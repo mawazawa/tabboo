@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -12,13 +13,11 @@ export const useAIStream = () => {
 
   const streamChat = useCallback(async ({
     messages,
-    userId,
     onDelta,
     onDone,
     onError,
   }: {
     messages: Message[];
-    userId: string;
     onDelta: (deltaText: string) => void;
     onDone: () => void;
     onError?: (error: string) => void;
@@ -26,13 +25,18 @@ export const useAIStream = () => {
     setIsLoading(true);
     
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('No active session');
+      }
+
       const resp = await fetch(CHAT_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          'Authorization': `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ messages, userId }),
+        body: JSON.stringify({ messages }),
       });
 
       if (!resp.ok) {

@@ -2,8 +2,9 @@ import { FormViewer } from "@/components/FormViewer";
 import { FieldNavigationPanel } from "@/components/FieldNavigationPanel";
 import { AIAssistant } from "@/components/AIAssistant";
 import { PersonalDataVault } from "@/components/PersonalDataVault";
-import { FileText, MessageSquare } from "lucide-react";
+import { FileText, MessageSquare, LogOut, Loader2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -40,6 +41,9 @@ interface FormData {
 }
 
 const Index = () => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState<FormData>({});
   const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
   const [fieldPositions, setFieldPositions] = useState<Record<string, { top: number; left: number }>>({});
@@ -57,11 +61,34 @@ const Index = () => {
     hasUnsavedChanges.current = true;
   };
 
-  // Load existing data on mount
+  // Check authentication
   useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setUser(session.user);
+        setLoading(false);
+      } else {
+        navigate("/auth");
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser(session.user);
+        setLoading(false);
+      } else {
+        navigate("/auth");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  // Load existing data when user is authenticated
+  useEffect(() => {
+    if (!user) return;
+
     const loadData = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
 
       const { data, error } = await supabase
         .from('legal_documents')
@@ -93,10 +120,12 @@ const Index = () => {
     };
 
     loadData();
-  }, []);
+  }, [user]);
 
   // Autosave every 5 seconds
   useEffect(() => {
+    if (!user) return;
+
     const saveData = async () => {
       if (!documentId || !hasUnsavedChanges.current) return;
 
@@ -116,7 +145,20 @@ const Index = () => {
 
     const interval = setInterval(saveData, 5000);
     return () => clearInterval(interval);
-  }, [formData, fieldPositions, documentId]);
+  }, [formData, fieldPositions, documentId, user]);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth");
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
@@ -155,7 +197,11 @@ const Index = () => {
                   </div>
                 </SheetContent>
               </Sheet>
-              <PersonalDataVault />
+              <PersonalDataVault userId={user?.id || ''} />
+              <Button variant="outline" size="sm" onClick={handleLogout} className="gap-2">
+                <LogOut className="h-4 w-4" />
+                Logout
+              </Button>
             </div>
           </div>
         </div>

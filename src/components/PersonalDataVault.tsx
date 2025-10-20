@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,26 +10,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Shield, Save } from "lucide-react";
+import { Shield, Save, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { personalInfoSchema, type PersonalInfoFormData } from "@/lib/validations";
 
-interface PersonalInfo {
-  full_name: string;
-  street_address: string;
-  city: string;
-  state: string;
-  zip_code: string;
-  telephone_no: string;
-  fax_no: string;
-  email_address: string;
-  attorney_name: string;
-  firm_name: string;
-  bar_number: string;
+interface PersonalDataVaultProps {
+  userId: string;
 }
 
-export const PersonalDataVault = () => {
+export const PersonalDataVault = ({ userId }: PersonalDataVaultProps) => {
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState<PersonalInfo>({
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState<PersonalInfoFormData>({
     full_name: '',
     street_address: '',
     city: '',
@@ -43,14 +36,75 @@ export const PersonalDataVault = () => {
     bar_number: '',
   });
 
-  const handleSave = () => {
-    // In production, save to Supabase
-    console.log('Saving to vault:', formData);
-    toast.success('Personal information saved securely!');
-    setOpen(false);
+  useEffect(() => {
+    if (open && userId) {
+      loadPersonalInfo();
+    }
+  }, [open, userId]);
+
+  const loadPersonalInfo = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('personal_info')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error) throw error;
+      if (data) {
+        setFormData({
+          full_name: data.full_name || '',
+          street_address: data.street_address || '',
+          city: data.city || '',
+          state: data.state || 'CA',
+          zip_code: data.zip_code || '',
+          telephone_no: data.telephone_no || '',
+          fax_no: data.fax_no || '',
+          email_address: data.email_address || '',
+          attorney_name: data.attorney_name || '',
+          firm_name: data.firm_name || '',
+          bar_number: data.bar_number || '',
+        });
+      }
+    } catch (error: any) {
+      toast.error("Failed to load personal information");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const updateField = (field: keyof PersonalInfo, value: string) => {
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      // Validate input
+      const validatedData = personalInfoSchema.parse(formData);
+
+      const { error } = await supabase
+        .from('personal_info')
+        .upsert({
+          user_id: userId,
+          ...validatedData,
+        });
+
+      if (error) throw error;
+      toast.success('Personal information saved securely!');
+      setOpen(false);
+    } catch (error: any) {
+      if (error.errors) {
+        // Zod validation errors
+        error.errors.forEach((err: any) => {
+          toast.error(err.message);
+        });
+      } else {
+        toast.error(error.message || "Failed to save personal information");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateField = (field: keyof PersonalInfoFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -188,8 +242,8 @@ export const PersonalDataVault = () => {
             </div>
           </div>
 
-          <Button onClick={handleSave} className="w-full gap-2 bg-gradient-to-r from-primary to-accent">
-            <Save className="w-4 h-4" />
+          <Button onClick={handleSave} className="w-full gap-2 bg-gradient-to-r from-primary to-accent" disabled={loading}>
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Save to Secure Vault
           </Button>
         </div>
