@@ -112,14 +112,14 @@ export const PersonalDataVault = ({ userId }: PersonalDataVaultProps) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="gap-2 border-2 shadow-soft">
-          <Shield className="w-4 h-4" />
+          <Shield className="w-4 h-4" strokeWidth={0.5} />
           Personal Data Vault
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
-            <Shield className="w-5 h-5 text-primary" />
+            <Shield className="w-5 h-5 text-primary" strokeWidth={0.5} />
             Personal Data Vault
           </DialogTitle>
           <DialogDescription>
@@ -243,7 +243,7 @@ export const PersonalDataVault = ({ userId }: PersonalDataVaultProps) => {
           </div>
 
           <Button onClick={handleSave} className="w-full gap-2 bg-gradient-to-r from-primary to-accent" disabled={loading}>
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" strokeWidth={0.5} /> : <Save className="w-4 h-4" strokeWidth={0.5} />}
             Save to Secure Vault
           </Button>
         </div>

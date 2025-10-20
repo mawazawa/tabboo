@@ -67,7 +67,7 @@ export default function Auth() {
       <Card className="w-full max-w-md border-2 shadow-medium">
         <CardHeader className="space-y-1 text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <Scale className="w-8 h-8 text-primary" />
+            <Scale className="w-8 h-8 text-primary" strokeWidth={0.5} />
             <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               SwiftFill Pro
             </h1>
@@ -107,7 +107,7 @@ export default function Auth() {
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" strokeWidth={0.5} />
                   Please wait...
                 </>
               ) : (

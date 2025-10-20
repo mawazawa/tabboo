@@ -215,7 +215,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                                   variant="default"
                                   className="settings-button absolute -top-2 -right-2 h-6 w-6 rounded-full shadow-lg"
                                 >
-                                  <Settings className="h-3 w-3" />
+                                  <Settings className="h-3 w-3" strokeWidth={0.5} />
                                 </Button>
                               </PopoverTrigger>
                               <PopoverContent className="w-80">

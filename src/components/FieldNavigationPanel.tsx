@@ -238,7 +238,7 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
             disabled={currentFieldIndex === 0}
             className="flex-1"
           >
-            <ChevronUp className="h-4 w-4 mr-1" />
+            <ChevronUp className="h-4 w-4 mr-1" strokeWidth={0.5} />
             Previous
           </Button>
           <Button
@@ -249,7 +249,7 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
             className="flex-1"
           >
             Next
-            <ChevronDown className="h-4 w-4 ml-1" />
+            <ChevronDown className="h-4 w-4 ml-1" strokeWidth={0.5} />
           </Button>
         </div>
 
@@ -301,7 +301,7 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
                         className="h-6 px-2 text-xs gap-1"
                         title="Copy from vault"
                       >
-                        <Copy className="h-3 w-3" />
+                        <Copy className="h-3 w-3" strokeWidth={0.5} />
                         Copy
                       </Button>
                     )}
@@ -319,7 +319,7 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
                           className="h-6 w-6 p-0"
                           title="Adjust position"
                         >
-                          <Settings className="h-3 w-3" />
+                          <Settings className="h-3 w-3" strokeWidth={0.5} />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-48 p-3" side="left" align="start">
@@ -360,7 +360,7 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
                             onClick={() => adjustPosition('up', config.field)}
                             className="h-7 px-1"
                           >
-                            <ChevronUp className="h-3 w-3" />
+                            <ChevronUp className="h-3 w-3" strokeWidth={0.5} />
                           </Button>
                           <div></div>
                           <Button
@@ -369,7 +369,7 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
                             onClick={() => adjustPosition('left', config.field)}
                             className="h-7 px-1"
                           >
-                            <ChevronLeft className="h-3 w-3" />
+                            <ChevronLeft className="h-3 w-3" strokeWidth={0.5} />
                           </Button>
                           <Button
                             size="sm"
@@ -377,7 +377,7 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
                             onClick={() => adjustPosition('down', config.field)}
                             className="h-7 px-1"
                           >
-                            <ChevronDown className="h-3 w-3" />
+                            <ChevronDown className="h-3 w-3" strokeWidth={0.5} />
                           </Button>
                           <Button
                             size="sm"
@@ -385,7 +385,7 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
                             onClick={() => adjustPosition('right', config.field)}
                             className="h-7 px-1"
                           >
-                            <ChevronRight className="h-3 w-3" />
+                            <ChevronRight className="h-3 w-3" strokeWidth={0.5} />
                           </Button>
                         </div>
                       </PopoverContent>

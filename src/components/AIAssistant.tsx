@@ -102,7 +102,7 @@ export const AIAssistant = ({ formContext }: AIAssistantProps) => {
             {isLoading && (
               <div className="flex justify-start">
                 <div className="bg-card border-2 rounded-2xl px-4 py-3 shadow-soft">
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" strokeWidth={0.5} />
                 </div>
               </div>
             )}
@@ -124,7 +124,7 @@ export const AIAssistant = ({ formContext }: AIAssistantProps) => {
               size="icon"
               className="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-4 h-4" strokeWidth={0.5} />
             </Button>
           </div>
         </div>

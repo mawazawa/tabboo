@@ -166,7 +166,7 @@ const Index = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" strokeWidth={0.5} />
       </div>
     );
   }
@@ -179,7 +179,7 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-glow">
-                <FileText className="w-6 h-6 text-primary-foreground" />
+                <FileText className="w-6 h-6 text-primary-foreground" strokeWidth={0.5} />
               </div>
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
@@ -200,7 +200,7 @@ const Index = () => {
                             onClick={() => navigate("/distribution-calculator")}
                             className="flex items-start gap-3 p-3 rounded-lg hover:bg-accent transition-colors text-left"
                           >
-                            <Calculator className="h-5 w-5 mt-0.5 text-primary" />
+                            <Calculator className="h-5 w-5 mt-0.5 text-primary" strokeWidth={0.5} />
                             <div>
                               <div className="font-medium mb-1">Distribution Calculator</div>
                               <p className="text-sm text-muted-foreground">
@@ -214,7 +214,7 @@ const Index = () => {
                             onClick={() => navigate("/")}
                             className="flex items-start gap-3 p-3 rounded-lg hover:bg-accent transition-colors text-left"
                           >
-                            <FileText className="h-5 w-5 mt-0.5 text-primary" />
+                            <FileText className="h-5 w-5 mt-0.5 text-primary" strokeWidth={0.5} />
                             <div>
                               <div className="font-medium mb-1">Form Filler (FL-320)</div>
                               <p className="text-sm text-muted-foreground">
@@ -235,7 +235,7 @@ const Index = () => {
                 className="gap-2"
                 onClick={() => setShowAIPanel(!showAIPanel)}
               >
-                <MessageSquare className="h-4 w-4" />
+                <MessageSquare className="h-4 w-4" strokeWidth={0.5} />
                 AI Assistant
               </Button>
               
@@ -245,12 +245,12 @@ const Index = () => {
                 className="gap-2"
                 onClick={() => setShowFieldsPanel(!showFieldsPanel)}
               >
-                <PanelRightClose className="h-4 w-4" />
+                <PanelRightClose className="h-4 w-4" strokeWidth={0.5} />
                 Fields
               </Button>
               <PersonalDataVault userId={user?.id || ''} />
               <Button variant="outline" size="sm" onClick={handleLogout} className="gap-2">
-                <LogOut className="h-4 w-4" />
+                <LogOut className="h-4 w-4" strokeWidth={0.5} />
                 Logout
               </Button>
             </div>
