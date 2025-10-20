@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useState, useRef } from "react";
 import { Document, Page, pdfjs } from 'react-pdf';
-import { Settings } from "lucide-react";
+import { Settings, Move } from "lucide-react";
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
@@ -60,6 +60,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
   const [numPages, setNumPages] = useState<number>(0);
   const [pageWidth, setPageWidth] = useState<number>(850);
   const [isDragging, setIsDragging] = useState<string | null>(null);
+  const [editModeField, setEditModeField] = useState<string | null>(null);
   const dragStartPos = useRef<{ x: number; y: number; top: number; left: number }>({ x: 0, y: 0, top: 0, left: 0 });
 
   // Map field names to indices
@@ -75,6 +76,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
   };
 
   const handleMouseDown = (e: React.MouseEvent, field: string, currentTop: number, currentLeft: number) => {
+    // Only allow drag if field is in edit mode
+    if (editModeField !== field) return;
+    
     // Prevent drag if clicking on settings button or input fields
     const target = e.target as HTMLElement;
     if (target.closest('.settings-button') || target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
@@ -87,6 +91,10 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
       top: currentTop,
       left: currentLeft
     };
+  };
+
+  const toggleEditMode = (field: string) => {
+    setEditModeField(editModeField === field ? null : field);
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -114,6 +122,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
   const handlePDFClick = (e: React.MouseEvent) => {
     // Only deselect if clicking directly on the PDF container, not on input fields
     if ((e.target as HTMLElement).closest('.field-container')) return;
+    setEditModeField(null);
     if (deselectField) {
       deselectField();
     }
@@ -184,17 +193,21 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                         };
                         
                         const isCurrentField = fieldNameToIndex[overlay.field] === currentFieldIndex;
+                        const isEditMode = editModeField === overlay.field;
                         
                           return (
                           <div
                             key={idx}
                             className={`field-container absolute pointer-events-auto select-none ${
-                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary opacity-80' : 'cursor-grab'
+                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary opacity-80' : 
+                              isEditMode ? 'cursor-grab ring-4 ring-green-600 shadow-xl' : 'cursor-default'
                             } ${
+                              isEditMode 
+                                ? 'ring-4 ring-green-600 shadow-xl bg-green-600/10' :
                               isCurrentField 
                                 ? 'ring-4 ring-primary shadow-lg' 
                                 : 'hover:ring-2 hover:ring-primary/50'
-                            } rounded transition-shadow`}
+                            } rounded transition-all`}
                             style={{
                               top: `${position.top}%`,
                               left: `${position.left}%`,
@@ -203,30 +216,33 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                             }}
                             onMouseDown={(e) => handleMouseDown(e, overlay.field, position.top, position.left)}
                           >
-                            {isCurrentField && (
+                            {isCurrentField && !isEditMode && (
                               <div className="absolute -top-8 left-0 bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium shadow-lg whitespace-nowrap">
                                 {overlay.placeholder || overlay.field}
                               </div>
                             )}
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <Button
-                                  size="icon"
-                                  variant="default"
-                                  className="settings-button absolute -top-2 -right-2 h-6 w-6 rounded-full shadow-lg"
-                                >
-                                  <Settings className="h-3 w-3" strokeWidth={0.5} />
-                                </Button>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-80">
-                                <div className="space-y-2">
-                                  <h4 className="text-sm font-semibold">Field Position</h4>
-                                  <p className="text-xs text-muted-foreground">
-                                    Use the controls in the right panel to adjust the position.
-                                  </p>
-                                </div>
-                              </PopoverContent>
-                            </Popover>
+                            {isEditMode && (
+                              <div className="absolute -top-8 left-0 bg-green-600 text-white px-2 py-1 rounded text-xs font-medium shadow-lg whitespace-nowrap">
+                                Edit Mode: {overlay.placeholder || overlay.field}
+                              </div>
+                            )}
+                            <Button
+                              size="icon"
+                              variant={isEditMode ? "default" : "default"}
+                              className={`settings-button absolute -top-2 -right-2 h-6 w-6 rounded-full shadow-lg ${
+                                isEditMode ? 'bg-green-600 hover:bg-green-700' : ''
+                              }`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleEditMode(overlay.field);
+                              }}
+                            >
+                              {isEditMode ? (
+                                <Move className="h-3 w-3" strokeWidth={0.5} />
+                              ) : (
+                                <Settings className="h-3 w-3" strokeWidth={0.5} />
+                              )}
+                            </Button>
                             
                             {overlay.type === 'input' && (
                               <Input
@@ -235,6 +251,8 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                                 placeholder={overlay.placeholder}
                                 onMouseDown={(e) => e.stopPropagation()}
                                 className={`h-8 text-sm pointer-events-auto ${
+                                  isEditMode
+                                    ? 'bg-green-600/10 border-green-600 border-2' :
                                   isCurrentField 
                                     ? 'bg-primary/10 border-primary border-2' 
                                     : 'bg-white/90 border-primary/50'
@@ -248,6 +266,8 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                                 placeholder={overlay.placeholder}
                                 onMouseDown={(e) => e.stopPropagation()}
                                 className={`text-sm resize-none pointer-events-auto ${
+                                  isEditMode
+                                    ? 'bg-green-600/10 border-green-600 border-2' :
                                   isCurrentField 
                                     ? 'bg-primary/10 border-primary border-2' 
                                     : 'bg-white/90 border-primary/50'
@@ -259,6 +279,8 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                                 checked={!!formData[overlay.field as keyof FormData]}
                                 onCheckedChange={(checked) => updateField(overlay.field, checked as boolean)}
                                 className={`border-2 pointer-events-auto ${
+                                  isEditMode
+                                    ? 'bg-green-600/10 border-green-600' :
                                   isCurrentField 
                                     ? 'bg-primary/10 border-primary' 
                                     : 'bg-white/90 border-primary'
