@@ -1,9 +1,40 @@
 import { FormViewer } from "@/components/FormViewer";
+import { FormFieldsPanel } from "@/components/FormFieldsPanel";
 import { AIAssistant } from "@/components/AIAssistant";
 import { PersonalDataVault } from "@/components/PersonalDataVault";
 import { FileText, Sparkles } from "lucide-react";
+import { useState } from "react";
+
+interface FormData {
+  partyName?: string;
+  streetAddress?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  telephoneNo?: string;
+  faxNo?: string;
+  email?: string;
+  attorneyFor?: string;
+  county?: string;
+  petitioner?: string;
+  respondent?: string;
+  caseNumber?: string;
+  facts?: string;
+  signatureDate?: string;
+  signatureName?: string;
+  noOrders?: boolean;
+  agreeOrders?: boolean;
+  consentCustody?: boolean;
+  consentVisitation?: boolean;
+}
 
 const Index = () => {
+  const [formData, setFormData] = useState<FormData>({});
+
+  const updateField = (field: string, value: string | boolean) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       {/* Header */}
@@ -32,12 +63,17 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Main Content - Split Screen */}
+      {/* Main Content - Three Column Layout */}
       <main className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-140px)]">
-          {/* Left: Form Viewer */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-140px)]">
+          {/* Left: Form Viewer with PDF */}
           <div className="min-h-[600px] lg:min-h-0">
-            <FormViewer />
+            <FormViewer formData={formData} updateField={updateField} />
+          </div>
+
+          {/* Middle: Form Fields Panel */}
+          <div className="min-h-[600px] lg:min-h-0">
+            <FormFieldsPanel formData={formData} updateField={updateField} />
           </div>
 
           {/* Right: AI Assistant */}

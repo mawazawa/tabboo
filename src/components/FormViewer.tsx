@@ -3,8 +3,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useState, useRef } from "react";
 import { Document, Page, pdfjs } from 'react-pdf';
+import { Settings } from "lucide-react";
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
@@ -34,21 +37,71 @@ interface FormData {
   consentVisitation?: boolean;
 }
 
-export const FormViewer = () => {
-  const [formData, setFormData] = useState<FormData>({});
+interface FieldOverlay {
+  type: 'input' | 'textarea' | 'checkbox';
+  field: string;
+  top: string;
+  left: string;
+  width?: string;
+  height?: string;
+  placeholder?: string;
+}
+
+interface Props {
+  formData: FormData;
+  updateField: (field: string, value: string | boolean) => void;
+}
+
+export const FormViewer = ({ formData, updateField }: Props) => {
   const [numPages, setNumPages] = useState<number>(0);
   const [pageWidth, setPageWidth] = useState<number>(850);
-
-  const updateField = (field: string, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  const [fieldPositions, setFieldPositions] = useState<Record<string, { top: string; left: string; width?: string; height?: string }>>({});
+  const [isDragging, setIsDragging] = useState<string | null>(null);
+  const dragStartPos = useRef<{ x: number; y: number; top: number; left: number }>({ x: 0, y: 0, top: 0, left: 0 });
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
   };
 
+  const updateFieldPosition = (field: string, position: { top?: string; left?: string; width?: string; height?: string }) => {
+    setFieldPositions(prev => ({
+      ...prev,
+      [field]: { ...prev[field], ...position }
+    }));
+  };
+
+  const handleMouseDown = (e: React.MouseEvent, field: string, currentTop: string, currentLeft: string) => {
+    if ((e.target as HTMLElement).closest('.settings-button')) return;
+    setIsDragging(field);
+    dragStartPos.current = {
+      x: e.clientX,
+      y: e.clientY,
+      top: parseFloat(currentTop),
+      left: parseFloat(currentLeft)
+    };
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    const deltaX = e.clientX - dragStartPos.current.x;
+    const deltaY = e.clientY - dragStartPos.current.y;
+    const parentRect = e.currentTarget.getBoundingClientRect();
+    
+    const newLeft = dragStartPos.current.left + (deltaX / parentRect.width) * 100;
+    const newTop = dragStartPos.current.top + (deltaY / parentRect.height) * 100;
+    
+    updateFieldPosition(isDragging, {
+      top: `${newTop}%`,
+      left: `${newLeft}%`
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(null);
+  };
+
   // Form field overlay positions (adjust these based on actual PDF coordinates)
-  const fieldOverlays = [
+  const fieldOverlays: { page: number; fields: FieldOverlay[] }[] = [
     {
       page: 1,
       fields: [
@@ -90,7 +143,13 @@ export const FormViewer = () => {
               const pageOverlays = fieldOverlays.find(o => o.page === pageNum);
               
               return (
-                <div key={`page_${pageNum}`} className="relative mb-4">
+                <div 
+                  key={`page_${pageNum}`} 
+                  className="relative mb-4"
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}
+                >
                   <Page
                     pageNumber={pageNum}
                     width={pageWidth}
@@ -100,42 +159,115 @@ export const FormViewer = () => {
                   
                   {pageOverlays && (
                     <div className="absolute inset-0 pointer-events-none">
-                      {pageOverlays.fields.map((overlay, idx) => (
-                        <div
-                          key={idx}
-                          className="absolute pointer-events-auto"
-                          style={{
-                            top: overlay.top,
-                            left: overlay.left,
-                            width: overlay.width || 'auto',
-                            height: overlay.height || 'auto',
-                          }}
-                        >
-                          {overlay.type === 'input' && (
-                            <Input
-                              value={formData[overlay.field as keyof FormData] as string || ''}
-                              onChange={(e) => updateField(overlay.field, e.target.value)}
-                              placeholder={overlay.placeholder}
-                              className="h-8 bg-white/90 border-primary/50 text-sm"
-                            />
-                          )}
-                          {overlay.type === 'textarea' && (
-                            <Textarea
-                              value={formData[overlay.field as keyof FormData] as string || ''}
-                              onChange={(e) => updateField(overlay.field, e.target.value)}
-                              placeholder={overlay.placeholder}
-                              className="bg-white/90 border-primary/50 text-sm resize-none"
-                            />
-                          )}
-                          {overlay.type === 'checkbox' && (
-                            <Checkbox
-                              checked={!!formData[overlay.field as keyof FormData]}
-                              onCheckedChange={(checked) => updateField(overlay.field, checked as boolean)}
-                              className="bg-white/90 border-2 border-primary"
-                            />
-                          )}
-                        </div>
-                      ))}
+                      {pageOverlays.fields.map((overlay, idx) => {
+                        const position = fieldPositions[overlay.field] || {
+                          top: overlay.top,
+                          left: overlay.left,
+                          width: overlay.width,
+                          height: overlay.height
+                        };
+                        
+                        return (
+                          <div
+                            key={idx}
+                            className={`absolute pointer-events-auto group ${isDragging === overlay.field ? 'cursor-grabbing z-50' : 'cursor-grab'} hover:ring-2 hover:ring-primary/50 rounded`}
+                            style={{
+                              top: position.top,
+                              left: position.left,
+                              width: position.width || 'auto',
+                              height: position.height || 'auto',
+                            }}
+                            onMouseDown={(e) => handleMouseDown(e, overlay.field, position.top, position.left)}
+                          >
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="settings-button absolute -top-8 -right-8 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity bg-primary text-primary-foreground hover:bg-primary/90 z-10"
+                                >
+                                  <Settings className="h-3 w-3" />
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-80 bg-background">
+                                <div className="space-y-4">
+                                  <h4 className="font-semibold text-sm">Adjust Position</h4>
+                                  <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                      <label className="text-xs text-muted-foreground">Top (%)</label>
+                                      <Input
+                                        type="number"
+                                        step="0.1"
+                                        value={parseFloat(position.top)}
+                                        onChange={(e) => updateFieldPosition(overlay.field, { top: `${e.target.value}%` })}
+                                        className="h-8 text-xs"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-xs text-muted-foreground">Left (%)</label>
+                                      <Input
+                                        type="number"
+                                        step="0.1"
+                                        value={parseFloat(position.left)}
+                                        onChange={(e) => updateFieldPosition(overlay.field, { left: `${e.target.value}%` })}
+                                        className="h-8 text-xs"
+                                      />
+                                    </div>
+                                    {position.width && (
+                                      <div>
+                                        <label className="text-xs text-muted-foreground">Width (%)</label>
+                                        <Input
+                                          type="number"
+                                          step="0.1"
+                                          value={parseFloat(position.width)}
+                                          onChange={(e) => updateFieldPosition(overlay.field, { width: `${e.target.value}%` })}
+                                          className="h-8 text-xs"
+                                        />
+                                      </div>
+                                    )}
+                                    {position.height && (
+                                      <div>
+                                        <label className="text-xs text-muted-foreground">Height (%)</label>
+                                        <Input
+                                          type="number"
+                                          step="0.1"
+                                          value={parseFloat(position.height)}
+                                          onChange={(e) => updateFieldPosition(overlay.field, { height: `${e.target.value}%` })}
+                                          className="h-8 text-xs"
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </PopoverContent>
+                            </Popover>
+                            
+                            {overlay.type === 'input' && (
+                              <Input
+                                value={formData[overlay.field as keyof FormData] as string || ''}
+                                onChange={(e) => updateField(overlay.field, e.target.value)}
+                                placeholder={overlay.placeholder}
+                                className="h-8 bg-white/90 border-primary/50 text-sm pointer-events-auto"
+                              />
+                            )}
+                            {overlay.type === 'textarea' && (
+                              <Textarea
+                                value={formData[overlay.field as keyof FormData] as string || ''}
+                                onChange={(e) => updateField(overlay.field, e.target.value)}
+                                placeholder={overlay.placeholder}
+                                className="bg-white/90 border-primary/50 text-sm resize-none pointer-events-auto"
+                              />
+                            )}
+                            {overlay.type === 'checkbox' && (
+                              <Checkbox
+                                checked={!!formData[overlay.field as keyof FormData]}
+                                onCheckedChange={(checked) => updateField(overlay.field, checked as boolean)}
+                                className="bg-white/90 border-2 border-primary pointer-events-auto"
+                              />
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
