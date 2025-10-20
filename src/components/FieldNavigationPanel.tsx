@@ -5,8 +5,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Copy } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
 interface FormData {
   partyName?: string;
@@ -36,6 +39,7 @@ interface FieldConfig {
   label: string;
   type: 'input' | 'textarea' | 'checkbox';
   placeholder?: string;
+  vaultField?: string; // Maps to personal_info column
 }
 
 interface Props {
@@ -46,15 +50,15 @@ interface Props {
 }
 
 const FIELD_CONFIG: FieldConfig[] = [
-  { field: 'partyName', label: 'Name', type: 'input', placeholder: 'Full name' },
-  { field: 'streetAddress', label: 'Street Address', type: 'input', placeholder: 'Street address' },
-  { field: 'city', label: 'City', type: 'input', placeholder: 'City' },
-  { field: 'state', label: 'State', type: 'input', placeholder: 'CA' },
-  { field: 'zipCode', label: 'ZIP Code', type: 'input', placeholder: 'ZIP code' },
-  { field: 'telephoneNo', label: 'Telephone', type: 'input', placeholder: 'Phone number' },
-  { field: 'faxNo', label: 'Fax', type: 'input', placeholder: 'Fax number' },
-  { field: 'email', label: 'Email', type: 'input', placeholder: 'Email address' },
-  { field: 'attorneyFor', label: 'Attorney For', type: 'input', placeholder: 'Attorney for' },
+  { field: 'partyName', label: 'Name', type: 'input', placeholder: 'Full name', vaultField: 'full_name' },
+  { field: 'streetAddress', label: 'Street Address', type: 'input', placeholder: 'Street address', vaultField: 'street_address' },
+  { field: 'city', label: 'City', type: 'input', placeholder: 'City', vaultField: 'city' },
+  { field: 'state', label: 'State', type: 'input', placeholder: 'CA', vaultField: 'state' },
+  { field: 'zipCode', label: 'ZIP Code', type: 'input', placeholder: 'ZIP code', vaultField: 'zip_code' },
+  { field: 'telephoneNo', label: 'Telephone', type: 'input', placeholder: 'Phone number', vaultField: 'telephone_no' },
+  { field: 'faxNo', label: 'Fax', type: 'input', placeholder: 'Fax number', vaultField: 'fax_no' },
+  { field: 'email', label: 'Email', type: 'input', placeholder: 'Email address', vaultField: 'email_address' },
+  { field: 'attorneyFor', label: 'Attorney For', type: 'input', placeholder: 'Attorney for', vaultField: 'attorney_name' },
   { field: 'county', label: 'County', type: 'input', placeholder: 'County' },
   { field: 'petitioner', label: 'Petitioner', type: 'input', placeholder: 'Petitioner name' },
   { field: 'respondent', label: 'Respondent', type: 'input', placeholder: 'Respondent name' },
@@ -65,11 +69,34 @@ const FIELD_CONFIG: FieldConfig[] = [
   { field: 'consentVisitation', label: 'Consent to visitation', type: 'checkbox' },
   { field: 'facts', label: 'Facts', type: 'textarea', placeholder: 'Enter facts and details' },
   { field: 'signatureDate', label: 'Date', type: 'input', placeholder: 'Date' },
-  { field: 'signatureName', label: 'Signature Name', type: 'input', placeholder: 'Your name' },
+  { field: 'signatureName', label: 'Signature Name', type: 'input', placeholder: 'Your name', vaultField: 'full_name' },
 ];
 
 export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex }: Props) => {
   const fieldRefs = useRef<(HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | null)[]>([]);
+  const { toast } = useToast();
+
+  // Fetch personal info from vault
+  const { data: personalInfo } = useQuery({
+    queryKey: ['personal-info'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data, error } = await supabase
+        .from('personal_info')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching personal info:', error);
+        return null;
+      }
+      
+      return data;
+    },
+  });
 
   useEffect(() => {
     // Focus the current field when index changes
@@ -79,6 +106,19 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
       currentRef.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }, [currentFieldIndex]);
+
+  const copyFromVault = (config: FieldConfig) => {
+    if (!config.vaultField || !personalInfo) return;
+    
+    const vaultValue = personalInfo[config.vaultField as keyof typeof personalInfo];
+    if (vaultValue) {
+      updateField(config.field, vaultValue);
+      toast({
+        title: "Copied from vault",
+        description: `${config.label} filled with saved data`,
+      });
+    }
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
     if (e.key === 'Tab') {
@@ -147,17 +187,41 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
                 }`}
                 onClick={() => setCurrentFieldIndex(index)}
               >
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                   <Label 
                     htmlFor={config.field} 
                     className={`text-xs font-medium ${isActive ? 'text-primary' : 'text-muted-foreground'}`}
                   >
                     {index + 1}. {config.label}
                   </Label>
-                  {isActive && (
-                    <span className="text-xs font-semibold text-primary">Active</span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {config.vaultField && personalInfo && personalInfo[config.vaultField as keyof typeof personalInfo] && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          copyFromVault(config);
+                        }}
+                        className="h-6 px-2 text-xs gap-1"
+                        title="Copy from vault"
+                      >
+                        <Copy className="h-3 w-3" />
+                        Copy
+                      </Button>
+                    )}
+                    {isActive && (
+                      <span className="text-xs font-semibold text-primary">Active</span>
+                    )}
+                  </div>
                 </div>
+                
+                {/* Show vault data preview if available */}
+                {config.vaultField && personalInfo && personalInfo[config.vaultField as keyof typeof personalInfo] && (
+                  <div className="text-xs text-muted-foreground bg-muted/50 rounded px-2 py-1 font-mono truncate">
+                    Saved: {personalInfo[config.vaultField as keyof typeof personalInfo]}
+                  </div>
+                )}
 
                 {config.type === 'input' && (
                   <Input
