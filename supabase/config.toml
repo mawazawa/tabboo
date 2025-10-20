@@ -2,3 +2,6 @@ project_id = "sbwgkocarqvonkdlitdx"
 
 [functions.ai-form-assistant]
 verify_jwt = true
+
+[functions.groq-chat]
+verify_jwt = false

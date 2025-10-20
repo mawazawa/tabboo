@@ -2,12 +2,13 @@ import { FormViewer } from "@/components/FormViewer";
 import { FieldNavigationPanel } from "@/components/FieldNavigationPanel";
 import { AIAssistant } from "@/components/AIAssistant";
 import { PersonalDataVault } from "@/components/PersonalDataVault";
-import { FileText, MessageSquare, LogOut, Loader2, Calculator } from "lucide-react";
+import { FileText, MessageSquare, LogOut, Loader2, Calculator, PanelLeftClose, PanelRightClose } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import {
   Sheet,
   SheetContent,
@@ -56,6 +57,8 @@ const Index = () => {
   const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
   const [fieldPositions, setFieldPositions] = useState<Record<string, { top: number; left: number }>>({});
   const [documentId, setDocumentId] = useState<string | null>(null);
+  const [showAIPanel, setShowAIPanel] = useState(false);
+  const [showFieldsPanel, setShowFieldsPanel] = useState(true);
   const { toast } = useToast();
   const hasUnsavedChanges = useRef(false);
 
@@ -226,25 +229,25 @@ const Index = () => {
                 </NavigationMenuList>
               </NavigationMenu>
 
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <MessageSquare className="h-4 w-4" />
-                    AI Assistant
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="right" className="w-[400px] sm:w-[540px]">
-                  <SheetHeader>
-                    <SheetTitle>AI Form Assistant</SheetTitle>
-                    <SheetDescription>
-                      Get help filling out your FL-320 form
-                    </SheetDescription>
-                  </SheetHeader>
-                  <div className="mt-6 h-[calc(100vh-120px)]">
-                    <AIAssistant />
-                  </div>
-                </SheetContent>
-              </Sheet>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="gap-2"
+                onClick={() => setShowAIPanel(!showAIPanel)}
+              >
+                <MessageSquare className="h-4 w-4" />
+                AI Assistant
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="gap-2"
+                onClick={() => setShowFieldsPanel(!showFieldsPanel)}
+              >
+                <PanelRightClose className="h-4 w-4" />
+                Fields
+              </Button>
               <PersonalDataVault userId={user?.id || ''} />
               <Button variant="outline" size="sm" onClick={handleLogout} className="gap-2">
                 <LogOut className="h-4 w-4" />
@@ -255,32 +258,53 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Main Content - DocuSign-style Layout */}
+      {/* Main Content with Resizable Panels */}
       <main className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr,320px] gap-6 h-[calc(100vh-140px)]">
-          {/* Left: Form Viewer with PDF */}
-          <div className="min-h-[600px] lg:min-h-0">
-            <FormViewer 
-              formData={formData} 
-              updateField={updateField}
-              currentFieldIndex={currentFieldIndex}
-              fieldPositions={fieldPositions}
-              updateFieldPosition={updateFieldPosition}
-            />
-          </div>
+        <ResizablePanelGroup direction="horizontal" className="h-[calc(100vh-140px)] w-full">
+          {/* Left: AI Assistant Panel (collapsible) */}
+          {showAIPanel && (
+            <>
+              <ResizablePanel defaultSize={25} minSize={20} maxSize={35}>
+                <div className="h-full pr-3">
+                  <AIAssistant formContext={formData} />
+                </div>
+              </ResizablePanel>
+              <ResizableHandle withHandle />
+            </>
+          )}
 
-          {/* Right: Narrow Field Navigation Panel */}
-          <div className="min-h-[600px] lg:min-h-0">
-            <FieldNavigationPanel 
-              formData={formData} 
-              updateField={updateField}
-              currentFieldIndex={currentFieldIndex}
-              setCurrentFieldIndex={setCurrentFieldIndex}
-              fieldPositions={fieldPositions}
-              updateFieldPosition={updateFieldPosition}
-            />
-          </div>
-        </div>
+          {/* Center: Form Viewer with PDF */}
+          <ResizablePanel defaultSize={showAIPanel ? 50 : 70} minSize={30}>
+            <div className="h-full px-3">
+              <FormViewer 
+                formData={formData} 
+                updateField={updateField}
+                currentFieldIndex={currentFieldIndex}
+                fieldPositions={fieldPositions}
+                updateFieldPosition={updateFieldPosition}
+              />
+            </div>
+          </ResizablePanel>
+
+          {/* Right: Field Navigation Panel (collapsible) */}
+          {showFieldsPanel && (
+            <>
+              <ResizableHandle withHandle />
+              <ResizablePanel defaultSize={25} minSize={20} maxSize={35}>
+                <div className="h-full pl-3">
+                  <FieldNavigationPanel 
+                    formData={formData} 
+                    updateField={updateField}
+                    currentFieldIndex={currentFieldIndex}
+                    setCurrentFieldIndex={setCurrentFieldIndex}
+                    fieldPositions={fieldPositions}
+                    updateFieldPosition={updateFieldPosition}
+                  />
+                </div>
+              </ResizablePanel>
+            </>
+          )}
+        </ResizablePanelGroup>
       </main>
     </div>
   );

@@ -4,25 +4,28 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, Loader2 } from "lucide-react";
-import { useAIStream } from "@/hooks/useAIStream";
+import { useGroqStream } from "@/hooks/useGroqStream";
 import { toast } from "sonner";
 import aiAssistant from "@/assets/ai-assistant.png";
-import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
 }
 
-export const AIAssistant = () => {
+interface AIAssistantProps {
+  formContext?: any;
+}
+
+export const AIAssistant = ({ formContext }: AIAssistantProps) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "👋 Hi! I'm your SwiftFill Pro AI Assistant. I'm here to help you fill out your FL-320 form accurately and efficiently. \n\nTo get started, I can use your saved personal information or you can provide it now. What would you like help with?"
+      content: "👋 Hi! I'm your SwiftFill Pro AI Assistant powered by Groq and Kimi 2. I can see your form data and help you fill it out accurately. What would you like help with?"
     }
   ]);
   const [input, setInput] = useState('');
-  const { streamChat, isLoading } = useAIStream();
+  const { streamChat, isLoading } = useGroqStream();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -43,15 +46,9 @@ export const AIAssistant = () => {
 
     setMessages(prev => [...prev, tempAssistantMessage]);
 
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      toast.error("Please log in to use AI assistant");
-      setMessages(prev => prev.slice(0, -1));
-      return;
-    }
-
     await streamChat({
       messages: [...messages, userMessage],
+      formContext,
       onDelta: (chunk) => {
         assistantContent += chunk;
         setMessages(prev => {

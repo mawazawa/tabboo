@@ -5,11 +5,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Copy } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Copy, Settings } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface FormData {
   partyName?: string;
@@ -78,6 +79,7 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
   const fieldRefs = useRef<(HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | null)[]>([]);
   const { toast } = useToast();
   const positionInputRef = useRef<HTMLInputElement>(null);
+  const [activePositionPopover, setActivePositionPopover] = useState<string | null>(null);
 
   // Fetch personal info from vault
   const { data: personalInfo } = useQuery({
@@ -174,9 +176,11 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
   const currentFieldName = FIELD_CONFIG[currentFieldIndex]?.field;
   const currentPosition = fieldPositions[currentFieldName] || getDefaultPosition(currentFieldName);
 
-  const adjustPosition = (direction: 'up' | 'down' | 'left' | 'right') => {
+  const adjustPosition = (direction: 'up' | 'down' | 'left' | 'right', fieldName?: string) => {
+    const targetField = fieldName || currentFieldName;
+    const position = fieldPositions[targetField] || getDefaultPosition(targetField);
     const step = 0.1;
-    const newPosition = { ...currentPosition };
+    const newPosition = { ...position };
     
     switch (direction) {
       case 'up':
@@ -193,7 +197,7 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
         break;
     }
     
-    updateFieldPosition(currentFieldName, newPosition);
+    updateFieldPosition(targetField, newPosition);
   };
 
   // Handle keyboard arrow keys
@@ -249,70 +253,16 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
           </Button>
         </div>
 
-        {/* Position Controls */}
+        {/* Current field position display only */}
         <div className="mt-4 p-3 bg-background rounded-lg border">
-          <h3 className="text-xs font-semibold mb-2">Position</h3>
-          <div className="grid grid-cols-2 gap-2 mb-2">
-            <div>
-              <label className="text-xs text-muted-foreground">X (Left %)</label>
-              <Input
-                ref={positionInputRef}
-                type="number"
-                step="0.1"
-                value={currentPosition.left.toFixed(1)}
-                onChange={(e) => updateFieldPosition(currentFieldName, { ...currentPosition, left: parseFloat(e.target.value) || 0 })}
-                className="h-8 text-xs"
-              />
-            </div>
-            <div>
-              <label className="text-xs text-muted-foreground">Y (Top %)</label>
-              <Input
-                type="number"
-                step="0.1"
-                value={currentPosition.top.toFixed(1)}
-                onChange={(e) => updateFieldPosition(currentFieldName, { ...currentPosition, top: parseFloat(e.target.value) || 0 })}
-                className="h-8 text-xs"
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-3 gap-1">
-            <div></div>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => adjustPosition('up')}
-              className="h-8 px-2"
-            >
-              <ChevronUp className="h-3 w-3" />
-            </Button>
-            <div></div>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => adjustPosition('left')}
-              className="h-8 px-2"
-            >
-              <ChevronLeft className="h-3 w-3" />
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => adjustPosition('down')}
-              className="h-8 px-2"
-            >
-              <ChevronDown className="h-3 w-3" />
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => adjustPosition('right')}
-              className="h-8 px-2"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+          <h3 className="text-xs font-semibold mb-2">Active Field Position</h3>
+          <div className="text-xs text-muted-foreground">
+            {FIELD_CONFIG[currentFieldIndex]?.label}
+            <br />
+            X: {currentPosition.left.toFixed(1)}% • Y: {currentPosition.top.toFixed(1)}%
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            Use arrow keys or buttons
+            Click gear icon on field to adjust
           </p>
         </div>
       </div>
@@ -355,6 +305,91 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
                         Copy
                       </Button>
                     )}
+                    <Popover 
+                      open={activePositionPopover === config.field} 
+                      onOpenChange={(open) => setActivePositionPopover(open ? config.field : null)}
+                    >
+                      <PopoverTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                          className="h-6 w-6 p-0"
+                          title="Adjust position"
+                        >
+                          <Settings className="h-3 w-3" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-48 p-3" side="left" align="start">
+                        <h4 className="text-xs font-semibold mb-2">Position</h4>
+                        <div className="grid grid-cols-2 gap-2 mb-2">
+                          <div>
+                            <label className="text-[10px] text-muted-foreground">X %</label>
+                            <Input
+                              type="number"
+                              step="0.1"
+                              value={(fieldPositions[config.field] || getDefaultPosition(config.field)).left.toFixed(1)}
+                              onChange={(e) => updateFieldPosition(config.field, { 
+                                ...(fieldPositions[config.field] || getDefaultPosition(config.field)), 
+                                left: parseFloat(e.target.value) || 0 
+                              })}
+                              className="h-7 text-xs"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-muted-foreground">Y %</label>
+                            <Input
+                              type="number"
+                              step="0.1"
+                              value={(fieldPositions[config.field] || getDefaultPosition(config.field)).top.toFixed(1)}
+                              onChange={(e) => updateFieldPosition(config.field, { 
+                                ...(fieldPositions[config.field] || getDefaultPosition(config.field)), 
+                                top: parseFloat(e.target.value) || 0 
+                              })}
+                              className="h-7 text-xs"
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-1">
+                          <div></div>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => adjustPosition('up', config.field)}
+                            className="h-7 px-1"
+                          >
+                            <ChevronUp className="h-3 w-3" />
+                          </Button>
+                          <div></div>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => adjustPosition('left', config.field)}
+                            className="h-7 px-1"
+                          >
+                            <ChevronLeft className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => adjustPosition('down', config.field)}
+                            className="h-7 px-1"
+                          >
+                            <ChevronDown className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => adjustPosition('right', config.field)}
+                            className="h-7 px-1"
+                          >
+                            <ChevronRight className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                     {isActive && (
                       <span className="text-xs font-semibold text-primary">Active</span>
                     )}
