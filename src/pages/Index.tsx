@@ -2,7 +2,7 @@ import { FormViewer } from "@/components/FormViewer";
 import { FieldNavigationPanel } from "@/components/FieldNavigationPanel";
 import { AIAssistant } from "@/components/AIAssistant";
 import { PersonalDataVault } from "@/components/PersonalDataVault";
-import { FileText, MessageSquare, LogOut, Loader2 } from "lucide-react";
+import { FileText, MessageSquare, LogOut, Loader2, Calculator } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,14 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 
 interface FormData {
   partyName?: string;
@@ -178,6 +186,46 @@ const Index = () => {
               </div>
             </div>
             <div className="flex items-center gap-3">
+              <NavigationMenu>
+                <NavigationMenuList>
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger>Tools</NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <div className="grid gap-3 p-4 w-[400px]">
+                        <NavigationMenuLink asChild>
+                          <button
+                            onClick={() => navigate("/distribution-calculator")}
+                            className="flex items-start gap-3 p-3 rounded-lg hover:bg-accent transition-colors text-left"
+                          >
+                            <Calculator className="h-5 w-5 mt-0.5 text-primary" />
+                            <div>
+                              <div className="font-medium mb-1">Distribution Calculator</div>
+                              <p className="text-sm text-muted-foreground">
+                                Calculate property division, validate Watts charges, and detect errors
+                              </p>
+                            </div>
+                          </button>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink asChild>
+                          <button
+                            onClick={() => navigate("/")}
+                            className="flex items-start gap-3 p-3 rounded-lg hover:bg-accent transition-colors text-left"
+                          >
+                            <FileText className="h-5 w-5 mt-0.5 text-primary" />
+                            <div>
+                              <div className="font-medium mb-1">Form Filler (FL-320)</div>
+                              <p className="text-sm text-muted-foreground">
+                                Fill out legal forms with AI assistance
+                              </p>
+                            </div>
+                          </button>
+                        </NavigationMenuLink>
+                      </div>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                </NavigationMenuList>
+              </NavigationMenu>
+
               <Sheet>
                 <SheetTrigger asChild>
                   <Button variant="outline" size="sm" className="gap-2">
