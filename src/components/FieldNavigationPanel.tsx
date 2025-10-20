@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { ChevronDown, ChevronUp, Copy } from "lucide-react";
+import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Copy } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -47,6 +47,8 @@ interface Props {
   updateField: (field: string, value: string | boolean) => void;
   currentFieldIndex: number;
   setCurrentFieldIndex: (index: number) => void;
+  fieldPositions: Record<string, { top: number; left: number }>;
+  updateFieldPosition: (field: string, position: { top: number; left: number }) => void;
 }
 
 const FIELD_CONFIG: FieldConfig[] = [
@@ -72,9 +74,10 @@ const FIELD_CONFIG: FieldConfig[] = [
   { field: 'signatureName', label: 'Signature Name', type: 'input', placeholder: 'Your name', vaultField: 'full_name' },
 ];
 
-export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex }: Props) => {
+export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition }: Props) => {
   const fieldRefs = useRef<(HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | null)[]>([]);
   const { toast } = useToast();
+  const positionInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch personal info from vault
   const { data: personalInfo } = useQuery({
@@ -141,6 +144,81 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
     setCurrentFieldIndex(Math.max(0, currentFieldIndex - 1));
   };
 
+  // Get default position for a field
+  const getDefaultPosition = (field: string) => {
+    const defaults: Record<string, { top: number; left: number }> = {
+      partyName: { top: 15.8, left: 5 },
+      streetAddress: { top: 19, left: 5 },
+      city: { top: 22.5, left: 5 },
+      state: { top: 22.5, left: 29.5 },
+      zipCode: { top: 22.5, left: 38 },
+      telephoneNo: { top: 25.8, left: 5 },
+      faxNo: { top: 25.8, left: 23 },
+      email: { top: 29.2, left: 5 },
+      attorneyFor: { top: 32.5, left: 5 },
+      county: { top: 15.8, left: 55 },
+      petitioner: { top: 22.5, left: 55 },
+      respondent: { top: 26.5, left: 55 },
+      caseNumber: { top: 32.5, left: 55 },
+      noOrders: { top: 43.5, left: 25.5 },
+      agreeOrders: { top: 46.5, left: 25.5 },
+      consentCustody: { top: 53, left: 25.5 },
+      consentVisitation: { top: 56, left: 25.5 },
+      facts: { top: 68, left: 5 },
+      signatureDate: { top: 90, left: 5 },
+      signatureName: { top: 90, left: 50 },
+    };
+    return defaults[field] || { top: 0, left: 0 };
+  };
+
+  const currentFieldName = FIELD_CONFIG[currentFieldIndex]?.field;
+  const currentPosition = fieldPositions[currentFieldName] || getDefaultPosition(currentFieldName);
+
+  const adjustPosition = (direction: 'up' | 'down' | 'left' | 'right') => {
+    const step = 0.1;
+    const newPosition = { ...currentPosition };
+    
+    switch (direction) {
+      case 'up':
+        newPosition.top = Math.max(0, newPosition.top - step);
+        break;
+      case 'down':
+        newPosition.top = Math.min(100, newPosition.top + step);
+        break;
+      case 'left':
+        newPosition.left = Math.max(0, newPosition.left - step);
+        break;
+      case 'right':
+        newPosition.left = Math.min(100, newPosition.left + step);
+        break;
+    }
+    
+    updateFieldPosition(currentFieldName, newPosition);
+  };
+
+  // Handle keyboard arrow keys
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (document.activeElement === positionInputRef.current ||
+          !['INPUT', 'TEXTAREA'].includes((document.activeElement as HTMLElement)?.tagName)) {
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+          e.preventDefault();
+          const direction = {
+            'ArrowUp': 'up',
+            'ArrowDown': 'down',
+            'ArrowLeft': 'left',
+            'ArrowRight': 'right'
+          }[e.key] as 'up' | 'down' | 'left' | 'right';
+          
+          adjustPosition(direction);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentFieldIndex, fieldPositions]);
+
   return (
     <Card className="h-full border-2 shadow-medium flex flex-col">
       <div className="p-4 border-b bg-muted/30">
@@ -169,6 +247,73 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
             Next
             <ChevronDown className="h-4 w-4 ml-1" />
           </Button>
+        </div>
+
+        {/* Position Controls */}
+        <div className="mt-4 p-3 bg-background rounded-lg border">
+          <h3 className="text-xs font-semibold mb-2">Position</h3>
+          <div className="grid grid-cols-2 gap-2 mb-2">
+            <div>
+              <label className="text-xs text-muted-foreground">X (Left %)</label>
+              <Input
+                ref={positionInputRef}
+                type="number"
+                step="0.1"
+                value={currentPosition.left.toFixed(1)}
+                onChange={(e) => updateFieldPosition(currentFieldName, { ...currentPosition, left: parseFloat(e.target.value) || 0 })}
+                className="h-8 text-xs"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground">Y (Top %)</label>
+              <Input
+                type="number"
+                step="0.1"
+                value={currentPosition.top.toFixed(1)}
+                onChange={(e) => updateFieldPosition(currentFieldName, { ...currentPosition, top: parseFloat(e.target.value) || 0 })}
+                className="h-8 text-xs"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-1">
+            <div></div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => adjustPosition('up')}
+              className="h-8 px-2"
+            >
+              <ChevronUp className="h-3 w-3" />
+            </Button>
+            <div></div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => adjustPosition('left')}
+              className="h-8 px-2"
+            >
+              <ChevronLeft className="h-3 w-3" />
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => adjustPosition('down')}
+              className="h-8 px-2"
+            >
+              <ChevronDown className="h-3 w-3" />
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => adjustPosition('right')}
+              className="h-8 px-2"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            Use arrow keys or buttons
+          </p>
         </div>
       </div>
 

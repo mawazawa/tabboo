@@ -68,24 +68,25 @@ const Index = () => {
         .select('*')
         .eq('user_id', user.id)
         .eq('title', 'FL-320 Form')
-        .single();
+        .maybeSingle();
 
       if (data) {
         setDocumentId(data.id);
-        setFormData(data.content as FormData || {});
-        setFieldPositions(data.metadata?.fieldPositions || {});
-      } else if (!error || error.code === 'PGRTE0') {
+        setFormData((data.content as any) || {});
+        const metadata = data.metadata as any;
+        setFieldPositions(metadata?.fieldPositions || {});
+      } else if (!error) {
         // Create new document
-        const { data: newDoc, error: createError } = await supabase
+        const { data: newDoc } = await supabase
           .from('legal_documents')
           .insert({
             title: 'FL-320 Form',
-            content: {},
-            metadata: { fieldPositions: {} },
+            content: {} as any,
+            metadata: { fieldPositions: {} } as any,
             user_id: user.id
           })
           .select()
-          .single();
+          .maybeSingle();
 
         if (newDoc) setDocumentId(newDoc.id);
       }
@@ -102,8 +103,8 @@ const Index = () => {
       const { error } = await supabase
         .from('legal_documents')
         .update({
-          content: formData,
-          metadata: { fieldPositions },
+          content: formData as any,
+          metadata: { fieldPositions } as any,
           updated_at: new Date().toISOString()
         })
         .eq('id', documentId);
@@ -121,7 +122,7 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       {/* Header */}
       <header className="border-b-2 bg-card/80 backdrop-blur-sm sticky top-0 z-50 shadow-medium">
-        <div className="container mx-auto px-4 py-3">
+        <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-glow">
@@ -162,8 +163,8 @@ const Index = () => {
 
       {/* Main Content - DocuSign-style Layout */}
       <main className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-[1-fr,320px] gap-6 h-[calc(100vh-140px)]">
-          {/* Left: PDF Viewer */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr,320px] gap-6 h-[calc(100vh-140px)]">
+          {/* Left: Form Viewer with PDF */}
           <div className="min-h-[600px] lg:min-h-0">
             <FormViewer 
               formData={formData} 
@@ -174,7 +175,7 @@ const Index = () => {
             />
           </div>
 
-          {/* Right: Field Navigation Panel */}
+          {/* Right: Narrow Field Navigation Panel */}
           <div className="min-h-[600px] lg:min-h-0">
             <FieldNavigationPanel 
               formData={formData} 
