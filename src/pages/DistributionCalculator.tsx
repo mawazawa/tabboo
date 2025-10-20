@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,8 +6,16 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { Calculator, AlertTriangle, CheckCircle, ArrowLeft } from "lucide-react";
+import { Calculator, AlertTriangle, CheckCircle, ArrowLeft, GripVertical } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { InlineMath, BlockMath } from 'react-katex';
+import 'katex/dist/katex.min.css';
+
+interface FieldPosition {
+  x: number;
+  y: number;
+}
 
 const DistributionCalculator = () => {
   const navigate = useNavigate();
@@ -24,11 +32,24 @@ const DistributionCalculator = () => {
   const [mortgageCosts, setMortgageCosts] = useState("0.00");
   const [claimedWattsCharges, setClaimedWattsCharges] = useState("0.00");
 
+  // Drag and drop states
+  const [fieldPositions, setFieldPositions] = useState<Record<string, FieldPosition>>({});
+  const [draggingField, setDraggingField] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   // Calculation results
   const [petitionerShare, setPetitionerShare] = useState(0);
   const [respondentShare, setRespondentShare] = useState(0);
   const [errors, setErrors] = useState<string[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    })
+  );
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -55,6 +76,26 @@ const DistributionCalculator = () => {
   useEffect(() => {
     calculateDistribution();
   }, [netProceeds, possessionDate, wattsStartDate, wattsEndDate, motorcycleValue, taxWithholding, mortgageCosts, claimedWattsCharges]);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, delta } = event;
+    const fieldId = active.id as string;
+    
+    if (containerRef.current) {
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const currentPos = fieldPositions[fieldId] || { x: 0, y: 0 };
+      
+      setFieldPositions(prev => ({
+        ...prev,
+        [fieldId]: {
+          x: currentPos.x + delta.x,
+          y: currentPos.y + delta.y,
+        }
+      }));
+    }
+    
+    setDraggingField(null);
+  };
 
   const calculateDistribution = () => {
     const newErrors: string[] = [];
@@ -142,25 +183,99 @@ const DistributionCalculator = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-background print:bg-white">
-      {/* Header - hide in print */}
-      <header className="border-b bg-card sticky top-0 z-50 print:hidden">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Button variant="ghost" onClick={() => navigate("/")} className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Form Filler
-            </Button>
-            <h1 className="text-xl font-bold">Distribution Calculator</h1>
-            <Button variant="outline" onClick={() => window.print()}>
-              Print Report
-            </Button>
+  const DraggableField = ({ id, label, value, onChange, type = "number", children }: {
+    id: string;
+    label: string;
+    value: string;
+    onChange: (value: string) => void;
+    type?: string;
+    children?: React.ReactNode;
+  }) => {
+    const position = fieldPositions[id] || { x: 0, y: 0 };
+    const isDragging = draggingField === id;
+
+    return (
+      <div 
+        className="relative"
+        style={{
+          transform: `translate(${position.x}px, ${position.y}px)`,
+          transition: isDragging ? 'none' : 'transform 0.2s ease-out',
+        }}
+      >
+        <div className="relative">
+          <Label htmlFor={id}>{label}</Label>
+          {children || (
+            <Input
+              id={id}
+              type={type}
+              step="0.01"
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              placeholder={value}
+            />
+          )}
+          
+          {/* Drag handle positioned 30px up and 30px right */}
+          <div
+            className="absolute cursor-move group"
+            style={{ top: '-30px', right: '-30px' }}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              setDraggingField(id);
+            }}
+          >
+            {/* Connector line */}
+            <svg
+              className="absolute pointer-events-none"
+              style={{
+                width: '40px',
+                height: '40px',
+                left: '-5px',
+                top: '-5px',
+              }}
+            >
+              <line
+                x1="35"
+                y1="35"
+                x2="5"
+                y2="5"
+                stroke="currentColor"
+                strokeWidth="1"
+                strokeDasharray="2,2"
+                className="text-muted-foreground group-hover:text-primary transition-colors"
+              />
+            </svg>
+            
+            {/* Drag icon */}
+            <div className="relative z-10 bg-background border rounded p-1 shadow-sm group-hover:shadow-md group-hover:border-primary transition-all">
+              <GripVertical className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+            </div>
           </div>
         </div>
-      </header>
+      </div>
+    );
+  };
 
-      <main className="container mx-auto px-4 py-8 print:px-0 print:py-0">
+  return (
+    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+      <div className="min-h-screen bg-background print:bg-white" ref={containerRef}>
+        {/* Header - hide in print */}
+        <header className="border-b bg-card sticky top-0 z-50 print:hidden">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <Button variant="ghost" onClick={() => navigate("/")} className="gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Back to Form Filler
+              </Button>
+              <h1 className="text-xl font-bold">Distribution Calculator</h1>
+              <Button variant="outline" onClick={() => window.print()}>
+                Print Report
+              </Button>
+            </div>
+          </div>
+        </header>
+
+        <main className="container mx-auto px-4 py-8 print:px-0 print:py-0">
         {/* Title Page */}
         <div className="mb-8 print:mb-0 print:page-break-after">
           <div className="text-center py-12 print:py-24">
@@ -176,109 +291,81 @@ const DistributionCalculator = () => {
           </div>
         </div>
 
-        {/* Input Section */}
-        <div className="grid gap-6 lg:grid-cols-2 print:hidden mb-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calculator className="h-5 w-5" />
-                Property Distribution Inputs
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="netProceeds">Net Proceeds from Sale</Label>
-                <Input
+          {/* Input Section */}
+          <div className="grid gap-6 lg:grid-cols-2 print:hidden mb-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calculator className="h-5 w-5" />
+                  Property Distribution Inputs
+                </CardTitle>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Drag the <GripVertical className="inline h-3 w-3" /> icon to reposition fields
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <DraggableField
                   id="netProceeds"
-                  type="number"
-                  step="0.01"
+                  label="Net Proceeds from Sale"
                   value={netProceeds}
-                  onChange={(e) => setNetProceeds(e.target.value)}
-                  placeholder="293695.00"
+                  onChange={setNetProceeds}
                 />
-              </div>
-              <div>
-                <Label htmlFor="motorcycleValue">Motorcycle Value (Kelly Bluebook)</Label>
-                <Input
+                <DraggableField
                   id="motorcycleValue"
-                  type="number"
-                  step="0.01"
+                  label="Motorcycle Value (Kelly Bluebook)"
                   value={motorcycleValue}
-                  onChange={(e) => setMotorcycleValue(e.target.value)}
-                  placeholder="8420.00"
+                  onChange={setMotorcycleValue}
                 />
-              </div>
-              <div>
-                <Label htmlFor="taxWithholding">Tax Withholding Amount</Label>
-                <Input
+                <DraggableField
                   id="taxWithholding"
-                  type="number"
-                  step="0.01"
+                  label="Tax Withholding Amount"
                   value={taxWithholding}
-                  onChange={(e) => setTaxWithholding(e.target.value)}
-                  placeholder="0.00"
+                  onChange={setTaxWithholding}
                 />
-              </div>
-              <div>
-                <Label htmlFor="mortgageCosts">Mortgage Costs</Label>
-                <Input
+                <DraggableField
                   id="mortgageCosts"
-                  type="number"
-                  step="0.01"
+                  label="Mortgage Costs"
                   value={mortgageCosts}
-                  onChange={(e) => setMortgageCosts(e.target.value)}
-                  placeholder="0.00"
+                  onChange={setMortgageCosts}
                 />
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Watts Charges Timeline</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="possessionDate">Possession Transfer Date</Label>
-                <Input
+            <Card>
+              <CardHeader>
+                <CardTitle>Watts Charges Timeline</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <DraggableField
                   id="possessionDate"
-                  type="date"
+                  label="Possession Transfer Date"
                   value={possessionDate}
-                  onChange={(e) => setPossessionDate(e.target.value)}
+                  onChange={setPossessionDate}
+                  type="date"
                 />
-              </div>
-              <div>
-                <Label htmlFor="wattsStartDate">Watts Charges Start Date</Label>
-                <Input
+                <DraggableField
                   id="wattsStartDate"
-                  type="date"
+                  label="Watts Charges Start Date"
                   value={wattsStartDate}
-                  onChange={(e) => setWattsStartDate(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="wattsEndDate">Watts Charges End Date (Claimed)</Label>
-                <Input
-                  id="wattsEndDate"
+                  onChange={setWattsStartDate}
                   type="date"
+                />
+                <DraggableField
+                  id="wattsEndDate"
+                  label="Watts Charges End Date (Claimed)"
                   value={wattsEndDate}
-                  onChange={(e) => setWattsEndDate(e.target.value)}
+                  onChange={setWattsEndDate}
+                  type="date"
                 />
-              </div>
-              <div>
-                <Label htmlFor="claimedWattsCharges">Claimed Watts Charges Amount</Label>
-                <Input
+                <DraggableField
                   id="claimedWattsCharges"
-                  type="number"
-                  step="0.01"
+                  label="Claimed Watts Charges Amount"
                   value={claimedWattsCharges}
-                  onChange={(e) => setClaimedWattsCharges(e.target.value)}
-                  placeholder="0.00"
+                  onChange={setClaimedWattsCharges}
                 />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+          </div>
 
         {/* Error and Warning Alerts */}
         {(errors.length > 0 || warnings.length > 0) && (
@@ -312,66 +399,94 @@ const DistributionCalculator = () => {
           </div>
         )}
 
-        {/* Calculation Results - Print-friendly */}
-        <div className="print:page-break-before">
-          <Card className="print:shadow-none print:border-0">
-            <CardHeader className="print:pt-0">
-              <CardTitle className="text-2xl print:text-3xl">Correct Distribution Calculation</CardTitle>
-              <p className="text-sm text-muted-foreground print:text-foreground">
-                Based on California Community Property Law (50/50 split modified by agreement: 35% Petitioner / 65% Respondent)
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid gap-4">
-                <div className="flex justify-between items-center p-4 bg-muted/50 print:bg-gray-50 rounded-lg">
-                  <span className="font-medium">Net Proceeds (Base):</span>
-                  <span className="text-xl font-bold">${parseFloat(netProceeds).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                </div>
-
-                <Separator />
-
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center p-3 bg-primary/5 print:bg-gray-100 rounded">
-                    <span className="font-medium">Petitioner Share (35%):</span>
-                    <span className="text-lg font-bold text-primary print:text-black">
-                      ${petitionerShare.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-primary/5 print:bg-gray-100 rounded">
-                    <span className="font-medium">Respondent Share (65%):</span>
-                    <span className="text-lg font-bold text-primary print:text-black">
-                      ${respondentShare.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </span>
-                  </div>
-                </div>
-
-                {parseFloat(motorcycleValue) > 0 && (
-                  <>
-                    <Separator />
-                    <div className="space-y-2">
-                      <h4 className="font-semibold">Motorcycle Distribution (Kelly Bluebook: ${parseFloat(motorcycleValue).toLocaleString('en-US', { minimumFractionDigits: 2 })}):</h4>
-                      <div className="flex justify-between p-2 text-sm">
-                        <span>Petitioner (35%):</span>
-                        <span className="font-medium">${(parseFloat(motorcycleValue) * 0.35).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                      </div>
-                      <div className="flex justify-between p-2 text-sm">
-                        <span>Respondent (65%):</span>
-                        <span className="font-medium">${(parseFloat(motorcycleValue) * 0.65).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+          {/* Calculation Results - Print-friendly */}
+          <div className="print:page-break-before">
+            <Card className="print:shadow-none print:border-0">
+              <CardHeader className="print:pt-0">
+                <CardTitle className="text-2xl print:text-3xl">Correct Distribution Calculation</CardTitle>
+                <p className="text-sm text-muted-foreground print:text-foreground">
+                  Based on California Community Property Law (50/50 split modified by agreement: 35% Petitioner / 65% Respondent)
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* LaTeX Formulas Section */}
+                <div className="bg-muted/30 p-4 rounded-lg border print:border-gray-300">
+                  <h3 className="font-semibold mb-3 text-sm">Mathematical Formulas</h3>
+                  <div className="space-y-3 text-sm">
+                    <div>
+                      <p className="text-muted-foreground mb-1">Petitioner Share Calculation:</p>
+                      <div className="bg-background p-3 rounded border overflow-x-auto">
+                        <BlockMath math={`\\text{Petitioner} = \\text{NetProceeds} \\times 0.35 = \\$${parseFloat(netProceeds).toLocaleString()} \\times 0.35 = \\$${petitionerShare.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} />
                       </div>
                     </div>
-                  </>
-                )}
+                    <div>
+                      <p className="text-muted-foreground mb-1">Respondent Share Calculation:</p>
+                      <div className="bg-background p-3 rounded border overflow-x-auto">
+                        <BlockMath math={`\\text{Respondent} = \\text{NetProceeds} \\times 0.65 = \\$${parseFloat(netProceeds).toLocaleString()} \\times 0.65 = \\$${respondentShare.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} />
+                      </div>
+                    </div>
+                    {parseFloat(motorcycleValue) > 0 && (
+                      <div>
+                        <p className="text-muted-foreground mb-1">Motorcycle Distribution:</p>
+                        <div className="bg-background p-3 rounded border overflow-x-auto">
+                          <BlockMath math={`\\text{Motorcycle}_{\\text{Petitioner}} = \\$${parseFloat(motorcycleValue).toLocaleString()} \\times 0.35 = \\$${(parseFloat(motorcycleValue) * 0.35).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} />
+                          <BlockMath math={`\\text{Motorcycle}_{\\text{Respondent}} = \\$${parseFloat(motorcycleValue).toLocaleString()} \\times 0.65 = \\$${(parseFloat(motorcycleValue) * 0.65).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
 
-                <Alert className="print:border print:border-gray-300">
-                  <CheckCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    Calculation verified against CA Family Code §2550-2552 (Equal Division of Community Property with modifications per agreement).
-                  </AlertDescription>
-                </Alert>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                <div className="grid gap-4">
+                  <div className="flex justify-between items-center p-4 bg-muted/50 print:bg-gray-50 rounded-lg">
+                    <span className="font-medium">Net Proceeds (Base):</span>
+                    <span className="text-xl font-bold">${parseFloat(netProceeds).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  </div>
+
+                  <Separator />
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center p-3 bg-primary/5 print:bg-gray-100 rounded">
+                      <span className="font-medium">Petitioner Share <InlineMath math="(0.35 \times \text{Net})" />:</span>
+                      <span className="text-lg font-bold text-primary print:text-black">
+                        ${petitionerShare.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-primary/5 print:bg-gray-100 rounded">
+                      <span className="font-medium">Respondent Share <InlineMath math="(0.65 \times \text{Net})" />:</span>
+                      <span className="text-lg font-bold text-primary print:text-black">
+                        ${respondentShare.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                  </div>
+
+                  {parseFloat(motorcycleValue) > 0 && (
+                    <>
+                      <Separator />
+                      <div className="space-y-2">
+                        <h4 className="font-semibold">Motorcycle Distribution (Kelly Bluebook: ${parseFloat(motorcycleValue).toLocaleString('en-US', { minimumFractionDigits: 2 })}):</h4>
+                        <div className="flex justify-between p-2 text-sm">
+                          <span>Petitioner <InlineMath math="(0.35)" />:</span>
+                          <span className="font-medium">${(parseFloat(motorcycleValue) * 0.35).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                        <div className="flex justify-between p-2 text-sm">
+                          <span>Respondent <InlineMath math="(0.65)" />:</span>
+                          <span className="font-medium">${(parseFloat(motorcycleValue) * 0.65).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  <Alert className="print:border print:border-gray-300">
+                    <CheckCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      Calculation verified against CA Family Code §2550-2552 (Equal Division of Community Property with modifications per agreement).
+                    </AlertDescription>
+                  </Alert>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
         {/* Legal Citations - Print-friendly */}
         <div className="mt-8 print:page-break-before print:mt-0">
@@ -426,52 +541,62 @@ const DistributionCalculator = () => {
           </Card>
         </div>
 
-        {/* Calculation Methodology */}
-        <div className="mt-8 print:page-break-before print:mt-0">
-          <Card className="print:shadow-none print:border-0">
-            <CardHeader>
-              <CardTitle>Calculation Methodology</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h4 className="font-semibold mb-2">Step 1: Determine Net Proceeds</h4>
-                <p className="text-sm text-muted-foreground print:text-foreground">
-                  Net proceeds = Gross sale price - (Mortgage payoff + Closing costs + Real estate commissions + 
-                  Transfer taxes + Title insurance + Recording fees + HOA fees + Repairs)
-                </p>
-              </div>
+          {/* Calculation Methodology */}
+          <div className="mt-8 print:page-break-before print:mt-0">
+            <Card className="print:shadow-none print:border-0">
+              <CardHeader>
+                <CardTitle>Calculation Methodology</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <h4 className="font-semibold mb-2">Step 1: Determine Net Proceeds</h4>
+                  <p className="text-sm text-muted-foreground print:text-foreground mb-2">
+                    Net proceeds = Gross sale price - (Mortgage payoff + Closing costs + Real estate commissions + 
+                    Transfer taxes + Title insurance + Recording fees + HOA fees + Repairs)
+                  </p>
+                  <div className="bg-muted/20 p-3 rounded border">
+                    <BlockMath math="\text{Net} = \text{Gross} - \sum_{i=1}^{n} \text{Cost}_i" />
+                  </div>
+                </div>
 
-              <div>
-                <h4 className="font-semibold mb-2">Step 2: Apply Distribution Percentages</h4>
-                <p className="text-sm text-muted-foreground print:text-foreground">
-                  Per written agreement or court order:
-                  <br />• Petitioner receives 35% of net proceeds
-                  <br />• Respondent receives 65% of net proceeds
-                </p>
-              </div>
+                <div>
+                  <h4 className="font-semibold mb-2">Step 2: Apply Distribution Percentages</h4>
+                  <p className="text-sm text-muted-foreground print:text-foreground mb-2">
+                    Per written agreement or court order:
+                  </p>
+                  <div className="bg-muted/20 p-3 rounded border space-y-2">
+                    <BlockMath math="\text{Petitioner} = \text{Net} \times 0.35" />
+                    <BlockMath math="\text{Respondent} = \text{Net} \times 0.65" />
+                  </div>
+                </div>
 
-              <div>
-                <h4 className="font-semibold mb-2">Step 3: Validate Watts Charges</h4>
-                <p className="text-sm text-muted-foreground print:text-foreground">
-                  Watts charges must only cover the period from separation date until possession transfer date. 
-                  Any claims extending beyond possession transfer are invalid. Calculate as: Fair market rental value 
-                  × Number of months of exclusive possession × 50% (community share).
-                </p>
-              </div>
+                <div>
+                  <h4 className="font-semibold mb-2">Step 3: Validate Watts Charges</h4>
+                  <p className="text-sm text-muted-foreground print:text-foreground mb-2">
+                    Watts charges must only cover the period from separation date until possession transfer date. 
+                    Any claims extending beyond possession transfer are invalid.
+                  </p>
+                  <div className="bg-muted/20 p-3 rounded border">
+                    <BlockMath math="\text{Watts} = \text{FMV}_{\text{rent}} \times \text{Months} \times 0.50" />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Where <InlineMath math="\text{FMV}_{\text{rent}}" /> is fair market rental value per month
+                  </p>
+                </div>
 
-              <div>
-                <h4 className="font-semibold mb-2">Step 4: Verify Asset Valuations</h4>
-                <p className="text-sm text-muted-foreground print:text-foreground">
-                  All assets must be valued at fair market value as of the date of separation or trial. Vehicle 
-                  valuations must use Kelly Bluebook or equivalent recognized valuation service. Personal property 
-                  should be valued at garage sale value unless special circumstances apply.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
-    </div>
+                <div>
+                  <h4 className="font-semibold mb-2">Step 4: Verify Asset Valuations</h4>
+                  <p className="text-sm text-muted-foreground print:text-foreground">
+                    All assets must be valued at fair market value as of the date of separation or trial. Vehicle 
+                    valuations must use Kelly Bluebook or equivalent recognized valuation service.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+      </div>
+    </DndContext>
   );
 };
 
