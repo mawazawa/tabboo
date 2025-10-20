@@ -105,26 +105,26 @@ export const FormViewer = ({ formData, updateField }: Props) => {
     {
       page: 1,
       fields: [
-        { type: 'input', field: 'partyName', top: '11%', left: '5%', width: '40%', placeholder: 'NAME' },
-        { type: 'input', field: 'streetAddress', top: '14.5%', left: '5%', width: '40%', placeholder: 'STREET ADDRESS' },
-        { type: 'input', field: 'city', top: '18%', left: '5%', width: '25%', placeholder: 'CITY' },
-        { type: 'input', field: 'state', top: '18%', left: '31%', width: '6%', placeholder: 'STATE' },
-        { type: 'input', field: 'zipCode', top: '18%', left: '38%', width: '7%', placeholder: 'ZIP' },
-        { type: 'input', field: 'telephoneNo', top: '21.5%', left: '5%', width: '19%', placeholder: 'TELEPHONE' },
-        { type: 'input', field: 'faxNo', top: '21.5%', left: '26%', width: '19%', placeholder: 'FAX' },
-        { type: 'input', field: 'email', top: '25%', left: '5%', width: '40%', placeholder: 'EMAIL' },
-        { type: 'input', field: 'attorneyFor', top: '28.5%', left: '5%', width: '40%', placeholder: 'ATTORNEY FOR' },
-        { type: 'input', field: 'county', top: '11%', left: '55%', width: '40%', placeholder: 'COUNTY' },
-        { type: 'input', field: 'petitioner', top: '18%', left: '55%', width: '40%', placeholder: 'PETITIONER' },
-        { type: 'input', field: 'respondent', top: '22%', left: '55%', width: '40%', placeholder: 'RESPONDENT' },
-        { type: 'input', field: 'caseNumber', top: '30%', left: '55%', width: '40%', placeholder: 'CASE NUMBER' },
-        { type: 'checkbox', field: 'noOrders', top: '39%', left: '8%' },
-        { type: 'checkbox', field: 'agreeOrders', top: '42%', left: '8%' },
-        { type: 'checkbox', field: 'consentCustody', top: '48%', left: '8%' },
-        { type: 'checkbox', field: 'consentVisitation', top: '51%', left: '8%' },
-        { type: 'textarea', field: 'facts', top: '60%', left: '5%', width: '90%', height: '20%' },
-        { type: 'input', field: 'signatureDate', top: '88%', left: '5%', width: '20%', placeholder: 'DATE' },
-        { type: 'input', field: 'signatureName', top: '88%', left: '50%', width: '40%', placeholder: 'SIGNATURE' },
+        { type: 'input', field: 'partyName', top: '15.8%', left: '5%', width: '40%', placeholder: 'NAME' },
+        { type: 'input', field: 'streetAddress', top: '19.2%', left: '5%', width: '40%', placeholder: 'STREET ADDRESS' },
+        { type: 'input', field: 'city', top: '22.5%', left: '5%', width: '23%', placeholder: 'CITY' },
+        { type: 'input', field: 'state', top: '22.5%', left: '29.5%', width: '7%', placeholder: 'STATE' },
+        { type: 'input', field: 'zipCode', top: '22.5%', left: '38%', width: '7%', placeholder: 'ZIP' },
+        { type: 'input', field: 'telephoneNo', top: '25.8%', left: '5%', width: '16%', placeholder: 'TELEPHONE' },
+        { type: 'input', field: 'faxNo', top: '25.8%', left: '23%', width: '22%', placeholder: 'FAX' },
+        { type: 'input', field: 'email', top: '29.2%', left: '5%', width: '40%', placeholder: 'EMAIL' },
+        { type: 'input', field: 'attorneyFor', top: '32.5%', left: '5%', width: '40%', placeholder: 'ATTORNEY FOR' },
+        { type: 'input', field: 'county', top: '15.8%', left: '55%', width: '40%', placeholder: 'COUNTY' },
+        { type: 'input', field: 'petitioner', top: '22.5%', left: '55%', width: '40%', placeholder: 'PETITIONER' },
+        { type: 'input', field: 'respondent', top: '26.5%', left: '55%', width: '40%', placeholder: 'RESPONDENT' },
+        { type: 'input', field: 'caseNumber', top: '32.5%', left: '55%', width: '40%', placeholder: 'CASE NUMBER' },
+        { type: 'checkbox', field: 'noOrders', top: '43.5%', left: '25.5%' },
+        { type: 'checkbox', field: 'agreeOrders', top: '46.5%', left: '25.5%' },
+        { type: 'checkbox', field: 'consentCustody', top: '53%', left: '25.5%' },
+        { type: 'checkbox', field: 'consentVisitation', top: '56%', left: '25.5%' },
+        { type: 'textarea', field: 'facts', top: '68%', left: '5%', width: '90%', height: '15%' },
+        { type: 'input', field: 'signatureDate', top: '90%', left: '5%', width: '20%', placeholder: 'DATE' },
+        { type: 'input', field: 'signatureName', top: '90%', left: '50%', width: '40%', placeholder: 'SIGNATURE' },
       ]
     }
   ];
@@ -170,7 +170,7 @@ export const FormViewer = ({ formData, updateField }: Props) => {
                         return (
                           <div
                             key={idx}
-                            className={`absolute pointer-events-auto group ${isDragging === overlay.field ? 'cursor-grabbing z-50' : 'cursor-grab'} hover:ring-2 hover:ring-primary/50 rounded`}
+                            className={`absolute pointer-events-auto ${isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary' : 'cursor-grab'} hover:ring-2 hover:ring-primary/50 rounded transition-all`}
                             style={{
                               top: position.top,
                               left: position.left,
@@ -183,13 +183,13 @@ export const FormViewer = ({ formData, updateField }: Props) => {
                               <PopoverTrigger asChild>
                                 <Button
                                   size="icon"
-                                  variant="ghost"
-                                  className="settings-button absolute -top-8 -right-8 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity bg-primary text-primary-foreground hover:bg-primary/90 z-10"
+                                  variant="default"
+                                  className="settings-button absolute -top-2 -right-2 h-6 w-6 rounded-full shadow-lg bg-primary text-primary-foreground hover:bg-primary/90 z-10"
                                 >
                                   <Settings className="h-3 w-3" />
                                 </Button>
                               </PopoverTrigger>
-                              <PopoverContent className="w-80 bg-background">
+                              <PopoverContent className="w-80 bg-background z-50">
                                 <div className="space-y-4">
                                   <h4 className="font-semibold text-sm">Adjust Position</h4>
                                   <div className="grid grid-cols-2 gap-3">
@@ -198,7 +198,7 @@ export const FormViewer = ({ formData, updateField }: Props) => {
                                       <Input
                                         type="number"
                                         step="0.1"
-                                        value={parseFloat(position.top)}
+                                        value={parseFloat(position.top) || 0}
                                         onChange={(e) => updateFieldPosition(overlay.field, { top: `${e.target.value}%` })}
                                         className="h-8 text-xs"
                                       />
@@ -208,7 +208,7 @@ export const FormViewer = ({ formData, updateField }: Props) => {
                                       <Input
                                         type="number"
                                         step="0.1"
-                                        value={parseFloat(position.left)}
+                                        value={parseFloat(position.left) || 0}
                                         onChange={(e) => updateFieldPosition(overlay.field, { left: `${e.target.value}%` })}
                                         className="h-8 text-xs"
                                       />
@@ -219,7 +219,7 @@ export const FormViewer = ({ formData, updateField }: Props) => {
                                         <Input
                                           type="number"
                                           step="0.1"
-                                          value={parseFloat(position.width)}
+                                          value={parseFloat(position.width) || 0}
                                           onChange={(e) => updateFieldPosition(overlay.field, { width: `${e.target.value}%` })}
                                           className="h-8 text-xs"
                                         />
@@ -231,7 +231,7 @@ export const FormViewer = ({ formData, updateField }: Props) => {
                                         <Input
                                           type="number"
                                           step="0.1"
-                                          value={parseFloat(position.height)}
+                                          value={parseFloat(position.height) || 0}
                                           onChange={(e) => updateFieldPosition(overlay.field, { height: `${e.target.value}%` })}
                                           className="h-8 text-xs"
                                         />
