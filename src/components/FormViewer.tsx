@@ -53,9 +53,10 @@ interface Props {
   currentFieldIndex: number;
   fieldPositions: Record<string, { top: number; left: number }>;
   updateFieldPosition: (field: string, position: { top: number; left: number }) => void;
+  deselectField?: () => void;
 }
 
-export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPositions, updateFieldPosition }: Props) => {
+export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPositions, updateFieldPosition, deselectField }: Props) => {
   const [numPages, setNumPages] = useState<number>(0);
   const [pageWidth, setPageWidth] = useState<number>(850);
   const [isDragging, setIsDragging] = useState<string | null>(null);
@@ -98,6 +99,14 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
 
   const handleMouseUp = () => {
     setIsDragging(null);
+  };
+
+  const handlePDFClick = (e: React.MouseEvent) => {
+    // Only deselect if clicking directly on the PDF container, not on input fields
+    if ((e.target as HTMLElement).closest('.field-container')) return;
+    if (deselectField) {
+      deselectField();
+    }
   };
 
   // Field overlays with default positions
@@ -147,6 +156,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                   onMouseMove={handleMouseMove}
                   onMouseUp={handleMouseUp}
                   onMouseLeave={handleMouseUp}
+                  onClick={handlePDFClick}
                 >
                   <Page
                     pageNumber={pageNum}
@@ -165,10 +175,10 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                         
                         const isCurrentField = fieldNameToIndex[overlay.field] === currentFieldIndex;
                         
-                        return (
+                          return (
                           <div
                             key={idx}
-                            className={`absolute pointer-events-auto ${
+                            className={`field-container absolute pointer-events-auto ${
                               isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary' : 'cursor-grab'
                             } ${
                               isCurrentField 
