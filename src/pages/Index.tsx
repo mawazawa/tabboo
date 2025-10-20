@@ -3,8 +3,10 @@ import { FieldNavigationPanel } from "@/components/FieldNavigationPanel";
 import { AIAssistant } from "@/components/AIAssistant";
 import { PersonalDataVault } from "@/components/PersonalDataVault";
 import { FileText, MessageSquare } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import {
   Sheet,
   SheetContent,
@@ -40,16 +42,86 @@ interface FormData {
 const Index = () => {
   const [formData, setFormData] = useState<FormData>({});
   const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
+  const [fieldPositions, setFieldPositions] = useState<Record<string, { top: number; left: number }>>({});
+  const [documentId, setDocumentId] = useState<string | null>(null);
+  const { toast } = useToast();
+  const hasUnsavedChanges = useRef(false);
 
   const updateField = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    hasUnsavedChanges.current = true;
   };
+
+  const updateFieldPosition = (field: string, position: { top: number; left: number }) => {
+    setFieldPositions(prev => ({ ...prev, [field]: position }));
+    hasUnsavedChanges.current = true;
+  };
+
+  // Load existing data on mount
+  useEffect(() => {
+    const loadData = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('legal_documents')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('title', 'FL-320 Form')
+        .single();
+
+      if (data) {
+        setDocumentId(data.id);
+        setFormData(data.content as FormData || {});
+        setFieldPositions(data.metadata?.fieldPositions || {});
+      } else if (!error || error.code === 'PGRTE0') {
+        // Create new document
+        const { data: newDoc, error: createError } = await supabase
+          .from('legal_documents')
+          .insert({
+            title: 'FL-320 Form',
+            content: {},
+            metadata: { fieldPositions: {} },
+            user_id: user.id
+          })
+          .select()
+          .single();
+
+        if (newDoc) setDocumentId(newDoc.id);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  // Autosave every 5 seconds
+  useEffect(() => {
+    const saveData = async () => {
+      if (!documentId || !hasUnsavedChanges.current) return;
+
+      const { error } = await supabase
+        .from('legal_documents')
+        .update({
+          content: formData,
+          metadata: { fieldPositions },
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', documentId);
+
+      if (!error) {
+        hasUnsavedChanges.current = false;
+      }
+    };
+
+    const interval = setInterval(saveData, 5000);
+    return () => clearInterval(interval);
+  }, [formData, fieldPositions, documentId]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       {/* Header */}
       <header className="border-b-2 bg-card/80 backdrop-blur-sm sticky top-0 z-50 shadow-medium">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-glow">
@@ -90,23 +162,27 @@ const Index = () => {
 
       {/* Main Content - DocuSign-style Layout */}
       <main className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr,320px] gap-6 h-[calc(100vh-140px)]">
-          {/* Left: Form Viewer with PDF */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1-fr,320px] gap-6 h-[calc(100vh-140px)]">
+          {/* Left: PDF Viewer */}
           <div className="min-h-[600px] lg:min-h-0">
             <FormViewer 
               formData={formData} 
               updateField={updateField}
               currentFieldIndex={currentFieldIndex}
+              fieldPositions={fieldPositions}
+              updateFieldPosition={updateFieldPosition}
             />
           </div>
 
-          {/* Right: Narrow Field Navigation Panel */}
+          {/* Right: Field Navigation Panel */}
           <div className="min-h-[600px] lg:min-h-0">
             <FieldNavigationPanel 
               formData={formData} 
               updateField={updateField}
               currentFieldIndex={currentFieldIndex}
               setCurrentFieldIndex={setCurrentFieldIndex}
+              fieldPositions={fieldPositions}
+              updateFieldPosition={updateFieldPosition}
             />
           </div>
         </div>
