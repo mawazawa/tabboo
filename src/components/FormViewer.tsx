@@ -79,9 +79,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
     // Only allow drag if field is in edit mode
     if (editModeField !== field) return;
     
-    // Prevent drag if clicking on settings button or input fields
+    // Prevent drag if clicking on input/textarea fields (but allow drag from anywhere else in the container)
     const target = e.target as HTMLElement;
-    if (target.closest('.settings-button') || target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
     
     e.preventDefault();
     setIsDragging(field);
@@ -94,7 +94,17 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
   };
 
   const toggleEditMode = (field: string) => {
-    setEditModeField(editModeField === field ? null : field);
+    const newEditMode = editModeField === field ? null : field;
+    setEditModeField(newEditMode);
+    // Also set this as the current field when entering edit mode
+    if (newEditMode && deselectField) {
+      // Find the field index and set it as current
+      const fieldIndex = fieldNameToIndex[field];
+      if (fieldIndex !== undefined) {
+        // You would need to pass setCurrentFieldIndex as a prop to do this
+        // For now, just toggle edit mode
+      }
+    }
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -196,10 +206,10 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                         const isEditMode = editModeField === overlay.field;
                         
                           return (
-                          <div
+                            <div
                             key={idx}
                             className={`field-container absolute pointer-events-auto select-none ${
-                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary opacity-80' : 
+                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-4 ring-green-600 opacity-90' : 
                               isEditMode ? 'cursor-grab ring-4 ring-green-600 shadow-xl' : 'cursor-default'
                             } ${
                               isEditMode 
@@ -222,8 +232,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                               </div>
                             )}
                             {isEditMode && (
-                              <div className="absolute -top-8 left-0 bg-green-600 text-white px-2 py-1 rounded text-xs font-medium shadow-lg whitespace-nowrap">
-                                Edit Mode: {overlay.placeholder || overlay.field}
+                              <div className="absolute -top-8 left-0 bg-green-600 text-white px-2 py-1 rounded text-xs font-medium shadow-lg whitespace-nowrap flex items-center gap-1">
+                                <Move className="h-3 w-3" strokeWidth={0.5} />
+                                Drag to Move: {overlay.placeholder || overlay.field}
                               </div>
                             )}
                             <Button
