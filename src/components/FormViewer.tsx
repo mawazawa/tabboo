@@ -75,7 +75,11 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
   };
 
   const handleMouseDown = (e: React.MouseEvent, field: string, currentTop: number, currentLeft: number) => {
-    if ((e.target as HTMLElement).closest('.settings-button')) return;
+    // Prevent drag if clicking on settings button or input fields
+    const target = e.target as HTMLElement;
+    if (target.closest('.settings-button') || target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+    
+    e.preventDefault();
     setIsDragging(field);
     dragStartPos.current = {
       x: e.clientX,
@@ -87,6 +91,8 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging) return;
+    e.preventDefault();
+    
     const deltaX = e.clientX - dragStartPos.current.x;
     const deltaY = e.clientY - dragStartPos.current.y;
     const parentRect = (e.currentTarget as HTMLElement).getBoundingClientRect();
@@ -94,7 +100,11 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
     const newLeft = dragStartPos.current.left + (deltaX / parentRect.width) * 100;
     const newTop = dragStartPos.current.top + (deltaY / parentRect.height) * 100;
     
-    updateFieldPosition(isDragging, { top: newTop, left: newLeft });
+    // Constrain within bounds
+    const constrainedLeft = Math.max(0, Math.min(95, newLeft));
+    const constrainedTop = Math.max(0, Math.min(95, newTop));
+    
+    updateFieldPosition(isDragging, { top: constrainedTop, left: constrainedLeft });
   };
 
   const handleMouseUp = () => {
@@ -178,13 +188,13 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                           return (
                           <div
                             key={idx}
-                            className={`field-container absolute pointer-events-auto ${
-                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary' : 'cursor-grab'
+                            className={`field-container absolute pointer-events-auto select-none ${
+                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary opacity-80' : 'cursor-grab'
                             } ${
                               isCurrentField 
-                                ? 'ring-4 ring-primary shadow-lg animate-pulse' 
+                                ? 'ring-4 ring-primary shadow-lg' 
                                 : 'hover:ring-2 hover:ring-primary/50'
-                            } rounded transition-all`}
+                            } rounded transition-shadow`}
                             style={{
                               top: `${position.top}%`,
                               left: `${position.left}%`,
@@ -223,6 +233,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                                 value={formData[overlay.field as keyof FormData] as string || ''}
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
+                                onMouseDown={(e) => e.stopPropagation()}
                                 className={`h-8 text-sm pointer-events-auto ${
                                   isCurrentField 
                                     ? 'bg-primary/10 border-primary border-2' 
@@ -235,6 +246,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                                 value={formData[overlay.field as keyof FormData] as string || ''}
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
+                                onMouseDown={(e) => e.stopPropagation()}
                                 className={`text-sm resize-none pointer-events-auto ${
                                   isCurrentField 
                                     ? 'bg-primary/10 border-primary border-2' 
