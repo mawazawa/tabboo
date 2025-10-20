@@ -1,9 +1,18 @@
 import { FormViewer } from "@/components/FormViewer";
-import { FormFieldsPanel } from "@/components/FormFieldsPanel";
+import { FieldNavigationPanel } from "@/components/FieldNavigationPanel";
 import { AIAssistant } from "@/components/AIAssistant";
 import { PersonalDataVault } from "@/components/PersonalDataVault";
-import { FileText, Sparkles } from "lucide-react";
+import { FileText, MessageSquare } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 interface FormData {
   partyName?: string;
@@ -30,6 +39,7 @@ interface FormData {
 
 const Index = () => {
   const [formData, setFormData] = useState<FormData>({});
+  const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
 
   const updateField = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -53,32 +63,51 @@ const Index = () => {
               </div>
             </div>
             <div className="flex items-center gap-3">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <MessageSquare className="h-4 w-4" />
+                    AI Assistant
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[400px] sm:w-[540px]">
+                  <SheetHeader>
+                    <SheetTitle>AI Form Assistant</SheetTitle>
+                    <SheetDescription>
+                      Get help filling out your FL-320 form
+                    </SheetDescription>
+                  </SheetHeader>
+                  <div className="mt-6 h-[calc(100vh-120px)]">
+                    <AIAssistant />
+                  </div>
+                </SheetContent>
+              </Sheet>
               <PersonalDataVault />
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20">
-                <Sparkles className="w-4 h-4 text-accent" />
-                <span className="text-sm font-medium">FL-320 Form</span>
-              </div>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content - Three Column Layout */}
+      {/* Main Content - DocuSign-style Layout */}
       <main className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-140px)]">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr,320px] gap-6 h-[calc(100vh-140px)]">
           {/* Left: Form Viewer with PDF */}
           <div className="min-h-[600px] lg:min-h-0">
-            <FormViewer formData={formData} updateField={updateField} />
+            <FormViewer 
+              formData={formData} 
+              updateField={updateField}
+              currentFieldIndex={currentFieldIndex}
+            />
           </div>
 
-          {/* Middle: Form Fields Panel */}
+          {/* Right: Narrow Field Navigation Panel */}
           <div className="min-h-[600px] lg:min-h-0">
-            <FormFieldsPanel formData={formData} updateField={updateField} />
-          </div>
-
-          {/* Right: AI Assistant */}
-          <div className="min-h-[600px] lg:min-h-0">
-            <AIAssistant />
+            <FieldNavigationPanel 
+              formData={formData} 
+              updateField={updateField}
+              currentFieldIndex={currentFieldIndex}
+              setCurrentFieldIndex={setCurrentFieldIndex}
+            />
           </div>
         </div>
       </main>

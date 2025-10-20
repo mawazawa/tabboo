@@ -50,9 +50,18 @@ interface FieldOverlay {
 interface Props {
   formData: FormData;
   updateField: (field: string, value: string | boolean) => void;
+  currentFieldIndex: number;
 }
 
-export const FormViewer = ({ formData, updateField }: Props) => {
+export const FormViewer = ({ formData, updateField, currentFieldIndex }: Props) => {
+  // Map field names to their array index in fieldOverlays
+  const fieldNameToIndex: Record<string, number> = {
+    partyName: 0, streetAddress: 1, city: 2, state: 3, zipCode: 4,
+    telephoneNo: 5, faxNo: 6, email: 7, attorneyFor: 8, county: 9,
+    petitioner: 10, respondent: 11, caseNumber: 12, noOrders: 13,
+    agreeOrders: 14, consentCustody: 15, consentVisitation: 16,
+    facts: 17, signatureDate: 18, signatureName: 19
+  };
   const [numPages, setNumPages] = useState<number>(0);
   const [pageWidth, setPageWidth] = useState<number>(850);
   const [fieldPositions, setFieldPositions] = useState<Record<string, { top: string; left: string; width?: string; height?: string }>>({});
@@ -167,10 +176,20 @@ export const FormViewer = ({ formData, updateField }: Props) => {
                           height: overlay.height
                         };
                         
+                        const isCurrentField = fieldNameToIndex[overlay.field] === currentFieldIndex;
+                        
                         return (
                           <div
                             key={idx}
-                            className={`absolute pointer-events-auto ${isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary' : 'cursor-grab'} hover:ring-2 hover:ring-primary/50 rounded transition-all`}
+                            className={`absolute pointer-events-auto ${
+                              isDragging === overlay.field 
+                                ? 'cursor-grabbing z-50 ring-2 ring-primary' 
+                                : 'cursor-grab'
+                            } ${
+                              isCurrentField 
+                                ? 'ring-4 ring-primary shadow-lg animate-pulse' 
+                                : 'hover:ring-2 hover:ring-primary/50'
+                            } rounded transition-all`}
                             style={{
                               top: position.top,
                               left: position.left,
@@ -179,6 +198,11 @@ export const FormViewer = ({ formData, updateField }: Props) => {
                             }}
                             onMouseDown={(e) => handleMouseDown(e, overlay.field, position.top, position.left)}
                           >
+                            {isCurrentField && (
+                              <div className="absolute -top-8 left-0 bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium shadow-lg whitespace-nowrap z-10">
+                                {overlay.placeholder || overlay.field}
+                              </div>
+                            )}
                             <Popover>
                               <PopoverTrigger asChild>
                                 <Button
@@ -247,7 +271,11 @@ export const FormViewer = ({ formData, updateField }: Props) => {
                                 value={formData[overlay.field as keyof FormData] as string || ''}
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
-                                className="h-8 bg-white/90 border-primary/50 text-sm pointer-events-auto"
+                                className={`h-8 text-sm pointer-events-auto ${
+                                  isCurrentField 
+                                    ? 'bg-primary/10 border-primary border-2' 
+                                    : 'bg-white/90 border-primary/50'
+                                }`}
                               />
                             )}
                             {overlay.type === 'textarea' && (
@@ -255,14 +283,22 @@ export const FormViewer = ({ formData, updateField }: Props) => {
                                 value={formData[overlay.field as keyof FormData] as string || ''}
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
-                                className="bg-white/90 border-primary/50 text-sm resize-none pointer-events-auto"
+                                className={`text-sm resize-none pointer-events-auto ${
+                                  isCurrentField 
+                                    ? 'bg-primary/10 border-primary border-2' 
+                                    : 'bg-white/90 border-primary/50'
+                                }`}
                               />
                             )}
                             {overlay.type === 'checkbox' && (
                               <Checkbox
                                 checked={!!formData[overlay.field as keyof FormData]}
                                 onCheckedChange={(checked) => updateField(overlay.field, checked as boolean)}
-                                className="bg-white/90 border-2 border-primary pointer-events-auto"
+                                className={`border-2 pointer-events-auto ${
+                                  isCurrentField 
+                                    ? 'bg-primary/10 border-primary' 
+                                    : 'bg-white/90 border-primary'
+                                }`}
                               />
                             )}
                           </div>
