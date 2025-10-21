@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useState, useRef } from "react";
 import { Document, Page, pdfjs } from 'react-pdf';
-import { Settings, Move } from "lucide-react";
+import { Settings, Move, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
@@ -138,6 +138,32 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
     }
   };
 
+  const adjustPosition = (direction: 'up' | 'down' | 'left' | 'right', field: string) => {
+    const position = fieldPositions[field] || {
+      top: parseFloat(fieldOverlays[0].fields.find(f => f.field === field)?.top || '0'),
+      left: parseFloat(fieldOverlays[0].fields.find(f => f.field === field)?.left || '0')
+    };
+    const step = 0.1;
+    const newPosition = { ...position };
+    
+    switch (direction) {
+      case 'up':
+        newPosition.top = Math.max(0, newPosition.top - step);
+        break;
+      case 'down':
+        newPosition.top = Math.min(100, newPosition.top + step);
+        break;
+      case 'left':
+        newPosition.left = Math.max(0, newPosition.left - step);
+        break;
+      case 'right':
+        newPosition.left = Math.min(100, newPosition.left + step);
+        break;
+    }
+    
+    updateFieldPosition(field, newPosition);
+  };
+
   // Field overlays with default positions
   const fieldOverlays: { page: number; fields: FieldOverlays[] }[] = [{
     page: 1,
@@ -228,9 +254,56 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                             onMouseDown={(e) => handleMouseDown(e, overlay.field, position.top, position.left)}
                           >
                             {isCurrentField && !isEditMode && (
-                              <div className="absolute -top-8 left-0 bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium shadow-lg whitespace-nowrap">
-                                {overlay.placeholder || overlay.field}
-                              </div>
+                              <>
+                                <div className="absolute -top-8 left-0 bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium shadow-lg whitespace-nowrap">
+                                  {overlay.placeholder || overlay.field}
+                                </div>
+                                {/* Glassmorphic Control Arrows */}
+                                <div className="absolute -top-24 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
+                                  <Button
+                                    size="icon"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      adjustPosition('up', overlay.field);
+                                    }}
+                                    className="h-8 w-8 rounded-xl backdrop-blur-xl bg-white/10 border border-white/20 hover:bg-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_48px_rgba(0,0,0,0.15)] transition-all duration-200 group"
+                                  >
+                                    <ChevronUp className="h-4 w-4 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
+                                  </Button>
+                                  <div className="flex gap-1">
+                                    <Button
+                                      size="icon"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        adjustPosition('left', overlay.field);
+                                      }}
+                                      className="h-8 w-8 rounded-xl backdrop-blur-xl bg-white/10 border border-white/20 hover:bg-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_48px_rgba(0,0,0,0.15)] transition-all duration-200 group"
+                                    >
+                                      <ChevronLeft className="h-4 w-4 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
+                                    </Button>
+                                    <Button
+                                      size="icon"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        adjustPosition('down', overlay.field);
+                                      }}
+                                      className="h-8 w-8 rounded-xl backdrop-blur-xl bg-white/10 border border-white/20 hover:bg-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_48px_rgba(0,0,0,0.15)] transition-all duration-200 group"
+                                    >
+                                      <ChevronDown className="h-4 w-4 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
+                                    </Button>
+                                    <Button
+                                      size="icon"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        adjustPosition('right', overlay.field);
+                                      }}
+                                      className="h-8 w-8 rounded-xl backdrop-blur-xl bg-white/10 border border-white/20 hover:bg-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_48px_rgba(0,0,0,0.15)] transition-all duration-200 group"
+                                    >
+                                      <ChevronRight className="h-4 w-4 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
+                                    </Button>
+                                  </div>
+                                </div>
+                              </>
                             )}
                             {isEditMode && (
                               <div className="absolute -top-8 left-0 bg-green-600 text-white px-2 py-1 rounded text-xs font-medium shadow-lg whitespace-nowrap flex items-center gap-1">
