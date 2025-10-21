@@ -21,10 +21,15 @@ export const useGroqStream = () => {
     const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/groq-chat`;
 
     try {
+      // Get auth token from session
+      const token = (await import('@/integrations/supabase/client')).supabase.auth.getSession()
+        .then(({ data }) => data.session?.access_token);
+
       const response = await fetch(CHAT_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${await token}`,
         },
         body: JSON.stringify({ messages, formContext }),
       });
