@@ -79,11 +79,12 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
     // Only allow drag if field is in edit mode
     if (editModeField !== field) return;
     
-    // Prevent drag if clicking on input/textarea fields (but allow drag from anywhere else in the container)
+    // Prevent drag if clicking on input/textarea/button elements
     const target = e.target as HTMLElement;
-    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.closest('button')) return;
     
     e.preventDefault();
+    e.stopPropagation();
     setIsDragging(field);
     dragStartPos.current = {
       x: e.clientX,
@@ -109,7 +110,6 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging) return;
-    e.preventDefault();
     
     const deltaX = e.clientX - dragStartPos.current.x;
     const deltaY = e.clientY - dragStartPos.current.y;
@@ -208,9 +208,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                           return (
                             <div
                             key={idx}
-                            className={`field-container absolute pointer-events-auto select-none ${
+                            className={`field-container absolute select-none ${
                               isDragging === overlay.field ? 'cursor-grabbing z-50 ring-4 ring-green-600 opacity-90' : 
-                              isEditMode ? 'cursor-grab ring-4 ring-green-600 shadow-xl' : 'cursor-default'
+                              isEditMode ? 'cursor-grab ring-4 ring-green-600 shadow-xl' : 'cursor-pointer'
                             } ${
                               isEditMode 
                                 ? 'ring-4 ring-green-600 shadow-xl bg-green-600/10' :
@@ -223,6 +223,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                               left: `${position.left}%`,
                               width: overlay.width || 'auto',
                               height: overlay.height || 'auto',
+                              pointerEvents: 'auto',
                             }}
                             onMouseDown={(e) => handleMouseDown(e, overlay.field, position.top, position.left)}
                           >
@@ -240,12 +241,17 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                             <Button
                               size="icon"
                               variant={isEditMode ? "default" : "default"}
-                              className={`settings-button absolute -top-2 -right-2 h-6 w-6 rounded-full shadow-lg ${
+                              className={`settings-button absolute -top-2 -right-2 h-6 w-6 rounded-full shadow-lg z-10 ${
                                 isEditMode ? 'bg-green-600 hover:bg-green-700' : ''
                               }`}
                               onClick={(e) => {
+                                e.preventDefault();
                                 e.stopPropagation();
                                 toggleEditMode(overlay.field);
+                              }}
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
                               }}
                             >
                               {isEditMode ? (
@@ -260,10 +266,13 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                                 value={formData[overlay.field as keyof FormData] as string || ''}
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
-                                onMouseDown={(e) => e.stopPropagation()}
-                                className={`h-8 text-sm pointer-events-auto ${
+                                onMouseDown={(e) => {
+                                  e.stopPropagation();
+                                }}
+                                disabled={isEditMode}
+                                className={`h-8 text-sm ${
                                   isEditMode
-                                    ? 'bg-green-600/10 border-green-600 border-2' :
+                                    ? 'bg-green-600/10 border-green-600 border-2 cursor-grab' :
                                   isCurrentField 
                                     ? 'bg-primary/10 border-primary border-2' 
                                     : 'bg-white/90 border-primary/50'
@@ -275,10 +284,13 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                                 value={formData[overlay.field as keyof FormData] as string || ''}
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
-                                onMouseDown={(e) => e.stopPropagation()}
-                                className={`text-sm resize-none pointer-events-auto ${
+                                onMouseDown={(e) => {
+                                  e.stopPropagation();
+                                }}
+                                disabled={isEditMode}
+                                className={`text-sm resize-none ${
                                   isEditMode
-                                    ? 'bg-green-600/10 border-green-600 border-2' :
+                                    ? 'bg-green-600/10 border-green-600 border-2 cursor-grab' :
                                   isCurrentField 
                                     ? 'bg-primary/10 border-primary border-2' 
                                     : 'bg-white/90 border-primary/50'
@@ -288,10 +300,11 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                             {overlay.type === 'checkbox' && (
                               <Checkbox
                                 checked={!!formData[overlay.field as keyof FormData]}
-                                onCheckedChange={(checked) => updateField(overlay.field, checked as boolean)}
-                                className={`border-2 pointer-events-auto ${
+                                onCheckedChange={(checked) => !isEditMode && updateField(overlay.field, checked as boolean)}
+                                disabled={isEditMode}
+                                className={`border-2 ${
                                   isEditMode
-                                    ? 'bg-green-600/10 border-green-600' :
+                                    ? 'bg-green-600/10 border-green-600 cursor-grab' :
                                   isCurrentField 
                                     ? 'bg-primary/10 border-primary' 
                                     : 'bg-white/90 border-primary'
