@@ -6,7 +6,7 @@ interface Message {
   content: string;
 }
 
-const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-form-assistant`;
+const CHAT_URL = `https://sbwgkocarqvonkdlitdx.supabase.co/functions/v1/ai-form-assistant`;
 
 export const useAIStream = () => {
   const [isLoading, setIsLoading] = useState(false);

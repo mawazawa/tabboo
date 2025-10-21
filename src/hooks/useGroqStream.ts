@@ -18,7 +18,7 @@ export const useGroqStream = () => {
 
   const streamChat = async ({ messages, formContext, onDelta, onDone, onError }: StreamChatParams) => {
     setIsLoading(true);
-    const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/groq-chat`;
+    const CHAT_URL = `https://sbwgkocarqvonkdlitdx.supabase.co/functions/v1/groq-chat`;
 
     try {
       // Get auth token from session

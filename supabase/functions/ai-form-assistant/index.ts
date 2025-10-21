@@ -1,10 +1,21 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Input validation schemas
+const messageSchema = z.object({
+  role: z.enum(['user', 'assistant', 'system']),
+  content: z.string().min(1).max(4000)
+});
+
+const requestSchema = z.object({
+  messages: z.array(messageSchema).min(1).max(50)
+});
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -39,15 +50,24 @@ serve(async (req) => {
       });
     }
 
-    const { messages } = await req.json();
+    const body = await req.json();
     
-    // Validate messages input
-    if (!Array.isArray(messages) || messages.length === 0) {
-      return new Response(JSON.stringify({ error: 'Invalid messages format' }), {
+    // Validate and sanitize input
+    let validated;
+    try {
+      validated = requestSchema.parse(body);
+    } catch (validationError) {
+      console.error('Validation error:', validationError);
+      return new Response(JSON.stringify({ 
+        error: 'Invalid input format',
+        details: validationError instanceof Error ? validationError.message : 'Validation failed'
+      }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+    
+    const { messages } = validated;
 
     // Fetch user's personal info from vault - only when explicitly needed
     const { data: personalInfo, error: dbError } = await supabase
@@ -60,7 +80,7 @@ serve(async (req) => {
       console.error('Database error:', dbError);
     }
 
-    // Check if user is asking for personal information in their message
+    // Sanitize and filter PII - only include when explicitly needed
     const lastUserMessage = messages[messages.length - 1]?.content?.toLowerCase() || '';
     const needsPersonalInfo = lastUserMessage.includes('my name') || 
                               lastUserMessage.includes('my address') || 
@@ -69,18 +89,21 @@ serve(async (req) => {
                               lastUserMessage.includes('fill out') ||
                               lastUserMessage.includes('attorney');
 
-    // Build minimal context - only include PII when explicitly needed
+    // Safe fields whitelist - never include sensitive fields
+    const safeFields = ['full_name', 'city', 'state', 'attorney_name'];
     let personalContext = '';
+    
     if (needsPersonalInfo && personalInfo) {
-      // Only include fields that are non-sensitive or explicitly requested
+      // Only include whitelisted fields and only when explicitly requested
       personalContext = `\n\nAvailable user information (use only when relevant):`;
-      if (personalInfo.full_name && lastUserMessage.includes('name')) {
+      if (personalInfo.full_name && lastUserMessage.includes('name') && safeFields.includes('full_name')) {
         personalContext += `\n- Name: ${personalInfo.full_name}`;
       }
       if ((personalInfo.city || personalInfo.state) && lastUserMessage.includes('address')) {
-        personalContext += `\n- Location: ${personalInfo.city || ''}${personalInfo.city && personalInfo.state ? ', ' : ''}${personalInfo.state || ''}`;
+        if (safeFields.includes('city')) personalContext += `\n- City: ${personalInfo.city || ''}`;
+        if (safeFields.includes('state')) personalContext += `\n- State: ${personalInfo.state || ''}`;
       }
-      if (personalInfo.attorney_name && lastUserMessage.includes('attorney')) {
+      if (personalInfo.attorney_name && lastUserMessage.includes('attorney') && safeFields.includes('attorney_name')) {
         personalContext += `\n- Attorney: ${personalInfo.attorney_name}`;
       }
     } else if (!personalInfo) {
