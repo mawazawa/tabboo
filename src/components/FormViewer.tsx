@@ -267,12 +267,14 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
                                 onMouseDown={(e) => {
-                                  e.stopPropagation();
+                                  if (!isEditMode) {
+                                    e.stopPropagation();
+                                  }
                                 }}
                                 disabled={isEditMode}
                                 className={`h-8 text-sm ${
                                   isEditMode
-                                    ? 'bg-green-600/10 border-green-600 border-2 cursor-grab' :
+                                    ? 'bg-green-600/10 border-green-600 border-2 cursor-grab pointer-events-none' :
                                   isCurrentField 
                                     ? 'bg-primary/10 border-primary border-2' 
                                     : 'bg-white/90 border-primary/50'
@@ -285,12 +287,14 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
                                 onMouseDown={(e) => {
-                                  e.stopPropagation();
+                                  if (!isEditMode) {
+                                    e.stopPropagation();
+                                  }
                                 }}
                                 disabled={isEditMode}
                                 className={`text-sm resize-none ${
                                   isEditMode
-                                    ? 'bg-green-600/10 border-green-600 border-2 cursor-grab' :
+                                    ? 'bg-green-600/10 border-green-600 border-2 cursor-grab pointer-events-none' :
                                   isCurrentField 
                                     ? 'bg-primary/10 border-primary border-2' 
                                     : 'bg-white/90 border-primary/50'
@@ -304,7 +308,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                                 disabled={isEditMode}
                                 className={`border-2 ${
                                   isEditMode
-                                    ? 'bg-green-600/10 border-green-600 cursor-grab' :
+                                    ? 'bg-green-600/10 border-green-600 cursor-grab pointer-events-none' :
                                   isCurrentField 
                                     ? 'bg-primary/10 border-primary' 
                                     : 'bg-white/90 border-primary'
