@@ -49,7 +49,7 @@ serve(async (req) => {
       });
     }
 
-    // Fetch user's personal info from vault
+    // Fetch user's personal info from vault - only when explicitly needed
     const { data: personalInfo, error: dbError } = await supabase
       .from('personal_info')
       .select('*')
@@ -60,26 +60,40 @@ serve(async (req) => {
       console.error('Database error:', dbError);
     }
 
-    // System prompt with context about the form and user data
+    // Check if user is asking for personal information in their message
+    const lastUserMessage = messages[messages.length - 1]?.content?.toLowerCase() || '';
+    const needsPersonalInfo = lastUserMessage.includes('my name') || 
+                              lastUserMessage.includes('my address') || 
+                              lastUserMessage.includes('my contact') ||
+                              lastUserMessage.includes('my information') ||
+                              lastUserMessage.includes('fill out') ||
+                              lastUserMessage.includes('attorney');
+
+    // Build minimal context - only include PII when explicitly needed
+    let personalContext = '';
+    if (needsPersonalInfo && personalInfo) {
+      // Only include fields that are non-sensitive or explicitly requested
+      personalContext = `\n\nAvailable user information (use only when relevant):`;
+      if (personalInfo.full_name && lastUserMessage.includes('name')) {
+        personalContext += `\n- Name: ${personalInfo.full_name}`;
+      }
+      if ((personalInfo.city || personalInfo.state) && lastUserMessage.includes('address')) {
+        personalContext += `\n- Location: ${personalInfo.city || ''}${personalInfo.city && personalInfo.state ? ', ' : ''}${personalInfo.state || ''}`;
+      }
+      if (personalInfo.attorney_name && lastUserMessage.includes('attorney')) {
+        personalContext += `\n- Attorney: ${personalInfo.attorney_name}`;
+      }
+    } else if (!personalInfo) {
+      personalContext = '\n\nNo personal information stored. Ask user to save their information in the Personal Data Vault first.';
+    }
+
+    // System prompt with minimal PII exposure
     const systemPrompt = `You are SwiftFill Pro AI Assistant, an intelligent legal form filling assistant.
 
-Your role is to help users fill out California FL-320 Responsive Declaration to Request for Order forms accurately and efficiently.
-
-${personalInfo ? `User's Personal Information:
-- Full Name: ${personalInfo.full_name || 'Not provided'}
-- Street Address: ${personalInfo.street_address || 'Not provided'}
-- City: ${personalInfo.city || 'Not provided'}
-- State: ${personalInfo.state || 'Not provided'}
-- ZIP Code: ${personalInfo.zip_code || 'Not provided'}
-- Telephone: ${personalInfo.telephone_no || 'Not provided'}
-- Fax: ${personalInfo.fax_no || 'Not provided'}
-- Email: ${personalInfo.email_address || 'Not provided'}
-- Attorney Name: ${personalInfo.attorney_name || 'Not provided'}
-- Firm Name: ${personalInfo.firm_name || 'Not provided'}
-- Bar Number: ${personalInfo.bar_number || 'Not provided'}` : 'No personal information stored yet. Ask the user to provide their information first.'}
+Your role is to help users fill out California FL-320 Responsive Declaration to Request for Order forms accurately and efficiently.${personalContext}
 
 When helping fill forms:
-1. Use the user's stored personal information when appropriate
+1. Only request user's personal information when absolutely necessary for the specific form field
 2. Ask clarifying questions about case-specific details
 3. Provide legal context about each section (without giving legal advice)
 4. Suggest appropriate responses based on common scenarios
