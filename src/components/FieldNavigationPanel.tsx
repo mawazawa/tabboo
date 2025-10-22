@@ -224,45 +224,45 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
   }, [currentFieldIndex, fieldPositions]);
 
   return (
-    <Card className="h-full border-2 shadow-medium flex flex-col">
-      <div className="p-4 border-b bg-muted/30">
+    <Card className="h-full border-hairline shadow-3point chamfered flex flex-col">
+      <div className="p-4 border-b-hairline bg-muted/30">
         <h2 className="font-semibold text-sm">Form Fields</h2>
         <p className="text-xs text-muted-foreground mt-1">
           Use Tab to navigate • {currentFieldIndex + 1} of {FIELD_CONFIG.length}
         </p>
         <div className="flex gap-2 mt-3">
           <Button
-            size="sm"
+            size="lg"
             variant="outline"
             onClick={goToPrevField}
             disabled={currentFieldIndex === 0}
-            className="flex-1"
+            className="flex-1 shadow-3point chamfered spring-hover border-hairline"
           >
-            <ChevronUp className="h-4 w-4 mr-1" strokeWidth={0.5} />
+            <ChevronUp className="h-5 w-5 mr-1" strokeWidth={0.5} />
             Previous
           </Button>
           <Button
-            size="sm"
+            size="lg"
             variant="outline"
             onClick={goToNextField}
             disabled={currentFieldIndex === FIELD_CONFIG.length - 1}
-            className="flex-1"
+            className="flex-1 shadow-3point chamfered spring-hover border-hairline"
           >
             Next
-            <ChevronDown className="h-4 w-4 ml-1" strokeWidth={0.5} />
+            <ChevronDown className="h-5 w-5 ml-1" strokeWidth={0.5} />
           </Button>
         </div>
 
         {/* Current field position display only */}
-        <div className="mt-4 p-3 bg-background rounded-lg border">
-          <h3 className="text-xs font-semibold mb-2">Active Field Position</h3>
-          <div className="text-xs text-muted-foreground">
+        <div className="mt-4 p-3 bg-background rounded-lg border-hairline shadow-3point chamfered">
+          <h3 className="text-sm font-semibold mb-2">Active Field Position</h3>
+          <div className="text-sm text-muted-foreground">
             {FIELD_CONFIG[currentFieldIndex]?.label}
             <br />
             X: {currentPosition.left.toFixed(1)}% • Y: {currentPosition.top.toFixed(1)}%
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            Click gear icon on field to adjust
+            Tap gear icon on field to adjust
           </p>
         </div>
       </div>
@@ -275,9 +275,9 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
             return (
               <div
                 key={config.field}
-                className={`space-y-2 p-3 rounded-lg border-2 transition-all ${
+                className={`space-y-2 p-4 rounded-lg border-hairline transition-all shadow-3point chamfered spring-hover ${
                   isActive 
-                    ? 'border-primary bg-primary/5 shadow-sm' 
+                    ? 'border-primary bg-primary/5 shadow-3point-hover' 
                     : 'border-transparent hover:border-muted'
                 }`}
                 onClick={() => setCurrentFieldIndex(index)}
@@ -292,16 +292,16 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
                   <div className="flex items-center gap-2">
                     {config.vaultField && personalInfo && personalInfo[config.vaultField as keyof typeof personalInfo] && (
                       <Button
-                        size="sm"
+                        size="lg"
                         variant="ghost"
                         onClick={(e) => {
                           e.stopPropagation();
                           copyFromVault(config);
                         }}
-                        className="h-6 px-2 text-xs gap-1"
+                        className="h-10 px-3 text-sm gap-1 shadow-3point chamfered spring-hover"
                         title="Copy from vault"
                       >
-                        <Copy className="h-3 w-3" strokeWidth={0.5} />
+                        <Copy className="h-4 w-4" strokeWidth={0.5} />
                         Copy
                       </Button>
                     )}
@@ -311,19 +311,19 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
                     >
                       <PopoverTrigger asChild>
                         <Button
-                          size="sm"
+                          size="lg"
                           variant="ghost"
                           onClick={(e) => {
                             e.stopPropagation();
                           }}
-                          className="h-6 w-6 p-0"
+                          className="h-10 w-10 p-0 shadow-3point chamfered spring-hover"
                           title="Adjust position"
                         >
-                          <Settings className="h-3 w-3" strokeWidth={0.5} />
+                          <Settings className="h-4 w-4" strokeWidth={0.5} />
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-48 p-3" side="left" align="start">
-                        <h4 className="text-xs font-semibold mb-2">Position</h4>
+                      <PopoverContent className="w-56 p-4 shadow-3point chamfered border-hairline" side="left" align="start">
+                        <h4 className="text-sm font-semibold mb-3">Position</h4>
                         <div className="grid grid-cols-2 gap-2 mb-2">
                           <div>
                             <label className="text-[10px] text-muted-foreground">X %</label>
@@ -412,7 +412,7 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
                     onKeyDown={(e) => handleKeyDown(e, index)}
                     onFocus={() => setCurrentFieldIndex(index)}
                     placeholder={config.placeholder}
-                    className="h-9 text-sm"
+                    className="h-12 text-base border-hairline shadow-3point chamfered"
                     maxLength={config.field === 'state' ? 2 : undefined}
                   />
                 )}

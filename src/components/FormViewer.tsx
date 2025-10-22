@@ -75,7 +75,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
     setNumPages(numPages);
   };
 
-  const handleMouseDown = (e: React.MouseEvent, field: string, currentTop: number, currentLeft: number) => {
+  const handlePointerDown = (e: React.PointerEvent, field: string, currentTop: number, currentLeft: number) => {
     // Only allow drag if field is in edit mode
     if (editModeField !== field) return;
     
@@ -86,6 +86,10 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(field);
+    
+    // Capture pointer for smooth mobile dragging
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    
     dragStartPos.current = {
       x: e.clientX,
       y: e.clientY,
@@ -108,8 +112,10 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
     }
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handlePointerMove = (e: React.PointerEvent) => {
     if (!isDragging) return;
+    
+    e.preventDefault();
     
     const deltaX = e.clientX - dragStartPos.current.x;
     const deltaY = e.clientY - dragStartPos.current.y;
@@ -125,7 +131,10 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
     updateFieldPosition(isDragging, { top: constrainedTop, left: constrainedLeft });
   };
 
-  const handleMouseUp = () => {
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (isDragging) {
+      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    }
     setIsDragging(null);
   };
 
@@ -192,7 +201,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
   }];
 
   return (
-    <Card className="h-full border-2 shadow-medium">
+    <Card className="h-full border-hairline shadow-3point chamfered">
       <ScrollArea className="h-full">
         <div className="relative">
           <Document
@@ -207,10 +216,10 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
               return (
                 <div 
                   key={`page_${pageNum}`}
-                  className="relative mb-4"
-                  onMouseMove={handleMouseMove}
-                  onMouseUp={handleMouseUp}
-                  onMouseLeave={handleMouseUp}
+                  className="relative mb-4 touch-none"
+                  onPointerMove={handlePointerMove}
+                  onPointerUp={handlePointerUp}
+                  onPointerLeave={handlePointerUp}
                   onClick={handlePDFClick}
                 >
                   <Page
@@ -234,16 +243,16 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                           return (
                             <div
                             key={idx}
-                            className={`field-container absolute select-none ${
-                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-4 ring-green-600 opacity-90' : 
-                              isEditMode ? 'cursor-grab ring-4 ring-green-600 shadow-xl' : 'cursor-pointer'
+                            className={`field-container absolute select-none touch-none spring-hover ${
+                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-4 ring-green-600 opacity-90 shadow-3point' : 
+                              isEditMode ? 'cursor-grab ring-4 ring-green-600 shadow-3point' : 'cursor-pointer'
                             } ${
                               isEditMode 
-                                ? 'ring-4 ring-green-600 shadow-xl bg-green-600/10' :
+                                ? 'ring-4 ring-green-600 shadow-3point bg-green-600/10 chamfered' :
                               isCurrentField 
-                                ? 'ring-4 ring-primary shadow-lg' 
+                                ? 'ring-4 ring-primary shadow-3point chamfered' 
                                 : 'hover:ring-2 hover:ring-primary/50'
-                            } rounded transition-all`}
+                            } rounded-lg transition-all`}
                             style={{
                               top: `${position.top}%`,
                               left: `${position.left}%`,
@@ -251,35 +260,35 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                               height: overlay.height || 'auto',
                               pointerEvents: 'auto',
                             }}
-                            onMouseDown={(e) => handleMouseDown(e, overlay.field, position.top, position.left)}
+                            onPointerDown={(e) => handlePointerDown(e, overlay.field, position.top, position.left)}
                           >
                             {isCurrentField && !isEditMode && (
                               <>
-                                <div className="absolute -top-8 left-0 bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium shadow-lg whitespace-nowrap">
+                                <div className="absolute -top-10 left-0 bg-primary text-primary-foreground px-3 py-2 rounded-lg text-sm font-medium shadow-3point whitespace-nowrap chamfered">
                                   {overlay.placeholder || overlay.field}
                                 </div>
-                                {/* Glassmorphic Control Arrows */}
-                                <div className="absolute -top-24 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
+                                {/* Premium Touch-Friendly Control Arrows */}
+                                <div className="absolute -top-32 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
                                   <Button
                                     size="icon"
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       adjustPosition('up', overlay.field);
                                     }}
-                                    className="h-8 w-8 rounded-xl backdrop-blur-xl bg-white/10 border border-white/20 hover:bg-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_48px_rgba(0,0,0,0.15)] transition-all duration-200 group"
+                                    className="h-12 w-12 rounded-xl backdrop-blur-xl bg-white/10 border-hairline border-white/20 hover:bg-white/20 shadow-3point chamfered spring-hover group touch-none"
                                   >
-                                    <ChevronUp className="h-4 w-4 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
+                                    <ChevronUp className="h-6 w-6 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
                                   </Button>
-                                  <div className="flex gap-1">
+                                  <div className="flex gap-2">
                                     <Button
                                       size="icon"
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         adjustPosition('left', overlay.field);
                                       }}
-                                      className="h-8 w-8 rounded-xl backdrop-blur-xl bg-white/10 border border-white/20 hover:bg-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_48px_rgba(0,0,0,0.15)] transition-all duration-200 group"
+                                      className="h-12 w-12 rounded-xl backdrop-blur-xl bg-white/10 border-hairline border-white/20 hover:bg-white/20 shadow-3point chamfered spring-hover group touch-none"
                                     >
-                                      <ChevronLeft className="h-4 w-4 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
+                                      <ChevronLeft className="h-6 w-6 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
                                     </Button>
                                     <Button
                                       size="icon"
@@ -287,9 +296,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                                         e.stopPropagation();
                                         adjustPosition('down', overlay.field);
                                       }}
-                                      className="h-8 w-8 rounded-xl backdrop-blur-xl bg-white/10 border border-white/20 hover:bg-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_48px_rgba(0,0,0,0.15)] transition-all duration-200 group"
+                                      className="h-12 w-12 rounded-xl backdrop-blur-xl bg-white/10 border-hairline border-white/20 hover:bg-white/20 shadow-3point chamfered spring-hover group touch-none"
                                     >
-                                      <ChevronDown className="h-4 w-4 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
+                                      <ChevronDown className="h-6 w-6 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
                                     </Button>
                                     <Button
                                       size="icon"
@@ -297,24 +306,24 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                                         e.stopPropagation();
                                         adjustPosition('right', overlay.field);
                                       }}
-                                      className="h-8 w-8 rounded-xl backdrop-blur-xl bg-white/10 border border-white/20 hover:bg-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_48px_rgba(0,0,0,0.15)] transition-all duration-200 group"
+                                      className="h-12 w-12 rounded-xl backdrop-blur-xl bg-white/10 border-hairline border-white/20 hover:bg-white/20 shadow-3point chamfered spring-hover group touch-none"
                                     >
-                                      <ChevronRight className="h-4 w-4 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
+                                      <ChevronRight className="h-6 w-6 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
                                     </Button>
                                   </div>
                                 </div>
                               </>
                             )}
                             {isEditMode && (
-                              <div className="absolute -top-8 left-0 bg-green-600 text-white px-2 py-1 rounded text-xs font-medium shadow-lg whitespace-nowrap flex items-center gap-1">
-                                <Move className="h-3 w-3" strokeWidth={0.5} />
-                                Drag to Move: {overlay.placeholder || overlay.field}
+                              <div className="absolute -top-10 left-0 bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium shadow-3point whitespace-nowrap flex items-center gap-2 chamfered">
+                                <Move className="h-4 w-4" strokeWidth={0.5} />
+                                Swipe to Move: {overlay.placeholder || overlay.field}
                               </div>
                             )}
                             <Button
                               size="icon"
                               variant={isEditMode ? "default" : "default"}
-                              className={`settings-button absolute -top-2 -right-2 h-6 w-6 rounded-full shadow-lg z-10 ${
+                              className={`settings-button absolute -top-3 -right-3 h-10 w-10 rounded-full shadow-3point z-10 spring-hover chamfered touch-none ${
                                 isEditMode ? 'bg-green-600 hover:bg-green-700' : ''
                               }`}
                               onClick={(e) => {
@@ -322,15 +331,15 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                                 e.stopPropagation();
                                 toggleEditMode(overlay.field);
                               }}
-                              onMouseDown={(e) => {
+                              onPointerDown={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
                               }}
                             >
                               {isEditMode ? (
-                                <Move className="h-3 w-3" strokeWidth={0.5} />
+                                <Move className="h-5 w-5" strokeWidth={0.5} />
                               ) : (
-                                <Settings className="h-3 w-3" strokeWidth={0.5} />
+                                <Settings className="h-5 w-5" strokeWidth={0.5} />
                               )}
                             </Button>
                             
@@ -339,17 +348,17 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                                 value={formData[overlay.field as keyof FormData] as string || ''}
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
-                                onMouseDown={(e) => {
+                                onPointerDown={(e) => {
                                   if (!isEditMode) {
                                     e.stopPropagation();
                                   }
                                 }}
                                 disabled={isEditMode}
-                                className={`h-8 text-sm ${
+                                className={`h-12 text-base border-hairline shadow-3point chamfered ${
                                   isEditMode
-                                    ? 'bg-green-600/10 border-green-600 border-2 cursor-grab pointer-events-none' :
+                                    ? 'bg-green-600/10 border-green-600 cursor-grab pointer-events-none' :
                                   isCurrentField 
-                                    ? 'bg-primary/10 border-primary border-2' 
+                                    ? 'bg-primary/10 border-primary' 
                                     : 'bg-white/90 border-primary/50'
                                 }`}
                               />
