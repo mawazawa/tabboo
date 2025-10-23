@@ -993,28 +993,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      add_credits: {
-        Args:
-          | {
+      add_credits:
+        | {
+            Args: {
               p_credits_to_add: number
               p_fingerprint: string
               p_stripe_customer_id?: string
               p_user_id: string
             }
-          | {
+            Returns: {
+              new_balance: number
+              success: boolean
+            }[]
+          }
+        | {
+            Args: {
               p_credits_to_add: number
               p_transaction_id: string
               p_user_id: string
             }
-        Returns: {
-          new_balance: number
-          success: boolean
-        }[]
-      }
-      binary_quantize: {
-        Args: { "": string } | { "": unknown }
-        Returns: unknown
-      }
+            Returns: Json
+          }
       check_quota: {
         Args: { user_fingerprint: string }
         Returns: {
@@ -1026,7 +1025,7 @@ export type Database = {
         }[]
       }
       cleanup_expired_sessions: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           cleanup_timestamp: string
           deleted_count: number
@@ -1039,69 +1038,11 @@ export type Database = {
           success: boolean
         }[]
       }
-      deduct_credit: {
-        Args: { p_user_id: string }
-        Returns: Json
-      }
-      expire_credits: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
+      deduct_credit: { Args: { p_user_id: string }; Returns: Json }
+      expire_credits: { Args: never; Returns: Json }
       get_credit_balance: {
         Args: { p_fingerprint: string; p_user_id: string }
         Returns: number
-      }
-      halfvec_avg: {
-        Args: { "": number[] }
-        Returns: unknown
-      }
-      halfvec_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      halfvec_send: {
-        Args: { "": unknown }
-        Returns: string
-      }
-      halfvec_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
-      }
-      hnsw_bit_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnsw_halfvec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnsw_sparsevec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnswhandler: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      ivfflat_bit_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      ivfflat_halfvec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      ivfflathandler: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      l2_norm: {
-        Args: { "": unknown } | { "": unknown }
-        Returns: number
-      }
-      l2_normalize: {
-        Args: { "": string } | { "": unknown } | { "": unknown }
-        Returns: unknown
       }
       process_refund: {
         Args: {
@@ -1125,42 +1066,6 @@ export type Database = {
           original_filename: string
           similarity: number
         }[]
-      }
-      sparsevec_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      sparsevec_send: {
-        Args: { "": unknown }
-        Returns: string
-      }
-      sparsevec_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
-      }
-      vector_avg: {
-        Args: { "": number[] }
-        Returns: string
-      }
-      vector_dims: {
-        Args: { "": string } | { "": unknown }
-        Returns: number
-      }
-      vector_norm: {
-        Args: { "": string }
-        Returns: number
-      }
-      vector_out: {
-        Args: { "": string }
-        Returns: unknown
-      }
-      vector_send: {
-        Args: { "": string }
-        Returns: string
-      }
-      vector_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
       }
     }
     Enums: {
