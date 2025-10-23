@@ -15,24 +15,71 @@ interface Message {
 
 interface AIAssistantProps {
   formContext?: any;
+  vaultData?: any;
 }
 
-export const AIAssistant = ({ formContext }: AIAssistantProps) => {
+export const AIAssistant = ({ formContext, vaultData }: AIAssistantProps) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "👋 Hi! I'm your SwiftFill Pro AI Assistant powered by Groq and Kimi 2. I can see your form data and help you fill it out accurately. What would you like help with?"
+      content: "👋 Hi! I'm your SwiftFill Pro AI Assistant powered by Groq and Kimi 2. I can see your form data and Personal Data Vault. I'll help you fill out forms accurately and flag any missing required information. What would you like help with?"
     }
   ]);
   const [input, setInput] = useState('');
   const { streamChat, isLoading } = useGroqStream();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const hasAnalyzed = useRef(false);
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // Analyze vault and form data on mount
+  useEffect(() => {
+    if (vaultData && !hasAnalyzed.current) {
+      hasAnalyzed.current = true;
+      
+      // Check for missing vault fields
+      const requiredVaultFields = [
+        'full_name', 'street_address', 'city', 'state', 'zip_code', 
+        'telephone_no', 'email_address'
+      ];
+      const missingVaultFields = requiredVaultFields.filter(
+        field => !vaultData[field]
+      );
+
+      // Check for missing form fields
+      const requiredFormFields = [
+        'partyName', 'streetAddress', 'city', 'state', 'zipCode', 
+        'telephoneNo', 'email'
+      ];
+      const missingFormFields = requiredFormFields.filter(
+        field => !formContext?.[field]
+      );
+
+      if (missingVaultFields.length > 0 || missingFormFields.length > 0) {
+        let analysisMessage = "📋 **Analysis:**\n\n";
+        
+        if (missingVaultFields.length > 0) {
+          analysisMessage += `🔴 Your Personal Data Vault is missing **${missingVaultFields.length} fields**:\n`;
+          analysisMessage += missingVaultFields.map(f => `  • ${f.replace(/_/g, ' ')}`).join('\n');
+          analysisMessage += '\n\n';
+        }
+
+        if (missingFormFields.length > 0) {
+          analysisMessage += `📝 The current form is missing **${missingFormFields.length} required fields**:\n`;
+          analysisMessage += missingFormFields.map(f => `  • ${f}`).join('\n');
+          analysisMessage += '\n\n';
+        }
+
+        analysisMessage += "💡 I can help you fill these fields. Just provide the information, and I'll save it to both your vault and the form!";
+
+        setMessages(prev => [...prev, { role: 'assistant', content: analysisMessage }]);
+      }
+    }
+  }, [vaultData, formContext]);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -48,7 +95,13 @@ export const AIAssistant = ({ formContext }: AIAssistantProps) => {
 
     await streamChat({
       messages: [...messages, userMessage],
-      formContext,
+      formContext: {
+        ...formContext,
+        vaultData: vaultData || {},
+        missingVaultFields: vaultData ? 
+          ['full_name', 'street_address', 'city', 'state', 'zip_code', 'telephone_no', 'email_address']
+            .filter(field => !vaultData[field]) : [],
+      },
       onDelta: (chunk) => {
         assistantContent += chunk;
         setMessages(prev => {

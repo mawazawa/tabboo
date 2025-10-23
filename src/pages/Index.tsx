@@ -2,12 +2,14 @@ import { FormViewer } from "@/components/FormViewer";
 import { FieldNavigationPanel } from "@/components/FieldNavigationPanel";
 import { AIAssistant } from "@/components/AIAssistant";
 import { PersonalDataVault } from "@/components/PersonalDataVault";
-import { FileText, MessageSquare, LogOut, Loader2, Calculator, PanelLeftClose, PanelRightClose } from "lucide-react";
+import { PersonalDataVaultPanel } from "@/components/PersonalDataVaultPanel";
+import { FileText, MessageSquare, LogOut, Loader2, Calculator, PanelLeftClose, PanelRightClose, Shield } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import {
   Sheet,
@@ -59,8 +61,29 @@ const Index = () => {
   const [documentId, setDocumentId] = useState<string | null>(null);
   const [showAIPanel, setShowAIPanel] = useState(false);
   const [showFieldsPanel, setShowFieldsPanel] = useState(true);
+  const [showVaultPanel, setShowVaultPanel] = useState(false);
   const { toast } = useToast();
   const hasUnsavedChanges = useRef(false);
+
+  // Fetch vault data for AI Assistant context
+  const { data: vaultData } = useQuery({
+    queryKey: ['vault-data', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from('personal_info')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching vault data:', error);
+        return null;
+      }
+      return data;
+    },
+    enabled: !!user?.id,
+  });
 
   const updateField = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -248,7 +271,16 @@ const Index = () => {
                 <PanelRightClose className="h-4 w-4" strokeWidth={0.5} />
                 Fields
               </Button>
-              <PersonalDataVault userId={user?.id || ''} />
+              
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className={`gap-2 ${showVaultPanel ? 'bg-primary/10 border-primary' : ''}`}
+                onClick={() => setShowVaultPanel(!showVaultPanel)}
+              >
+                <Shield className="h-4 w-4" strokeWidth={0.5} />
+                Vault
+              </Button>
               <Button variant="outline" size="sm" onClick={handleLogout} className="gap-2">
                 <LogOut className="h-4 w-4" strokeWidth={0.5} />
                 Logout
@@ -266,7 +298,7 @@ const Index = () => {
             <>
               <ResizablePanel defaultSize={25} minSize={20} maxSize={35}>
                 <div className="h-full pr-3">
-                  <AIAssistant formContext={formData} />
+                  <AIAssistant formContext={formData} vaultData={vaultData} />
                 </div>
               </ResizablePanel>
               <ResizableHandle withHandle />
@@ -287,20 +319,24 @@ const Index = () => {
             </div>
           </ResizablePanel>
 
-          {/* Right: Field Navigation Panel (collapsible) */}
-          {showFieldsPanel && (
+          {/* Right: Field Navigation Panel OR Vault Panel (collapsible) */}
+          {(showFieldsPanel || showVaultPanel) && (
             <>
               <ResizableHandle withHandle />
               <ResizablePanel defaultSize={25} minSize={20} maxSize={35}>
                 <div className="h-full pl-3">
-                  <FieldNavigationPanel 
-                    formData={formData} 
-                    updateField={updateField}
-                    currentFieldIndex={currentFieldIndex}
-                    setCurrentFieldIndex={setCurrentFieldIndex}
-                    fieldPositions={fieldPositions}
-                    updateFieldPosition={updateFieldPosition}
-                  />
+                  {showVaultPanel ? (
+                    <PersonalDataVaultPanel userId={user?.id || ''} />
+                  ) : (
+                    <FieldNavigationPanel 
+                      formData={formData} 
+                      updateField={updateField}
+                      currentFieldIndex={currentFieldIndex}
+                      setCurrentFieldIndex={setCurrentFieldIndex}
+                      fieldPositions={fieldPositions}
+                      updateFieldPosition={updateFieldPosition}
+                    />
+                  )}
                 </div>
               </ResizablePanel>
             </>
