@@ -437,6 +437,28 @@ const DistributionCalculator = () => {
                   </div>
                 </div>
 
+                {/* Legal Authority Section */}
+                <div className="bg-blue-50/50 dark:bg-blue-950/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800 print:border-gray-400">
+                  <h3 className="font-semibold mb-2 text-sm text-blue-900 dark:text-blue-100">Legal Authority for Calculation Methodology</h3>
+                  <div className="space-y-3 text-xs">
+                    <div className="bg-white dark:bg-gray-900 p-3 rounded border border-blue-100 dark:border-blue-900">
+                      <p className="font-semibold mb-1 text-blue-800 dark:text-blue-200">California Family Code § 2550 (2024)</p>
+                      <p className="italic text-gray-700 dark:text-gray-300 leading-relaxed">
+                        "Except upon the written agreement of the parties, or on oral stipulation of the parties in open court, or as otherwise provided in this division, in a proceeding for dissolution of marriage or for legal separation of the parties, the court shall, either in its judgment of dissolution of the marriage, in its judgment of legal separation of the parties, or at a later time if it expressly reserves jurisdiction to make such a property division, divide the community estate of the parties equally."
+                      </p>
+                      <p className="text-gray-600 dark:text-gray-400 mt-2 text-[10px]">
+                        (Enacted by Stats. 1992, Ch. 162, Sec. 10. Operative January 1, 1994.)
+                      </p>
+                    </div>
+                    <div className="text-gray-700 dark:text-gray-300">
+                      <p className="font-medium mb-1">Application to This Case:</p>
+                      <p className="leading-relaxed">
+                        The base calculation follows California's equal division requirement (50/50). The modified distribution ratio (35% Petitioner / 65% Respondent) is applied pursuant to either: (1) written agreement of the parties under Cal. Fam. Code § 2550, or (2) oral stipulation in open court under the same statute. This modification is legally enforceable and supersedes the default equal division only when properly documented through one of the statutory exceptions.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="grid gap-4">
                   <div className="flex justify-between items-center p-4 bg-muted/50 print:bg-gray-50 rounded-lg">
                     <span className="font-medium">Net Proceeds (Base):</span>
