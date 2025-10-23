@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -15,8 +15,24 @@ interface StreamChatParams {
 
 export const useGroqStream = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const cancelStream = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      setIsLoading(false);
+    }
+  };
 
   const streamChat = async ({ messages, formContext, onDelta, onDone, onError }: StreamChatParams) => {
+    // Cancel any existing stream
+    cancelStream();
+
+    // Create new AbortController for this request
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setIsLoading(true);
     const CHAT_URL = `https://sbwgkocarqvonkdlitdx.supabase.co/functions/v1/groq-chat`;
 
@@ -32,6 +48,7 @@ export const useGroqStream = () => {
           'Authorization': `Bearer ${await token}`,
         },
         body: JSON.stringify({ messages, formContext }),
+        signal: controller.signal, // Pass abort signal
       });
 
       if (!response.ok) {
@@ -49,9 +66,15 @@ export const useGroqStream = () => {
       let streamDone = false;
 
       while (!streamDone) {
+        // Check if stream was cancelled
+        if (controller.signal.aborted) {
+          reader.cancel();
+          break;
+        }
+
         const { done, value } = await reader.read();
         if (done) break;
-        
+
         textBuffer += decoder.decode(value, { stream: true });
 
         let newlineIndex: number;
@@ -80,6 +103,9 @@ export const useGroqStream = () => {
         }
       }
 
+      // Release reader lock
+      reader.releaseLock();
+
       // Final flush
       if (textBuffer.trim()) {
         for (let raw of textBuffer.split('\n')) {
@@ -97,14 +123,27 @@ export const useGroqStream = () => {
         }
       }
 
-      onDone();
+      // Only call onDone if not aborted
+      if (!controller.signal.aborted) {
+        onDone();
+      }
     } catch (error) {
+      // Don't report AbortError as an actual error
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('Stream cancelled by user');
+        return;
+      }
+
       console.error('Stream error:', error);
       onError(error instanceof Error ? error.message : 'Unknown error occurred');
     } finally {
+      // Clean up controller reference
+      if (abortControllerRef.current === controller) {
+        abortControllerRef.current = null;
+      }
       setIsLoading(false);
     }
   };
 
-  return { streamChat, isLoading };
+  return { streamChat, isLoading, cancelStream };
 };

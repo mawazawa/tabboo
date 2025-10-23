@@ -35,9 +35,16 @@ export const AIAssistant = ({ formContext, vaultData }: AIAssistantProps) => {
   const [input, setInput] = useState('');
   const [showInput, setShowInput] = useState(false);
   const [suggestedActions, setSuggestedActions] = useState<SuggestedAction[]>([]);
-  const { streamChat, isLoading } = useGroqStream();
+  const { streamChat, isLoading, cancelStream } = useGroqStream();
   const scrollRef = useRef<HTMLDivElement>(null);
   const hasAnalyzed = useRef(false);
+
+  // Cleanup on unmount - cancel any ongoing streams
+  useEffect(() => {
+    return () => {
+      cancelStream();
+    };
+  }, [cancelStream]);
 
   useEffect(() => {
     if (scrollRef.current) {
