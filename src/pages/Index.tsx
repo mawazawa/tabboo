@@ -486,6 +486,19 @@ const Index = () => {
     return () => clearInterval(interval);
   }, [formData, fieldPositions, documentId, user]);
 
+  // Warn user before leaving with unsaved changes (prevents data loss)
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges.current) {
+        e.preventDefault();
+        e.returnValue = ''; // Modern browsers show generic "Leave site?" message
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/auth");
