@@ -14,7 +14,19 @@ const chatRequestSchema = z.object({
       content: z.string().min(1).max(4000)
     })
   ).min(1).max(50),
-  formContext: z.record(z.any()).optional()
+  formContext: z.record(
+    z.string().max(500)
+  ).optional().refine(
+    (ctx) => !ctx || Object.keys(ctx).length <= 50,
+    { message: 'Form context too large' }
+  ).refine(
+    (ctx) => {
+      if (!ctx) return true;
+      const size = JSON.stringify(ctx).length;
+      return size <= 10000;
+    },
+    { message: 'Form context payload exceeds 10KB' }
+  )
 });
 
 serve(async (req) => {
@@ -58,7 +70,14 @@ serve(async (req) => {
     }
 
     console.log('Received chat request with', messages.length, 'messages');
-    console.log('Form context provided:', !!formContext);
+    
+    if (formContext) {
+      const sanitized = Object.keys(formContext).reduce((acc, key) => {
+        acc[key] = formContext[key]?.toString().substring(0, 100) || '';
+        return acc;
+      }, {} as Record<string, string>);
+      console.log('Form context fields:', Object.keys(sanitized));
+    }
 
     // Build system prompt with form context
     let systemPrompt = `You are SwiftFill Pro AI, an intelligent legal form assistant. You help users fill out California legal forms accurately and efficiently.
