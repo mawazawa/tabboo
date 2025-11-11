@@ -6,9 +6,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useRef, memo, useCallback } from "react";
 import { Document, Page, pdfjs } from 'react-pdf';
-import { Settings, Move, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { Settings, Move, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Sparkles, Loader2 } from "lucide-react";
 import { canAutofill, getVaultValueForField, type PersonalVaultData } from "@/utils/vaultFieldMatcher";
 import { TutorialTooltips } from "@/components/TutorialTooltips";
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
@@ -69,6 +70,8 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   const [isDragging, setIsDragging] = useState<string | null>(null);
   const [editModeField, setEditModeField] = useState<string | null>(null);
   const [alignmentGuides, setAlignmentGuides] = useState<{ x: number[]; y: number[] }>({ x: [], y: [] });
+  const [pdfLoading, setPdfLoading] = useState(true);
+  const [loadProgress, setLoadProgress] = useState(0);
   const dragStartPos = useRef<{ x: number; y: number; top: number; left: number }>({ x: 0, y: 0, top: 0, left: 0 });
   const rafRef = useRef<number | null>(null);
 
@@ -82,6 +85,8 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
+    setPdfLoading(false);
+    setLoadProgress(100);
   };
 
   const handlePointerDown = (e: React.PointerEvent, field: string, currentTop: number, currentLeft: number) => {
@@ -312,11 +317,44 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
       <div className="h-full w-full overflow-auto bg-muted/20">
         <TutorialTooltips />
         <div className="relative min-h-full w-full flex items-center justify-center p-4">
+          {pdfLoading && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-background/80 backdrop-blur-sm z-50">
+              <div className="w-full max-w-md bg-card rounded-lg border-2 shadow-3point chamfered p-8">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="relative">
+                    <Loader2 className="h-12 w-12 animate-spin text-primary" strokeWidth={1.5} />
+                    <div className="absolute inset-0 bg-primary/20 blur-xl animate-pulse" />
+                  </div>
+                  <div className="text-center space-y-2">
+                    <h3 className="text-lg font-semibold">Loading PDF Form</h3>
+                    <p className="text-sm text-muted-foreground">Preparing your FL-320 form...</p>
+                  </div>
+                  {loadProgress > 0 && loadProgress < 100 && (
+                    <div className="w-full">
+                      <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-300"
+                          style={{ width: `${loadProgress}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground text-center mt-2">{loadProgress}%</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         <div className="w-full" style={{ maxWidth: `${pageWidth * zoom}px` }}>
             <Document
               file="/fl320.pdf"
               onLoadSuccess={onDocumentLoadSuccess}
+              onLoadProgress={({ loaded, total }) => {
+                if (total > 0) {
+                  setLoadProgress(Math.round((loaded / total) * 100));
+                }
+              }}
               className="flex flex-col items-center w-full"
+              loading=""
             >
               {Array.from(new Array(numPages), (el, index) => {
                 const pageNum = index + 1;
@@ -337,6 +375,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                       renderTextLayer={true}
                       renderAnnotationLayer={false}
                       className="w-full"
+                      loading=""
                     />
                   
                   {pageOverlays && (

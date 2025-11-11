@@ -21,7 +21,11 @@ import {
 } from "@/utils/fieldPresets";
 import type { FormTemplate } from "@/utils/templateManager";
 import { autofillAllFromVault, getAutofillableFields, type PersonalVaultData } from "@/utils/vaultFieldMatcher";
-import { preloadDistributionCalculator } from "@/utils/routePreloader";
+import { 
+  preloadDistributionCalculator, 
+  cancelDistributionCalculator,
+  preloadCriticalRoutes 
+} from "@/utils/routePreloader";
 import { prefetchUserData } from "@/utils/dataPrefetcher";
 import { useState, useEffect, useRef } from "react";
 
@@ -372,6 +376,8 @@ const Index = () => {
         setLoading(false);
         // Prefetch user data immediately for faster perceived performance
         prefetchUserData(queryClient, session.user);
+        // Preload critical routes when idle
+        preloadCriticalRoutes();
       } else {
         navigate("/auth");
       }
@@ -383,6 +389,8 @@ const Index = () => {
         setLoading(false);
         // Prefetch user data on auth state change
         prefetchUserData(queryClient, session.user);
+        // Preload critical routes when idle
+        preloadCriticalRoutes();
       } else {
         navigate("/auth");
       }
@@ -532,6 +540,7 @@ const Index = () => {
                           <button
                             onClick={() => navigate("/distribution-calculator")}
                             onMouseEnter={preloadDistributionCalculator}
+                            onMouseLeave={cancelDistributionCalculator}
                             className="flex items-start gap-3 p-3 rounded-lg hover:bg-accent transition-colors text-left"
                           >
                             <Calculator className="h-5 w-5 mt-0.5 text-primary" strokeWidth={1.5} />

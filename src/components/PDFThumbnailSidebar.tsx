@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { FileText, Loader2 } from "lucide-react";
 import { FieldMinimapIndicator } from "./FieldMinimapIndicator";
 
 // Configure PDF.js worker
@@ -25,6 +26,8 @@ export const PDFThumbnailSidebar = ({
   const [numPages, setNumPages] = useState<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const [thumbnailWidth, setThumbnailWidth] = useState(200);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadedPages, setLoadedPages] = useState<Set<number>>(new Set());
 
   // Auto-scale thumbnails based on panel width
   useEffect(() => {
@@ -36,6 +39,11 @@ export const PDFThumbnailSidebar = ({
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
+    setIsLoading(false);
+  };
+
+  const onPageLoadSuccess = (pageNum: number) => {
+    setLoadedPages(prev => new Set(prev).add(pageNum));
   };
 
   return (
@@ -47,10 +55,17 @@ export const PDFThumbnailSidebar = ({
 
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-3">
+          {isLoading && (
+            <div className="flex flex-col items-center gap-3 py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" strokeWidth={1.5} />
+              <p className="text-xs text-muted-foreground">Loading pages...</p>
+            </div>
+          )}
           <Document
             file="/fl320.pdf"
             onLoadSuccess={onDocumentLoadSuccess}
             className="flex flex-col"
+            loading=""
           >
             {Array.from(new Array(numPages), (el, index) => {
               const pageNum = index + 1;
@@ -67,13 +82,22 @@ export const PDFThumbnailSidebar = ({
                   }`}
                 >
                   <div className="relative w-full">
-                    <Page
-                      pageNumber={pageNum}
-                      width={thumbnailWidth}
-                      renderTextLayer={false}
-                      renderAnnotationLayer={false}
-                      className="chamfered w-full"
-                    />
+                    {!loadedPages.has(pageNum) && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-muted/20">
+                        <Skeleton className="w-full aspect-[8.5/11]" />
+                      </div>
+                    )}
+                    <div className={`transition-opacity duration-300 ${loadedPages.has(pageNum) ? 'opacity-100' : 'opacity-0'}`}>
+                      <Page
+                        pageNumber={pageNum}
+                        width={thumbnailWidth}
+                        renderTextLayer={false}
+                        renderAnnotationLayer={false}
+                        className="chamfered w-full"
+                        onLoadSuccess={() => onPageLoadSuccess(pageNum)}
+                        loading=""
+                      />
+                    </div>
                     {/* Minimap Field Indicator - only shows on current page */}
                     {isActive && showFieldIndicator && currentFieldPositions.length > 0 && (
                       <FieldMinimapIndicator

@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, Loader2, Sparkles } from "lucide-react";
 import { useGroqStream } from "@/hooks/useGroqStream";
 import { toast } from "sonner";
+import { ProgressiveImage } from "@/components/ui/progressive-image";
 import aiAssistant from "@/assets/ai-assistant.png";
 
 interface Message {
@@ -158,7 +159,11 @@ export const AIAssistant = ({ formContext, vaultData }: AIAssistantProps) => {
       <CardHeader className="bg-gradient-to-r from-primary to-accent text-primary-foreground pb-4">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-full overflow-hidden bg-background p-1 shadow-glow">
-            <img src={aiAssistant} alt="AI Assistant" className="w-full h-full object-contain" />
+            <ProgressiveImage 
+              src={aiAssistant} 
+              alt="AI Assistant" 
+              className="w-full h-full object-contain"
+            />
           </div>
           <div>
             <CardTitle className="text-xl">SwiftFill Pro AI</CardTitle>
