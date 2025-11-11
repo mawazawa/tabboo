@@ -77,7 +77,7 @@ const FIELD_CONFIG: FieldConfig[] = [
 
 export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition }: Props) => {
   const fieldRefs = useRef<(HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | null)[]>([]);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const scrollViewportRef = useRef<HTMLDivElement>(null);
   const activeFieldRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -114,13 +114,28 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
     config.field.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Smooth scroll to active field
+  // Smooth scroll to active field within ScrollArea viewport only
   useEffect(() => {
-    if (activeFieldRef.current && scrollContainerRef.current) {
-      activeFieldRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'nearest'
+    if (activeFieldRef.current && scrollViewportRef.current) {
+      const fieldElement = activeFieldRef.current;
+      const viewportElement = scrollViewportRef.current;
+      
+      // Find the actual scrollable viewport (ScrollArea renders a viewport inside)
+      const scrollableViewport = viewportElement.querySelector('[data-radix-scroll-area-viewport]') as HTMLElement || viewportElement;
+      
+      // Get the field's position relative to the scrollable container
+      const fieldRect = fieldElement.getBoundingClientRect();
+      const viewportRect = scrollableViewport.getBoundingClientRect();
+      
+      // Calculate the scroll position to center the field
+      const fieldCenter = fieldRect.top + fieldRect.height / 2;
+      const viewportCenter = viewportRect.top + viewportRect.height / 2;
+      const scrollOffset = fieldCenter - viewportCenter;
+      
+      // Smooth scroll within the viewport only
+      scrollableViewport.scrollBy({
+        top: scrollOffset,
+        behavior: 'smooth'
       });
     }
   }, [currentFieldIndex]);
@@ -460,8 +475,12 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
       </div>
 
       {/* Scrollable Content Area - Independent Scroll Container */}
-      <ScrollArea className="flex-1 relative">
-        <div ref={scrollContainerRef} className="p-4 space-y-3">
+      <div 
+        ref={scrollViewportRef}
+        className="flex-1 relative overflow-hidden"
+      >
+        <ScrollArea className="h-full">
+          <div className="p-4 space-y-3">
           {filteredFields.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Search className="h-12 w-12 text-muted-foreground/30 mb-3" strokeWidth={1} />
@@ -572,8 +591,9 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
               );
             })
           )}
-        </div>
-      </ScrollArea>
+          </div>
+        </ScrollArea>
+      </div>
     </Card>
   );
 };
