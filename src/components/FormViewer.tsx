@@ -82,17 +82,21 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   };
 
   const handlePointerDown = (e: React.PointerEvent, field: string, currentTop: number, currentLeft: number) => {
-    // Prevent drag if clicking on input/textarea/button elements
     const target = e.target as HTMLElement;
-    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.closest('button')) return;
     
-    // Allow direct drag on the field container itself
+    // Only prevent drag if clicking directly on buttons (not the drag handle)
+    if (target.tagName === 'BUTTON' && !target.closest('.drag-handle')) return;
+    
+    // Allow drag from anywhere on the container or its children (including inputs)
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(field);
     
-    // Capture pointer for smooth mobile dragging
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    // Capture pointer for smooth dragging
+    const container = target.closest('.field-container') as HTMLElement;
+    if (container) {
+      container.setPointerCapture(e.pointerId);
+    }
     
     dragStartPos.current = {
       x: e.clientX,
@@ -357,7 +361,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                           return (
                             <div
                             key={idx}
-                            className={`field-container absolute select-none touch-none spring-hover ${
+                            className={`field-container group absolute select-none touch-none spring-hover ${
                               isDragging === overlay.field ? 'cursor-grabbing z-50 ring-4 ring-primary opacity-90 shadow-3point p-4' : 
                               'cursor-grab p-3'
                             } ${
@@ -381,6 +385,15 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             onClick={(e) => handleFieldClick(overlay.field, e)}
                             onPointerDown={(e) => handlePointerDown(e, overlay.field, position.top, position.left)}
                           >
+                            {/* Visual Drag Handle Indicator */}
+                            <div className="drag-handle absolute -left-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                              <div className="flex flex-col gap-0.5 bg-primary/80 p-1.5 rounded-lg shadow-lg">
+                                <div className="h-0.5 w-3 bg-primary-foreground rounded"></div>
+                                <div className="h-0.5 w-3 bg-primary-foreground rounded"></div>
+                                <div className="h-0.5 w-3 bg-primary-foreground rounded"></div>
+                              </div>
+                            </div>
+                            
                             {isCurrentField && !isEditMode && (
                               <>
                                 <div className="absolute -top-10 left-0 bg-primary text-primary-foreground px-3 py-2 rounded-lg text-sm font-medium shadow-3point whitespace-nowrap chamfered flex items-center gap-2">
