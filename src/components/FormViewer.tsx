@@ -9,6 +9,7 @@ import { useState, useRef } from "react";
 import { Document, Page, pdfjs } from 'react-pdf';
 import { Settings, Move, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { canAutofill, getVaultValueForField, type PersonalVaultData } from "@/utils/vaultFieldMatcher";
+import { TutorialTooltips } from "@/components/TutorialTooltips";
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
@@ -289,6 +290,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
 
   return (
     <div className="h-full w-full overflow-auto bg-muted/20">
+      <TutorialTooltips />
       <div className="relative min-h-full w-full flex items-center justify-center p-4">
         <div className="w-full" style={{ maxWidth: `${pageWidth * zoom}px` }}>
             <Document
