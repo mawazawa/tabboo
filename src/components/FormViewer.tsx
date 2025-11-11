@@ -392,141 +392,144 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             onClick={(e) => handleFieldClick(overlay.field, e)}
                             onPointerDown={(e) => handlePointerDown(e, overlay.field, position.top, position.left)}
                           >
-                            {isCurrentField && !isEditMode && (
-                              <>
-                                <div className="absolute -top-10 left-0 bg-primary text-primary-foreground px-3 py-2 rounded-lg text-sm font-medium shadow-3point whitespace-nowrap chamfered flex items-center gap-2">
-                                  {overlay.placeholder || overlay.field}
-                                  {canAutofillField && !hasValue && (
-                                    <Sparkles className="h-3 w-3 animate-pulse" strokeWidth={2} />
-                                  )}
-                                </div>
-                                {/* Premium Touch-Friendly Control Arrows */}
-                                <div className="absolute -top-32 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        size="icon"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          adjustPosition('up', overlay.field);
-                                        }}
-                                        className="h-12 w-12 rounded-xl backdrop-blur-xl bg-white/10 border-hairline border-white/20 hover:bg-white/20 shadow-3point chamfered spring-hover group touch-none"
-                                      >
-                                        <ChevronUp className="h-6 w-6 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>Move field up</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                  <div className="flex gap-2">
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <Button
-                                          size="icon"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            adjustPosition('left', overlay.field);
-                                          }}
-                                          className="h-12 w-12 rounded-xl backdrop-blur-xl bg-white/10 border-hairline border-white/20 hover:bg-white/20 shadow-3point chamfered spring-hover group touch-none"
-                                        >
-                                          <ChevronLeft className="h-6 w-6 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
-                                        </Button>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p>Move field left</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <Button
-                                          size="icon"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            adjustPosition('down', overlay.field);
-                                          }}
-                                          className="h-12 w-12 rounded-xl backdrop-blur-xl bg-white/10 border-hairline border-white/20 hover:bg-white/20 shadow-3point chamfered spring-hover group touch-none"
-                                        >
-                                          <ChevronDown className="h-6 w-6 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
-                                        </Button>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p>Move field down</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <Button
-                                          size="icon"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            adjustPosition('right', overlay.field);
-                                          }}
-                                          className="h-12 w-12 rounded-xl backdrop-blur-xl bg-white/10 border-hairline border-white/20 hover:bg-white/20 shadow-3point chamfered spring-hover group touch-none"
-                                        >
-                                          <ChevronRight className="h-6 w-6 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
-                                        </Button>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p>Move field right</p>
-                                      </TooltipContent>
-                                    </Tooltip>
+                            {/* Field Controls - Show on hover only */}
+                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                              {isCurrentField && !isEditMode && (
+                                <>
+                                  <div className="absolute -top-10 left-0 bg-primary text-primary-foreground px-3 py-2 rounded-lg text-sm font-medium shadow-3point whitespace-nowrap chamfered flex items-center gap-2">
+                                    {overlay.placeholder || overlay.field}
+                                    {canAutofillField && !hasValue && (
+                                      <Sparkles className="h-3 w-3 animate-pulse" strokeWidth={2} />
+                                    )}
                                   </div>
+                                  {/* Premium Touch-Friendly Control Arrows */}
+                                  <div className="absolute -top-32 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          size="icon"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            adjustPosition('up', overlay.field);
+                                          }}
+                                          className="h-12 w-12 rounded-xl backdrop-blur-xl bg-white/10 border-hairline border-white/20 hover:bg-white/20 shadow-3point chamfered spring-hover group touch-none"
+                                        >
+                                          <ChevronUp className="h-6 w-6 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>Move field up</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                    <div className="flex gap-2">
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <Button
+                                            size="icon"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              adjustPosition('left', overlay.field);
+                                            }}
+                                            className="h-12 w-12 rounded-xl backdrop-blur-xl bg-white/10 border-hairline border-white/20 hover:bg-white/20 shadow-3point chamfered spring-hover group touch-none"
+                                          >
+                                            <ChevronLeft className="h-6 w-6 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
+                                          </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p>Move field left</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <Button
+                                            size="icon"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              adjustPosition('down', overlay.field);
+                                            }}
+                                            className="h-12 w-12 rounded-xl backdrop-blur-xl bg-white/10 border-hairline border-white/20 hover:bg-white/20 shadow-3point chamfered spring-hover group touch-none"
+                                          >
+                                            <ChevronDown className="h-6 w-6 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
+                                          </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p>Move field down</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <Button
+                                            size="icon"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              adjustPosition('right', overlay.field);
+                                            }}
+                                            className="h-12 w-12 rounded-xl backdrop-blur-xl bg-white/10 border-hairline border-white/20 hover:bg-white/20 shadow-3point chamfered spring-hover group touch-none"
+                                          >
+                                            <ChevronRight className="h-6 w-6 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
+                                          </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p>Move field right</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </div>
+                                  </div>
+                                </>
+                              )}
+                              {isEditMode && (
+                                <div className="absolute -top-10 left-0 bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium shadow-3point whitespace-nowrap flex items-center gap-2 chamfered">
+                                  <Move className="h-4 w-4" strokeWidth={1.5} />
+                                  Swipe to Move: {overlay.placeholder || overlay.field}
                                 </div>
-                              </>
-                            )}
-                            {isEditMode && (
-                              <div className="absolute -top-10 left-0 bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium shadow-3point whitespace-nowrap flex items-center gap-2 chamfered">
-                                <Move className="h-4 w-4" strokeWidth={1.5} />
-                                Swipe to Move: {overlay.placeholder || overlay.field}
-                              </div>
-                            )}
-                            {canAutofillField && !hasValue && (
+                              )}
+                              {canAutofillField && !hasValue && (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      size="icon"
+                                      variant="default"
+                                      className="absolute -top-3 -right-16 h-10 w-10 rounded-full shadow-3point z-10 spring-hover chamfered touch-none bg-gradient-to-r from-accent to-primary hover:shadow-3point-hover"
+                                      onClick={(e) => handleAutofillField(overlay.field, e)}
+                                      onPointerDown={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                      }}
+                                    >
+                                      <Sparkles className="h-5 w-5 animate-pulse" strokeWidth={2} />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Autofill from Personal Data Vault</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              )}
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <Button
                                     size="icon"
-                                    variant="default"
-                                    className="absolute -top-3 -right-16 h-10 w-10 rounded-full shadow-3point z-10 spring-hover chamfered touch-none bg-gradient-to-r from-accent to-primary hover:shadow-3point-hover"
-                                    onClick={(e) => handleAutofillField(overlay.field, e)}
-                                    onPointerDown={(e) => {
+                                    variant={isEditMode ? "default" : "default"}
+                                    className={`settings-button drag-handle absolute -top-3 -right-3 h-10 w-10 rounded-full shadow-3point z-10 spring-hover chamfered cursor-grab ${
+                                      isEditMode ? 'bg-green-600 hover:bg-green-700' : ''
+                                    }`}
+                                    onClick={(e) => {
                                       e.preventDefault();
                                       e.stopPropagation();
+                                      toggleEditMode(overlay.field);
                                     }}
                                   >
-                                    <Sparkles className="h-5 w-5 animate-pulse" strokeWidth={2} />
+                                    {isEditMode ? (
+                                      <Move className="h-5 w-5" strokeWidth={1.5} />
+                                    ) : (
+                                      <Move className="h-5 w-5" strokeWidth={1.5} />
+                                    )}
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p>Autofill from Personal Data Vault</p>
+                                  <p>{isEditMode ? 'Exit move mode (or drag to reposition)' : 'Click to toggle edit mode • Drag to move field'}</p>
                                 </TooltipContent>
                               </Tooltip>
-                            )}
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  size="icon"
-                                  variant={isEditMode ? "default" : "default"}
-                                  className={`settings-button drag-handle absolute -top-3 -right-3 h-10 w-10 rounded-full shadow-3point z-10 spring-hover chamfered cursor-grab ${
-                                    isEditMode ? 'bg-green-600 hover:bg-green-700' : ''
-                                  }`}
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    toggleEditMode(overlay.field);
-                                  }}
-                                >
-                                  {isEditMode ? (
-                                    <Move className="h-5 w-5" strokeWidth={1.5} />
-                                  ) : (
-                                    <Move className="h-5 w-5" strokeWidth={1.5} />
-                                  )}
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>{isEditMode ? 'Exit move mode (or drag to reposition)' : 'Click to toggle edit mode • Drag to move field'}</p>
-                              </TooltipContent>
-                            </Tooltip>
+                            </div>
                             
                             {overlay.type === 'input' && (
                               <Input

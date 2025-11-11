@@ -63,9 +63,11 @@ export const DraggableAIAssistant = ({ formContext, vaultData, isVisible, onTogg
   return (
     <div
       className={cn(
-        "fixed z-50 transition-all duration-300 ease-spring rounded-2xl shadow-3point",
-        "bg-card/95 backdrop-blur-xl border-2 border-border/30",
-        isDragging ? "cursor-grabbing scale-105 shadow-glow" : "cursor-grab",
+        "fixed z-50 transition-all duration-300 ease-spring rounded-2xl",
+        "bg-background/30 backdrop-blur-3xl border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]",
+        "before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none",
+        "after:absolute after:inset-0 after:rounded-2xl after:bg-gradient-to-t after:from-black/10 after:to-transparent after:pointer-events-none",
+        isDragging ? "cursor-grabbing scale-105 shadow-[0_16px_64px_0_rgba(0,0,0,0.5)]" : "cursor-grab",
         isMinimized ? "w-14 h-14 animate-float" : "w-[400px] h-[600px]"
       )}
       style={{
@@ -87,7 +89,7 @@ export const DraggableAIAssistant = ({ formContext, vaultData, isVisible, onTogg
         <div className="flex flex-col h-full" onClick={(e) => e.stopPropagation()}>
           {/* Draggable Header */}
           <div 
-            className="flex items-center justify-between p-3 border-b bg-card/50 rounded-t-2xl cursor-grab active:cursor-grabbing"
+            className="flex items-center justify-between p-3 border-b border-white/10 bg-background/20 backdrop-blur-xl rounded-t-2xl cursor-grab active:cursor-grabbing relative z-10"
             onMouseDown={handleMouseDown}
           >
             <div className="flex items-center gap-2">
