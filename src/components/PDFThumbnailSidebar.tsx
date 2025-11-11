@@ -73,7 +73,7 @@ export const PDFThumbnailSidebar = ({
                         <div className="relative">
                           <Page
                             pageNumber={pageNum}
-                            width={open ? 180 : 48}
+                            width={open ? 240 : 48}
                             renderTextLayer={false}
                             renderAnnotationLayer={false}
                             className="chamfered"
