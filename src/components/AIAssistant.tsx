@@ -119,14 +119,17 @@ export const AIAssistant = ({ formContext, vaultData }: AIAssistantProps) => {
 
     setMessages(prev => [...prev, tempAssistantMessage]);
 
+    // Prepare form context with vault data as strings
+    const missingVaultFields = vaultData ? 
+      ['full_name', 'street_address', 'city', 'state', 'zip_code', 'telephone_no', 'email_address']
+        .filter(field => !vaultData[field]) : [];
+
     await streamChat({
       messages: [...messages, userMessage],
       formContext: {
         ...formContext,
-        vaultData: vaultData || {},
-        missingVaultFields: vaultData ? 
-          ['full_name', 'street_address', 'city', 'state', 'zip_code', 'telephone_no', 'email_address']
-            .filter(field => !vaultData[field]) : [],
+        vaultData: vaultData ? JSON.stringify(vaultData) : '{}',
+        missingVaultFields: missingVaultFields.join(', '),
       },
       onDelta: (chunk) => {
         assistantContent += chunk;
