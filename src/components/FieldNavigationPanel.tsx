@@ -231,7 +231,7 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
   // Track pressed arrow keys for visual feedback
   const [pressedKey, setPressedKey] = useState<'up' | 'down' | 'left' | 'right' | null>(null);
 
-  // Handle keyboard shortcuts
+  // Handle keyboard shortcuts with optimized performance
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
@@ -275,7 +275,10 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
             'ArrowRight': 'right'
           }[e.key] as 'up' | 'down' | 'left' | 'right';
           
-          setPressedKey(direction);
+          // Immediate visual feedback with requestAnimationFrame for optimal performance
+          requestAnimationFrame(() => {
+            setPressedKey(direction);
+          });
           adjustPosition(direction);
         }
       }
@@ -293,17 +296,20 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
 
     const handleKeyUp = (e: KeyboardEvent) => {
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-        setPressedKey(null);
+        // Immediate clear with requestAnimationFrame for smooth transition
+        requestAnimationFrame(() => {
+          setPressedKey(null);
+        });
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('keydown', handleKeyDown, { passive: false });
+    window.addEventListener('keyup', handleKeyUp, { passive: true });
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [currentFieldIndex, fieldPositions, showPositionControl, showSearch]);
+  }, [currentFieldIndex, showPositionControl, showSearch]);
 
   return (
     <Card className="h-full border-hairline shadow-3point chamfered flex flex-col overflow-hidden">
@@ -366,26 +372,26 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
             </div>
           )}
 
-          <div className="flex gap-2 w-full">
+          <div className="grid grid-cols-2 gap-2 w-full">
             <Button
               size="lg"
               variant="outline"
               onClick={goToPrevField}
               disabled={currentFieldIndex === 0}
-              className="flex-1 shadow-3point chamfered spring-hover border-hairline justify-center"
+              className="shadow-3point chamfered spring-hover border-hairline flex items-center justify-center gap-1.5"
             >
-              <ChevronUp className="h-5 w-5 mr-1" strokeWidth={0.5} />
-              Previous
+              <ChevronUp className="h-5 w-5" strokeWidth={0.5} />
+              <span>Previous</span>
             </Button>
             <Button
               size="lg"
               variant="outline"
               onClick={goToNextField}
               disabled={currentFieldIndex === FIELD_CONFIG.length - 1}
-              className="flex-1 shadow-3point chamfered spring-hover border-hairline justify-center"
+              className="shadow-3point chamfered spring-hover border-hairline flex items-center justify-center gap-1.5"
             >
-              Next
-              <ChevronDown className="h-5 w-5 ml-1" strokeWidth={0.5} />
+              <span>Next</span>
+              <ChevronDown className="h-5 w-5" strokeWidth={0.5} />
             </Button>
           </div>
 
@@ -443,8 +449,8 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
                         size="sm"
                         variant="outline"
                         onClick={() => adjustPosition('up')}
-                        className={`h-7 px-1 transition-all ${
-                          pressedKey === 'up' ? 'bg-primary text-primary-foreground scale-95' : ''
+                        className={`h-7 px-1 transition-all duration-75 ${
+                          pressedKey === 'up' ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 shadow-lg scale-95' : ''
                         }`}
                       >
                         <ChevronUp className="h-3 w-3" strokeWidth={0.5} />
@@ -454,8 +460,8 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
                         size="sm"
                         variant="outline"
                         onClick={() => adjustPosition('left')}
-                        className={`h-7 px-1 transition-all ${
-                          pressedKey === 'left' ? 'bg-primary text-primary-foreground scale-95' : ''
+                        className={`h-7 px-1 transition-all duration-75 ${
+                          pressedKey === 'left' ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 shadow-lg scale-95' : ''
                         }`}
                       >
                         <ChevronLeft className="h-3 w-3" strokeWidth={0.5} />
@@ -464,8 +470,8 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
                         size="sm"
                         variant="outline"
                         onClick={() => adjustPosition('down')}
-                        className={`h-7 px-1 transition-all ${
-                          pressedKey === 'down' ? 'bg-primary text-primary-foreground scale-95' : ''
+                        className={`h-7 px-1 transition-all duration-75 ${
+                          pressedKey === 'down' ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 shadow-lg scale-95' : ''
                         }`}
                       >
                         <ChevronDown className="h-3 w-3" strokeWidth={0.5} />
@@ -474,8 +480,8 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
                         size="sm"
                         variant="outline"
                         onClick={() => adjustPosition('right')}
-                        className={`h-7 px-1 transition-all ${
-                          pressedKey === 'right' ? 'bg-primary text-primary-foreground scale-95' : ''
+                        className={`h-7 px-1 transition-all duration-75 ${
+                          pressedKey === 'right' ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 shadow-lg scale-95' : ''
                         }`}
                       >
                         <ChevronRight className="h-3 w-3" strokeWidth={0.5} />

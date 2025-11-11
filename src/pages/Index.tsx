@@ -410,7 +410,7 @@ const Index = () => {
 
         <ResizablePanelGroup direction="horizontal" className="h-[calc(100vh-220px)] w-full">
           {/* Center: Form Viewer with PDF + Thumbnail Sidebar */}
-          <ResizablePanel defaultSize={70} minSize={30}>
+          <ResizablePanel defaultSize={75} minSize={30}>
             <ResizablePanelGroup direction="horizontal" className="h-full">
               {/* Resizable Thumbnail Sidebar */}
               {showThumbnails && (
@@ -421,7 +421,7 @@ const Index = () => {
                     maxSize={40}
                     onResize={(size) => {
                       // Convert percentage to pixels (approximate)
-                      const containerWidth = window.innerWidth * 0.7; // 70% of viewport
+                      const containerWidth = window.innerWidth * 0.75; // 75% of viewport
                       setThumbnailPanelWidth((size / 100) * containerWidth);
                     }}
                   >
