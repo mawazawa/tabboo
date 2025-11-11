@@ -198,21 +198,12 @@ const Index = () => {
   }
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 w-full flex">
-        {/* PDF Thumbnail Sidebar */}
-        <PDFThumbnailSidebar 
-          currentPage={currentPDFPage}
-          onPageClick={setCurrentPDFPage}
-        />
-
-        <div className="flex-1 flex flex-col">
-          {/* Header */}
-          <header className="border-b-2 bg-card/80 backdrop-blur-sm sticky top-0 z-50 shadow-medium">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <SidebarTrigger className="h-9 w-9" />
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 w-full">
+      {/* Header */}
+      <header className="border-b-2 bg-card/80 backdrop-blur-sm sticky top-0 z-50 shadow-medium">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-glow">
                 <FileText className="w-6 h-6 text-primary-foreground" strokeWidth={0.5} />
               </div>
@@ -297,13 +288,13 @@ const Index = () => {
                 <LogOut className="h-4 w-4" strokeWidth={0.5} />
                 Logout
               </Button>
-              </div>
             </div>
           </div>
-          </header>
+        </div>
+      </header>
 
-          {/* Main Content with Resizable Panels */}
-          <main className="container mx-auto px-4 py-6">
+      {/* Main Content with Resizable Panels */}
+      <main className="container mx-auto px-4 py-6">
         <ResizablePanelGroup direction="horizontal" className="h-[calc(100vh-140px)] w-full">
           {/* Left: AI Assistant Panel (collapsible) */}
           {showAIPanel && (
@@ -317,18 +308,29 @@ const Index = () => {
             </>
           )}
 
-          {/* Center: Form Viewer with PDF */}
+          {/* Center: Form Viewer with PDF + Thumbnail Sidebar */}
           <ResizablePanel defaultSize={showAIPanel ? 50 : 70} minSize={30}>
-            <div className="h-full px-3">
-              <FormViewer 
-                formData={formData} 
-                updateField={updateField}
-                currentFieldIndex={currentFieldIndex}
-                setCurrentFieldIndex={setCurrentFieldIndex}
-                fieldPositions={fieldPositions}
-                updateFieldPosition={updateFieldPosition}
-              />
-            </div>
+            <SidebarProvider>
+              <div className="h-full px-3 flex w-full">
+                <PDFThumbnailSidebar 
+                  currentPage={currentPDFPage}
+                  onPageClick={setCurrentPDFPage}
+                />
+                <div className="flex-1 flex flex-col">
+                  <div className="mb-2">
+                    <SidebarTrigger className="h-9 w-9" />
+                  </div>
+                  <FormViewer 
+                    formData={formData} 
+                    updateField={updateField}
+                    currentFieldIndex={currentFieldIndex}
+                    setCurrentFieldIndex={setCurrentFieldIndex}
+                    fieldPositions={fieldPositions}
+                    updateFieldPosition={updateFieldPosition}
+                  />
+                </div>
+              </div>
+            </SidebarProvider>
           </ResizablePanel>
 
           {/* Right: Field Navigation Panel OR Vault Panel (collapsible) */}
@@ -353,11 +355,9 @@ const Index = () => {
               </ResizablePanel>
             </>
           )}
-          </ResizablePanelGroup>
-          </main>
-        </div>
-      </div>
-    </SidebarProvider>
+        </ResizablePanelGroup>
+      </main>
+    </div>
   );
 };
 
