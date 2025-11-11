@@ -438,7 +438,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 w-full">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-background via-background to-primary/5 w-full overflow-hidden">
       {/* Command Palette - Cmd+K */}
       <CommandPalette
         onToggleAI={() => setShowAIPanel(!showAIPanel)}
@@ -451,7 +451,7 @@ const Index = () => {
       />
       
       {/* Header */}
-      <header className="border-b-2 bg-card/80 backdrop-blur-sm sticky top-0 z-50 shadow-medium">
+      <header className="border-b-2 bg-card/80 backdrop-blur-sm z-50 shadow-medium flex-shrink-0">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -517,9 +517,9 @@ const Index = () => {
       </header>
 
       {/* Main Content with Resizable Panels */}
-      <main className="container mx-auto px-4 py-6">
+      <main className="flex-1 flex flex-col container mx-auto px-4 py-6 overflow-hidden">
         {/* Control Toolbar */}
-        <div className="flex items-center gap-2 mb-4 p-3 bg-card/80 backdrop-blur-sm rounded-lg border shadow-sm">
+        <div className="flex items-center gap-2 mb-4 p-3 bg-card/80 backdrop-blur-sm rounded-lg border shadow-sm flex-shrink-0">
           {/* Search Bar - Relocated */}
           <FieldSearchBar 
             onFieldSearch={(query) => setFieldSearchQuery(query)}
@@ -689,7 +689,7 @@ const Index = () => {
           </Button>
         </div>
 
-        <ResizablePanelGroup direction="horizontal" className="min-h-[600px] h-[calc(100vh-200px)] w-full">
+        <ResizablePanelGroup direction="horizontal" className="flex-1 w-full">
           {/* Center: Form Viewer with PDF + Thumbnail Sidebar */}
           <ResizablePanel 
             id="viewer-panel"
