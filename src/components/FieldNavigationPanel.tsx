@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Copy, Move } from "lucide-react";
+import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Copy, Move, Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -78,9 +78,13 @@ const FIELD_CONFIG: FieldConfig[] = [
 export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition }: Props) => {
   const fieldRefs = useRef<(HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | null)[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const activeFieldRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const positionInputRef = useRef<HTMLInputElement>(null);
   const [showPositionControl, setShowPositionControl] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearch, setShowSearch] = useState(false);
 
   // Fetch personal info from vault
   const { data: personalInfo } = useQuery({
@@ -104,8 +108,22 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
     },
   });
 
-  // Remove auto-scroll effect - we want the list to be independently scrollable
-  // Users can manually scroll or see the highlighter in the fixed position
+  // Filter fields based on search query
+  const filteredFields = FIELD_CONFIG.filter(config => 
+    config.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    config.field.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Smooth scroll to active field
+  useEffect(() => {
+    if (activeFieldRef.current && scrollContainerRef.current) {
+      activeFieldRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest'
+      });
+    }
+  }, [currentFieldIndex]);
 
   const copyFromVault = (config: FieldConfig) => {
     if (!config.vaultField || !personalInfo) return;
@@ -201,6 +219,15 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
       const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
       const modKey = isMac ? e.metaKey : e.ctrlKey;
       
+      // Cmd/Ctrl+F to toggle search
+      if (modKey && e.key === 'f') {
+        e.preventDefault();
+        setShowSearch(prev => !prev);
+        // Focus search input after a brief delay
+        setTimeout(() => searchInputRef.current?.focus(), 100);
+        return;
+      }
+
       // Cmd/Ctrl+K to toggle positioning control
       if (modKey && e.key === 'k') {
         e.preventDefault();
@@ -235,32 +262,81 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
         }
       }
 
-      // Escape to close positioning control
+      // Escape to close controls
       if (e.key === 'Escape') {
-        setShowPositionControl(false);
+        if (showSearch) {
+          setShowSearch(false);
+          setSearchQuery('');
+        } else if (showPositionControl) {
+          setShowPositionControl(false);
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentFieldIndex, fieldPositions, showPositionControl]);
+  }, [currentFieldIndex, fieldPositions, showPositionControl, showSearch]);
 
   return (
     <Card className="h-full border-hairline shadow-3point chamfered flex flex-col overflow-hidden">
       {/* Sticky Header - Fixed Interaction Surface */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-sm">
         <div className="p-4 space-y-3">
-          <div>
-            <h2 className="font-semibold text-sm">Form Field Controls</h2>
-            <p className="text-xs text-muted-foreground mt-1">
-              Field {currentFieldIndex + 1} of {FIELD_CONFIG.length}
-            </p>
-            <div className="text-[10px] text-muted-foreground mt-2 space-y-0.5">
-              <div>⌘K • Toggle positioning</div>
-              <div>Tab • Next field</div>
-              <div>Arrows • Adjust position</div>
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1">
+              <h2 className="font-semibold text-sm">Form Field Controls</h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                Field {currentFieldIndex + 1} of {FIELD_CONFIG.length}
+                {searchQuery && ` • ${filteredFields.length} results`}
+              </p>
+              <div className="text-[10px] text-muted-foreground mt-2 space-y-0.5">
+                <div>⌘F • Search fields</div>
+                <div>⌘K • Toggle positioning</div>
+                <div>Tab • Next field</div>
+              </div>
             </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                setShowSearch(!showSearch);
+                setTimeout(() => searchInputRef.current?.focus(), 100);
+              }}
+              className="h-8 w-8 p-0 shrink-0"
+            >
+              <Search className="h-4 w-4" strokeWidth={1.5} />
+            </Button>
           </div>
+
+          {/* Glassmorphic Search Bar */}
+          {showSearch && (
+            <div className="relative animate-in slide-in-from-top-2 duration-300">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 rounded-xl blur-xl" />
+              <div className="relative bg-background/60 backdrop-blur-2xl border border-border/30 rounded-xl shadow-lg overflow-hidden">
+                <div className="flex items-center gap-2 px-4 py-2.5">
+                  <Search className="h-4 w-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
+                  <Input
+                    ref={searchInputRef}
+                    type="text"
+                    placeholder="Search fields..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 h-8 px-0 text-sm placeholder:text-muted-foreground/60"
+                  />
+                  {searchQuery && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setSearchQuery('')}
+                      className="h-6 w-6 p-0 shrink-0 hover:bg-muted/50"
+                    >
+                      <X className="h-3 w-3" strokeWidth={2} />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="flex gap-2">
             <Button
@@ -386,50 +462,59 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
       {/* Scrollable Content Area - Independent Scroll Container */}
       <ScrollArea className="flex-1 relative">
         <div ref={scrollContainerRef} className="p-4 space-y-3">
-          {FIELD_CONFIG.map((config, index) => {
-            const isActive = index === currentFieldIndex;
-            
-            return (
-              <div
-                key={config.field}
-                className={`relative space-y-2 p-4 rounded-lg border-hairline transition-all shadow-3point chamfered spring-hover ${
-                  isActive 
-                    ? 'border-primary bg-primary/5 shadow-3point-hover' 
-                    : 'border-transparent hover:border-muted'
-                }`}
-                onClick={() => setCurrentFieldIndex(index)}
-              >
-                {/* Visual Highlighter Bar */}
-                {isActive && (
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-primary via-primary to-primary/50 rounded-l-lg animate-pulse" />
-                )}
-                <div className="flex items-center justify-between gap-2">
-                  <Label 
-                    htmlFor={config.field} 
-                    className={`text-xs font-medium ${isActive ? 'text-primary' : 'text-muted-foreground'}`}
-                  >
-                    {index + 1}. {config.label}
-                  </Label>
-                  <div className="flex items-center gap-2">
-                    {config.vaultField && personalInfo && personalInfo[config.vaultField as keyof typeof personalInfo] && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          copyFromVault(config);
-                        }}
-                        className="h-8 px-3 text-xs gap-1 shadow-3point chamfered spring-hover"
-                        title="Copy from vault"
-                      >
-                        <Copy className="h-4 w-4" strokeWidth={0.5} />
-                      </Button>
-                    )}
-                    {isActive && (
-                      <span className="text-xs font-semibold text-primary px-2 py-1 rounded-md bg-primary/10">Active</span>
-                    )}
+          {filteredFields.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <Search className="h-12 w-12 text-muted-foreground/30 mb-3" strokeWidth={1} />
+              <p className="text-sm text-muted-foreground">No fields found</p>
+              <p className="text-xs text-muted-foreground/60 mt-1">Try a different search term</p>
+            </div>
+          ) : (
+            filteredFields.map((config) => {
+              const originalIndex = FIELD_CONFIG.findIndex(f => f.field === config.field);
+              const isActive = originalIndex === currentFieldIndex;
+              
+              return (
+                <div
+                  key={config.field}
+                  ref={isActive ? activeFieldRef : null}
+                  className={`relative space-y-2 p-4 rounded-lg border-hairline transition-all duration-300 shadow-3point chamfered spring-hover ${
+                    isActive 
+                      ? 'border-primary bg-primary/5 shadow-3point-hover scale-[1.02]' 
+                      : 'border-transparent hover:border-muted'
+                  }`}
+                  onClick={() => setCurrentFieldIndex(originalIndex)}
+                >
+                  {/* Visual Highlighter Bar */}
+                  {isActive && (
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-primary via-primary to-primary/50 rounded-l-lg animate-pulse" />
+                  )}
+                  <div className="flex items-center justify-between gap-2">
+                    <Label 
+                      htmlFor={config.field} 
+                      className={`text-xs font-medium transition-colors duration-200 ${isActive ? 'text-primary' : 'text-muted-foreground'}`}
+                    >
+                      {originalIndex + 1}. {config.label}
+                    </Label>
+                    <div className="flex items-center gap-2">
+                      {config.vaultField && personalInfo && personalInfo[config.vaultField as keyof typeof personalInfo] && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            copyFromVault(config);
+                          }}
+                          className="h-8 px-3 text-xs gap-1 shadow-3point chamfered spring-hover"
+                          title="Copy from vault"
+                        >
+                          <Copy className="h-4 w-4" strokeWidth={0.5} />
+                        </Button>
+                      )}
+                      {isActive && (
+                        <span className="text-xs font-semibold text-primary px-2 py-1 rounded-md bg-primary/10 animate-in fade-in duration-200">Active</span>
+                      )}
+                    </div>
                   </div>
-                </div>
                 
                 {/* Show vault data preview if available */}
                 {config.vaultField && personalInfo && personalInfo[config.vaultField as keyof typeof personalInfo] && (
@@ -438,54 +523,55 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
                   </div>
                 )}
 
-                {config.type === 'input' && (
-                  <Input
-                    id={config.field}
-                    ref={el => fieldRefs.current[index] = el}
-                    value={formData[config.field] as string || ''}
-                    onChange={(e) => updateField(config.field, e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(e, index)}
-                    onFocus={() => setCurrentFieldIndex(index)}
-                    placeholder={config.placeholder}
-                    className="h-12 text-base border-hairline shadow-3point chamfered"
-                    maxLength={config.field === 'state' ? 2 : undefined}
-                  />
-                )}
-
-                {config.type === 'textarea' && (
-                  <Textarea
-                    id={config.field}
-                    ref={el => fieldRefs.current[index] = el as HTMLTextAreaElement}
-                    value={formData[config.field] as string || ''}
-                    onChange={(e) => updateField(config.field, e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(e, index)}
-                    onFocus={() => setCurrentFieldIndex(index)}
-                    placeholder={config.placeholder}
-                    className="min-h-[100px] text-sm resize-none"
-                  />
-                )}
-
-                {config.type === 'checkbox' && (
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
+                  {config.type === 'input' && (
+                    <Input
                       id={config.field}
-                      ref={el => fieldRefs.current[index] = el as unknown as HTMLButtonElement}
-                      checked={!!formData[config.field]}
-                      onCheckedChange={(checked) => updateField(config.field, checked as boolean)}
-                      onKeyDown={(e) => handleKeyDown(e, index)}
-                      onFocus={() => setCurrentFieldIndex(index)}
+                      ref={el => fieldRefs.current[originalIndex] = el}
+                      value={formData[config.field] as string || ''}
+                      onChange={(e) => updateField(config.field, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(e, originalIndex)}
+                      onFocus={() => setCurrentFieldIndex(originalIndex)}
+                      placeholder={config.placeholder}
+                      className="h-12 text-base border-hairline shadow-3point chamfered transition-all duration-200"
+                      maxLength={config.field === 'state' ? 2 : undefined}
                     />
-                    <label 
-                      htmlFor={config.field} 
-                      className="text-sm cursor-pointer"
-                    >
-                      {config.label}
-                    </label>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                  )}
+
+                  {config.type === 'textarea' && (
+                    <Textarea
+                      id={config.field}
+                      ref={el => fieldRefs.current[originalIndex] = el as HTMLTextAreaElement}
+                      value={formData[config.field] as string || ''}
+                      onChange={(e) => updateField(config.field, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(e, originalIndex)}
+                      onFocus={() => setCurrentFieldIndex(originalIndex)}
+                      placeholder={config.placeholder}
+                      className="min-h-[100px] text-sm resize-none transition-all duration-200"
+                    />
+                  )}
+
+                  {config.type === 'checkbox' && (
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id={config.field}
+                        ref={el => fieldRefs.current[originalIndex] = el as unknown as HTMLButtonElement}
+                        checked={!!formData[config.field]}
+                        onCheckedChange={(checked) => updateField(config.field, checked as boolean)}
+                        onKeyDown={(e) => handleKeyDown(e, originalIndex)}
+                        onFocus={() => setCurrentFieldIndex(originalIndex)}
+                      />
+                      <label 
+                        htmlFor={config.field} 
+                        className="text-sm cursor-pointer"
+                      >
+                        {config.label}
+                      </label>
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
         </div>
       </ScrollArea>
     </Card>
