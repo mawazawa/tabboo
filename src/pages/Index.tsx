@@ -11,6 +11,7 @@ const FieldSearchBar = lazy(() => import("@/components/FieldSearchBar").then(m =
 const TemplateManager = lazy(() => import("@/components/TemplateManager").then(m => ({ default: m.TemplateManager })));
 const FieldGroupManager = lazy(() => import("@/components/FieldGroupManager").then(m => ({ default: m.FieldGroupManager })));
 const CommandPalette = lazy(() => import("@/components/CommandPalette").then(m => ({ default: m.CommandPalette })));
+import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { FileText, MessageSquare, LogOut, Loader2, Calculator, PanelLeftClose, PanelRightClose, Shield, Settings, Sparkles } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { 
@@ -888,6 +889,9 @@ const Index = () => {
             onToggleVisible={() => setShowAIPanel(!showAIPanel)}
           />
         </Suspense>
+
+        {/* Offline Indicator */}
+        <OfflineIndicator />
       </main>
 
       {/* Personal Data Vault Sheet */}

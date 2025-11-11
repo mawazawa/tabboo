@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { offlineSyncManager } from '@/utils/offlineSync';
 
 interface AutoSaveOptions {
   documentId: string | null;
@@ -48,6 +49,27 @@ export const useFormAutoSave = ({
     isSavingRef.current = true;
 
     try {
+      // Check if online
+      if (!navigator.onLine) {
+        // Queue for offline sync
+        await offlineSyncManager.queueUpdate({
+          documentId,
+          formData,
+          fieldPositions,
+          url: `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/legal_documents?id=eq.${documentId}`,
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+          },
+        });
+
+        lastSaveRef.current = { formData, fieldPositions };
+        hasUnsavedChanges.current = false;
+        
+        console.log('Saved offline - will sync when online');
+        return;
+      }
+
       const { error } = await supabase
         .from('legal_documents' as any)
         .update({
@@ -66,6 +88,25 @@ export const useFormAutoSave = ({
       console.log('Auto-save successful');
     } catch (error) {
       console.error('Auto-save failed:', error);
+      
+      // If network error, queue offline
+      if (!navigator.onLine) {
+        await offlineSyncManager.queueUpdate({
+          documentId,
+          formData,
+          fieldPositions,
+          url: `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/legal_documents?id=eq.${documentId}`,
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+          },
+        });
+        
+        lastSaveRef.current = { formData, fieldPositions };
+        hasUnsavedChanges.current = false;
+        return;
+      }
+      
       toast({
         title: "Auto-save failed",
         description: "Your changes could not be saved. Please try again.",
