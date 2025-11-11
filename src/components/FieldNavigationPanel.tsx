@@ -447,10 +447,10 @@ export const FieldNavigationPanel = ({
 
           {/* Unified Positioning Control */}
           {currentFieldIndex >= 0 && currentFieldIndex < FIELD_CONFIG.length && (
-            <div className="p-3 bg-background rounded-lg border-hairline shadow-3point chamfered">
-              <div className="flex items-center justify-between mb-2">
+            <div className="p-3 bg-background rounded-lg border-hairline shadow-3point chamfered space-y-2">
+              <div className="flex items-center justify-between">
                 <h3 className="text-sm font-semibold">
-                  {FIELD_CONFIG[currentFieldIndex]?.label}
+                  Active Field: {FIELD_CONFIG[currentFieldIndex]?.label}
                   {selectedFields.length > 0 && (
                     <span className="ml-2 text-xs text-muted-foreground">
                       ({selectedFields.length} selected)
@@ -548,6 +548,38 @@ export const FieldNavigationPanel = ({
                   </PopoverContent>
                 </Popover>
               </div>
+              
+              {/* Quick Edit Input */}
+              {FIELD_CONFIG[currentFieldIndex]?.type === 'input' && (
+                <Input
+                  value={formData[currentFieldName] as string || ''}
+                  onChange={(e) => updateField(currentFieldName, e.target.value)}
+                  placeholder={FIELD_CONFIG[currentFieldIndex]?.placeholder}
+                  className="h-9 text-sm"
+                />
+              )}
+              
+              {FIELD_CONFIG[currentFieldIndex]?.type === 'textarea' && (
+                <Textarea
+                  value={formData[currentFieldName] as string || ''}
+                  onChange={(e) => updateField(currentFieldName, e.target.value)}
+                  placeholder={FIELD_CONFIG[currentFieldIndex]?.placeholder}
+                  className="min-h-[60px] text-sm resize-none"
+                />
+              )}
+
+              {FIELD_CONFIG[currentFieldIndex]?.type === 'checkbox' && (
+                <div className="flex items-center space-x-2 py-1">
+                  <Checkbox
+                    checked={!!formData[currentFieldName]}
+                    onCheckedChange={(checked) => updateField(currentFieldName, checked as boolean)}
+                  />
+                  <label className="text-sm">
+                    {FIELD_CONFIG[currentFieldIndex]?.label}
+                  </label>
+                </div>
+              )}
+              
               <div className="text-xs text-muted-foreground">
                 Position: X {currentPosition.left.toFixed(1)}% • Y {currentPosition.top.toFixed(1)}%
               </div>

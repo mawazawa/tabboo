@@ -6,7 +6,7 @@ import { PersonalDataVaultPanel } from "@/components/PersonalDataVaultPanel";
 import { PDFThumbnailSidebar } from "@/components/PDFThumbnailSidebar";
 import { FieldSearchBar } from "@/components/FieldSearchBar";
 import { TemplateManager } from "@/components/TemplateManager";
-import { FileText, MessageSquare, LogOut, Loader2, Calculator, PanelLeftClose, PanelRightClose, Shield } from "lucide-react";
+import { FileText, MessageSquare, LogOut, Loader2, Calculator, PanelLeftClose, PanelRightClose, Shield, Settings } from "lucide-react";
 import { 
   snapAllToGrid, 
   alignHorizontal, 
@@ -294,7 +294,7 @@ const Index = () => {
                 <p className="text-sm text-muted-foreground">AI-Powered Legal Form Assistant</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 flex-1">
+            <div className="flex items-center gap-3">
               <NavigationMenu>
                 <NavigationMenuList>
                   <NavigationMenuItem>
@@ -335,19 +335,6 @@ const Index = () => {
                 </NavigationMenuList>
               </NavigationMenu>
 
-              {/* Search/AI Input */}
-              <FieldSearchBar 
-                onFieldSearch={(query) => setFieldSearchQuery(query)}
-                onAIQuery={(query) => {
-                  setShowAIPanel(true);
-                  // TODO: Send query to AI assistant
-                  toast({
-                    title: "AI Query",
-                    description: `Sending to AI: ${query}`,
-                  });
-                }}
-              />
-
               <Button variant="outline" size="sm" onClick={handleLogout} className="gap-2">
                 <LogOut className="h-4 w-4" strokeWidth={0.5} />
                 Logout
@@ -361,6 +348,20 @@ const Index = () => {
       <main className="container mx-auto px-4 py-6">
         {/* Control Toolbar */}
         <div className="flex items-center gap-2 mb-4 p-3 bg-card/80 backdrop-blur-sm rounded-lg border shadow-sm">
+          {/* Search Bar - Relocated */}
+          <FieldSearchBar 
+            onFieldSearch={(query) => setFieldSearchQuery(query)}
+            onAIQuery={(query) => {
+              setShowAIPanel(true);
+              toast({
+                title: "AI Query",
+                description: `Sending to AI: ${query}`,
+              });
+            }}
+          />
+
+          <div className="h-6 w-px bg-border" />
+
           {/* Thumbnail Collapse */}
           <Button
             variant="ghost"
@@ -372,6 +373,33 @@ const Index = () => {
             <PanelLeftClose className={`h-4 w-4 transition-transform ${!showThumbnails ? 'rotate-180' : ''}`} strokeWidth={0.5} />
             {showThumbnails ? 'Hide' : 'Show'}
           </Button>
+
+          <div className="h-6 w-px bg-border" />
+
+          {/* Settings Menu with Gear Icon */}
+          <NavigationMenu>
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="gap-2 h-9 px-3">
+                  <Settings className="h-4 w-4" strokeWidth={0.5} />
+                  <span className="text-sm">Settings</span>
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="p-2 w-[300px]">
+                    <div className="p-2">
+                      <TemplateManager
+                        currentFormId="FL-320"
+                        currentFormName="Response to Request for Restraining Orders"
+                        currentFieldPositions={fieldPositions}
+                        onApplyTemplate={handleApplyTemplate}
+                        triggerless={true}
+                      />
+                    </div>
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
 
           <div className="h-6 w-px bg-border" />
 
@@ -450,16 +478,6 @@ const Index = () => {
             <Shield className="h-4 w-4" strokeWidth={0.5} />
             Vault
           </Button>
-
-          <div className="h-6 w-px bg-border" />
-
-          {/* Template Manager */}
-          <TemplateManager
-            currentFormId="FL-320"
-            currentFormName="Response to Request for Restraining Orders"
-            currentFieldPositions={fieldPositions}
-            onApplyTemplate={handleApplyTemplate}
-          />
         </div>
 
         <ResizablePanelGroup direction="horizontal" className="h-[calc(100vh-220px)] w-full">

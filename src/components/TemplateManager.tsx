@@ -26,6 +26,7 @@ interface TemplateManagerProps {
   currentFormName: string;
   currentFieldPositions: Record<string, any>;
   onApplyTemplate: (template: FormTemplate) => void;
+  triggerless?: boolean; // If true, renders without Dialog wrapper
 }
 
 export const TemplateManager = ({
@@ -33,6 +34,7 @@ export const TemplateManager = ({
   currentFormName,
   currentFieldPositions,
   onApplyTemplate,
+  triggerless = false,
 }: TemplateManagerProps) => {
   const [open, setOpen] = useState(false);
   const [templates, setTemplates] = useState(getStoredTemplates());
@@ -86,6 +88,101 @@ export const TemplateManager = ({
     toast.success('Template deleted');
   };
 
+  const content = (
+    <div className="space-y-4">
+      {/* Actions */}
+      <div className="flex gap-2 flex-wrap">
+        <Button onClick={handleExport} variant="outline" size="sm" className="gap-2">
+          <Download className="h-4 w-4" />
+          Export Current
+        </Button>
+        <Button onClick={handleSaveCurrent} variant="outline" size="sm" className="gap-2">
+          <Download className="h-4 w-4" />
+          Save to Library
+        </Button>
+        <Button asChild variant="outline" size="sm" className="gap-2">
+          <label className="cursor-pointer">
+            <Upload className="h-4 w-4" />
+            Import Mapping
+            <input
+              type="file"
+              accept=".json"
+              onChange={handleImport}
+              className="hidden"
+            />
+          </label>
+        </Button>
+      </div>
+
+      {/* Saved Templates */}
+      <div className="space-y-2">
+        <h3 className="text-sm font-medium">Saved Templates</h3>
+        {Object.keys(templates).length === 0 ? (
+          <p className="text-sm text-muted-foreground py-4 text-center">
+            No saved templates. Import a mapping file or save the current field positions.
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {Object.values(templates).map((template) => (
+              <Card key={template.formId} className="p-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-sm">{template.formName}</h4>
+                    <p className="text-xs text-muted-foreground">
+                      ID: {template.formId} • Version: {template.version}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {Object.keys(template.fields).length} fields
+                      {template.author && ` • by ${template.author}`}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(template.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="flex gap-1 ml-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleApply(template)}
+                    >
+                      Apply
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => exportTemplate(template)}
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDelete(template.formId)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  if (triggerless) {
+    return (
+      <div className="w-full">
+        <h3 className="text-sm font-semibold mb-3">Field Position Templates</h3>
+        <p className="text-xs text-muted-foreground mb-4">
+          Import, export, and manage form field position templates for crowdsourcing.
+        </p>
+        {content}
+      </div>
+    );
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -101,87 +198,7 @@ export const TemplateManager = ({
             Import, export, and manage form field position templates for crowdsourcing.
           </DialogDescription>
         </DialogHeader>
-
-        <div className="space-y-4">
-          {/* Actions */}
-          <div className="flex gap-2 flex-wrap">
-            <Button onClick={handleExport} variant="outline" size="sm" className="gap-2">
-              <Download className="h-4 w-4" />
-              Export Current
-            </Button>
-            <Button onClick={handleSaveCurrent} variant="outline" size="sm" className="gap-2">
-              <Download className="h-4 w-4" />
-              Save to Library
-            </Button>
-            <Button asChild variant="outline" size="sm" className="gap-2">
-              <label className="cursor-pointer">
-                <Upload className="h-4 w-4" />
-                Import JSON
-                <input
-                  type="file"
-                  accept=".json"
-                  onChange={handleImport}
-                  className="hidden"
-                />
-              </label>
-            </Button>
-          </div>
-
-          {/* Saved Templates */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-medium">Saved Templates</h3>
-            {Object.keys(templates).length === 0 ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">
-                No saved templates. Import a JSON template or save the current field positions.
-              </p>
-            ) : (
-              <div className="space-y-2">
-                {Object.values(templates).map((template) => (
-                  <Card key={template.formId} className="p-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm">{template.formName}</h4>
-                        <p className="text-xs text-muted-foreground">
-                          ID: {template.formId} • Version: {template.version}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {Object.keys(template.fields).length} fields
-                          {template.author && ` • by ${template.author}`}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(template.createdAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div className="flex gap-1 ml-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleApply(template)}
-                        >
-                          Apply
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => exportTemplate(template)}
-                        >
-                          <Download className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(template.formId)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+        {content}
       </DialogContent>
     </Dialog>
   );
