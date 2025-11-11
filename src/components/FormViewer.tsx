@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useState, useRef } from "react";
+import { useState, useRef, memo, useCallback } from "react";
 import { Document, Page, pdfjs } from 'react-pdf';
 import { Settings, Move, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { canAutofill, getVaultValueForField, type PersonalVaultData } from "@/utils/vaultFieldMatcher";
@@ -70,6 +70,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   const [editModeField, setEditModeField] = useState<string | null>(null);
   const [alignmentGuides, setAlignmentGuides] = useState<{ x: number[]; y: number[] }>({ x: [], y: [] });
   const dragStartPos = useRef<{ x: number; y: number; top: number; left: number }>({ x: 0, y: 0, top: 0, left: 0 });
+  const rafRef = useRef<number | null>(null);
 
   // Map field names to indices
   const fieldNameToIndex: Record<string, number> = {
@@ -132,100 +133,112 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     }
   };
 
-  const handlePointerMove = (e: React.PointerEvent) => {
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
     if (!isDragging) return;
     
     e.preventDefault();
     
-    const deltaX = e.clientX - dragStartPos.current.x;
-    const deltaY = e.clientY - dragStartPos.current.y;
-    const parentRect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    // Cancel any pending animation frame
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+    }
     
-    let newLeft = dragStartPos.current.left + (deltaX / parentRect.width) * 100;
-    let newTop = dragStartPos.current.top + (deltaY / parentRect.height) * 100;
-    
-    // Constrain within bounds
-    newLeft = Math.max(0, Math.min(95, newLeft));
-    newTop = Math.max(0, Math.min(95, newTop));
+    // Use requestAnimationFrame for smooth 60fps updates
+    rafRef.current = requestAnimationFrame(() => {
+      const deltaX = e.clientX - dragStartPos.current.x;
+      const deltaY = e.clientY - dragStartPos.current.y;
+      const parentRect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      
+      let newLeft = dragStartPos.current.left + (deltaX / parentRect.width) * 100;
+      let newTop = dragStartPos.current.top + (deltaY / parentRect.height) * 100;
+      
+      // Constrain within bounds
+      newLeft = Math.max(0, Math.min(95, newLeft));
+      newTop = Math.max(0, Math.min(95, newTop));
 
-    // Smart snapping to other fields
-    const snapThreshold = 1.5; // Snap within 1.5% distance
-    const guides: { x: number[]; y: number[] } = { x: [], y: [] };
-    
-    // Get all other field positions
-    Object.entries(fieldPositions).forEach(([field, pos]) => {
-      if (field === isDragging) return; // Skip the field being dragged
+      // Smart snapping to other fields
+      const snapThreshold = 1.5; // Snap within 1.5% distance
+      const guides: { x: number[]; y: number[] } = { x: [], y: [] };
       
-      // Snap to left edge
-      if (Math.abs(newLeft - pos.left) < snapThreshold) {
-        newLeft = pos.left;
-        guides.x.push(pos.left);
-      }
+      // Get all other field positions
+      Object.entries(fieldPositions).forEach(([field, pos]) => {
+        if (field === isDragging) return; // Skip the field being dragged
+        
+        // Snap to left edge
+        if (Math.abs(newLeft - pos.left) < snapThreshold) {
+          newLeft = pos.left;
+          guides.x.push(pos.left);
+        }
+        
+        // Snap to right edge (assuming ~20% width for fields)
+        const draggedRight = newLeft + 20;
+        const otherRight = pos.left + 20;
+        if (Math.abs(draggedRight - otherRight) < snapThreshold) {
+          newLeft = pos.left;
+          guides.x.push(pos.left);
+        }
+        
+        // Snap left edge to other's right edge
+        if (Math.abs(newLeft - otherRight) < snapThreshold) {
+          newLeft = otherRight;
+          guides.x.push(otherRight);
+        }
+        
+        // Snap to top edge
+        if (Math.abs(newTop - pos.top) < snapThreshold) {
+          newTop = pos.top;
+          guides.y.push(pos.top);
+        }
+        
+        // Snap to bottom edge (assuming ~5% height for most fields)
+        const draggedBottom = newTop + 5;
+        const otherBottom = pos.top + 5;
+        if (Math.abs(draggedBottom - otherBottom) < snapThreshold) {
+          newTop = pos.top;
+          guides.y.push(pos.top);
+        }
+        
+        // Snap top edge to other's bottom edge
+        if (Math.abs(newTop - otherBottom) < snapThreshold) {
+          newTop = otherBottom;
+          guides.y.push(otherBottom);
+        }
+        
+        // Snap to vertical center alignment
+        const draggedCenterY = newTop + 2.5;
+        const otherCenterY = pos.top + 2.5;
+        if (Math.abs(draggedCenterY - otherCenterY) < snapThreshold) {
+          newTop = pos.top;
+          guides.y.push(pos.top);
+        }
+        
+        // Snap to horizontal center alignment
+        const draggedCenterX = newLeft + 10;
+        const otherCenterX = pos.left + 10;
+        if (Math.abs(draggedCenterX - otherCenterX) < snapThreshold) {
+          newLeft = pos.left;
+          guides.x.push(pos.left);
+        }
+      });
       
-      // Snap to right edge (assuming ~20% width for fields)
-      const draggedRight = newLeft + 20;
-      const otherRight = pos.left + 20;
-      if (Math.abs(draggedRight - otherRight) < snapThreshold) {
-        newLeft = pos.left;
-        guides.x.push(pos.left);
-      }
+      // Update alignment guides
+      setAlignmentGuides(guides);
       
-      // Snap left edge to other's right edge
-      if (Math.abs(newLeft - otherRight) < snapThreshold) {
-        newLeft = otherRight;
-        guides.x.push(otherRight);
-      }
-      
-      // Snap to top edge
-      if (Math.abs(newTop - pos.top) < snapThreshold) {
-        newTop = pos.top;
-        guides.y.push(pos.top);
-      }
-      
-      // Snap to bottom edge (assuming ~5% height for most fields)
-      const draggedBottom = newTop + 5;
-      const otherBottom = pos.top + 5;
-      if (Math.abs(draggedBottom - otherBottom) < snapThreshold) {
-        newTop = pos.top;
-        guides.y.push(pos.top);
-      }
-      
-      // Snap top edge to other's bottom edge
-      if (Math.abs(newTop - otherBottom) < snapThreshold) {
-        newTop = otherBottom;
-        guides.y.push(otherBottom);
-      }
-      
-      // Snap to vertical center alignment
-      const draggedCenterY = newTop + 2.5;
-      const otherCenterY = pos.top + 2.5;
-      if (Math.abs(draggedCenterY - otherCenterY) < snapThreshold) {
-        newTop = pos.top;
-        guides.y.push(pos.top);
-      }
-      
-      // Snap to horizontal center alignment
-      const draggedCenterX = newLeft + 10;
-      const otherCenterX = pos.left + 10;
-      if (Math.abs(draggedCenterX - otherCenterX) < snapThreshold) {
-        newLeft = pos.left;
-        guides.x.push(pos.left);
-      }
+      updateFieldPosition(isDragging, { top: newTop, left: newLeft });
     });
-    
-    // Update alignment guides
-    setAlignmentGuides(guides);
-    
-    updateFieldPosition(isDragging, { top: newTop, left: newLeft });
-  };
+  }, [isDragging, fieldPositions, updateFieldPosition]);
 
-  const handlePointerUp = (e: React.PointerEvent) => {
+  const handlePointerUp = useCallback((e: React.PointerEvent) => {
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
     if (isDragging) {
       (e.target as HTMLElement).releasePointerCapture(e.pointerId);
     }
     setIsDragging(null);
     setAlignmentGuides({ x: [], y: [] }); // Clear guides when done dragging
-  };
+  }, [isDragging]);
 
   const handlePDFClick = (e: React.MouseEvent) => {
     // Only deselect if clicking directly on the PDF container, not on input fields
