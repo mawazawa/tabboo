@@ -370,42 +370,29 @@ export const FieldNavigationPanel = ({
 
   return (
     <Card className="h-full border-hairline shadow-3point chamfered flex flex-col overflow-hidden">
-      {/* Sticky Header - Fixed Interaction Surface */}
+      {/* Compact Sticky Header */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-sm">
-        <div className="p-4 space-y-3">
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex-1">
-              <h2 className="font-semibold text-sm">Form Field Controls</h2>
-              <p className="text-xs text-muted-foreground mt-1">
-                Field {currentFieldIndex + 1} of {FIELD_CONFIG.length}
-                {searchQuery && ` • ${filteredFields.length} results`}
-              </p>
-              <div className="text-[10px] text-muted-foreground mt-2 space-y-0.5">
-                <div>⌘F • Search fields</div>
-                <div>⌘K • Toggle positioning</div>
-                <div>Tab • Next field</div>
-              </div>
+        <div className="p-3 space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <h2 className="font-semibold text-sm truncate">Field {currentFieldIndex + 1}/{FIELD_CONFIG.length}</h2>
+              {searchQuery && (
+                <p className="text-xs text-muted-foreground truncate">{filteredFields.length} results</p>
+              )}
             </div>
-            <div className="flex items-center gap-1.5 shrink-0">
+            <div className="flex items-center gap-1 shrink-0">
               <Badge
                 variant="secondary"
-                className="cursor-pointer hover:bg-secondary/80 transition-colors px-2 py-1 gap-1"
-                onClick={() => {
-                  setShowAISearch(!showAISearch);
-                }}
+                className="cursor-pointer hover:bg-secondary/80 transition-colors px-1.5 py-0.5"
+                onClick={() => setShowAISearch(!showAISearch)}
               >
                 <Search className="h-3 w-3" strokeWidth={1.5} />
-                <span className="text-xs">AI</span>
               </Badge>
               
               <Popover>
                 <PopoverTrigger asChild>
-                  <Badge
-                    variant="secondary"
-                    className="cursor-pointer hover:bg-secondary/80 transition-colors px-2 py-1 gap-1"
-                  >
+                  <Badge variant="secondary" className="cursor-pointer hover:bg-secondary/80 transition-colors px-1.5 py-0.5">
                     <Package className="h-3 w-3" strokeWidth={1.5} />
-                    <span className="text-xs">Groups</span>
                   </Badge>
                 </PopoverTrigger>
                 <PopoverContent className="w-[500px]" align="end">
@@ -420,11 +407,10 @@ export const FieldNavigationPanel = ({
 
               <Badge
                 variant="secondary"
-                className="cursor-pointer hover:bg-secondary/80 transition-colors px-2 py-1 gap-1"
+                className="cursor-pointer hover:bg-secondary/80 transition-colors px-1.5 py-0.5"
                 onClick={() => onSettingsSheetChange(true)}
               >
                 <Settings className="h-3 w-3" strokeWidth={1.5} />
-                <span className="text-xs">Settings</span>
               </Badge>
             </div>
           </div>
@@ -433,9 +419,7 @@ export const FieldNavigationPanel = ({
             <SheetContent side="right" className="w-[400px] sm:w-[540px]">
               <SheetHeader>
                 <SheetTitle>Form Settings</SheetTitle>
-                <SheetDescription>
-                  Manage templates and form configurations
-                </SheetDescription>
+                <SheetDescription>Manage templates and form configurations</SheetDescription>
               </SheetHeader>
               <div className="mt-6">
                 <TemplateManager
@@ -449,155 +433,142 @@ export const FieldNavigationPanel = ({
             </SheetContent>
           </Sheet>
 
-          {/* AI Search Bar */}
+          {/* Compact Search Bars */}
           {showAISearch && (
-            <div className="animate-in slide-in-from-top-2 duration-300">
-              <FieldSearchBar 
-                onFieldSearch={(query) => setSearchQuery(query)}
-                onAIQuery={(query) => {
-                  toast({
-                    title: "AI Query Sent",
-                    description: query,
-                  });
-                  setShowAISearch(false);
-                }}
-                placeholder="Ask AI or search fields..."
-              />
-            </div>
+            <FieldSearchBar 
+              onFieldSearch={(query) => setSearchQuery(query)}
+              onAIQuery={(query) => {
+                toast({ title: "AI Query Sent", description: query });
+                setShowAISearch(false);
+              }}
+              placeholder="Ask AI or search fields..."
+            />
           )}
 
-          {/* Glassmorphic Search Bar */}
           {showSearch && (
-            <div className="relative animate-in slide-in-from-top-2 duration-300">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 rounded-xl blur-xl" />
-              <div className="relative bg-background/60 backdrop-blur-2xl border border-border/30 rounded-xl shadow-lg overflow-hidden">
-                <div className="flex items-center gap-2 px-4 py-2.5">
-                  <Search className="h-4 w-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
-                  <Input
-                    ref={searchInputRef}
-                    type="text"
-                    placeholder="Search fields..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 h-8 px-0 text-sm placeholder:text-muted-foreground/60"
-                  />
-                  {searchQuery && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => setSearchQuery('')}
-                      className="h-6 w-6 p-0 shrink-0 hover:bg-muted/50"
-                    >
-                      <X className="h-3 w-3" strokeWidth={2} />
-                    </Button>
-                  )}
-                </div>
+            <div className="relative bg-background/60 backdrop-blur-2xl border border-border/30 rounded-lg overflow-hidden">
+              <div className="flex items-center gap-2 px-3 py-1.5">
+                <Search className="h-3.5 w-3.5 text-muted-foreground shrink-0" strokeWidth={1.5} />
+                <Input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Search fields..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="flex-1 border-0 bg-transparent focus-visible:ring-0 h-7 px-0 text-sm"
+                />
+                {searchQuery && (
+                  <Button size="sm" variant="ghost" onClick={() => setSearchQuery('')} className="h-5 w-5 p-0">
+                    <X className="h-3 w-3" strokeWidth={2} />
+                  </Button>
+                )}
               </div>
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-2 w-full">
+          {/* Compact Navigation */}
+          <div className="grid grid-cols-2 gap-1.5">
             <Button
-              size="lg"
+              size="sm"
               variant="outline"
               onClick={goToPrevField}
               disabled={currentFieldIndex === 0}
-              className="shadow-3point chamfered spring-hover border-hairline flex items-center justify-center gap-1.5"
+              className="h-8 gap-1"
             >
-              <ChevronUp className="h-5 w-5" strokeWidth={1.5} />
-              <span>Previous</span>
+              <ChevronUp className="h-4 w-4" strokeWidth={1.5} />
+              <span className="text-xs">Prev</span>
             </Button>
             <Button
-              size="lg"
+              size="sm"
               variant="outline"
               onClick={goToNextField}
               disabled={currentFieldIndex === FIELD_CONFIG.length - 1}
-              className="shadow-3point chamfered spring-hover border-hairline flex items-center justify-center gap-1.5"
+              className="h-8 gap-1"
             >
-              <span>Next</span>
-              <ChevronDown className="h-5 w-5" strokeWidth={1.5} />
+              <span className="text-xs">Next</span>
+              <ChevronDown className="h-4 w-4" strokeWidth={1.5} />
             </Button>
           </div>
+        </div>
+      </div>
 
-          {/* Field Presets Toolbar */}
-          <FieldPresetsToolbar
-            selectedFields={selectedFields}
-            onSnapToGrid={onSnapToGrid}
-            onAlignHorizontal={onAlignHorizontal}
-            onAlignVertical={onAlignVertical}
-            onDistribute={onDistribute}
-            onCopyPositions={onCopyPositions}
-            onPastePositions={onPastePositions}
-            onTransformPositions={onTransformPositions}
-            hasCopiedPositions={hasCopiedPositions}
-          />
+      {/* Scrollable Content Area */}
+      <div ref={scrollViewportRef} className="flex-1 relative overflow-hidden">
+        <ScrollArea className="h-full">
+          <div className="p-3 space-y-2">
+            {/* Toolbar Section - Now in scrollable area */}
+            <div className="space-y-2 pb-2 border-b border-border/50">
+              <FieldPresetsToolbar
+                selectedFields={selectedFields}
+                onSnapToGrid={onSnapToGrid}
+                onAlignHorizontal={onAlignHorizontal}
+                onAlignVertical={onAlignVertical}
+                onDistribute={onDistribute}
+                onCopyPositions={onCopyPositions}
+                onPastePositions={onPastePositions}
+                onTransformPositions={onTransformPositions}
+                hasCopiedPositions={hasCopiedPositions}
+              />
 
-          {/* Multi-Select Controls */}
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setSelectedFields(FIELD_CONFIG.map(c => c.field))}
-              className="flex-1 text-xs h-7"
-            >
-              Select All
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setSelectedFields([])}
-              className="flex-1 text-xs h-7"
-              disabled={selectedFields.length === 0}
-            >
-              Clear ({selectedFields.length})
-            </Button>
-          </div>
+              <div className="flex gap-1.5">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setSelectedFields(FIELD_CONFIG.map(c => c.field))}
+                  className="flex-1 text-xs h-7"
+                >
+                  Select All
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setSelectedFields([])}
+                  className="flex-1 text-xs h-7"
+                  disabled={selectedFields.length === 0}
+                >
+                  Clear ({selectedFields.length})
+                </Button>
+              </div>
 
-          {/* Unified Positioning Control */}
-          {currentFieldIndex >= 0 && currentFieldIndex < FIELD_CONFIG.length && (
-            <div className="p-3 bg-background rounded-lg border-hairline shadow-3point chamfered space-y-2">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold">
-                  Active Field: {FIELD_CONFIG[currentFieldIndex]?.label}
-                  {selectedFields.length > 0 && (
-                    <span className="ml-2 text-xs text-muted-foreground">
-                      ({selectedFields.length} selected)
-                    </span>
-                  )}
-                </h3>
-                <Popover open={showPositionControl} onOpenChange={setShowPositionControl}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-8 px-3 gap-2 shadow-3point chamfered spring-hover"
-                    >
-                      <Move className="h-4 w-4" strokeWidth={1.5} />
-                      Adjust
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-56 p-4 shadow-3point chamfered border-hairline" side="left" align="start">
-                    <h4 className="text-sm font-semibold mb-3">Position Adjustment</h4>
-                    <div className="grid grid-cols-2 gap-2 mb-3">
-                      <div>
-                        <label className="text-[10px] text-muted-foreground">X %</label>
-                        <Input
-                          type="number"
-                          step="0.1"
-                          value={currentPosition.left.toFixed(1)}
-                          onChange={(e) => updateFieldPosition(currentFieldName, { 
-                            ...currentPosition, 
-                            left: parseFloat(e.target.value) || 0 
-                          })}
-                          className="h-7 text-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[10px] text-muted-foreground">Y %</label>
-                        <Input
-                          type="number"
-                          step="0.1"
-                          value={currentPosition.top.toFixed(1)}
+              {/* Active Field Control - Compact */}
+              {currentFieldIndex >= 0 && currentFieldIndex < FIELD_CONFIG.length && (
+                <div className="p-2 bg-muted/30 rounded-lg border space-y-1.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="text-xs font-semibold truncate">
+                      {FIELD_CONFIG[currentFieldIndex]?.label}
+                      {selectedFields.length > 0 && (
+                        <span className="ml-1 text-[10px] text-muted-foreground">({selectedFields.length})</span>
+                      )}
+                    </h3>
+                    <Popover open={showPositionControl} onOpenChange={setShowPositionControl}>
+                      <PopoverTrigger asChild>
+                        <Button size="sm" variant="outline" className="h-7 px-2 gap-1">
+                          <Move className="h-3 w-3" strokeWidth={1.5} />
+                          <span className="text-xs">Adjust</span>
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-56 p-4" side="left" align="start">
+                        <h4 className="text-sm font-semibold mb-3">Position Adjustment</h4>
+                        <div className="grid grid-cols-2 gap-2 mb-3">
+                          <div>
+                            <label className="text-[10px] text-muted-foreground">X %</label>
+                            <Input
+                              type="number"
+                              step="0.1"
+                              value={currentPosition.left.toFixed(1)}
+                              onChange={(e) => updateFieldPosition(currentFieldName, { 
+                                ...currentPosition, 
+                                left: parseFloat(e.target.value) || 0 
+                              })}
+                              className="h-7 text-xs"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-muted-foreground">Y %</label>
+                            <Input
+                              type="number"
+                              step="0.1"
+                              value={currentPosition.top.toFixed(1)}
                           onChange={(e) => updateFieldPosition(currentFieldName, { 
                             ...currentPosition, 
                             top: parseFloat(e.target.value) || 0 
@@ -688,21 +659,14 @@ export const FieldNavigationPanel = ({
                 </div>
               )}
               
-              <div className="text-xs text-muted-foreground">
+               <div className="text-xs text-muted-foreground">
                 Position: X {currentPosition.left.toFixed(1)}% • Y {currentPosition.top.toFixed(1)}%
               </div>
             </div>
           )}
         </div>
-      </div>
 
-      {/* Scrollable Content Area - Independent Scroll Container */}
-      <div 
-        ref={scrollViewportRef}
-        className="flex-1 relative overflow-hidden"
-      >
-        <ScrollArea className="h-full">
-          <div className="p-4 space-y-3">
+            {/* Field List */}
           {filteredFields.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Search className="h-12 w-12 text-muted-foreground/30 mb-3" strokeWidth={1} />
