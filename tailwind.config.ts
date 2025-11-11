@@ -102,46 +102,11 @@ export default {
             filter: "drop-shadow(0 0 11px hsl(var(--primary) / 0.38))",
           },
         },
-        "gradient-flow": {
-          "0%": { backgroundPosition: "0% 50%" },
-          "50%": { backgroundPosition: "100% 50%" },
-          "100%": { backgroundPosition: "0% 50%" },
-        },
-        "bounce-subtle": {
-          "0%, 100%": { 
-            transform: "translateY(0) scale(1)",
-            filter: "drop-shadow(0 0 8px hsl(var(--primary) / 0.6))"
-          },
-          "50%": { 
-            transform: "translateY(-5px) scale(1.1)",
-            filter: "drop-shadow(0 0 16px hsl(var(--accent) / 0.8))"
-          },
-        },
-        "pulse-gentle": {
-          "0%, 100%": { opacity: "1", transform: "scale(1)" },
-          "50%": { opacity: "0.85", transform: "scale(1.02)" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "float": "float 120s cubic-bezier(0.4, 0.0, 0.2, 1) infinite",
-        "gradient-flow": "gradient-flow 3s ease infinite",
-        "bounce-subtle": "bounce-subtle 2s ease-in-out infinite",
-        "pulse-gentle": "pulse-gentle 3s ease-in-out infinite",
-      },
-      backgroundSize: {
-        "size-200": "200% 200%",
-      },
-      dropShadow: {
-        "glow": [
-          "0 0 20px hsl(var(--primary) / 0.5)",
-          "0 0 40px hsl(var(--accent) / 0.3)"
-        ],
-      },
-      boxShadow: {
-        "glow": "0 0 30px hsl(var(--primary) / 0.5), 0 0 60px hsl(var(--accent) / 0.3)",
-        "glow-intense": "0 0 40px hsl(var(--primary) / 0.7), 0 0 80px hsl(var(--accent) / 0.5), 0 0 120px hsl(var(--primary) / 0.3)",
       },
     },
   },
