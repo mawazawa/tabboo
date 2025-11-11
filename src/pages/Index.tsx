@@ -7,6 +7,7 @@ import { PDFThumbnailSidebar } from "@/components/PDFThumbnailSidebar";
 import { FieldSearchBar } from "@/components/FieldSearchBar";
 import { TemplateManager } from "@/components/TemplateManager";
 import { FieldGroupManager } from "@/components/FieldGroupManager";
+import { CommandPalette } from "@/components/CommandPalette";
 import { FileText, MessageSquare, LogOut, Loader2, Calculator, PanelLeftClose, PanelRightClose, Shield, Settings, Sparkles } from "lucide-react";
 import { 
   snapAllToGrid, 
@@ -89,6 +90,7 @@ const Index = () => {
   const [copiedFieldPositions, setCopiedFieldPositions] = useState<Record<string, { top: number; left: number }> | null>(null);
   const [validationRules, setValidationRules] = useState<Record<string, any[]>>({});
   const [validationErrors, setValidationErrors] = useState<Record<string, any[]>>({});
+  const [settingsSheetOpen, setSettingsSheetOpen] = useState(false);
   const { toast } = useToast();
   const hasUnsavedChanges = useRef(false);
 
@@ -426,6 +428,17 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 w-full">
+      {/* Command Palette - Cmd+K */}
+      <CommandPalette
+        onToggleAI={() => setShowAIPanel(!showAIPanel)}
+        onToggleFields={() => setShowFieldsPanel(!showFieldsPanel)}
+        onToggleVault={() => setShowVaultPanel(!showVaultPanel)}
+        onToggleThumbnails={() => setShowThumbnails(!showThumbnails)}
+        onOpenSettings={() => setSettingsSheetOpen(true)}
+        onAutofillAll={handleAutofillAll}
+        onLogout={handleLogout}
+      />
+      
       {/* Header */}
       <header className="border-b-2 bg-card/80 backdrop-blur-sm sticky top-0 z-50 shadow-medium">
         <div className="container mx-auto px-4 py-4">
@@ -544,7 +557,7 @@ const Index = () => {
           <div className="h-6 w-px bg-border" />
 
           {/* Settings Menu with Gear Icon */}
-          <Sheet>
+          <Sheet open={settingsSheetOpen} onOpenChange={setSettingsSheetOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="sm" className="gap-2">
                 <Settings className="h-4 w-4" strokeWidth={0.5} />

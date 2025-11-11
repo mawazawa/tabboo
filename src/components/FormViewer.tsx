@@ -154,7 +154,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
       top: parseFloat(fieldOverlays[0].fields.find(f => f.field === field)?.top || '0'),
       left: parseFloat(fieldOverlays[0].fields.find(f => f.field === field)?.left || '0')
     };
-    const step = 0.1;
+    const step = 1.0; // Increased from 0.1 for faster movement
     const newPosition = { ...position };
     
     switch (direction) {
@@ -256,9 +256,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                           return (
                             <div
                             key={idx}
-                            className={`field-container absolute select-none touch-none spring-hover p-1 ${
-                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-4 ring-primary opacity-90 shadow-3point' : 
-                              'cursor-grab'
+                            className={`field-container absolute select-none touch-none spring-hover ${
+                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-4 ring-primary opacity-90 shadow-3point p-4' : 
+                              'cursor-grab p-3'
                             } ${
                               highlightedField === overlay.field
                                 ? 'ring-4 ring-accent shadow-3point-hover animate-pulse bg-accent/20 chamfered' :
@@ -266,7 +266,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 ? 'ring-4 ring-green-600 shadow-3point bg-green-600/10 chamfered' :
                               isCurrentField 
                                 ? 'ring-4 ring-primary shadow-3point chamfered' 
-                                : 'hover:ring-2 hover:ring-primary/50'
+                                : 'hover:ring-2 hover:ring-primary/50 hover:bg-primary/5'
                             } rounded-lg transition-all`}
                             style={{
                               top: `${position.top}%`,
@@ -274,6 +274,8 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                               width: overlay.width || 'auto',
                               height: overlay.height || 'auto',
                               pointerEvents: 'auto',
+                              // Expand clickable area with negative margin
+                              margin: '-8px',
                             }}
                             onClick={(e) => handleFieldClick(overlay.field, e)}
                             onPointerDown={(e) => handlePointerDown(e, overlay.field, position.top, position.left)}

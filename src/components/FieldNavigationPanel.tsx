@@ -244,7 +244,7 @@ export const FieldNavigationPanel = ({
   const adjustPosition = (direction: 'up' | 'down' | 'left' | 'right', fieldName?: string) => {
     const targetField = fieldName || currentFieldName;
     const position = fieldPositions[targetField] || getDefaultPosition(targetField);
-    const step = 0.1;
+    const step = 1.0; // Increased from 0.1 for faster keyboard movement
     const newPosition = { ...position };
     
     switch (direction) {
@@ -525,42 +525,42 @@ export const FieldNavigationPanel = ({
                         size="sm"
                         variant="outline"
                         onClick={() => adjustPosition('up')}
-                        className={`h-7 px-1 transition-all duration-75 ${
+                        className={`h-8 px-2 transition-all duration-75 hover:bg-primary/20 hover:border-primary ${
                           pressedKey === 'up' ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 shadow-lg scale-95' : ''
                         }`}
                       >
-                        <ChevronUp className="h-3 w-3" strokeWidth={0.5} />
+                        <ChevronUp className="h-4 w-4" strokeWidth={2} />
                       </Button>
                       <div></div>
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={() => adjustPosition('left')}
-                        className={`h-7 px-1 transition-all duration-75 ${
+                        className={`h-8 px-2 transition-all duration-75 hover:bg-primary/20 hover:border-primary ${
                           pressedKey === 'left' ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 shadow-lg scale-95' : ''
                         }`}
                       >
-                        <ChevronLeft className="h-3 w-3" strokeWidth={0.5} />
+                        <ChevronLeft className="h-4 w-4" strokeWidth={2} />
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={() => adjustPosition('down')}
-                        className={`h-7 px-1 transition-all duration-75 ${
+                        className={`h-8 px-2 transition-all duration-75 hover:bg-primary/20 hover:border-primary ${
                           pressedKey === 'down' ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 shadow-lg scale-95' : ''
                         }`}
                       >
-                        <ChevronDown className="h-3 w-3" strokeWidth={0.5} />
+                        <ChevronDown className="h-4 w-4" strokeWidth={2} />
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={() => adjustPosition('right')}
-                        className={`h-7 px-1 transition-all duration-75 ${
+                        className={`h-8 px-2 transition-all duration-75 hover:bg-primary/20 hover:border-primary ${
                           pressedKey === 'right' ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 shadow-lg scale-95' : ''
                         }`}
                       >
-                        <ChevronRight className="h-3 w-3" strokeWidth={0.5} />
+                        <ChevronRight className="h-4 w-4" strokeWidth={2} />
                       </Button>
                     </div>
                     <p className="text-xs text-muted-foreground mt-3">
