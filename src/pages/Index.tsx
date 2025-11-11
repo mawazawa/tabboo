@@ -7,7 +7,7 @@ import { PDFThumbnailSidebar } from "@/components/PDFThumbnailSidebar";
 import { FieldSearchBar } from "@/components/FieldSearchBar";
 import { TemplateManager } from "@/components/TemplateManager";
 import { FieldGroupManager } from "@/components/FieldGroupManager";
-import { FileText, MessageSquare, LogOut, Loader2, Calculator, PanelLeftClose, PanelRightClose, Shield, Settings } from "lucide-react";
+import { FileText, MessageSquare, LogOut, Loader2, Calculator, PanelLeftClose, PanelRightClose, Shield, Settings, Sparkles } from "lucide-react";
 import { 
   snapAllToGrid, 
   alignHorizontal, 
@@ -15,6 +15,7 @@ import {
   distributeEvenly 
 } from "@/utils/fieldPresets";
 import type { FormTemplate } from "@/utils/templateManager";
+import { autofillAllFromVault, getAutofillableFields, type PersonalVaultData } from "@/utils/vaultFieldMatcher";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -121,6 +122,27 @@ const Index = () => {
         [field]: errors
       }));
     }
+  };
+
+  const handleAutofillAll = () => {
+    const autofilled = autofillAllFromVault(vaultData as PersonalVaultData);
+    const fieldsCount = Object.keys(autofilled).length;
+    
+    if (fieldsCount === 0) {
+      toast({ 
+        title: "No data available", 
+        description: "Please add information to your Personal Data Vault first",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setFormData(prev => ({ ...prev, ...autofilled }));
+    hasUnsavedChanges.current = true;
+    toast({ 
+      title: "Autofilled successfully", 
+      description: `${fieldsCount} field(s) filled from your Personal Data Vault` 
+    });
   };
 
   const updateFieldPosition = (field: string, position: { top: number; left: number }) => {
@@ -481,6 +503,25 @@ const Index = () => {
 
           <div className="h-6 w-px bg-border" />
 
+          {/* Personal Data Vault Button */}
+          <PersonalDataVault userId={user?.id} />
+
+          {/* Autofill All Button */}
+          {vaultData && getAutofillableFields(vaultData as PersonalVaultData).length > 0 && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={handleAutofillAll}
+              className="gap-2 bg-gradient-to-r from-accent to-primary hover:shadow-3point-hover"
+              title="Autofill all fields from Personal Data Vault"
+            >
+              <Sparkles className="h-4 w-4 animate-pulse" strokeWidth={2} />
+              Autofill All ({getAutofillableFields(vaultData as PersonalVaultData).length})
+            </Button>
+          )}
+
+          <div className="h-6 w-px bg-border" />
+
           {/* Settings Menu with Gear Icon */}
           <NavigationMenu>
             <NavigationMenuList>
@@ -647,6 +688,7 @@ const Index = () => {
                   zoom={pdfZoom}
                   highlightedField={highlightedField}
                   validationErrors={validationErrors}
+                  vaultData={vaultData as PersonalVaultData}
                 />
               </ResizablePanel>
             </ResizablePanelGroup>

@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useState, useRef } from "react";
 import { Document, Page, pdfjs } from 'react-pdf';
-import { Settings, Move, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { Settings, Move, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { canAutofill, getVaultValueForField, type PersonalVaultData } from "@/utils/vaultFieldMatcher";
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
@@ -57,9 +58,10 @@ interface Props {
   zoom?: number;
   highlightedField?: string | null;
   validationErrors?: Record<string, any[]>;
+  vaultData?: PersonalVaultData | null;
 }
 
-export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, zoom = 1, highlightedField = null, validationErrors = {} }: Props) => {
+export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, zoom = 1, highlightedField = null, validationErrors = {}, vaultData = null }: Props) => {
   const [numPages, setNumPages] = useState<number>(0);
   const [pageWidth, setPageWidth] = useState<number>(850);
   const [isDragging, setIsDragging] = useState<string | null>(null);
@@ -173,6 +175,14 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     updateFieldPosition(field, newPosition);
   };
 
+  const handleAutofillField = (field: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const value = getVaultValueForField(field, vaultData);
+    if (value) {
+      updateField(field, value);
+    }
+  };
+
   // Field overlays with default positions
   const fieldOverlays: { page: number; fields: FieldOverlays[] }[] = [{
     page: 1,
@@ -240,6 +250,8 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                         
                         const isCurrentField = fieldNameToIndex[overlay.field] === currentFieldIndex;
                         const isEditMode = editModeField === overlay.field;
+                        const canAutofillField = canAutofill(overlay.field, vaultData);
+                        const hasValue = !!formData[overlay.field as keyof FormData];
                         
                           return (
                             <div
@@ -268,8 +280,11 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                           >
                             {isCurrentField && !isEditMode && (
                               <>
-                                <div className="absolute -top-10 left-0 bg-primary text-primary-foreground px-3 py-2 rounded-lg text-sm font-medium shadow-3point whitespace-nowrap chamfered">
+                                <div className="absolute -top-10 left-0 bg-primary text-primary-foreground px-3 py-2 rounded-lg text-sm font-medium shadow-3point whitespace-nowrap chamfered flex items-center gap-2">
                                   {overlay.placeholder || overlay.field}
+                                  {canAutofillField && !hasValue && (
+                                    <Sparkles className="h-3 w-3 animate-pulse" strokeWidth={2} />
+                                  )}
                                 </div>
                                 {/* Premium Touch-Friendly Control Arrows */}
                                 <div className="absolute -top-32 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
@@ -323,6 +338,21 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 <Move className="h-4 w-4" strokeWidth={0.5} />
                                 Swipe to Move: {overlay.placeholder || overlay.field}
                               </div>
+                            )}
+                            {canAutofillField && !hasValue && (
+                              <Button
+                                size="icon"
+                                variant="default"
+                                className="absolute -top-3 -right-16 h-10 w-10 rounded-full shadow-3point z-10 spring-hover chamfered touch-none bg-gradient-to-r from-accent to-primary hover:shadow-3point-hover"
+                                onClick={(e) => handleAutofillField(overlay.field, e)}
+                                onPointerDown={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                }}
+                                title="Autofill from Personal Data Vault"
+                              >
+                                <Sparkles className="h-5 w-5 animate-pulse" strokeWidth={2} />
+                              </Button>
                             )}
                             <Button
                               size="icon"
