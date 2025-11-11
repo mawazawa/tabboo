@@ -57,6 +57,10 @@ interface Props {
   onAlignHorizontal: (alignment: 'left' | 'center' | 'right') => void;
   onAlignVertical: (alignment: 'top' | 'middle' | 'bottom') => void;
   onDistribute: (direction: 'horizontal' | 'vertical') => void;
+  onCopyPositions: () => void;
+  onPastePositions: () => void;
+  onTransformPositions: (transformation: { offsetX?: number; offsetY?: number; scale?: number }) => void;
+  hasCopiedPositions: boolean;
   onFieldHover?: (fieldName: string | null) => void;
 }
 
@@ -96,6 +100,10 @@ export const FieldNavigationPanel = ({
   onAlignHorizontal,
   onAlignVertical,
   onDistribute,
+  onCopyPositions,
+  onPastePositions,
+  onTransformPositions,
+  hasCopiedPositions,
   onFieldHover
 }: Props) => {
   const fieldRefs = useRef<(HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | null)[]>([]);
@@ -424,6 +432,10 @@ export const FieldNavigationPanel = ({
             onAlignHorizontal={onAlignHorizontal}
             onAlignVertical={onAlignVertical}
             onDistribute={onDistribute}
+            onCopyPositions={onCopyPositions}
+            onPastePositions={onPastePositions}
+            onTransformPositions={onTransformPositions}
+            hasCopiedPositions={hasCopiedPositions}
           />
 
           {/* Multi-Select Controls */}

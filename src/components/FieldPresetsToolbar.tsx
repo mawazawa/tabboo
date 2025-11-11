@@ -1,4 +1,4 @@
-import { AlignLeft, AlignCenter, AlignRight, AlignVerticalJustifyStart, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd, Grid3x3, MoveHorizontal, MoveVertical } from 'lucide-react';
+import { AlignLeft, AlignCenter, AlignRight, AlignVerticalJustifyStart, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd, Grid3x3, MoveHorizontal, MoveVertical, Copy, Clipboard, ArrowUpDown } from 'lucide-react';
 import { Button } from './ui/button';
 import { Separator } from './ui/separator';
 import {
@@ -7,6 +7,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from './ui/tooltip';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
 import { toast } from 'sonner';
 
 interface FieldPresetsToolbarProps {
@@ -15,6 +21,10 @@ interface FieldPresetsToolbarProps {
   onAlignHorizontal: (alignment: 'left' | 'center' | 'right') => void;
   onAlignVertical: (alignment: 'top' | 'middle' | 'bottom') => void;
   onDistribute: (direction: 'horizontal' | 'vertical') => void;
+  onCopyPositions: () => void;
+  onPastePositions: () => void;
+  onTransformPositions: (transformation: { offsetX?: number; offsetY?: number; scale?: number }) => void;
+  hasCopiedPositions: boolean;
 }
 
 export const FieldPresetsToolbar = ({
@@ -23,6 +33,10 @@ export const FieldPresetsToolbar = ({
   onAlignHorizontal,
   onAlignVertical,
   onDistribute,
+  onCopyPositions,
+  onPastePositions,
+  onTransformPositions,
+  hasCopiedPositions,
 }: FieldPresetsToolbarProps) => {
   const hasSelection = selectedFields.length > 0;
   const hasMultiple = selectedFields.length > 1;
@@ -195,6 +209,74 @@ export const FieldPresetsToolbar = ({
           </TooltipTrigger>
           <TooltipContent>Distribute Vertically</TooltipContent>
         </Tooltip>
+
+        <Separator orientation="vertical" className="h-4" />
+
+        {/* Copy/Paste Operations */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={!hasSelection}
+              onClick={() => handleAction(() => onCopyPositions())}
+              className="h-7 w-7 p-0"
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Copy Positions</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={!hasSelection || !hasCopiedPositions}
+              onClick={() => handleAction(() => onPastePositions())}
+              className="h-7 w-7 p-0"
+            >
+              <Clipboard className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Paste Positions</TooltipContent>
+        </Tooltip>
+
+        <Separator orientation="vertical" className="h-4" />
+
+        {/* Transform Operations */}
+        <DropdownMenu>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  disabled={!hasSelection}
+                  className="h-7 w-7 p-0"
+                >
+                  <ArrowUpDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent>Transform</TooltipContent>
+          </Tooltip>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => handleAction(() => onTransformPositions({ offsetX: 5, offsetY: 0 }))}>
+              Move Right (+5%)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleAction(() => onTransformPositions({ offsetX: -5, offsetY: 0 }))}>
+              Move Left (-5%)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleAction(() => onTransformPositions({ offsetX: 0, offsetY: 5 }))}>
+              Move Down (+5%)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleAction(() => onTransformPositions({ offsetX: 0, offsetY: -5 }))}>
+              Move Up (-5%)
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </TooltipProvider>
   );

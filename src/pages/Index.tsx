@@ -80,6 +80,7 @@ const Index = () => {
   const [fieldSearchQuery, setFieldSearchQuery] = useState("");
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [highlightedField, setHighlightedField] = useState<string | null>(null);
+  const [copiedFieldPositions, setCopiedFieldPositions] = useState<Record<string, { top: number; left: number }> | null>(null);
   const { toast } = useToast();
   const hasUnsavedChanges = useRef(false);
 
@@ -140,6 +141,75 @@ const Index = () => {
     setFieldPositions(updated);
     hasUnsavedChanges.current = true;
     toast({ title: "Distributed evenly", description: `${selectedFields.length} field(s) spaced ${direction}ly` });
+  };
+
+  const handleCopyPositions = () => {
+    if (selectedFields.length === 0) return;
+    const copied: Record<string, { top: number; left: number }> = {};
+    selectedFields.forEach(field => {
+      if (fieldPositions[field]) {
+        copied[field] = { ...fieldPositions[field] };
+      }
+    });
+    setCopiedFieldPositions(copied);
+    toast({ title: "Copied", description: `${selectedFields.length} field position(s) copied to clipboard` });
+  };
+
+  const handlePastePositions = () => {
+    if (!copiedFieldPositions || selectedFields.length === 0) return;
+    
+    const copiedFields = Object.keys(copiedFieldPositions);
+    if (copiedFields.length === 0) return;
+
+    const updated = { ...fieldPositions };
+    
+    // If pasting to same number of fields, apply directly with slight offset
+    if (selectedFields.length === copiedFields.length) {
+      selectedFields.forEach((targetField, index) => {
+        const sourceField = copiedFields[index];
+        if (copiedFieldPositions[sourceField]) {
+          updated[targetField] = {
+            top: copiedFieldPositions[sourceField].top + 2, // 2% offset to avoid exact overlap
+            left: copiedFieldPositions[sourceField].left + 2
+          };
+        }
+      });
+    } else {
+      // If different number, apply first copied position to all selected
+      const firstCopiedPosition = copiedFieldPositions[copiedFields[0]];
+      selectedFields.forEach((field, index) => {
+        updated[field] = {
+          top: firstCopiedPosition.top + (index * 2), // Stack with 2% offset
+          left: firstCopiedPosition.left + (index * 2)
+        };
+      });
+    }
+
+    setFieldPositions(updated);
+    hasUnsavedChanges.current = true;
+    toast({ title: "Pasted", description: `Applied positions to ${selectedFields.length} field(s)` });
+  };
+
+  const handleTransformPositions = (transformation: { offsetX?: number; offsetY?: number; scale?: number }) => {
+    if (selectedFields.length === 0) return;
+    
+    const updated = { ...fieldPositions };
+    selectedFields.forEach(field => {
+      if (updated[field]) {
+        const pos = updated[field];
+        updated[field] = {
+          top: transformation.scale ? pos.top * transformation.scale : pos.top + (transformation.offsetY || 0),
+          left: transformation.scale ? pos.left * transformation.scale : pos.left + (transformation.offsetX || 0)
+        };
+      }
+    });
+
+    setFieldPositions(updated);
+    hasUnsavedChanges.current = true;
+    const desc = transformation.scale 
+      ? `Scaled ${selectedFields.length} field(s) by ${transformation.scale}x`
+      : `Moved ${selectedFields.length} field(s)`;
+    toast({ title: "Transformed", description: desc });
   };
 
   const handleApplyTemplate = (template: FormTemplate) => {
@@ -566,6 +636,10 @@ const Index = () => {
                       onAlignHorizontal={handleAlignHorizontal}
                       onAlignVertical={handleAlignVertical}
                       onDistribute={handleDistribute}
+                      onCopyPositions={handleCopyPositions}
+                      onPastePositions={handlePastePositions}
+                      onTransformPositions={handleTransformPositions}
+                      hasCopiedPositions={!!copiedFieldPositions}
                       onFieldHover={setHighlightedField}
                     />
                   )}
