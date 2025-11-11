@@ -91,24 +91,36 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
 
   const handlePointerDown = (e: React.PointerEvent, field: string, currentTop: number, currentLeft: number) => {
     const target = e.target as HTMLElement;
+    const isInEditMode = editModeField === field;
     
-    // Don't drag when clicking on interactive elements (inputs, textareas, checkboxes)
-    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.closest('[role="checkbox"]')) {
+    // If in edit mode, allow dragging from anywhere (inputs are disabled)
+    if (isInEditMode) {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDragging(field);
+      
+      const container = target.closest('.field-container') as HTMLElement;
+      if (container) {
+        container.setPointerCapture(e.pointerId);
+      }
+      
+      dragStartPos.current = {
+        x: e.clientX,
+        y: e.clientY,
+        top: currentTop,
+        left: currentLeft
+      };
       return;
     }
     
-    // Allow drag from the gear/move icon button
+    // When not in edit mode, only drag from the move button
     const isDragHandle = target.closest('.drag-handle');
+    if (!isDragHandle) return;
     
-    // Prevent drag from other buttons (like autofill)
-    if (target.tagName === 'BUTTON' && !isDragHandle) return;
-    
-    // Allow drag from anywhere on the container or the drag handle
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(field);
     
-    // Capture pointer for smooth dragging
     const container = target.closest('.field-container') as HTMLElement;
     if (container) {
       container.setPointerCapture(e.pointerId);
@@ -256,7 +268,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
       top: parseFloat(fieldOverlays[0].fields.find(f => f.field === field)?.top || '0'),
       left: parseFloat(fieldOverlays[0].fields.find(f => f.field === field)?.left || '0')
     };
-    const step = 1.0; // Increased from 0.1 for faster movement
+    const step = 0.5; // Fine-tuned for precise control
     const newPosition = { ...position };
     
     switch (direction) {
@@ -427,7 +439,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             key={idx}
                             className={`field-container group absolute select-none touch-none spring-hover ${
                               isDragging === overlay.field ? 'cursor-grabbing z-50 ring-4 ring-primary opacity-90 shadow-3point p-4' : 
-                              'cursor-grab p-3'
+                              isEditMode ? 'cursor-move p-3' : 'cursor-grab p-3'
                             } ${
                               highlightedField === overlay.field
                                 ? 'ring-4 ring-accent shadow-3point-hover animate-pulse bg-accent/20 chamfered' :
@@ -456,13 +468,13 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             <div className={`transition-opacity duration-200 ${isCurrentField || isEditMode ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
                               {isCurrentField && (
                                 <>
-                                  <div className={`absolute -top-10 left-0 px-3 py-2 rounded-lg text-sm font-medium shadow-3point whitespace-nowrap chamfered flex items-center gap-2 ${
+                                   <div className={`absolute -top-10 left-0 px-3 py-2 rounded-lg text-sm font-medium shadow-3point whitespace-nowrap chamfered flex items-center gap-2 ${
                                     isEditMode 
-                                      ? 'bg-green-600 text-white' 
+                                      ? 'bg-green-600 text-white animate-pulse' 
                                       : 'bg-primary text-primary-foreground'
                                   }`}>
                                     {isEditMode && <Move className="h-4 w-4" strokeWidth={1.5} />}
-                                    {isEditMode ? 'Move Mode Active' : overlay.placeholder || overlay.field}
+                                    {isEditMode ? 'Drag Anywhere to Move' : overlay.placeholder || overlay.field}
                                     {!isEditMode && canAutofillField && !hasValue && (
                                       <Sparkles className="h-3 w-3 animate-pulse" strokeWidth={2} />
                                     )}
@@ -585,7 +597,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p>{isEditMode ? 'Exit move mode (or drag to reposition)' : 'Click to toggle edit mode • Drag to move field'}</p>
+                                  <p>{isEditMode ? 'Exit move mode' : 'Enter move mode - then drag anywhere on field'}</p>
                                 </TooltipContent>
                               </Tooltip>
                             </div>
