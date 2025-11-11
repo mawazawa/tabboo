@@ -204,7 +204,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     <Card className="h-full border-hairline shadow-3point chamfered overflow-hidden">
       <ScrollArea className="h-full">
         <div className="relative min-h-full w-full flex items-center justify-center p-4 bg-muted/30">
-          <div style={{ maxWidth: `${pageWidth * zoom}px`, width: '100%' }}>
+          <div className="w-full" style={{ maxWidth: `${pageWidth * zoom}px` }}>
             <Document
               file="/fl320.pdf"
               onLoadSuccess={onDocumentLoadSuccess}

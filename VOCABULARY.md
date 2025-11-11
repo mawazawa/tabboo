@@ -11,6 +11,86 @@ A comprehensive reference for user experience design patterns, cognitive princip
 - [Interaction Patterns](#interaction-patterns)
 - [Information Architecture](#information-architecture)
 - [Design Systems](#design-systems)
+- [Modern UI Architecture Patterns](#modern-ui-architecture-patterns)
+
+---
+
+## Modern UI Architecture Patterns
+
+### Viewport-Anchored Positioning
+**Technical**: Positioning strategy utilizing `position: sticky` with viewport-relative units (`vh`, `vw`) to maintain UI elements within visible browser bounds regardless of scroll position or document height.
+
+**Purpose**: Eliminates hunt-and-peck behavior by keeping interactive controls consistently positioned relative to user's viewport rather than document coordinates.
+
+**Implementation**:
+```css
+.resize-handle {
+  position: sticky;
+  top: 50vh; /* Always centered in viewport */
+  transform: translateY(-50%);
+  z-index: 10;
+}
+```
+
+### Fluid Layout Architecture
+**Technical**: Responsive design paradigm where components dynamically adjust dimensions based on parent container constraints using percentage-based or `flex`/`grid` intrinsic sizing.
+
+**Anti-pattern**: Fixed pixel widths that break at varying viewport dimensions.
+
+**Correct pattern**: Container queries with proportional scaling.
+
+### Glassmorphic Floating Architecture
+**Technical**: Visual design pattern combining `backdrop-filter: blur()` with semi-transparent backgrounds and elevated `z-index` layering to create frosted-glass aesthetic.
+
+**Key properties**:
+- Background: `hsl(var(--card) / 0.95)`
+- Backdrop blur: `backdrop-filter: blur(12px)`
+- Border: `border: 2px solid hsl(var(--border) / 0.3)`
+- Shadow: Multi-layer shadows for depth perception
+
+### Bounded Viewport Containment
+**Technical**: Layout constraint pattern using `max-width: 100%`, `max-height: 100%`, and `overflow: hidden/auto` to ensure child content scales within parent boundaries without causing layout reflow.
+
+**Critical for**: PDF viewers, image galleries, video players—any zoomable content that must not break container boundaries.
+
+### Polymorphic Input Components
+**Technical**: UI components exhibiting modal behavior bifurcation based on interaction patterns.
+
+**Example**: Search input with dual-mode operation:
+- **Search mode**: Real-time filtering on keystroke
+- **AI mode**: Explicit submission via dedicated button
+
+**Advantages**: Reduces UI clutter by eliminating redundant input fields while maintaining distinct user intentions.
+
+### Reactive Thumbnail Scaling
+**Technical**: Dynamic image sizing pattern using `ResizeObserver` API or reactive width props to proportionally scale thumbnail dimensions as parent panel width mutates.
+
+**Implementation**:
+```typescript
+const [thumbnailWidth, setThumbnailWidth] = useState(240);
+
+useEffect(() => {
+  if (containerRef.current) {
+    const availableWidth = containerRef.current.offsetWidth - 32;
+    setThumbnailWidth(Math.min(availableWidth, 280));
+  }
+}, [panelWidth]);
+```
+
+### Spatial Persistence Pattern
+**Technical**: State management paradigm for draggable components that preserves `x/y` coordinates across minimize/maximize cycles and session boundaries.
+
+**Purpose**: Reduces cognitive load by maintaining predictable spatial behavior—users develop muscle memory for component locations.
+
+### WCAG Contrast Compliance
+**Technical**: Web Content Accessibility Guidelines requirement for minimum contrast ratios:
+- **Normal text** (< 18pt): 4.5:1 minimum
+- **Large text** (≥ 18pt or ≥ 14pt bold): 3:1 minimum  
+- **UI components**: 3:1 minimum
+
+**Implementation strategy**: Use semantic color tokens (`--foreground`, `--muted-foreground`, `--primary-foreground`) that automatically adapt to light/dark themes with guaranteed contrast ratios.
+
+**Anti-pattern**: Direct color values (`text-white`, `bg-gray-100`) that break theme system and violate contrast requirements.
 
 ---
 
