@@ -10,7 +10,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 interface Props {
   currentPage?: number;
   onPageClick?: (pageNumber: number) => void;
-  currentFieldPosition?: { top: number; left: number } | null;
+  currentFieldPositions?: { top: number; left: number }[];
   showFieldIndicator?: boolean;
   panelWidth?: number;
 }
@@ -18,13 +18,13 @@ interface Props {
 export const PDFThumbnailSidebar = ({ 
   currentPage = 1, 
   onPageClick, 
-  currentFieldPosition = null,
+  currentFieldPositions = [],
   showFieldIndicator = false,
-  panelWidth = 256
+  panelWidth = 200
 }: Props) => {
   const [numPages, setNumPages] = useState<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [thumbnailWidth, setThumbnailWidth] = useState(240);
+  const [thumbnailWidth, setThumbnailWidth] = useState(200);
 
   // Auto-scale thumbnails based on panel width
   useEffect(() => {
@@ -41,7 +41,7 @@ export const PDFThumbnailSidebar = ({
   return (
     <div ref={containerRef} className="w-full border-r bg-card/50 backdrop-blur-sm flex flex-col h-full">
       <div className="border-b p-4 flex items-center gap-2 bg-card/80">
-        <FileText className="h-5 w-5 text-primary" strokeWidth={0.5} />
+        <FileText className="h-5 w-5 text-primary" strokeWidth={1.5} />
         <span className="font-semibold text-sm">Pages</span>
       </div>
 
@@ -75,9 +75,9 @@ export const PDFThumbnailSidebar = ({
                       className="chamfered w-full"
                     />
                     {/* Minimap Field Indicator - only shows on current page */}
-                    {isActive && showFieldIndicator && currentFieldPosition && (
+                    {isActive && showFieldIndicator && currentFieldPositions.length > 0 && (
                       <FieldMinimapIndicator
-                        fieldPosition={currentFieldPosition}
+                        fieldPositions={currentFieldPositions}
                         isActive={true}
                       />
                     )}

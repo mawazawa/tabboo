@@ -30,6 +30,7 @@ interface CommandPaletteProps {
   onOpenSettings?: () => void;
   onAutofillAll?: () => void;
   onLogout?: () => void;
+  userId?: string;
 }
 
 export const CommandPalette = ({
@@ -40,6 +41,7 @@ export const CommandPalette = ({
   onOpenSettings,
   onAutofillAll,
   onLogout,
+  userId,
 }: CommandPaletteProps) => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
@@ -109,13 +111,28 @@ export const CommandPalette = ({
 
         <CommandSeparator />
 
-        <CommandGroup heading="Actions">
+        <CommandGroup heading="Data">
+          {userId && (
+            <CommandItem onSelect={() => runCommand(() => {
+              // Open personal data vault in a sheet
+              const event = new CustomEvent('open-vault-sheet');
+              window.dispatchEvent(event);
+            })}>
+              <Shield className="mr-2 h-4 w-4" />
+              <span>Personal Data Vault</span>
+            </CommandItem>
+          )}
           {onAutofillAll && (
             <CommandItem onSelect={() => runCommand(onAutofillAll)}>
               <Sparkles className="mr-2 h-4 w-4" />
               <span>Autofill All Fields</span>
             </CommandItem>
           )}
+        </CommandGroup>
+
+        <CommandSeparator />
+
+        <CommandGroup heading="Settings">
           {onOpenSettings && (
             <CommandItem onSelect={() => runCommand(onOpenSettings)}>
               <Settings className="mr-2 h-4 w-4" />

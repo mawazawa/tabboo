@@ -477,7 +477,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             )}
                             {isEditMode && (
                               <div className="absolute -top-10 left-0 bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium shadow-3point whitespace-nowrap flex items-center gap-2 chamfered">
-                                <Move className="h-4 w-4" strokeWidth={0.5} />
+                                <Move className="h-4 w-4" strokeWidth={1.5} />
                                 Swipe to Move: {overlay.placeholder || overlay.field}
                               </div>
                             )}
@@ -517,9 +517,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                   }}
                                 >
                                   {isEditMode ? (
-                                    <Move className="h-5 w-5" strokeWidth={0.5} />
+                                    <Move className="h-5 w-5" strokeWidth={1.5} />
                                   ) : (
-                                    <Move className="h-5 w-5" strokeWidth={0.5} />
+                                    <Move className="h-5 w-5" strokeWidth={1.5} />
                                   )}
                                 </Button>
                               </TooltipTrigger>

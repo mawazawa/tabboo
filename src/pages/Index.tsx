@@ -1,7 +1,6 @@
 import { FormViewer } from "@/components/FormViewer";
 import { FieldNavigationPanel } from "@/components/FieldNavigationPanel";
 import { DraggableAIAssistant } from "@/components/DraggableAIAssistant";
-import { PersonalDataVault } from "@/components/PersonalDataVault";
 import { PersonalDataVaultPanel } from "@/components/PersonalDataVaultPanel";
 import { PDFThumbnailSidebar } from "@/components/PDFThumbnailSidebar";
 import { FieldSearchBar } from "@/components/FieldSearchBar";
@@ -83,7 +82,7 @@ const Index = () => {
   const [currentPDFPage, setCurrentPDFPage] = useState(1);
   const [pdfZoom, setPdfZoom] = useState(1);
   const [showThumbnails, setShowThumbnails] = useState(true);
-  const [thumbnailPanelWidth, setThumbnailPanelWidth] = useState(256);
+  const [thumbnailPanelWidth, setThumbnailPanelWidth] = useState(200);
   const [fieldSearchQuery, setFieldSearchQuery] = useState("");
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [highlightedField, setHighlightedField] = useState<string | null>(null);
@@ -91,6 +90,7 @@ const Index = () => {
   const [validationRules, setValidationRules] = useState<Record<string, any[]>>({});
   const [validationErrors, setValidationErrors] = useState<Record<string, any[]>>({});
   const [settingsSheetOpen, setSettingsSheetOpen] = useState(false);
+  const [vaultSheetOpen, setVaultSheetOpen] = useState(false);
   const { toast } = useToast();
   const hasUnsavedChanges = useRef(false);
 
@@ -289,8 +289,8 @@ const Index = () => {
     }));
   };
 
-  // Get current field position for minimap indicator
-  const getCurrentFieldPosition = () => {
+  // Get current field positions for minimap indicators (supports multiple fields)
+  const getCurrentFieldPositions = () => {
     const fieldConfigs = [
       { field: 'partyName', top: 15.8, left: 5 },
       { field: 'streetAddress', top: 19, left: 5 },
@@ -314,10 +314,31 @@ const Index = () => {
       { field: 'signatureName', top: 90, left: 50 },
     ];
 
+    const positions: { top: number; left: number }[] = [];
+    
+    // Add current field
     const currentFieldName = fieldConfigs[currentFieldIndex]?.field;
-    if (!currentFieldName) return null;
+    if (currentFieldName) {
+      positions.push(fieldPositions[currentFieldName] || fieldConfigs[currentFieldIndex]);
+    }
+    
+    // Add selected fields
+    selectedFields.forEach(fieldName => {
+      const config = fieldConfigs.find(f => f.field === fieldName);
+      if (config) {
+        positions.push(fieldPositions[fieldName] || { top: config.top, left: config.left });
+      }
+    });
+    
+    // Add highlighted field
+    if (highlightedField) {
+      const config = fieldConfigs.find(f => f.field === highlightedField);
+      if (config && !positions.some(p => p === (fieldPositions[highlightedField] || { top: config.top, left: config.left }))) {
+        positions.push(fieldPositions[highlightedField] || { top: config.top, left: config.left });
+      }
+    }
 
-    return fieldPositions[currentFieldName] || fieldConfigs[currentFieldIndex];
+    return positions;
   };
 
   // Check authentication and prefetch data
@@ -344,7 +365,16 @@ const Index = () => {
       }
     });
 
-    return () => subscription.unsubscribe();
+    // Listen for vault sheet open event from command palette
+    const handleOpenVaultSheet = () => {
+      setVaultSheetOpen(true);
+    };
+    window.addEventListener('open-vault-sheet', handleOpenVaultSheet);
+
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener('open-vault-sheet', handleOpenVaultSheet);
+    };
   }, [navigate, queryClient]);
 
   // Load existing data when user is authenticated (use cached data if available)
@@ -432,7 +462,7 @@ const Index = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" strokeWidth={0.5} />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" strokeWidth={1.5} />
       </div>
     );
   }
@@ -448,6 +478,7 @@ const Index = () => {
         onOpenSettings={() => setSettingsSheetOpen(true)}
         onAutofillAll={handleAutofillAll}
         onLogout={handleLogout}
+        userId={user?.id}
       />
       
       {/* Header */}
@@ -456,7 +487,7 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-glow">
-                <FileText className="w-6 h-6 text-primary-foreground" strokeWidth={0.5} />
+                <FileText className="w-6 h-6 text-primary-foreground" strokeWidth={1.5} />
               </div>
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
@@ -478,7 +509,7 @@ const Index = () => {
                             onMouseEnter={preloadDistributionCalculator}
                             className="flex items-start gap-3 p-3 rounded-lg hover:bg-accent transition-colors text-left"
                           >
-                            <Calculator className="h-5 w-5 mt-0.5 text-primary" strokeWidth={0.5} />
+                            <Calculator className="h-5 w-5 mt-0.5 text-primary" strokeWidth={1.5} />
                             <div>
                               <div className="font-medium mb-1">Distribution Calculator</div>
                               <p className="text-sm text-muted-foreground">
@@ -492,7 +523,7 @@ const Index = () => {
                             onClick={() => navigate("/")}
                             className="flex items-start gap-3 p-3 rounded-lg hover:bg-accent transition-colors text-left"
                           >
-                            <FileText className="h-5 w-5 mt-0.5 text-primary" strokeWidth={0.5} />
+                            <FileText className="h-5 w-5 mt-0.5 text-primary" strokeWidth={1.5} />
                             <div>
                               <div className="font-medium mb-1">Form Filler (FL-320)</div>
                               <p className="text-sm text-muted-foreground">
@@ -508,7 +539,7 @@ const Index = () => {
               </NavigationMenu>
 
               <Button variant="outline" size="sm" onClick={handleLogout} className="gap-2">
-                <LogOut className="h-4 w-4" strokeWidth={0.5} />
+                <LogOut className="h-4 w-4" strokeWidth={1.5} />
                 Logout
               </Button>
             </div>
@@ -519,64 +550,60 @@ const Index = () => {
       {/* Main Content with Resizable Panels */}
       <main className="flex-1 flex flex-col container mx-auto px-4 py-6 overflow-hidden">
         {/* Control Toolbar */}
-        <div className="flex items-center gap-2 mb-4 p-3 bg-card/80 backdrop-blur-sm rounded-lg border shadow-sm flex-shrink-0">
-          {/* AI Assistant Toggle */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowAIPanel(!showAIPanel)}
-            className={`gap-2 ${showAIPanel ? 'bg-primary/10 text-primary' : ''}`}
-            title="Toggle AI Assistant"
-          >
-            <MessageSquare className="h-4 w-4" strokeWidth={0.5} />
-            AI Chat
-          </Button>
+        <div className="flex items-center justify-between gap-2 mb-4 p-3 bg-card/80 backdrop-blur-sm rounded-lg border shadow-sm flex-shrink-0">
+          {/* Left Section */}
+          <div className="flex items-center gap-2">
+            {/* AI Assistant Toggle */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowAIPanel(!showAIPanel)}
+              className={`gap-2 ${showAIPanel ? 'bg-primary/10 text-primary' : ''}`}
+              title="Toggle AI Assistant"
+            >
+              <MessageSquare className="h-4 w-4" strokeWidth={1.5} />
+              AI Chat
+            </Button>
 
-          <div className="h-6 w-px bg-border" />
+            <div className="h-6 w-px bg-border" />
 
-          {/* Autofill All Fields Button */}
-          <Button
-            variant="default"
-            size="default"
-            onClick={handleAutofillAll}
-            disabled={isVaultLoading || !vaultData}
-            className="gap-2"
-          >
-            {isVaultLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Sparkles className="h-4 w-4" />
-            )}
-            Autofill All Fields
-            {vaultData && !isVaultLoading && (
-              <span className="ml-1 px-2 py-0.5 text-xs bg-primary-foreground/20 rounded-full">
-                {getAutofillableFields(vaultData as PersonalVaultData).length}
-              </span>
-            )}
-          </Button>
+            {/* Autofill All Fields Button */}
+            <Button
+              variant="default"
+              size="default"
+              onClick={handleAutofillAll}
+              disabled={isVaultLoading || !vaultData}
+              className="gap-2"
+            >
+              {isVaultLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5} />
+              ) : (
+                <Sparkles className="h-4 w-4" strokeWidth={1.5} />
+              )}
+              Autofill All Fields
+              {vaultData && !isVaultLoading && (
+                <span className="ml-1 px-2 py-0.5 text-xs bg-primary-foreground/20 rounded-full">
+                  {getAutofillableFields(vaultData as PersonalVaultData).length}
+                </span>
+              )}
+            </Button>
 
-          <div className="h-6 w-px bg-border" />
+            <div className="h-6 w-px bg-border" />
 
-          {/* Thumbnail Collapse */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowThumbnails(!showThumbnails)}
-            className="gap-2"
-            title={showThumbnails ? "Hide thumbnails" : "Show thumbnails"}
-          >
-            <PanelLeftClose className={`h-4 w-4 transition-transform ${!showThumbnails ? 'rotate-180' : ''}`} strokeWidth={0.5} />
-            {showThumbnails ? 'Hide' : 'Show'}
-          </Button>
+            {/* Thumbnail Collapse */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowThumbnails(!showThumbnails)}
+              className="gap-2"
+              title={showThumbnails ? "Hide thumbnails" : "Show thumbnails"}
+            >
+              <PanelLeftClose className={`h-4 w-4 transition-transform ${!showThumbnails ? 'rotate-180' : ''}`} strokeWidth={1.5} />
+              {showThumbnails ? 'Hide' : 'Show'}
+            </Button>
+          </div>
 
-          <div className="h-6 w-px bg-border" />
-
-          {/* Personal Data Vault Button */}
-          <PersonalDataVault userId={user?.id} />
-
-          <div className="h-6 w-px bg-border" />
-
-          {/* Zoom Controls */}
+          {/* Center Section - Zoom Controls */}
           <div className="flex items-center gap-1 px-2">
             <Button
               variant="ghost"
@@ -589,14 +616,16 @@ const Index = () => {
               <span className="text-lg font-semibold">−</span>
             </Button>
             <Button
-              variant="ghost"
+              variant={pdfZoom === 1 ? "default" : "ghost"}
               size="sm"
               onClick={() => setPdfZoom(1)}
               title="Fit to page"
-              className="flex items-center gap-1 px-3 min-w-[100px] justify-center hover:bg-primary/10 hover:text-primary transition-colors"
+              className="flex items-center gap-1 px-3 min-w-[120px] justify-center transition-colors"
             >
-              <FileText className="h-3.5 w-3.5" strokeWidth={0.5} />
-              <span className="text-sm font-medium">{Math.round(pdfZoom * 100)}%</span>
+              <FileText className="h-3.5 w-3.5" strokeWidth={1.5} />
+              <span className="text-sm font-medium">
+                {pdfZoom === 1 ? 'Fit to Page' : `${Math.round(pdfZoom * 100)}%`}
+              </span>
             </Button>
             <Button
               variant="ghost"
@@ -610,33 +639,34 @@ const Index = () => {
             </Button>
           </div>
 
-          <div className="h-6 w-px bg-border" />
+          {/* Right Section */}
+          <div className="flex items-center gap-2">
+            {/* Fields Panel Toggle */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowFieldsPanel(!showFieldsPanel)}
+              className={`gap-2 ${showFieldsPanel && !showVaultPanel ? 'bg-primary/10 text-primary' : ''}`}
+              title="Toggle Fields Panel"
+            >
+              <PanelRightClose className="h-4 w-4" strokeWidth={1.5} />
+              Fields
+            </Button>
 
-          {/* Fields Panel Toggle */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowFieldsPanel(!showFieldsPanel)}
-            className={`gap-2 ${showFieldsPanel && !showVaultPanel ? 'bg-primary/10 text-primary' : ''}`}
-            title="Toggle Fields Panel"
-          >
-            <PanelRightClose className="h-4 w-4" strokeWidth={0.5} />
-            Fields
-          </Button>
+            <div className="h-6 w-px bg-border" />
 
-          <div className="h-6 w-px bg-border" />
-
-          {/* Personal Data Vault Toggle */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowVaultPanel(!showVaultPanel)}
-            className={`gap-2 ${showVaultPanel ? 'bg-primary/10 text-primary' : ''}`}
-            title="Toggle Personal Data Vault"
-          >
-            <Shield className="h-4 w-4" strokeWidth={0.5} />
-            Vault
-          </Button>
+            {/* Personal Data Vault Toggle */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowVaultPanel(!showVaultPanel)}
+              className={`gap-2 ${showVaultPanel ? 'bg-primary/10 text-primary' : ''}`}
+              title="Toggle Personal Data Vault"
+            >
+              <Shield className="h-4 w-4" strokeWidth={1.5} />
+              Vault
+            </Button>
+          </div>
         </div>
 
         <ResizablePanelGroup direction="horizontal" className="flex-1 w-full">
@@ -667,8 +697,8 @@ const Index = () => {
                 <PDFThumbnailSidebar 
                   currentPage={currentPDFPage}
                   onPageClick={setCurrentPDFPage}
-                  currentFieldPosition={getCurrentFieldPosition()}
-                  showFieldIndicator={currentFieldIndex >= 0}
+                  currentFieldPositions={getCurrentFieldPositions()}
+                  showFieldIndicator={currentFieldIndex >= 0 || selectedFields.length > 0 || !!highlightedField}
                   panelWidth={thumbnailPanelWidth}
                 />
               </ResizablePanel>
@@ -755,6 +785,21 @@ const Index = () => {
           onToggleVisible={() => setShowAIPanel(!showAIPanel)}
         />
       </main>
+
+      {/* Personal Data Vault Sheet */}
+      <Sheet open={vaultSheetOpen} onOpenChange={setVaultSheetOpen}>
+        <SheetContent side="right" className="w-[400px] sm:w-[540px] overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Personal Data Vault</SheetTitle>
+            <SheetDescription>
+              Securely manage your personal information for auto-filling forms
+            </SheetDescription>
+          </SheetHeader>
+          <div className="mt-6">
+            {user?.id && <PersonalDataVaultPanel userId={user.id} />}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };

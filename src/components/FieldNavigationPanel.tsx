@@ -504,7 +504,7 @@ export const FieldNavigationPanel = ({
               disabled={currentFieldIndex === 0}
               className="shadow-3point chamfered spring-hover border-hairline flex items-center justify-center gap-1.5"
             >
-              <ChevronUp className="h-5 w-5" strokeWidth={0.5} />
+              <ChevronUp className="h-5 w-5" strokeWidth={1.5} />
               <span>Previous</span>
             </Button>
             <Button
@@ -515,7 +515,7 @@ export const FieldNavigationPanel = ({
               className="shadow-3point chamfered spring-hover border-hairline flex items-center justify-center gap-1.5"
             >
               <span>Next</span>
-              <ChevronDown className="h-5 w-5" strokeWidth={0.5} />
+              <ChevronDown className="h-5 w-5" strokeWidth={1.5} />
             </Button>
           </div>
 
@@ -572,7 +572,7 @@ export const FieldNavigationPanel = ({
                       variant="outline"
                       className="h-8 px-3 gap-2 shadow-3point chamfered spring-hover"
                     >
-                      <Move className="h-4 w-4" strokeWidth={0.5} />
+                      <Move className="h-4 w-4" strokeWidth={1.5} />
                       Adjust
                     </Button>
                   </PopoverTrigger>
@@ -791,7 +791,7 @@ export const FieldNavigationPanel = ({
                           className="h-8 px-3 text-xs gap-1 shadow-3point chamfered spring-hover"
                           title="Copy from vault"
                         >
-                          <Copy className="h-4 w-4" strokeWidth={0.5} />
+                          <Copy className="h-4 w-4" strokeWidth={1.5} />
                         </Button>
                       )}
                       {isActive && (

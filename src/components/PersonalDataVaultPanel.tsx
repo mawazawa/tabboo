@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Shield, Save, Loader2, AlertCircle, CheckCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { personalInfoSchema, type PersonalInfoFormData } from "@/lib/validations";
@@ -133,7 +134,7 @@ export const PersonalDataVaultPanel = ({ userId, onDataChange }: PersonalDataVau
     <Card className="h-full border-hairline shadow-3point chamfered flex flex-col">
       <div className="p-4 border-b-hairline bg-muted/30">
         <div className="flex items-center gap-2 mb-2">
-          <Shield className="w-5 h-5 text-primary" strokeWidth={0.5} />
+          <Shield className="w-5 h-5 text-primary" strokeWidth={1.5} />
           <h2 className="font-semibold text-sm">Personal Data Vault</h2>
         </div>
         <p className="text-xs text-muted-foreground mb-3">
@@ -160,7 +161,7 @@ export const PersonalDataVaultPanel = ({ userId, onDataChange }: PersonalDataVau
           className="w-full mt-3 gap-2 shadow-3point chamfered spring-hover"
           size="lg"
         >
-          {loading ? <Loader2 className="w-4 h-4 animate-spin" strokeWidth={0.5} /> : <Save className="w-4 h-4" strokeWidth={0.5} />}
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" strokeWidth={1.5} /> : <Save className="w-4 h-4" strokeWidth={1.5} />}
           Save to Vault
         </Button>
       </div>
@@ -187,13 +188,13 @@ export const PersonalDataVaultPanel = ({ userId, onDataChange }: PersonalDataVau
                   >
                     {field.label}
                     {isFilled && (
-                      <CheckCircle className="h-3 w-3 text-primary" strokeWidth={0.5} />
+                      <CheckCircle className="h-3 w-3 text-primary" strokeWidth={1.5} />
                     )}
                   </Label>
                   {hasFormMapping && (
-                    <span className="text-[10px] text-muted-foreground">
+                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5 h-5">
                       Maps to form
-                    </span>
+                    </Badge>
                   )}
                 </div>
 
@@ -207,8 +208,12 @@ export const PersonalDataVaultPanel = ({ userId, onDataChange }: PersonalDataVau
 
                 {/* Show which form fields this maps to */}
                 {hasFormMapping && field.formFields!.length > 0 && (
-                  <div className="text-[10px] text-muted-foreground bg-muted/50 rounded px-2 py-1 font-mono">
-                    Auto-fills: {field.formFields!.join(', ')}
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {field.formFields!.map(formField => (
+                      <Badge key={formField} variant="outline" className="text-[10px] px-1.5 py-0.5 h-5 font-mono">
+                        {formField}
+                      </Badge>
+                    ))}
                   </div>
                 )}
               </div>
