@@ -1,7 +1,42 @@
 # UX Improvements TODO List
 
 ## Overview
-Implement smooth field navigation, unified positioning controls, and bi-directional field selection between PDF preview and control panel.
+Implement smooth field navigation, unified positioning controls, bi-directional field selection, synchronized highlighting system, and enhanced thumbnail sidebar.
+
+## Latest: Synchronized Highlighting & Thumbnail Fixes
+
+### Problem 1: Form Field Controls Jumping & Lack of Visual Sync
+The form field controls currently scroll/jump when clicking Next, making it hard to use efficiently. Refactored design with:
+- **Fixed top section**: Navigation buttons, positioning controls, and metadata stay anchored at the top
+- **Scrollable field strip**: List of fields below that doesn't auto-scroll when navigating
+- **Visual highlighter system**: A clear highlight indicator that moves synchronously across:
+  1. The actual field on the PDF page
+  2. The field in the scrollable strip
+  3. A minimap indicator on the thumbnail sidebar
+- **Low latency**: All highlights update instantly when navigating
+
+### Problem 2: Thumbnail Shows Form Panel
+The thumbnail sidebar currently includes the form fields control panel in its miniature view. It should only show the PDF document page layout itself, without any UI components.
+
+### Success Criteria:
+
+**Form Field Controls:**
+- [ ] Top section remains fixed/anchored (navigation buttons, positioning widget, field count)
+- [ ] Field list is independently scrollable without auto-scrolling on navigation
+- [ ] Visual highlighter appears on the active field in the field strip
+- [ ] Visual highlighter appears on the active field overlay in the PDF viewer
+- [ ] Visual minimap indicator appears on the thumbnail for the active field's position
+- [ ] All three highlighters update simultaneously with no noticeable lag
+- [ ] Keyboard navigation (Tab/Shift+Tab, arrow keys) updates all highlighters
+- [ ] Clicking a field in any location (PDF, field strip, or thumbnail area) syncs all highlighters
+
+**Thumbnail Sidebar:**
+- [ ] Thumbnails only render the PDF page content
+- [ ] No UI components (form panel, controls) visible in thumbnail miniatures
+- [ ] Thumbnails remain centered in the sidebar
+- [ ] Current page indicator still works correctly
+
+---
 
 ---
 

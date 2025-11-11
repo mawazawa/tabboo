@@ -11,6 +11,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { FileText } from "lucide-react";
+import { FieldMinimapIndicator } from "./FieldMinimapIndicator";
 
 // Configure PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -18,9 +19,16 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 interface Props {
   currentPage?: number;
   onPageClick?: (pageNumber: number) => void;
+  currentFieldPosition?: { top: number; left: number } | null;
+  showFieldIndicator?: boolean;
 }
 
-export const PDFThumbnailSidebar = ({ currentPage = 1, onPageClick }: Props) => {
+export const PDFThumbnailSidebar = ({ 
+  currentPage = 1, 
+  onPageClick, 
+  currentFieldPosition = null,
+  showFieldIndicator = false 
+}: Props) => {
   const [numPages, setNumPages] = useState<number>(0);
   const { open } = useSidebar();
 
@@ -62,13 +70,22 @@ export const PDFThumbnailSidebar = ({ currentPage = 1, onPageClick }: Props) => 
                             : "ring-2 ring-border hover:ring-primary/50 shadow-3point"
                         } ${open ? "w-full" : "w-12"}`}
                       >
-                        <Page
-                          pageNumber={pageNum}
-                          width={open ? 180 : 48}
-                          renderTextLayer={false}
-                          renderAnnotationLayer={false}
-                          className="chamfered"
-                        />
+                        <div className="relative">
+                          <Page
+                            pageNumber={pageNum}
+                            width={open ? 180 : 48}
+                            renderTextLayer={false}
+                            renderAnnotationLayer={false}
+                            className="chamfered"
+                          />
+                          {/* Minimap Field Indicator - only shows on current page */}
+                          {isActive && showFieldIndicator && currentFieldPosition && (
+                            <FieldMinimapIndicator
+                              fieldPosition={currentFieldPosition}
+                              isActive={true}
+                            />
+                          )}
+                        </div>
                         {open && (
                           <div
                             className={`absolute bottom-0 left-0 right-0 py-1 text-center text-xs font-semibold ${

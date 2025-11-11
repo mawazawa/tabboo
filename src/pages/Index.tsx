@@ -98,6 +98,37 @@ const Index = () => {
     hasUnsavedChanges.current = true;
   };
 
+  // Get current field position for minimap indicator
+  const getCurrentFieldPosition = () => {
+    const fieldConfigs = [
+      { field: 'partyName', top: 15.8, left: 5 },
+      { field: 'streetAddress', top: 19, left: 5 },
+      { field: 'city', top: 22.5, left: 5 },
+      { field: 'state', top: 22.5, left: 29.5 },
+      { field: 'zipCode', top: 22.5, left: 38 },
+      { field: 'telephoneNo', top: 25.8, left: 5 },
+      { field: 'faxNo', top: 25.8, left: 23 },
+      { field: 'email', top: 29.2, left: 5 },
+      { field: 'attorneyFor', top: 32.5, left: 5 },
+      { field: 'county', top: 15.8, left: 55 },
+      { field: 'petitioner', top: 22.5, left: 55 },
+      { field: 'respondent', top: 26.5, left: 55 },
+      { field: 'caseNumber', top: 32.5, left: 55 },
+      { field: 'noOrders', top: 43.5, left: 25.5 },
+      { field: 'agreeOrders', top: 46.5, left: 25.5 },
+      { field: 'consentCustody', top: 53, left: 25.5 },
+      { field: 'consentVisitation', top: 56, left: 25.5 },
+      { field: 'facts', top: 68, left: 5 },
+      { field: 'signatureDate', top: 90, left: 5 },
+      { field: 'signatureName', top: 90, left: 50 },
+    ];
+
+    const currentFieldName = fieldConfigs[currentFieldIndex]?.field;
+    if (!currentFieldName) return null;
+
+    return fieldPositions[currentFieldName] || fieldConfigs[currentFieldIndex];
+  };
+
   // Check authentication
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -315,6 +346,8 @@ const Index = () => {
                 <PDFThumbnailSidebar 
                   currentPage={currentPDFPage}
                   onPageClick={setCurrentPDFPage}
+                  currentFieldPosition={getCurrentFieldPosition()}
+                  showFieldIndicator={currentFieldIndex >= 0}
                 />
                 <div className="flex-1 flex flex-col">
                   <div className="mb-2">

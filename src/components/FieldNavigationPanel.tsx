@@ -104,15 +104,8 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
     },
   });
 
-  useEffect(() => {
-    // Smooth scroll to current field when index changes
-    const currentRef = fieldRefs.current[currentFieldIndex];
-    if (currentRef && scrollContainerRef.current) {
-      currentRef.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
-      // Focus after a brief delay to ensure scroll completes
-      setTimeout(() => currentRef.focus(), 150);
-    }
-  }, [currentFieldIndex]);
+  // Remove auto-scroll effect - we want the list to be independently scrollable
+  // Users can manually scroll or see the highlighter in the fixed position
 
   const copyFromVault = (config: FieldConfig) => {
     if (!config.vaultField || !personalInfo) return;
@@ -395,13 +388,17 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
             return (
               <div
                 key={config.field}
-                className={`space-y-2 p-4 rounded-lg border-hairline transition-all shadow-3point chamfered spring-hover ${
+                className={`relative space-y-2 p-4 rounded-lg border-hairline transition-all shadow-3point chamfered spring-hover ${
                   isActive 
                     ? 'border-primary bg-primary/5 shadow-3point-hover' 
                     : 'border-transparent hover:border-muted'
                 }`}
                 onClick={() => setCurrentFieldIndex(index)}
               >
+                {/* Visual Highlighter Bar */}
+                {isActive && (
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-primary via-primary to-primary/50 rounded-l-lg animate-pulse" />
+                )}
                 <div className="flex items-center justify-between gap-2">
                   <Label 
                     htmlFor={config.field} 
