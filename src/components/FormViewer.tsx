@@ -86,6 +86,11 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   const handlePointerDown = (e: React.PointerEvent, field: string, currentTop: number, currentLeft: number) => {
     const target = e.target as HTMLElement;
     
+    // Don't drag when clicking on interactive elements (inputs, textareas, checkboxes)
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.closest('[role="checkbox"]')) {
+      return;
+    }
+    
     // Allow drag from the gear/move icon button
     const isDragHandle = target.closest('.drag-handle');
     
