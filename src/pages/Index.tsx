@@ -618,13 +618,19 @@ const Index = () => {
             <Button
               variant={pdfZoom === 1 ? "default" : "ghost"}
               size="sm"
-              onClick={() => setPdfZoom(1)}
-              title="Fit to page"
+              onClick={() => {
+                // Calculate zoom to fit PDF to viewport
+                const viewportWidth = window.innerWidth - (showThumbnails ? thumbnailPanelWidth : 0) - (showFieldsPanel ? 400 : 0) - 100; // Account for panels and padding
+                const targetWidth = 850; // Default PDF width
+                const calculatedZoom = Math.min(2, Math.max(0.5, viewportWidth / targetWidth));
+                setPdfZoom(calculatedZoom);
+              }}
+              title="Scale to fit viewport"
               className="flex items-center gap-1 px-3 min-w-[120px] justify-center transition-colors"
             >
               <FileText className="h-3.5 w-3.5" strokeWidth={1.5} />
               <span className="text-sm font-medium">
-                {pdfZoom === 1 ? 'Fit to Page' : `${Math.round(pdfZoom * 100)}%`}
+                {pdfZoom === 1 ? 'Scale to Fit' : `${Math.round(pdfZoom * 100)}%`}
               </span>
             </Button>
             <Button

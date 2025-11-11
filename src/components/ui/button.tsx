@@ -5,15 +5,15 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border-2 border-border bg-background text-foreground hover:bg-accent hover:text-accent-foreground hover:border-primary/50",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "text-foreground hover:bg-accent hover:text-accent-foreground",
+        default: "bg-gradient-to-br from-primary to-primary-glow text-primary-foreground hover:from-primary/90 hover:to-primary-glow/90 shadow-[0_2px_8px_-2px_hsl(var(--primary)/0.3),0_4px_16px_-4px_hsl(var(--primary)/0.2)] hover:shadow-[0_4px_12px_-2px_hsl(var(--primary)/0.4),0_8px_20px_-4px_hsl(var(--primary)/0.25)] hover:scale-[1.02] active:scale-[0.98]",
+        destructive: "bg-gradient-to-br from-destructive to-destructive text-destructive-foreground hover:from-destructive/90 hover:to-destructive/90 shadow-[0_2px_8px_-2px_hsl(var(--destructive)/0.3)] hover:shadow-[0_4px_12px_-2px_hsl(var(--destructive)/0.4)]",
+        outline: "border-2 border-border bg-background text-foreground hover:bg-accent hover:text-accent-foreground hover:border-primary/50 shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:shadow-[0_2px_6px_rgba(0,0,0,0.08)]",
+        secondary: "bg-gradient-to-br from-secondary to-secondary/80 text-secondary-foreground hover:from-secondary/90 hover:to-secondary/70 shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:shadow-[0_2px_6px_rgba(0,0,0,0.08)]",
+        ghost: "text-foreground hover:bg-accent hover:text-accent-foreground hover:shadow-[0_1px_3px_rgba(0,0,0,0.05)]",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
