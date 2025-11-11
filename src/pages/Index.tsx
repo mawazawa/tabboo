@@ -16,6 +16,7 @@ import {
 } from "@/utils/fieldPresets";
 import type { FormTemplate } from "@/utils/templateManager";
 import { autofillAllFromVault, getAutofillableFields, type PersonalVaultData } from "@/utils/vaultFieldMatcher";
+import { preloadDistributionCalculator } from "@/utils/routePreloader";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -431,6 +432,7 @@ const Index = () => {
                         <NavigationMenuLink asChild>
                           <button
                             onClick={() => navigate("/distribution-calculator")}
+                            onMouseEnter={preloadDistributionCalculator}
                             className="flex items-start gap-3 p-3 rounded-lg hover:bg-accent transition-colors text-left"
                           >
                             <Calculator className="h-5 w-5 mt-0.5 text-primary" strokeWidth={0.5} />
