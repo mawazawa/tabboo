@@ -1,9 +1,89 @@
 # UX Improvements TODO List
 
 ## Overview
-Implement smooth field navigation, unified positioning controls, bi-directional field selection, synchronized highlighting system, and enhanced thumbnail sidebar.
+Implement smooth field navigation, unified positioning controls, bi-directional field selection, synchronized highlighting system, enhanced thumbnail sidebar, field position presets, and JSON template system for crowdsourcing form mappings.
 
-## Latest: Synchronized Highlighting & Thumbnail Fixes
+## Latest: Field Position Presets & Template System
+
+### Feature 1: Field Position Presets
+Quick positioning tools to speed up form field placement:
+- **Snap to Grid**: Align fields to 5%, 10%, or custom grid increments
+- **Align Left/Right/Center**: Align selected field(s) horizontally
+- **Align Top/Middle/Bottom**: Align selected field(s) vertically
+- **Distribute Evenly**: Space multiple fields evenly (horizontal or vertical)
+
+### Feature 2: JSON Template System
+Crowdsourceable form field mapping system:
+- **Export Templates**: Save current field positions as JSON template
+- **Import Templates**: Upload JSON to apply pre-mapped field positions
+- **Template Library**: Local storage for saved templates
+- **Settings Integration**: Upload/manage templates via settings menu
+- **Template Format**: Standardized JSON schema for form field coordinates
+
+### Template JSON Schema:
+```json
+{
+  "formId": "FL-320",
+  "formName": "Response to Request for Restraining Orders",
+  "version": "1.0",
+  "createdAt": "ISO date",
+  "author": "optional",
+  "fields": {
+    "partyName": { "top": 15.8, "left": 5, "width": "40%", "height": "auto" },
+    ...
+  }
+}
+```
+
+### Implementation Plan:
+
+#### Phase 1: Template Utilities & Schema
+- [ ] Create `src/utils/templateManager.ts` with import/export functions
+- [ ] Define TypeScript interfaces for template format
+- [ ] Add JSON validation functions
+- [ ] Implement local storage management for templates
+
+#### Phase 2: Preset Positioning Functions
+- [ ] Create `src/utils/fieldPresets.ts` with positioning algorithms:
+  - [ ] `snapToGrid(position, gridSize)` - Round to nearest grid increment
+  - [ ] `alignHorizontal(fields, alignment: 'left'|'center'|'right')` - Align multiple fields
+  - [ ] `alignVertical(fields, alignment: 'top'|'middle'|'bottom')` - Align multiple fields
+  - [ ] `distributeEvenly(fields, direction: 'horizontal'|'vertical')` - Even spacing
+
+#### Phase 3: UI Components
+- [ ] Create `src/components/FieldPresetsToolbar.tsx` with preset buttons
+- [ ] Create `src/components/TemplateManager.tsx` for upload/download UI
+- [ ] Add settings section in toolbar for template management
+- [ ] Add visual grid overlay toggle in FormViewer (optional)
+
+#### Phase 4: Integration
+- [ ] Add preset toolbar to FieldNavigationPanel header
+- [ ] Wire up preset functions to field position state
+- [ ] Add template upload button to settings dropdown
+- [ ] Implement template export (download current positions as JSON)
+- [ ] Add template selection dropdown (from saved templates)
+- [ ] Add confirmation dialog when applying templates
+
+#### Phase 5: Multi-Field Selection (Required for presets)
+- [ ] Add Ctrl/Cmd+Click to select multiple fields
+- [ ] Add visual indication for selected fields (blue border)
+- [ ] Update preset functions to work with selected field array
+- [ ] Add "Select All" / "Deselect All" buttons
+
+### Success Criteria:
+- [ ] Can snap any field to 5% grid with one click
+- [ ] Can align multiple selected fields left/right/center
+- [ ] Can distribute 3+ fields evenly with one click
+- [ ] Can export current field positions as JSON file
+- [ ] Can upload JSON template and apply to form
+- [ ] Templates persist in local storage
+- [ ] Template format is documented and shareable
+- [ ] All presets follow design system tokens
+- [ ] No performance degradation with presets
+
+---
+
+## Previous: Synchronized Highlighting & Thumbnail Fixes
 
 ### Problem 1: Form Field Controls Jumping & Lack of Visual Sync
 The form field controls currently scroll/jump when clicking Next, making it hard to use efficiently. Refactored design with:
@@ -21,13 +101,13 @@ The thumbnail sidebar currently includes the form fields control panel in its mi
 ### Success Criteria:
 
 **Form Field Controls:**
-- [ ] Top section remains fixed/anchored (navigation buttons, positioning widget, field count)
-- [ ] Field list is independently scrollable without auto-scrolling on navigation
+- [✓] Top section remains fixed/anchored (navigation buttons, positioning widget, field count)
+- [✓] Field list is independently scrollable without auto-scrolling on navigation
 - [ ] Visual highlighter appears on the active field in the field strip
 - [ ] Visual highlighter appears on the active field overlay in the PDF viewer
 - [ ] Visual minimap indicator appears on the thumbnail for the active field's position
 - [ ] All three highlighters update simultaneously with no noticeable lag
-- [ ] Keyboard navigation (Tab/Shift+Tab, arrow keys) updates all highlighters
+- [✓] Keyboard navigation (Tab/Shift+Tab, arrow keys) updates all highlighters
 - [ ] Clicking a field in any location (PDF, field strip, or thumbnail area) syncs all highlighters
 
 **Thumbnail Sidebar:**
@@ -38,15 +118,13 @@ The thumbnail sidebar currently includes the form fields control panel in its mi
 
 ---
 
----
-
 ## Phase 1: Smooth Scrolling Navigation
 ### Tasks
-- [ ] Add smooth scroll behavior to field list when Previous/Next buttons are clicked
-- [ ] Implement `scrollIntoView({ behavior: 'smooth', block: 'nearest' })` for active field
-- [ ] Keep Field Control Panel header fixed/persistent during navigation
-- [ ] Add transition animations for focus state changes
-- [ ] Prevent abrupt jumps by using `block: 'nearest'` instead of `block: 'center'`
+- [✓] Add smooth scroll behavior to field list when Previous/Next buttons are clicked
+- [✓] Implement `scrollIntoView({ behavior: 'smooth', block: 'nearest' })` for active field
+- [✓] Keep Field Control Panel header fixed/persistent during navigation
+- [✓] Add transition animations for focus state changes
+- [✓] Prevent abrupt jumps by using `block: 'nearest'` instead of `block: 'center'`
 
 ### Success Criteria
 - ✓ Clicking Previous/Next scrolls smoothly to the target field without jarring jumps
@@ -98,11 +176,11 @@ The thumbnail sidebar currently includes the form fields control panel in its mi
 
 ## Phase 4: Polish & Edge Cases
 ### Tasks
-- [ ] Add keyboard shortcuts (Tab/Shift+Tab) to navigate fields while maintaining smooth scroll
-- [ ] Ensure positioning control updates immediately when switching fields
+- [✓] Add keyboard shortcuts (Tab/Shift+Tab) to navigate fields while maintaining smooth scroll
+- [✓] Ensure positioning control updates immediately when switching fields
 - [ ] Handle edge case: user adjusts position while another field is loading
-- [ ] Add subtle transition animations for field selection state changes
-- [ ] Test with all field types (text, textarea, checkbox)
+- [✓] Add subtle transition animations for field selection state changes
+- [✓] Test with all field types (text, textarea, checkbox)
 - [ ] Verify mobile responsiveness (if applicable)
 
 ### Success Criteria
@@ -116,12 +194,12 @@ The thumbnail sidebar currently includes the form fields control panel in its mi
 
 ## Design System Compliance
 ### Requirements
-- [ ] Use semantic tokens from index.css (--primary, --accent, --border, etc.)
-- [ ] Apply consistent border-radius using design system (rounded-xl, rounded-lg)
-- [ ] Use shadow utilities (shadow-soft, shadow-medium) for depth
-- [ ] Implement transitions using `transition-all duration-300`
-- [ ] Active state uses primary color with appropriate opacity
-- [ ] Hover states follow Apple HIG principles
+- [✓] Use semantic tokens from index.css (--primary, --accent, --border, etc.)
+- [✓] Apply consistent border-radius using design system (rounded-xl, rounded-lg)
+- [✓] Use shadow utilities (shadow-soft, shadow-medium) for depth
+- [✓] Implement transitions using `transition-all duration-300`
+- [✓] Active state uses primary color with appropriate opacity
+- [✓] Hover states follow Apple HIG principles
 
 ### Success Criteria
 - ✓ No hardcoded colors (e.g., no `text-blue-500`, use semantic tokens)
@@ -132,21 +210,29 @@ The thumbnail sidebar currently includes the form fields control panel in its mi
 ---
 
 ## Testing Checklist
-- [ ] Test Previous/Next navigation smoothness
-- [ ] Test positioning control with all fields
+- [✓] Test Previous/Next navigation smoothness
+- [✓] Test positioning control with all fields
 - [ ] Test clicking field overlays in PDF preview
 - [ ] Test clicking field rows in control panel
-- [ ] Verify no functionality breaks during refactor
-- [ ] Check console for errors
-- [ ] Verify performance (no lag during animations)
+- [✓] Verify no functionality breaks during refactor
+- [✓] Check console for errors
+- [✓] Verify performance (no lag during animations)
 
 ---
 
-## Files to Modify
-- `src/components/FieldNavigationPanel.tsx` - Add smooth scroll, unified positioning widget
-- `src/components/FormViewer.tsx` - Add click handlers, field highlighting
-- `src/pages/Index.tsx` - Add shared activeField state management
-- `src/config/fieldPositions.ts` - May need updates if positioning logic changes
+## Files to Modify/Create
+
+### New Files:
+- `src/utils/templateManager.ts` - Template import/export/storage
+- `src/utils/fieldPresets.ts` - Preset positioning algorithms
+- `src/components/FieldPresetsToolbar.tsx` - Preset UI controls
+- `src/components/TemplateManager.tsx` - Template upload/download UI
+
+### Existing Files:
+- `src/components/FieldNavigationPanel.tsx` - Add preset toolbar, multi-select
+- `src/components/FormViewer.tsx` - Add multi-select, visual grid overlay
+- `src/pages/Index.tsx` - Wire up template management
+- `src/config/fieldPositions.ts` - Export for template generation
 
 ---
 
@@ -156,9 +242,12 @@ The thumbnail sidebar currently includes the form fields control panel in its mi
 - User can quickly locate and edit any field
 - Positioning adjustments are intuitive
 - Visual feedback is immediate and clear
+- Presets speed up form field placement significantly
+- Templates enable instant form mapping from community library
 
 **Technical:**
 - No performance degradation
 - Clean, maintainable code
 - Follows DRY principles
 - Proper React patterns (state management, event handling)
+- Template format is standardized and extensible

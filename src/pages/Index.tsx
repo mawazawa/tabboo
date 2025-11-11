@@ -5,7 +5,15 @@ import { PersonalDataVault } from "@/components/PersonalDataVault";
 import { PersonalDataVaultPanel } from "@/components/PersonalDataVaultPanel";
 import { PDFThumbnailSidebar } from "@/components/PDFThumbnailSidebar";
 import { FieldSearchBar } from "@/components/FieldSearchBar";
+import { TemplateManager } from "@/components/TemplateManager";
 import { FileText, MessageSquare, LogOut, Loader2, Calculator, PanelLeftClose, PanelRightClose, Shield } from "lucide-react";
+import { 
+  snapAllToGrid, 
+  alignHorizontal, 
+  alignVertical, 
+  distributeEvenly 
+} from "@/utils/fieldPresets";
+import type { FormTemplate } from "@/utils/templateManager";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -70,6 +78,7 @@ const Index = () => {
   const [showThumbnails, setShowThumbnails] = useState(true);
   const [thumbnailPanelWidth, setThumbnailPanelWidth] = useState(256);
   const [fieldSearchQuery, setFieldSearchQuery] = useState("");
+  const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const { toast } = useToast();
   const hasUnsavedChanges = useRef(false);
 
@@ -101,6 +110,41 @@ const Index = () => {
   const updateFieldPosition = (field: string, position: { top: number; left: number }) => {
     setFieldPositions(prev => ({ ...prev, [field]: position }));
     hasUnsavedChanges.current = true;
+  };
+
+  // Preset handlers
+  const handleSnapToGrid = (gridSize: number) => {
+    const updated = snapAllToGrid(fieldPositions, selectedFields, gridSize);
+    setFieldPositions(updated);
+    hasUnsavedChanges.current = true;
+    toast({ title: "Snapped to grid", description: `${selectedFields.length} field(s) aligned to ${gridSize}% grid` });
+  };
+
+  const handleAlignHorizontal = (alignment: 'left' | 'center' | 'right') => {
+    const updated = alignHorizontal(fieldPositions, selectedFields, alignment);
+    setFieldPositions(updated);
+    hasUnsavedChanges.current = true;
+    toast({ title: "Aligned horizontally", description: `${selectedFields.length} field(s) aligned ${alignment}` });
+  };
+
+  const handleAlignVertical = (alignment: 'top' | 'middle' | 'bottom') => {
+    const updated = alignVertical(fieldPositions, selectedFields, alignment);
+    setFieldPositions(updated);
+    hasUnsavedChanges.current = true;
+    toast({ title: "Aligned vertically", description: `${selectedFields.length} field(s) aligned ${alignment}` });
+  };
+
+  const handleDistribute = (direction: 'horizontal' | 'vertical') => {
+    const updated = distributeEvenly(fieldPositions, selectedFields, direction);
+    setFieldPositions(updated);
+    hasUnsavedChanges.current = true;
+    toast({ title: "Distributed evenly", description: `${selectedFields.length} field(s) spaced ${direction}ly` });
+  };
+
+  const handleApplyTemplate = (template: FormTemplate) => {
+    setFieldPositions(template.fields);
+    hasUnsavedChanges.current = true;
+    toast({ title: "Template applied", description: `Loaded ${Object.keys(template.fields).length} field positions` });
   };
 
   // Get current field position for minimap indicator
@@ -406,6 +450,16 @@ const Index = () => {
             <Shield className="h-4 w-4" strokeWidth={0.5} />
             Vault
           </Button>
+
+          <div className="h-6 w-px bg-border" />
+
+          {/* Template Manager */}
+          <TemplateManager
+            currentFormId="FL-320"
+            currentFormName="Response to Request for Restraining Orders"
+            currentFieldPositions={fieldPositions}
+            onApplyTemplate={handleApplyTemplate}
+          />
         </div>
 
         <ResizablePanelGroup direction="horizontal" className="h-[calc(100vh-220px)] w-full">
@@ -468,6 +522,12 @@ const Index = () => {
                       setCurrentFieldIndex={setCurrentFieldIndex}
                       fieldPositions={fieldPositions}
                       updateFieldPosition={updateFieldPosition}
+                      selectedFields={selectedFields}
+                      setSelectedFields={setSelectedFields}
+                      onSnapToGrid={handleSnapToGrid}
+                      onAlignHorizontal={handleAlignHorizontal}
+                      onAlignVertical={handleAlignVertical}
+                      onDistribute={handleDistribute}
                     />
                   )}
                 </div>

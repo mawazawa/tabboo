@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { FieldPresetsToolbar } from "./FieldPresetsToolbar";
 
 interface FormData {
   partyName?: string;
@@ -50,6 +51,12 @@ interface Props {
   setCurrentFieldIndex: (index: number) => void;
   fieldPositions: Record<string, { top: number; left: number }>;
   updateFieldPosition: (field: string, position: { top: number; left: number }) => void;
+  selectedFields: string[];
+  setSelectedFields: React.Dispatch<React.SetStateAction<string[]>>;
+  onSnapToGrid: (gridSize: number) => void;
+  onAlignHorizontal: (alignment: 'left' | 'center' | 'right') => void;
+  onAlignVertical: (alignment: 'top' | 'middle' | 'bottom') => void;
+  onDistribute: (direction: 'horizontal' | 'vertical') => void;
 }
 
 const FIELD_CONFIG: FieldConfig[] = [
@@ -75,7 +82,20 @@ const FIELD_CONFIG: FieldConfig[] = [
   { field: 'signatureName', label: 'Signature Name', type: 'input', placeholder: 'Your name', vaultField: 'full_name' },
 ];
 
-export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition }: Props) => {
+export const FieldNavigationPanel = ({ 
+  formData, 
+  updateField, 
+  currentFieldIndex, 
+  setCurrentFieldIndex, 
+  fieldPositions, 
+  updateFieldPosition,
+  selectedFields,
+  setSelectedFields,
+  onSnapToGrid,
+  onAlignHorizontal,
+  onAlignVertical,
+  onDistribute
+}: Props) => {
   const fieldRefs = useRef<(HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | null)[]>([]);
   const scrollViewportRef = useRef<HTMLDivElement>(null);
   const activeFieldRef = useRef<HTMLDivElement>(null);
@@ -395,12 +415,47 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
             </Button>
           </div>
 
+          {/* Field Presets Toolbar */}
+          <FieldPresetsToolbar
+            selectedFields={selectedFields}
+            onSnapToGrid={onSnapToGrid}
+            onAlignHorizontal={onAlignHorizontal}
+            onAlignVertical={onAlignVertical}
+            onDistribute={onDistribute}
+          />
+
+          {/* Multi-Select Controls */}
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setSelectedFields(FIELD_CONFIG.map(c => c.field))}
+              className="flex-1 text-xs h-7"
+            >
+              Select All
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setSelectedFields([])}
+              className="flex-1 text-xs h-7"
+              disabled={selectedFields.length === 0}
+            >
+              Clear ({selectedFields.length})
+            </Button>
+          </div>
+
           {/* Unified Positioning Control */}
           {currentFieldIndex >= 0 && currentFieldIndex < FIELD_CONFIG.length && (
             <div className="p-3 bg-background rounded-lg border-hairline shadow-3point chamfered">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-semibold">
                   {FIELD_CONFIG[currentFieldIndex]?.label}
+                  {selectedFields.length > 0 && (
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      ({selectedFields.length} selected)
+                    </span>
+                  )}
                 </h3>
                 <Popover open={showPositionControl} onOpenChange={setShowPositionControl}>
                   <PopoverTrigger asChild>
@@ -518,26 +573,51 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
             filteredFields.map((config) => {
               const originalIndex = FIELD_CONFIG.findIndex(f => f.field === config.field);
               const isActive = originalIndex === currentFieldIndex;
+              const isSelected = selectedFields.includes(config.field);
               
               return (
                 <div
                   key={config.field}
                   ref={isActive ? activeFieldRef : null}
-                  className={`relative space-y-2 p-4 rounded-lg border-hairline transition-all duration-300 shadow-3point chamfered spring-hover ${
+                  className={`relative space-y-2 p-4 rounded-lg border transition-all duration-300 shadow-3point chamfered spring-hover cursor-pointer ${
                     isActive 
                       ? 'border-primary bg-primary/5 shadow-3point-hover scale-[1.02]' 
+                      : isSelected
+                      ? 'border-blue-500 bg-blue-500/10 shadow-3point-hover'
                       : 'border-transparent hover:border-muted'
                   }`}
-                  onClick={() => setCurrentFieldIndex(originalIndex)}
+                  onClick={(e) => {
+                    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+                    const modKey = isMac ? e.metaKey : e.ctrlKey;
+                    
+                    if (modKey) {
+                      // Multi-select mode
+                      e.stopPropagation();
+                      setSelectedFields(prev => 
+                        prev.includes(config.field)
+                          ? prev.filter(f => f !== config.field)
+                          : [...prev, config.field]
+                      );
+                    } else {
+                      // Normal navigation
+                      setCurrentFieldIndex(originalIndex);
+                    }
+                  }}
                 >
                   {/* Visual Highlighter Bar */}
                   {isActive && (
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-primary via-primary to-primary/50 rounded-l-lg animate-pulse" />
                   )}
+                  {/* Selection Indicator */}
+                  {isSelected && !isActive && (
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 via-blue-500 to-blue-500/50 rounded-l-lg" />
+                  )}
                   <div className="flex items-center justify-between gap-2">
                     <Label 
                       htmlFor={config.field} 
-                      className={`text-xs font-medium transition-colors duration-200 ${isActive ? 'text-primary' : 'text-muted-foreground'}`}
+                      className={`text-xs font-medium transition-colors duration-200 ${
+                        isActive ? 'text-primary' : isSelected ? 'text-blue-600' : 'text-muted-foreground'
+                      }`}
                     >
                       {originalIndex + 1}. {config.label}
                     </Label>
@@ -559,6 +639,9 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
                       {isActive && (
                         <span className="text-xs font-semibold text-primary px-2 py-1 rounded-md bg-primary/10 animate-in fade-in duration-200">Active</span>
                       )}
+                      {isSelected && !isActive && (
+                        <span className="text-xs font-semibold text-blue-600 px-2 py-1 rounded-md bg-blue-500/10 animate-in fade-in duration-200">Selected</span>
+                      )}
                     </div>
                   </div>
                 
@@ -576,7 +659,11 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
                       value={formData[config.field] as string || ''}
                       onChange={(e) => updateField(config.field, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(e, originalIndex)}
-                      onFocus={() => setCurrentFieldIndex(originalIndex)}
+                      onFocus={(e) => {
+                        e.stopPropagation();
+                        setCurrentFieldIndex(originalIndex);
+                      }}
+                      onClick={(e) => e.stopPropagation()}
                       placeholder={config.placeholder}
                       className="h-12 text-base border-hairline shadow-3point chamfered transition-all duration-200"
                       maxLength={config.field === 'state' ? 2 : undefined}
@@ -590,7 +677,11 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
                       value={formData[config.field] as string || ''}
                       onChange={(e) => updateField(config.field, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(e, originalIndex)}
-                      onFocus={() => setCurrentFieldIndex(originalIndex)}
+                      onFocus={(e) => {
+                        e.stopPropagation();
+                        setCurrentFieldIndex(originalIndex);
+                      }}
+                      onClick={(e) => e.stopPropagation()}
                       placeholder={config.placeholder}
                       className="min-h-[100px] text-sm resize-none transition-all duration-200"
                     />
