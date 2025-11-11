@@ -10,6 +10,9 @@
     <link rel="dns-prefetch" href="https://unpkg.com" />
     <link rel="dns-prefetch" href="https://sbwgkocarqvonkdlitdx.supabase.co" />
     
+    <!-- Preload critical entry point to reduce request chain -->
+    <link rel="modulepreload" href="/src/main.tsx" />
+    
     <!-- Inline critical CSS to prevent render blocking -->
     <style>
       :root {
