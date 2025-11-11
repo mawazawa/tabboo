@@ -320,24 +320,26 @@ export const FieldNavigationPanel = ({
         return;
       }
 
-      // Arrow keys for positioning (when not typing in input/textarea)
-      if (document.activeElement === positionInputRef.current ||
-          !['INPUT', 'TEXTAREA'].includes((document.activeElement as HTMLElement)?.tagName)) {
-        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-          e.preventDefault();
-          const direction = {
-            'ArrowUp': 'up',
-            'ArrowDown': 'down',
-            'ArrowLeft': 'left',
-            'ArrowRight': 'right'
-          }[e.key] as 'up' | 'down' | 'left' | 'right';
-          
-          // Immediate visual feedback with requestAnimationFrame for optimal performance
-          requestAnimationFrame(() => {
-            setPressedKey(direction);
-          });
-          adjustPosition(direction);
-        }
+      // Arrow keys for positioning - work when a field is selected, unless actively typing
+      const activeElement = document.activeElement as HTMLElement;
+      const isActivelyTyping = activeElement && 
+        (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA') &&
+        activeElement.classList.contains('field-input'); // Only block if it's a form field input
+      
+      if (!isActivelyTyping && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        e.preventDefault();
+        const direction = {
+          'ArrowUp': 'up',
+          'ArrowDown': 'down',
+          'ArrowLeft': 'left',
+          'ArrowRight': 'right'
+        }[e.key] as 'up' | 'down' | 'left' | 'right';
+        
+        // Immediate visual feedback with requestAnimationFrame for optimal performance
+        requestAnimationFrame(() => {
+          setPressedKey(direction);
+        });
+        adjustPosition(direction);
       }
 
       // Escape to close controls

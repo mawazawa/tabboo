@@ -437,18 +437,16 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                           return (
                             <div
                             key={idx}
-                            className={`field-container group absolute select-none touch-none spring-hover ${
-                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary/60 opacity-95 shadow-[0_8px_32px_hsl(var(--primary)/0.25)] backdrop-blur-xl bg-card/60 p-4' : 
-                              isEditMode ? 'cursor-move p-3' : 'cursor-grab p-3'
+                            className={`field-container group absolute select-none touch-none ${
+                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary shadow-lg scale-105' : 
+                              isEditMode ? 'cursor-move ring-2 ring-primary/70' : 'cursor-pointer'
                             } ${
                               highlightedField === overlay.field
-                                ? 'ring-2 ring-accent/60 shadow-[0_8px_32px_hsl(var(--accent)/0.25)] animate-pulse bg-accent/10 backdrop-blur-xl' :
-                              isEditMode 
-                                ? 'ring-2 ring-green-500/60 shadow-[0_8px_32px_hsl(142_76%_36%/0.25)] bg-green-500/10 backdrop-blur-xl' :
+                                ? 'ring-2 ring-accent shadow-lg animate-pulse' :
                               isCurrentField 
-                                ? 'ring-2 ring-primary/60 shadow-[0_4px_24px_hsl(var(--primary)/0.15)] bg-card/40 backdrop-blur-lg' 
-                                : 'ring-1 ring-border/30 bg-card/20 backdrop-blur-md hover:ring-2 hover:ring-primary/40 hover:shadow-[0_4px_16px_hsl(var(--primary)/0.1)] hover:bg-card/30'
-                            } rounded-full transition-all duration-300`}
+                                ? 'ring-2 ring-primary shadow-md bg-primary/5' 
+                                : 'ring-1 ring-border/50 hover:ring-primary/50'
+                            } rounded-lg bg-background/80 backdrop-blur-sm p-2 transition-all duration-200`}
                             style={{
                               top: `${position.top}%`,
                               left: `${position.left}%`,
@@ -464,143 +462,109 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             onClick={(e) => handleFieldClick(overlay.field, e)}
                             onPointerDown={(e) => handlePointerDown(e, overlay.field, position.top, position.left)}
                           >
-                            {/* Field Controls - Always visible for current field, or on hover */}
-                            <div className={`transition-opacity duration-200 ${isCurrentField || isEditMode ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-                              {isCurrentField && (
-                                <>
-                                   <div className={`absolute -top-10 left-0 px-3 py-2 rounded-lg text-sm font-medium shadow-3point whitespace-nowrap chamfered flex items-center gap-2 ${
-                                    isEditMode 
-                                      ? 'bg-green-600 text-white animate-pulse' 
-                                      : 'bg-primary text-primary-foreground'
-                                  }`}>
-                                    {isEditMode && <Move className="h-4 w-4" strokeWidth={1.5} />}
-                                    {isEditMode ? 'Drag Anywhere to Move' : overlay.placeholder || overlay.field}
-                                    {!isEditMode && canAutofillField && !hasValue && (
-                                      <Sparkles className="h-3 w-3 animate-pulse" strokeWidth={2} />
-                                    )}
+                            {/* Simplified Field Controls */}
+                            {isCurrentField && (
+                              <div className="absolute -top-8 left-0 right-0 flex items-center justify-between gap-2">
+                                <div className="px-2 py-1 rounded bg-primary text-primary-foreground text-xs font-medium whitespace-nowrap">
+                                  {overlay.placeholder || overlay.field}
+                                  {canAutofillField && !hasValue && (
+                                    <Sparkles className="inline h-3 w-3 ml-1 animate-pulse" />
+                                  )}
+                                </div>
+                                {isEditMode && (
+                                  <div className="flex gap-1">
+                                    <Button
+                                      size="icon"
+                                      variant="secondary"
+                                      className="h-6 w-6"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        adjustPosition('up', overlay.field);
+                                      }}
+                                    >
+                                      <ChevronUp className="h-3 w-3" />
+                                    </Button>
+                                    <Button
+                                      size="icon"
+                                      variant="secondary"
+                                      className="h-6 w-6"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        adjustPosition('down', overlay.field);
+                                      }}
+                                    >
+                                      <ChevronDown className="h-3 w-3" />
+                                    </Button>
+                                    <Button
+                                      size="icon"
+                                      variant="secondary"
+                                      className="h-6 w-6"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        adjustPosition('left', overlay.field);
+                                      }}
+                                    >
+                                      <ChevronLeft className="h-3 w-3" />
+                                    </Button>
+                                    <Button
+                                      size="icon"
+                                      variant="secondary"
+                                      className="h-6 w-6"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        adjustPosition('right', overlay.field);
+                                      }}
+                                    >
+                                      <ChevronRight className="h-3 w-3" />
+                                    </Button>
                                   </div>
-                                  {/* Premium Touch-Friendly Control Arrows - visible in both modes */}
-                                  <div className="absolute -top-40 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <Button
-                                          size="icon"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            adjustPosition('up', overlay.field);
-                                          }}
-                                          className="h-12 w-12 rounded-xl backdrop-blur-xl bg-white/10 border-hairline border-white/20 hover:bg-white/20 shadow-3point chamfered spring-hover group touch-none"
-                                        >
-                                          <ChevronUp className="h-6 w-6 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
-                                        </Button>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p>Move field up</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                    <div className="flex gap-2">
-                                      <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <Button
-                                            size="icon"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              adjustPosition('left', overlay.field);
-                                            }}
-                                            className="h-12 w-12 rounded-xl backdrop-blur-xl bg-white/10 border-hairline border-white/20 hover:bg-white/20 shadow-3point chamfered spring-hover group touch-none"
-                                          >
-                                            <ChevronLeft className="h-6 w-6 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
-                                          </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          <p>Move field left</p>
-                                        </TooltipContent>
-                                      </Tooltip>
-                                      <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <Button
-                                            size="icon"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              adjustPosition('right', overlay.field);
-                                            }}
-                                            className="h-12 w-12 rounded-xl backdrop-blur-xl bg-white/10 border-hairline border-white/20 hover:bg-white/20 shadow-3point chamfered spring-hover group touch-none"
-                                          >
-                                            <ChevronRight className="h-6 w-6 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
-                                          </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          <p>Move field right</p>
-                                          </TooltipContent>
-                                      </Tooltip>
-                                    </div>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <Button
-                                          size="icon"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            adjustPosition('down', overlay.field);
-                                          }}
-                                          className="h-12 w-12 rounded-xl backdrop-blur-xl bg-white/10 border-hairline border-white/20 hover:bg-white/20 shadow-3point chamfered spring-hover group touch-none"
-                                        >
-                                          <ChevronDown className="h-6 w-6 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
-                                        </Button>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p>Move field down</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </div>
-                                </>
-                              )}
-                              {canAutofillField && !hasValue && (
+                                )}
+                              </div>
+                            )}
+                            {isCurrentField && (
+                              <>
+                                {canAutofillField && !hasValue && (
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        size="icon"
+                                        variant="secondary"
+                                        className="absolute -top-2 -right-10 h-7 w-7 rounded-full"
+                                        onClick={(e) => handleAutofillField(overlay.field, e)}
+                                        onPointerDown={(e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                        }}
+                                      >
+                                        <Sparkles className="h-4 w-4" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>Autofill from vault</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                )}
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                     <Button
                                       size="icon"
-                                      variant="default"
-                                      className="absolute -top-3 -right-16 h-10 w-10 rounded-full shadow-3point z-10 spring-hover chamfered touch-none bg-gradient-to-r from-accent to-primary hover:shadow-3point-hover"
-                                      onClick={(e) => handleAutofillField(overlay.field, e)}
-                                      onPointerDown={(e) => {
+                                      variant={isEditMode ? "default" : "secondary"}
+                                      className="absolute -top-2 -right-2 h-7 w-7 rounded-full"
+                                      onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
+                                        toggleEditMode(overlay.field);
                                       }}
                                     >
-                                      <Sparkles className="h-5 w-5 animate-pulse" strokeWidth={2} />
+                                      <Move className="h-4 w-4" />
                                     </Button>
                                   </TooltipTrigger>
                                   <TooltipContent>
-                                    <p>Autofill from Personal Data Vault</p>
+                                    <p>{isEditMode ? 'Lock position' : 'Move field'}</p>
                                   </TooltipContent>
                                 </Tooltip>
-                              )}
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button
-                                    size="icon"
-                                    variant={isEditMode ? "default" : "default"}
-                                    className={`settings-button drag-handle absolute -top-3 -right-3 h-10 w-10 rounded-full shadow-3point z-10 spring-hover chamfered cursor-grab ${
-                                      isEditMode ? 'bg-green-600 hover:bg-green-700' : ''
-                                    }`}
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      toggleEditMode(overlay.field);
-                                    }}
-                                  >
-                                    {isEditMode ? (
-                                      <Move className="h-5 w-5" strokeWidth={1.5} />
-                                    ) : (
-                                      <Move className="h-5 w-5" strokeWidth={1.5} />
-                                    )}
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>{isEditMode ? 'Exit move mode' : 'Enter move mode - then drag anywhere on field'}</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </div>
+                              </>
+                            )}
                             
                             {overlay.type === 'input' && (
                               <Input
@@ -608,14 +572,14 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
                                 disabled={isEditMode}
-                                className={`h-12 text-base border-hairline shadow-3point chamfered ${
+                                className={`field-input h-10 text-sm ${
                                   isEditMode
-                                    ? 'bg-green-600/10 border-green-600 cursor-grab pointer-events-none' :
+                                    ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   validationErrors?.[overlay.field]?.length
-                                    ? 'bg-destructive/10 border-destructive ring-2 ring-destructive/20'
+                                    ? 'bg-destructive/10 border-destructive'
                                     : isCurrentField 
-                                    ? 'bg-primary/10 border-primary' 
-                                    : 'bg-white/90 border-primary/50'
+                                    ? 'bg-primary/5 border-primary' 
+                                    : 'bg-background border-border'
                                 }`}
                               />
                             )}
@@ -625,14 +589,14 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
                                 disabled={isEditMode}
-                                className={`text-sm resize-none ${
+                                className={`field-input text-sm resize-none ${
                                   isEditMode
-                                    ? 'bg-green-600/10 border-green-600 border-2 cursor-grab pointer-events-none' :
+                                    ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   validationErrors?.[overlay.field]?.length
-                                    ? 'bg-destructive/10 border-destructive border-2 ring-2 ring-destructive/20'
+                                    ? 'bg-destructive/10 border-destructive'
                                     : isCurrentField 
-                                    ? 'bg-primary/10 border-primary border-2' 
-                                    : 'bg-white/90 border-primary/50'
+                                    ? 'bg-primary/5 border-primary' 
+                                    : 'bg-background border-border'
                                 }`}
                               />
                             )}
@@ -643,10 +607,10 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 disabled={isEditMode}
                                 className={`border-2 ${
                                   isEditMode
-                                    ? 'bg-green-600/10 border-green-600 cursor-grab pointer-events-none' :
+                                    ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   isCurrentField 
-                                    ? 'bg-primary/10 border-primary' 
-                                    : 'bg-white/90 border-primary'
+                                    ? 'bg-primary/5 border-primary' 
+                                    : 'bg-background border-border'
                                 }`}
                               />
                             )}
