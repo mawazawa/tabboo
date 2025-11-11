@@ -10,6 +10,31 @@
     <link rel="dns-prefetch" href="https://unpkg.com" />
     <link rel="dns-prefetch" href="https://sbwgkocarqvonkdlitdx.supabase.co" />
     
+    <!-- Inline critical CSS to prevent render blocking -->
+    <style>
+      :root {
+        --background: 220 25% 97%;
+        --foreground: 220 13% 13%;
+      }
+      .dark {
+        --background: 220 18% 8%;
+        --foreground: 220 15% 95%;
+      }
+      * {
+        border-color: hsl(220 15% 88%);
+      }
+      body {
+        margin: 0;
+        background-color: hsl(var(--background));
+        color: hsl(var(--foreground));
+        font-family: system-ui, -apple-system, sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
+      #root {
+        min-height: 100vh;
+      }
+    </style>
+    
     <title>SwiftFill Pro - AI Legal Form Assistant</title>
     <meta name="description" content="SwiftFill Pro: AI-powered California legal form automation. Intelligently fill FL-320 court forms using your secure personal data vault." />
     <meta name="author" content="SwiftFill Pro" />
