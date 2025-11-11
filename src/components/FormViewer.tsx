@@ -438,17 +438,17 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             <div
                             key={idx}
                             className={`field-container group absolute select-none touch-none spring-hover ${
-                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-4 ring-primary opacity-90 shadow-3point p-4' : 
+                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary/60 opacity-95 shadow-[0_8px_32px_hsl(var(--primary)/0.25)] backdrop-blur-xl bg-card/60 p-4' : 
                               isEditMode ? 'cursor-move p-3' : 'cursor-grab p-3'
                             } ${
                               highlightedField === overlay.field
-                                ? 'ring-4 ring-accent shadow-3point-hover animate-pulse bg-accent/20 chamfered' :
+                                ? 'ring-2 ring-accent/60 shadow-[0_8px_32px_hsl(var(--accent)/0.25)] animate-pulse bg-accent/10 backdrop-blur-xl' :
                               isEditMode 
-                                ? 'ring-4 ring-green-600 shadow-3point bg-green-600/10 chamfered' :
+                                ? 'ring-2 ring-green-500/60 shadow-[0_8px_32px_hsl(142_76%_36%/0.25)] bg-green-500/10 backdrop-blur-xl' :
                               isCurrentField 
-                                ? 'ring-4 ring-primary shadow-3point chamfered' 
-                                : 'hover:ring-2 hover:ring-primary/50 hover:bg-primary/5'
-                            } rounded-lg transition-all`}
+                                ? 'ring-2 ring-primary/60 shadow-[0_4px_24px_hsl(var(--primary)/0.15)] bg-card/40 backdrop-blur-lg' 
+                                : 'ring-1 ring-border/30 bg-card/20 backdrop-blur-md hover:ring-2 hover:ring-primary/40 hover:shadow-[0_4px_16px_hsl(var(--primary)/0.1)] hover:bg-card/30'
+                            } rounded-full transition-all duration-300`}
                             style={{
                               top: `${position.top}%`,
                               left: `${position.left}%`,

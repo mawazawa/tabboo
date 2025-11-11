@@ -5,15 +5,15 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-gradient-to-br from-primary to-primary-glow text-primary-foreground hover:from-primary/90 hover:to-primary-glow/90 shadow-[0_2px_8px_-2px_hsl(var(--primary)/0.3),0_4px_16px_-4px_hsl(var(--primary)/0.2)] hover:shadow-[0_4px_12px_-2px_hsl(var(--primary)/0.4),0_8px_20px_-4px_hsl(var(--primary)/0.25)] hover:scale-[1.02] active:scale-[0.98]",
-        destructive: "bg-gradient-to-br from-destructive to-destructive text-destructive-foreground hover:from-destructive/90 hover:to-destructive/90 shadow-[0_2px_8px_-2px_hsl(var(--destructive)/0.3)] hover:shadow-[0_4px_12px_-2px_hsl(var(--destructive)/0.4)]",
-        outline: "border-2 border-border bg-background text-foreground hover:bg-accent hover:text-accent-foreground hover:border-primary/50 shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:shadow-[0_2px_6px_rgba(0,0,0,0.08)]",
-        secondary: "bg-gradient-to-br from-secondary to-secondary/80 text-secondary-foreground hover:from-secondary/90 hover:to-secondary/70 shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:shadow-[0_2px_6px_rgba(0,0,0,0.08)]",
-        ghost: "text-foreground hover:bg-accent hover:text-accent-foreground hover:shadow-[0_1px_3px_rgba(0,0,0,0.05)]",
+        default: "relative bg-gradient-to-br from-primary via-primary to-primary-glow text-primary-foreground shadow-[inset_0_1px_0_hsl(var(--primary-glow)/0.8),inset_0_-1px_0_hsl(var(--primary)/0.5),0_1px_2px_hsl(220_13%_13%/0.12),0_4px_8px_hsl(220_13%_13%/0.08),0_8px_16px_hsl(220_13%_13%/0.06)] hover:shadow-[inset_0_1px_0_hsl(var(--primary-glow)/0.9),inset_0_-1px_0_hsl(var(--primary)/0.6),0_2px_4px_hsl(220_13%_13%/0.14),0_6px_12px_hsl(220_13%_13%/0.1),0_12px_24px_hsl(220_13%_13%/0.08)] hover:translate-y-[-1px] active:translate-y-[1px] active:shadow-[inset_0_1px_2px_hsl(var(--primary)/0.3),0_1px_2px_hsl(220_13%_13%/0.1)]",
+        destructive: "relative bg-gradient-to-br from-destructive via-destructive to-destructive/90 text-destructive-foreground shadow-[inset_0_1px_0_hsl(var(--destructive)/0.8),inset_0_-1px_0_hsl(var(--destructive)/0.5),0_1px_2px_hsl(220_13%_13%/0.12),0_4px_8px_hsl(220_13%_13%/0.08),0_8px_16px_hsl(220_13%_13%/0.06)] hover:shadow-[inset_0_1px_0_hsl(var(--destructive)/0.9),inset_0_-1px_0_hsl(var(--destructive)/0.6),0_2px_4px_hsl(220_13%_13%/0.14),0_6px_12px_hsl(220_13%_13%/0.1),0_12px_24px_hsl(220_13%_13%/0.08)] hover:translate-y-[-1px] active:translate-y-[1px]",
+        outline: "border-2 border-border bg-background text-foreground shadow-[inset_0_1px_0_hsl(0_0%_100%/0.1),0_1px_2px_hsl(220_13%_13%/0.08)] hover:bg-accent hover:text-accent-foreground hover:border-primary/50 hover:shadow-[inset_0_1px_0_hsl(0_0%_100%/0.15),0_2px_4px_hsl(220_13%_13%/0.1)] hover:translate-y-[-1px] active:translate-y-[1px]",
+        secondary: "relative bg-gradient-to-br from-secondary via-secondary to-secondary/80 text-secondary-foreground shadow-[inset_0_1px_0_hsl(var(--secondary)/1.2),inset_0_-1px_0_hsl(220_13%_13%/0.05),0_1px_2px_hsl(220_13%_13%/0.08)] hover:shadow-[inset_0_1px_0_hsl(var(--secondary)/1.3),0_2px_4px_hsl(220_13%_13%/0.1)] hover:translate-y-[-1px] active:translate-y-[1px]",
+        ghost: "text-foreground hover:bg-accent hover:text-accent-foreground hover:shadow-[0_1px_3px_hsl(220_13%_13%/0.05)]",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
