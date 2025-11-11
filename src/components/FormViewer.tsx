@@ -66,6 +66,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   const [pageWidth, setPageWidth] = useState<number>(850);
   const [isDragging, setIsDragging] = useState<string | null>(null);
   const [editModeField, setEditModeField] = useState<string | null>(null);
+  const [alignmentGuides, setAlignmentGuides] = useState<{ x: number[]; y: number[] }>({ x: [], y: [] });
   const dragStartPos = useRef<{ x: number; y: number; top: number; left: number }>({ x: 0, y: 0, top: 0, left: 0 });
 
   // Map field names to indices
@@ -126,14 +127,82 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     const deltaY = e.clientY - dragStartPos.current.y;
     const parentRect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     
-    const newLeft = dragStartPos.current.left + (deltaX / parentRect.width) * 100;
-    const newTop = dragStartPos.current.top + (deltaY / parentRect.height) * 100;
+    let newLeft = dragStartPos.current.left + (deltaX / parentRect.width) * 100;
+    let newTop = dragStartPos.current.top + (deltaY / parentRect.height) * 100;
     
     // Constrain within bounds
-    const constrainedLeft = Math.max(0, Math.min(95, newLeft));
-    const constrainedTop = Math.max(0, Math.min(95, newTop));
+    newLeft = Math.max(0, Math.min(95, newLeft));
+    newTop = Math.max(0, Math.min(95, newTop));
+
+    // Smart snapping to other fields
+    const snapThreshold = 1.5; // Snap within 1.5% distance
+    const guides: { x: number[]; y: number[] } = { x: [], y: [] };
     
-    updateFieldPosition(isDragging, { top: constrainedTop, left: constrainedLeft });
+    // Get all other field positions
+    Object.entries(fieldPositions).forEach(([field, pos]) => {
+      if (field === isDragging) return; // Skip the field being dragged
+      
+      // Snap to left edge
+      if (Math.abs(newLeft - pos.left) < snapThreshold) {
+        newLeft = pos.left;
+        guides.x.push(pos.left);
+      }
+      
+      // Snap to right edge (assuming ~20% width for fields)
+      const draggedRight = newLeft + 20;
+      const otherRight = pos.left + 20;
+      if (Math.abs(draggedRight - otherRight) < snapThreshold) {
+        newLeft = pos.left;
+        guides.x.push(pos.left);
+      }
+      
+      // Snap left edge to other's right edge
+      if (Math.abs(newLeft - otherRight) < snapThreshold) {
+        newLeft = otherRight;
+        guides.x.push(otherRight);
+      }
+      
+      // Snap to top edge
+      if (Math.abs(newTop - pos.top) < snapThreshold) {
+        newTop = pos.top;
+        guides.y.push(pos.top);
+      }
+      
+      // Snap to bottom edge (assuming ~5% height for most fields)
+      const draggedBottom = newTop + 5;
+      const otherBottom = pos.top + 5;
+      if (Math.abs(draggedBottom - otherBottom) < snapThreshold) {
+        newTop = pos.top;
+        guides.y.push(pos.top);
+      }
+      
+      // Snap top edge to other's bottom edge
+      if (Math.abs(newTop - otherBottom) < snapThreshold) {
+        newTop = otherBottom;
+        guides.y.push(otherBottom);
+      }
+      
+      // Snap to vertical center alignment
+      const draggedCenterY = newTop + 2.5;
+      const otherCenterY = pos.top + 2.5;
+      if (Math.abs(draggedCenterY - otherCenterY) < snapThreshold) {
+        newTop = pos.top;
+        guides.y.push(pos.top);
+      }
+      
+      // Snap to horizontal center alignment
+      const draggedCenterX = newLeft + 10;
+      const otherCenterX = pos.left + 10;
+      if (Math.abs(draggedCenterX - otherCenterX) < snapThreshold) {
+        newLeft = pos.left;
+        guides.x.push(pos.left);
+      }
+    });
+    
+    // Update alignment guides
+    setAlignmentGuides(guides);
+    
+    updateFieldPosition(isDragging, { top: newTop, left: newLeft });
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
@@ -141,6 +210,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
       (e.target as HTMLElement).releasePointerCapture(e.pointerId);
     }
     setIsDragging(null);
+    setAlignmentGuides({ x: [], y: [] }); // Clear guides when done dragging
   };
 
   const handlePDFClick = (e: React.MouseEvent) => {
@@ -242,6 +312,37 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                   
                   {pageOverlays && (
                     <div className="absolute inset-0">
+                      {/* Alignment Guides */}
+                      {isDragging && (
+                        <>
+                          {/* Vertical alignment guides */}
+                          {alignmentGuides.x.map((x, i) => (
+                            <div
+                              key={`guide-x-${i}`}
+                              className="absolute top-0 bottom-0 w-0.5 bg-accent shadow-lg pointer-events-none z-40 animate-in fade-in duration-100"
+                              style={{ left: `${x}%` }}
+                            >
+                              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full bg-accent text-accent-foreground text-xs px-2 py-1 rounded-t">
+                                {x.toFixed(1)}%
+                              </div>
+                            </div>
+                          ))}
+                          
+                          {/* Horizontal alignment guides */}
+                          {alignmentGuides.y.map((y, i) => (
+                            <div
+                              key={`guide-y-${i}`}
+                              className="absolute left-0 right-0 h-0.5 bg-accent shadow-lg pointer-events-none z-40 animate-in fade-in duration-100"
+                              style={{ top: `${y}%` }}
+                            >
+                              <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full bg-accent text-accent-foreground text-xs px-2 py-1 rounded-l">
+                                {y.toFixed(1)}%
+                              </div>
+                            </div>
+                          ))}
+                        </>
+                      )}
+                      
                       {pageOverlays.fields.map((overlay, idx) => {
                         const position = fieldPositions[overlay.field] || {
                           top: parseFloat(overlay.top),
