@@ -544,29 +544,31 @@ const Index = () => {
           <div className="h-6 w-px bg-border" />
 
           {/* Settings Menu with Gear Icon */}
-          <NavigationMenu>
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="gap-2 h-9 px-3">
-                  <Settings className="h-4 w-4" strokeWidth={0.5} />
-                  <span className="text-sm">Settings</span>
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className="p-2 w-[300px]">
-                    <div className="p-2">
-                      <TemplateManager
-                        currentFormId="FL-320"
-                        currentFormName="Response to Request for Restraining Orders"
-                        currentFieldPositions={fieldPositions}
-                        onApplyTemplate={handleApplyTemplate}
-                        triggerless={true}
-                      />
-                    </div>
-                  </div>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="sm" className="gap-2">
+                <Settings className="h-4 w-4" strokeWidth={0.5} />
+                <span className="text-sm">Settings</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[400px] sm:w-[540px]">
+              <SheetHeader>
+                <SheetTitle>Form Settings</SheetTitle>
+                <SheetDescription>
+                  Manage templates and form configurations
+                </SheetDescription>
+              </SheetHeader>
+              <div className="mt-6">
+                <TemplateManager
+                  currentFormId="FL-320"
+                  currentFormName="Response to Request for Restraining Orders"
+                  currentFieldPositions={fieldPositions}
+                  onApplyTemplate={handleApplyTemplate}
+                  triggerless={true}
+                />
+              </div>
+            </SheetContent>
+          </Sheet>
 
           <div className="h-6 w-px bg-border" />
 
@@ -656,7 +658,7 @@ const Index = () => {
           </Button>
         </div>
 
-        <ResizablePanelGroup direction="horizontal" className="h-[calc(100vh-220px)] w-full">
+        <ResizablePanelGroup direction="horizontal" className="min-h-[600px] h-[calc(100vh-200px)] w-full">
           {/* Center: Form Viewer with PDF + Thumbnail Sidebar */}
           <ResizablePanel 
             id="viewer-panel"
