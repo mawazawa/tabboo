@@ -5,7 +5,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Copy, Move, Search, X, AlertCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Copy, Move, Search, X, AlertCircle, Settings, Package } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -13,6 +14,16 @@ import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ValidationRuleEditor } from "./ValidationRuleEditor";
 import { FieldPresetsToolbar } from "./FieldPresetsToolbar";
+import { FieldSearchBar } from "./FieldSearchBar";
+import { FieldGroupManager } from "./FieldGroupManager";
+import { TemplateManager } from "./TemplateManager";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 
 interface FormData {
   partyName?: string;
@@ -66,6 +77,10 @@ interface Props {
   validationRules?: Record<string, any[]>;
   validationErrors?: Record<string, any[]>;
   onSaveValidationRules?: (fieldName: string, rules: any[]) => void;
+  settingsSheetOpen: boolean;
+  onSettingsSheetChange: (open: boolean) => void;
+  onApplyTemplate: (template: any) => void;
+  onApplyGroup: (groupPositions: Record<string, { top: number; left: number }>) => void;
 }
 
 const FIELD_CONFIG: FieldConfig[] = [
@@ -112,6 +127,10 @@ export const FieldNavigationPanel = ({
   validationRules = {},
   validationErrors = {},
   onSaveValidationRules,
+  settingsSheetOpen,
+  onSettingsSheetChange,
+  onApplyTemplate,
+  onApplyGroup,
 }: Props) => {
   const fieldRefs = useRef<(HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | null)[]>([]);
   const scrollViewportRef = useRef<HTMLDivElement>(null);
@@ -122,6 +141,7 @@ export const FieldNavigationPanel = ({
   const [showPositionControl, setShowPositionControl] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
+  const [showAISearch, setShowAISearch] = useState(false);
 
   // Fetch personal info from vault
   const { data: personalInfo } = useQuery({
@@ -353,7 +373,7 @@ export const FieldNavigationPanel = ({
       {/* Sticky Header - Fixed Interaction Surface */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-sm">
         <div className="p-4 space-y-3">
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start justify-between gap-2">
             <div className="flex-1">
               <h2 className="font-semibold text-sm">Form Field Controls</h2>
               <p className="text-xs text-muted-foreground mt-1">
@@ -366,18 +386,85 @@ export const FieldNavigationPanel = ({
                 <div>Tab • Next field</div>
               </div>
             </div>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                setShowSearch(!showSearch);
-                setTimeout(() => searchInputRef.current?.focus(), 100);
-              }}
-              className="h-8 w-8 p-0 shrink-0"
-            >
-              <Search className="h-4 w-4" strokeWidth={1.5} />
-            </Button>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <Badge
+                variant="secondary"
+                className="cursor-pointer hover:bg-secondary/80 transition-colors px-2 py-1 gap-1"
+                onClick={() => {
+                  setShowAISearch(!showAISearch);
+                }}
+              >
+                <Search className="h-3 w-3" strokeWidth={1.5} />
+                <span className="text-xs">AI</span>
+              </Badge>
+              
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Badge
+                    variant="secondary"
+                    className="cursor-pointer hover:bg-secondary/80 transition-colors px-2 py-1 gap-1"
+                  >
+                    <Package className="h-3 w-3" strokeWidth={1.5} />
+                    <span className="text-xs">Groups</span>
+                  </Badge>
+                </PopoverTrigger>
+                <PopoverContent className="w-[500px]" align="end">
+                  <FieldGroupManager
+                    selectedFields={selectedFields}
+                    fieldPositions={fieldPositions}
+                    onApplyGroup={onApplyGroup}
+                    triggerless={true}
+                  />
+                </PopoverContent>
+              </Popover>
+
+              <Badge
+                variant="secondary"
+                className="cursor-pointer hover:bg-secondary/80 transition-colors px-2 py-1 gap-1"
+                onClick={() => onSettingsSheetChange(true)}
+              >
+                <Settings className="h-3 w-3" strokeWidth={1.5} />
+                <span className="text-xs">Settings</span>
+              </Badge>
+            </div>
           </div>
+
+          <Sheet open={settingsSheetOpen} onOpenChange={onSettingsSheetChange}>
+            <SheetContent side="right" className="w-[400px] sm:w-[540px]">
+              <SheetHeader>
+                <SheetTitle>Form Settings</SheetTitle>
+                <SheetDescription>
+                  Manage templates and form configurations
+                </SheetDescription>
+              </SheetHeader>
+              <div className="mt-6">
+                <TemplateManager
+                  currentFormId="FL-320"
+                  currentFormName="Response to Request for Restraining Orders"
+                  currentFieldPositions={fieldPositions}
+                  onApplyTemplate={onApplyTemplate}
+                  triggerless={true}
+                />
+              </div>
+            </SheetContent>
+          </Sheet>
+
+          {/* AI Search Bar */}
+          {showAISearch && (
+            <div className="animate-in slide-in-from-top-2 duration-300">
+              <FieldSearchBar 
+                onFieldSearch={(query) => setSearchQuery(query)}
+                onAIQuery={(query) => {
+                  toast({
+                    title: "AI Query Sent",
+                    description: query,
+                  });
+                  setShowAISearch(false);
+                }}
+                placeholder="Ask AI or search fields..."
+              />
+            </div>
+          )}
 
           {/* Glassmorphic Search Bar */}
           {showSearch && (

@@ -520,36 +520,19 @@ const Index = () => {
       <main className="flex-1 flex flex-col container mx-auto px-4 py-6 overflow-hidden">
         {/* Control Toolbar */}
         <div className="flex items-center gap-2 mb-4 p-3 bg-card/80 backdrop-blur-sm rounded-lg border shadow-sm flex-shrink-0">
-          {/* Search Bar - Relocated */}
-          <FieldSearchBar 
-            onFieldSearch={(query) => setFieldSearchQuery(query)}
-            onAIQuery={(query) => {
-              setShowAIPanel(true);
-              toast({
-                title: "AI Query",
-                description: `Sending to AI: ${query}`,
-              });
-            }}
-          />
-
-          <div className="h-6 w-px bg-border" />
-
-          {/* Thumbnail Collapse */}
+          {/* AI Assistant Toggle */}
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setShowThumbnails(!showThumbnails)}
-            className="gap-2"
-            title={showThumbnails ? "Hide thumbnails" : "Show thumbnails"}
+            onClick={() => setShowAIPanel(!showAIPanel)}
+            className={`gap-2 ${showAIPanel ? 'bg-primary/10 text-primary' : ''}`}
+            title="Toggle AI Assistant"
           >
-            <PanelLeftClose className={`h-4 w-4 transition-transform ${!showThumbnails ? 'rotate-180' : ''}`} strokeWidth={0.5} />
-            {showThumbnails ? 'Hide' : 'Show'}
+            <MessageSquare className="h-4 w-4" strokeWidth={0.5} />
+            AI Chat
           </Button>
 
           <div className="h-6 w-px bg-border" />
-
-          {/* Personal Data Vault Button */}
-          <PersonalDataVault userId={user?.id} />
 
           {/* Autofill All Fields Button */}
           <Button
@@ -574,55 +557,22 @@ const Index = () => {
 
           <div className="h-6 w-px bg-border" />
 
-          {/* Settings Menu with Gear Icon */}
-          <Sheet open={settingsSheetOpen} onOpenChange={setSettingsSheetOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="sm" className="gap-2">
-                <Settings className="h-4 w-4" strokeWidth={0.5} />
-                <span className="text-sm">Settings</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[400px] sm:w-[540px]">
-              <SheetHeader>
-                <SheetTitle>Form Settings</SheetTitle>
-                <SheetDescription>
-                  Manage templates and form configurations
-                </SheetDescription>
-              </SheetHeader>
-              <div className="mt-6">
-                <TemplateManager
-                  currentFormId="FL-320"
-                  currentFormName="Response to Request for Restraining Orders"
-                  currentFieldPositions={fieldPositions}
-                  onApplyTemplate={handleApplyTemplate}
-                  triggerless={true}
-                />
-              </div>
-            </SheetContent>
-          </Sheet>
-
-          <div className="h-6 w-px bg-border" />
-
-          {/* Field Groups */}
-          <FieldGroupManager
-            selectedFields={selectedFields}
-            fieldPositions={fieldPositions}
-            onApplyGroup={handleApplyGroup}
-          />
-
-          <div className="h-6 w-px bg-border" />
-
-          {/* AI Assistant Toggle */}
+          {/* Thumbnail Collapse */}
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setShowAIPanel(!showAIPanel)}
-            className={`gap-2 ${showAIPanel ? 'bg-primary/10 text-primary' : ''}`}
-            title="Toggle AI Assistant"
+            onClick={() => setShowThumbnails(!showThumbnails)}
+            className="gap-2"
+            title={showThumbnails ? "Hide thumbnails" : "Show thumbnails"}
           >
-            <MessageSquare className="h-4 w-4" strokeWidth={0.5} />
-            AI Chat
+            <PanelLeftClose className={`h-4 w-4 transition-transform ${!showThumbnails ? 'rotate-180' : ''}`} strokeWidth={0.5} />
+            {showThumbnails ? 'Hide' : 'Show'}
           </Button>
+
+          <div className="h-6 w-px bg-border" />
+
+          {/* Personal Data Vault Button */}
+          <PersonalDataVault userId={user?.id} />
 
           <div className="h-6 w-px bg-border" />
 
@@ -787,6 +737,10 @@ const Index = () => {
                   validationRules={validationRules}
                   validationErrors={validationErrors}
                   onSaveValidationRules={handleSaveValidationRules}
+                  settingsSheetOpen={settingsSheetOpen}
+                  onSettingsSheetChange={setSettingsSheetOpen}
+                  onApplyTemplate={handleApplyTemplate}
+                  onApplyGroup={handleApplyGroup}
                 />
               )}
             </div>

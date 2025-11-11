@@ -51,12 +51,12 @@ export const FieldSearchBar = ({
       <Button
         size="sm"
         variant="default"
-        className="absolute right-1 gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90 shadow-3point-hover chamfered font-bold animate-pulse"
+        className="absolute right-1 gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md font-semibold"
         onClick={handleAISubmit}
         disabled={!value.trim()}
       >
-        <MessageSquare className="h-4 w-4" strokeWidth={2.5} />
-        <span className="text-sm font-bold">AI</span>
+        <MessageSquare className="h-3.5 w-3.5" strokeWidth={2} />
+        <span className="text-xs font-semibold">AI</span>
       </Button>
     </div>
   );
