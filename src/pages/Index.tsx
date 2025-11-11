@@ -6,6 +6,7 @@ import { PersonalDataVaultPanel } from "@/components/PersonalDataVaultPanel";
 import { PDFThumbnailSidebar } from "@/components/PDFThumbnailSidebar";
 import { FieldSearchBar } from "@/components/FieldSearchBar";
 import { TemplateManager } from "@/components/TemplateManager";
+import { FieldGroupManager } from "@/components/FieldGroupManager";
 import { FileText, MessageSquare, LogOut, Loader2, Calculator, PanelLeftClose, PanelRightClose, Shield, Settings } from "lucide-react";
 import { 
   snapAllToGrid, 
@@ -206,10 +207,13 @@ const Index = () => {
 
     setFieldPositions(updated);
     hasUnsavedChanges.current = true;
-    const desc = transformation.scale 
-      ? `Scaled ${selectedFields.length} field(s) by ${transformation.scale}x`
-      : `Moved ${selectedFields.length} field(s)`;
-    toast({ title: "Transformed", description: desc });
+    toast({ title: "Transformed", description: `Applied transformation to ${selectedFields.length} field(s)` });
+  };
+
+  const handleApplyGroup = (groupPositions: Record<string, { top: number; left: number }>) => {
+    const updated = { ...fieldPositions, ...groupPositions };
+    setFieldPositions(updated);
+    hasUnsavedChanges.current = true;
   };
 
   const handleApplyTemplate = (template: FormTemplate) => {
@@ -471,6 +475,15 @@ const Index = () => {
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
+
+          <div className="h-6 w-px bg-border" />
+
+          {/* Field Groups */}
+          <FieldGroupManager
+            selectedFields={selectedFields}
+            fieldPositions={fieldPositions}
+            onApplyGroup={handleApplyGroup}
+          />
 
           <div className="h-6 w-px bg-border" />
 
