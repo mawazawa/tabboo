@@ -990,6 +990,36 @@ export type Database = {
           },
         ]
       }
+      legal_documents: {
+        Row: {
+          content: Json | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: Json | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: Json | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       McpConnection: {
         Row: {
           createdAt: string
