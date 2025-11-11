@@ -77,12 +77,13 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   };
 
   const handlePointerDown = (e: React.PointerEvent, field: string, currentTop: number, currentLeft: number) => {
-    // Only allow drag if field is in edit mode
-    if (editModeField !== field) return;
-    
     // Prevent drag if clicking on input/textarea/button elements
     const target = e.target as HTMLElement;
     if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.closest('button')) return;
+    
+    // Allow direct drag without edit mode - but only if holding Ctrl/Cmd or field is in edit mode
+    const isDragAllowed = editModeField === field || e.ctrlKey || e.metaKey;
+    if (!isDragAllowed) return;
     
     e.preventDefault();
     e.stopPropagation();
@@ -201,10 +202,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   }];
 
   return (
-    <Card className="h-full border-hairline shadow-3point chamfered overflow-hidden">
-      <ScrollArea className="h-full">
-        <div className="relative min-h-full w-full flex items-center justify-center p-4 bg-muted/30">
-          <div className="w-full" style={{ maxWidth: `${pageWidth * zoom}px` }}>
+    <div className="h-full w-full overflow-auto bg-muted/20">
+      <div className="relative min-h-full w-full flex items-center justify-center p-4">
+        <div className="w-full" style={{ maxWidth: `${pageWidth * zoom}px` }}>
             <Document
               file="/fl320.pdf"
               onLoadSuccess={onDocumentLoadSuccess}
@@ -409,9 +409,8 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
               );
             })}
           </Document>
-          </div>
         </div>
-      </ScrollArea>
-    </Card>
+      </div>
+    </div>
   );
 };

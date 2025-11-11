@@ -357,10 +357,16 @@ const Index = () => {
             >
               <span className="text-lg font-semibold">−</span>
             </Button>
-            <div className="flex items-center gap-1 px-2 min-w-[100px] justify-center">
-              <FileText className="h-3.5 w-3.5 text-muted-foreground" strokeWidth={0.5} />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setPdfZoom(1)}
+              title="Fit to page"
+              className="flex items-center gap-1 px-3 min-w-[100px] justify-center hover:bg-primary/10 hover:text-primary transition-colors"
+            >
+              <FileText className="h-3.5 w-3.5" strokeWidth={0.5} />
               <span className="text-sm font-medium">{Math.round(pdfZoom * 100)}%</span>
-            </div>
+            </Button>
             <Button
               variant="ghost"
               size="sm"
@@ -433,17 +439,15 @@ const Index = () => {
               
               {/* PDF Viewer */}
               <ResizablePanel defaultSize={showThumbnails ? 70 : 100} minSize={50}>
-                <div className="h-full w-full overflow-auto bg-muted/20">
-                  <FormViewer 
-                    formData={formData} 
-                    updateField={updateField}
-                    currentFieldIndex={currentFieldIndex}
-                    setCurrentFieldIndex={setCurrentFieldIndex}
-                    fieldPositions={fieldPositions}
-                    updateFieldPosition={updateFieldPosition}
-                    zoom={pdfZoom}
-                  />
-                </div>
+                <FormViewer 
+                  formData={formData} 
+                  updateField={updateField}
+                  currentFieldIndex={currentFieldIndex}
+                  setCurrentFieldIndex={setCurrentFieldIndex}
+                  fieldPositions={fieldPositions}
+                  updateFieldPosition={updateFieldPosition}
+                  zoom={pdfZoom}
+                />
               </ResizablePanel>
             </ResizablePanelGroup>
           </ResizablePanel>

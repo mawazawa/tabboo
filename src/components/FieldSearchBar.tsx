@@ -50,11 +50,8 @@ export const FieldSearchBar = ({
       />
       <Button
         size="sm"
-        variant={value.trim() ? "default" : "ghost"}
-        className={cn(
-          "absolute right-1 gap-1.5 transition-all",
-          value.trim() ? "bg-primary text-primary-foreground hover:bg-primary/90" : ""
-        )}
+        variant="default"
+        className="absolute right-1 gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 shadow-3point chamfered"
         onClick={handleAISubmit}
         disabled={!value.trim()}
       >
