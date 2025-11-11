@@ -28,7 +28,7 @@ export const AIAssistant = ({ formContext, vaultData }: AIAssistantProps) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "👋 Hi! I'm your SwiftFill Pro AI Assistant powered by Groq's Llama 3.3. I can see your form data and Personal Data Vault. I'll help you fill out forms accurately and flag any missing required information. What would you like help with?"
+      content: "👋 Hi! I'm your SwiftFill Pro AI Assistant powered by Groq Llama 3.3 (with Gemini Flash 2.5 fallback). I can see your form data and Personal Data Vault. I'll help you fill out forms accurately and flag any missing required information. What would you like help with?"
     }
   ]);
   const [input, setInput] = useState('');

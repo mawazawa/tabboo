@@ -64,11 +64,8 @@ serve(async (req) => {
     const validated = chatRequestSchema.parse(body);
     const { messages, formContext } = validated;
     const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
-    if (!GROQ_API_KEY) {
-      throw new Error('GROQ_API_KEY is not configured');
-    }
-
     console.log('Received chat request with', messages.length, 'messages');
     
     if (formContext) {
@@ -93,54 +90,96 @@ You have access to the user's current form data and can help them with:
       systemPrompt += `\n\nCurrent form data:\n${JSON.stringify(formContext, null, 2)}`;
     }
 
-    console.log('Calling Groq API with model:', 'llama-3.3-70b-versatile');
-    
-    const groqPayload = {
-      model: 'llama-3.3-70b-versatile', // Production model - more reliable than preview models
-      messages: [
-        { role: 'system', content: systemPrompt },
-        ...messages,
-      ],
-      stream: true,
-      temperature: 0.7,
-      max_tokens: 2048,
-    };
-    
-    console.log('Groq request payload:', JSON.stringify(groqPayload).substring(0, 500));
+    const chatMessages = [
+      { role: 'system', content: systemPrompt },
+      ...messages,
+    ];
 
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${GROQ_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(groqPayload),
-    });
+    // Try Groq first
+    let response: Response | null = null;
+    let usingFallback = false;
 
-    console.log('Groq API response status:', response.status);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Groq API error details:', {
-        status: response.status,
-        statusText: response.statusText,
-        errorBody: errorText
-      });
+    if (GROQ_API_KEY) {
+      console.log('Attempting Groq API with model: llama-3.3-70b-versatile');
       
-      if (response.status === 429) {
+      try {
+        response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${GROQ_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'llama-3.3-70b-versatile',
+            messages: chatMessages,
+            stream: true,
+            temperature: 0.7,
+            max_tokens: 2048,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Groq API error:', { status: response.status, error: errorText });
+          response = null; // Will trigger fallback
+        } else {
+          console.log('✓ Groq API successful');
+        }
+      } catch (error) {
+        console.error('Groq API exception:', error);
+        response = null;
+      }
+    }
+
+    // Fallback to Lovable AI (Google Gemini Flash 2.5)
+    if (!response && LOVABLE_API_KEY) {
+      console.log('Falling back to Lovable AI (Google Gemini Flash 2.5)');
+      usingFallback = true;
+
+      try {
+        response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'google/gemini-2.5-flash',
+            messages: chatMessages,
+            stream: true,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Lovable AI error:', { status: response.status, error: errorText });
+          
+          if (response.status === 429) {
+            return new Response(
+              JSON.stringify({ error: 'Rate limit exceeded on fallback service. Please try again in a moment.' }),
+              { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+          
+          return new Response(
+            JSON.stringify({ error: 'Both AI services unavailable', details: errorText.substring(0, 200) }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        
+        console.log('✓ Lovable AI (Gemini Flash 2.5) successful');
+      } catch (error) {
+        console.error('Lovable AI exception:', error);
         return new Response(
-          JSON.stringify({ error: 'Rate limit exceeded. Please try again in a moment.' }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          JSON.stringify({ error: 'All AI services failed' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-      
-      // Return more specific error information
+    }
+
+    if (!response) {
       return new Response(
-        JSON.stringify({ 
-          error: 'AI service error', 
-          details: errorText.substring(0, 200),
-          status: response.status 
-        }),
+        JSON.stringify({ error: 'No AI service available. Please check API keys.' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -152,6 +191,7 @@ You have access to the user's current form data and can help them with:
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
+        'X-AI-Provider': usingFallback ? 'lovable-gemini' : 'groq-llama',
       },
     });
   } catch (error) {
