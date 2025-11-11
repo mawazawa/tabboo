@@ -1,9 +1,10 @@
 import { FormViewer } from "@/components/FormViewer";
 import { FieldNavigationPanel } from "@/components/FieldNavigationPanel";
-import { AIAssistant } from "@/components/AIAssistant";
+import { DraggableAIAssistant } from "@/components/DraggableAIAssistant";
 import { PersonalDataVault } from "@/components/PersonalDataVault";
 import { PersonalDataVaultPanel } from "@/components/PersonalDataVaultPanel";
 import { PDFThumbnailSidebar } from "@/components/PDFThumbnailSidebar";
+import { FieldSearchBar } from "@/components/FieldSearchBar";
 import { FileText, MessageSquare, LogOut, Loader2, Calculator, PanelLeftClose, PanelRightClose, Shield } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
@@ -67,6 +68,8 @@ const Index = () => {
   const [currentPDFPage, setCurrentPDFPage] = useState(1);
   const [pdfZoom, setPdfZoom] = useState(1);
   const [showThumbnails, setShowThumbnails] = useState(true);
+  const [thumbnailPanelWidth, setThumbnailPanelWidth] = useState(256);
+  const [fieldSearchQuery, setFieldSearchQuery] = useState("");
   const { toast } = useToast();
   const hasUnsavedChanges = useRef(false);
 
@@ -247,7 +250,7 @@ const Index = () => {
                 <p className="text-sm text-muted-foreground">AI-Powered Legal Form Assistant</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-1">
               <NavigationMenu>
                 <NavigationMenuList>
                   <NavigationMenuItem>
@@ -287,6 +290,19 @@ const Index = () => {
                   </NavigationMenuItem>
                 </NavigationMenuList>
               </NavigationMenu>
+
+              {/* Search/AI Input */}
+              <FieldSearchBar 
+                onFieldSearch={(query) => setFieldSearchQuery(query)}
+                onAIQuery={(query) => {
+                  setShowAIPanel(true);
+                  // TODO: Send query to AI assistant
+                  toast({
+                    title: "AI Query",
+                    description: `Sending to AI: ${query}`,
+                  });
+                }}
+              />
 
               <Button variant="outline" size="sm" onClick={handleLogout} className="gap-2">
                 <LogOut className="h-4 w-4" strokeWidth={0.5} />
@@ -387,30 +403,28 @@ const Index = () => {
         </div>
 
         <ResizablePanelGroup direction="horizontal" className="h-[calc(100vh-220px)] w-full">
-          {/* Left: AI Assistant Panel (collapsible) */}
-          {showAIPanel && (
-            <>
-              <ResizablePanel defaultSize={25} minSize={20} maxSize={35}>
-                <div className="h-full pr-3">
-                  <AIAssistant formContext={formData} vaultData={vaultData} />
-                </div>
-              </ResizablePanel>
-              <ResizableHandle withHandle />
-            </>
-          )}
-
           {/* Center: Form Viewer with PDF + Thumbnail Sidebar */}
-          <ResizablePanel defaultSize={showAIPanel ? 50 : 70} minSize={30}>
+          <ResizablePanel defaultSize={70} minSize={30}>
             <ResizablePanelGroup direction="horizontal" className="h-full">
               {/* Resizable Thumbnail Sidebar */}
               {showThumbnails && (
                 <>
-                  <ResizablePanel defaultSize={30} minSize={20} maxSize={40}>
+                  <ResizablePanel 
+                    defaultSize={30} 
+                    minSize={20} 
+                    maxSize={40}
+                    onResize={(size) => {
+                      // Convert percentage to pixels (approximate)
+                      const containerWidth = window.innerWidth * 0.7; // 70% of viewport
+                      setThumbnailPanelWidth((size / 100) * containerWidth);
+                    }}
+                  >
                     <PDFThumbnailSidebar 
                       currentPage={currentPDFPage}
                       onPageClick={setCurrentPDFPage}
                       currentFieldPosition={getCurrentFieldPosition()}
                       showFieldIndicator={currentFieldIndex >= 0}
+                      panelWidth={thumbnailPanelWidth}
                     />
                   </ResizablePanel>
                   <ResizableHandle withHandle className="hover:bg-primary/30 transition-colors" />
@@ -419,7 +433,7 @@ const Index = () => {
               
               {/* PDF Viewer */}
               <ResizablePanel defaultSize={showThumbnails ? 70 : 100} minSize={50}>
-                <div className="h-full overflow-auto bg-muted/20">
+                <div className="h-full w-full overflow-auto bg-muted/20">
                   <FormViewer 
                     formData={formData} 
                     updateField={updateField}
@@ -457,6 +471,14 @@ const Index = () => {
             </>
           )}
         </ResizablePanelGroup>
+
+        {/* Draggable AI Assistant */}
+        <DraggableAIAssistant 
+          formContext={formData}
+          vaultData={vaultData}
+          isVisible={showAIPanel}
+          onToggleVisible={() => setShowAIPanel(!showAIPanel)}
+        />
       </main>
     </div>
   );

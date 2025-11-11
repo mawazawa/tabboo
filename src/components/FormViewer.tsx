@@ -201,33 +201,35 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   }];
 
   return (
-    <Card className="h-full border-hairline shadow-3point chamfered">
+    <Card className="h-full border-hairline shadow-3point chamfered overflow-hidden">
       <ScrollArea className="h-full">
-        <div className="relative">
-          <Document
-            file="/fl320.pdf"
-            onLoadSuccess={onDocumentLoadSuccess}
-            className="flex flex-col items-center"
-          >
-            {Array.from(new Array(numPages), (el, index) => {
-              const pageNum = index + 1;
-              const pageOverlays = fieldOverlays.find(o => o.page === pageNum);
+        <div className="relative min-h-full w-full flex items-center justify-center p-4 bg-muted/30">
+          <div style={{ maxWidth: `${pageWidth * zoom}px`, width: '100%' }}>
+            <Document
+              file="/fl320.pdf"
+              onLoadSuccess={onDocumentLoadSuccess}
+              className="flex flex-col items-center w-full"
+            >
+              {Array.from(new Array(numPages), (el, index) => {
+                const pageNum = index + 1;
+                const pageOverlays = fieldOverlays.find(o => o.page === pageNum);
 
-              return (
-                <div 
-                  key={`page_${pageNum}`}
-                  className="relative mb-4 touch-none"
-                  onPointerMove={handlePointerMove}
-                  onPointerUp={handlePointerUp}
-                  onPointerLeave={handlePointerUp}
-                  onClick={handlePDFClick}
-                >
-                  <Page
-                    pageNumber={pageNum}
-                    width={pageWidth * zoom}
-                    renderTextLayer={true}
-                    renderAnnotationLayer={false}
-                  />
+                return (
+                  <div 
+                    key={`page_${pageNum}`}
+                    className="relative mb-4 touch-none w-full"
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
+                    onPointerLeave={handlePointerUp}
+                    onClick={handlePDFClick}
+                  >
+                    <Page
+                      pageNumber={pageNum}
+                      width={pageWidth * zoom}
+                      renderTextLayer={true}
+                      renderAnnotationLayer={false}
+                      className="w-full"
+                    />
                   
                   {pageOverlays && (
                     <div className="absolute inset-0">
@@ -407,6 +409,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
               );
             })}
           </Document>
+          </div>
         </div>
       </ScrollArea>
     </Card>

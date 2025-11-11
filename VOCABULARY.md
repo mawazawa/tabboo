@@ -494,6 +494,169 @@ const optimisticUpdate = async (field: string, value: string) => {
 
 ---
 
+## Viewport-Relative Positioning
+
+### Viewport-Anchored Elements
+**Technical**: UI components that maintain fixed position relative to the viewport during scroll operations, using `position: sticky` or `position: fixed` to remain visible regardless of content scroll state.
+
+**Purpose**: Ensures critical interactive affordances remain accessible without requiring user navigation.
+
+**Implementation**:
+```css
+.viewport-anchored {
+  position: sticky;
+  top: 50vh; /* Centers vertically in viewport */
+  transform: translateY(-50%); /* Precise centering */
+  z-index: var(--z-sticky);
+}
+```
+
+**Use Cases**:
+- Resizable panel handles
+- Floating action buttons
+- Persistent navigation controls
+- Scroll-independent tools
+
+---
+
+## Fluid Layout Architecture
+
+### Container-Adaptive Scaling
+**Technical**: Layout pattern where child elements scale proportionally to their parent container dimensions, maintaining aspect ratio while maximizing spatial economy.
+
+**Problem Solved**: Fixed-dimension containers that waste available real estate or create unnecessary scrolling.
+
+**Implementation**:
+```typescript
+// Fluid container with aspect-preserved content
+<div className="w-full h-full flex items-center justify-center">
+  <div style={{
+    width: '100%',
+    maxWidth: `${pageWidth * zoom}px`,
+    aspectRatio: '8.5/11', // Letter size
+  }}>
+    <Page width={pageWidth * zoom} />
+  </div>
+</div>
+```
+
+### Scaling Rigidity
+**Anti-pattern**: Fixed dimensions that prevent adaptive layout behavior.
+
+**Example**:
+```css
+/* ❌ Scaling rigidity */
+.thumbnail {
+  width: 180px; /* Fixed, non-responsive */
+}
+
+/* ✅ Fluid scaling */
+.thumbnail {
+  width: 100%; /* Adapts to container */
+  max-width: 240px;
+  aspect-ratio: 8.5/11;
+}
+```
+
+---
+
+## Glassmorphic Floating Architecture
+
+### Draggable Glass Components
+**Pattern**: Semi-transparent, backdrop-blurred UI elements with unrestricted viewport positioning capability and state minimization.
+
+**Characteristics**:
+- **Spatial freedom**: Can be positioned anywhere in viewport via drag-and-drop
+- **Z-elevation**: Floats above primary content with appropriate shadow depth
+- **State transitions**: Expands from minimized icon to full panel
+- **Visual treatment**: Glassmorphism with subtle border and shadow
+
+**Implementation**:
+```typescript
+interface FloatingComponentProps {
+  position: { x: number; y: number };
+  isMinimized: boolean;
+  onDrag: (delta: { x: number; y: number }) => void;
+  onToggleMinimize: () => void;
+}
+
+const FloatingGlassPanel = ({ position, isMinimized, onDrag }: FloatingComponentProps) => (
+  <div
+    className="fixed glass-surface rounded-2xl shadow-3point"
+    style={{
+      left: `${position.x}px`,
+      top: `${position.y}px`,
+      width: isMinimized ? '56px' : '400px',
+      height: isMinimized ? '56px' : '600px',
+      zIndex: 'var(--z-modal)',
+      transition: 'width 0.3s var(--ease-spring), height 0.3s var(--ease-spring)',
+    }}
+    onMouseDown={(e) => handleDragStart(e, onDrag)}
+  >
+    {/* Content */}
+  </div>
+);
+```
+
+**Apple HIG Alignment**:
+- Unrestricted positioning honors user spatial preference
+- Minimize state reduces cognitive overhead when not in use
+- Glassmorphic treatment creates clear visual hierarchy
+
+---
+
+## Polymorphic Input Components
+
+### Dual-Mode Input Fields
+**Pattern**: A single input interface with multiple operational modes activated by distinct affordances.
+
+**Use Case**: Search/AI hybrid input where:
+- **Mode 1 (Search)**: Real-time keystroke filtering of form fields
+- **Mode 2 (AI Query)**: Natural language query submission to AI assistant
+
+**Implementation**:
+```typescript
+interface PolymorphicInputProps {
+  value: string;
+  onChange: (value: string) => void;
+  onSearch: (query: string) => void;
+  onAISubmit: (query: string) => void;
+}
+
+const PolymorphicInput = ({ value, onChange, onSearch, onAISubmit }: PolymorphicInputProps) => {
+  useEffect(() => {
+    // Real-time search mode
+    onSearch(value);
+  }, [value]);
+
+  return (
+    <div className="relative flex items-center">
+      <Search className="absolute left-3 text-muted-foreground" />
+      <Input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Search fields or ask AI..."
+        className="pl-10 pr-20"
+      />
+      <Button
+        size="sm"
+        className="absolute right-1"
+        onClick={() => onAISubmit(value)}
+      >
+        <MessageSquare className="h-4 w-4" />
+      </Button>
+    </div>
+  );
+};
+```
+
+**Interaction Design**:
+- Typing triggers search mode automatically
+- AI button click switches context to assistant query
+- Visual affordance differentiates modes (icon, button state)
+
+---
+
 ## Accessibility Considerations
 
 ### Focus Indicators

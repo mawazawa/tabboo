@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText } from "lucide-react";
@@ -12,29 +12,41 @@ interface Props {
   onPageClick?: (pageNumber: number) => void;
   currentFieldPosition?: { top: number; left: number } | null;
   showFieldIndicator?: boolean;
+  panelWidth?: number;
 }
 
 export const PDFThumbnailSidebar = ({ 
   currentPage = 1, 
   onPageClick, 
   currentFieldPosition = null,
-  showFieldIndicator = false 
+  showFieldIndicator = false,
+  panelWidth = 256
 }: Props) => {
   const [numPages, setNumPages] = useState<number>(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [thumbnailWidth, setThumbnailWidth] = useState(240);
+
+  // Auto-scale thumbnails based on panel width
+  useEffect(() => {
+    if (containerRef.current) {
+      const availableWidth = containerRef.current.offsetWidth - 32; // Account for padding
+      setThumbnailWidth(Math.min(availableWidth, 280)); // Max 280px
+    }
+  }, [panelWidth]);
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
   };
 
   return (
-    <div className="w-64 border-r bg-card/50 backdrop-blur-sm flex flex-col h-full">
+    <div ref={containerRef} className="w-full border-r bg-card/50 backdrop-blur-sm flex flex-col h-full">
       <div className="border-b p-4 flex items-center gap-2 bg-card/80">
         <FileText className="h-5 w-5 text-primary" strokeWidth={0.5} />
         <span className="font-semibold text-sm">Pages</span>
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-3 space-y-3">
+        <div className="p-4 space-y-3">
           <Document
             file="/fl320.pdf"
             onLoadSuccess={onDocumentLoadSuccess}
@@ -54,13 +66,13 @@ export const PDFThumbnailSidebar = ({
                       : "ring-2 ring-border hover:ring-primary/50 shadow-3point"
                   }`}
                 >
-                  <div className="relative">
+                  <div className="relative w-full">
                     <Page
                       pageNumber={pageNum}
-                      width={240}
+                      width={thumbnailWidth}
                       renderTextLayer={false}
                       renderAnnotationLayer={false}
-                      className="chamfered"
+                      className="chamfered w-full"
                     />
                     {/* Minimap Field Indicator - only shows on current page */}
                     {isActive && showFieldIndicator && currentFieldPosition && (
