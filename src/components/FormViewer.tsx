@@ -51,12 +51,12 @@ interface Props {
   formData: FormData;
   updateField: (field: string, value: string | boolean) => void;
   currentFieldIndex: number;
+  setCurrentFieldIndex: (index: number) => void;
   fieldPositions: Record<string, { top: number; left: number }>;
   updateFieldPosition: (field: string, position: { top: number; left: number }) => void;
-  deselectField?: () => void;
 }
 
-export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPositions, updateFieldPosition, deselectField }: Props) => {
+export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition }: Props) => {
   const [numPages, setNumPages] = useState<number>(0);
   const [pageWidth, setPageWidth] = useState<number>(850);
   const [isDragging, setIsDragging] = useState<string | null>(null);
@@ -101,14 +101,16 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
   const toggleEditMode = (field: string) => {
     const newEditMode = editModeField === field ? null : field;
     setEditModeField(newEditMode);
-    // Also set this as the current field when entering edit mode
-    if (newEditMode && deselectField) {
-      // Find the field index and set it as current
-      const fieldIndex = fieldNameToIndex[field];
-      if (fieldIndex !== undefined) {
-        // You would need to pass setCurrentFieldIndex as a prop to do this
-        // For now, just toggle edit mode
-      }
+  };
+
+  const handleFieldClick = (field: string, e: React.MouseEvent) => {
+    // Prevent event propagation to avoid triggering PDF click
+    e.stopPropagation();
+    
+    // Set this field as active in the control panel
+    const fieldIndex = fieldNameToIndex[field];
+    if (fieldIndex !== undefined) {
+      setCurrentFieldIndex(fieldIndex);
     }
   };
 
@@ -142,9 +144,6 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
     // Only deselect if clicking directly on the PDF container, not on input fields
     if ((e.target as HTMLElement).closest('.field-container')) return;
     setEditModeField(null);
-    if (deselectField) {
-      deselectField();
-    }
   };
 
   const adjustPosition = (direction: 'up' | 'down' | 'left' | 'right', field: string) => {
@@ -260,6 +259,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, fieldPosi
                               height: overlay.height || 'auto',
                               pointerEvents: 'auto',
                             }}
+                            onClick={(e) => handleFieldClick(overlay.field, e)}
                             onPointerDown={(e) => handlePointerDown(e, overlay.field, position.top, position.left)}
                           >
                             {isCurrentField && !isEditMode && (

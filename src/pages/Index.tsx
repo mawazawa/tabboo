@@ -312,9 +312,9 @@ const Index = () => {
                 formData={formData} 
                 updateField={updateField}
                 currentFieldIndex={currentFieldIndex}
+                setCurrentFieldIndex={setCurrentFieldIndex}
                 fieldPositions={fieldPositions}
                 updateFieldPosition={updateFieldPosition}
-                deselectField={() => setCurrentFieldIndex(-1)}
               />
             </div>
           </ResizablePanel>
