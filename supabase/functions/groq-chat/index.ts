@@ -93,27 +93,39 @@ You have access to the user's current form data and can help them with:
       systemPrompt += `\n\nCurrent form data:\n${JSON.stringify(formContext, null, 2)}`;
     }
 
+    console.log('Calling Groq API with model:', 'llama-3.3-70b-versatile');
+    
+    const groqPayload = {
+      model: 'llama-3.3-70b-versatile', // Production model - more reliable than preview models
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages,
+      ],
+      stream: true,
+      temperature: 0.7,
+      max_tokens: 2048,
+    };
+    
+    console.log('Groq request payload:', JSON.stringify(groqPayload).substring(0, 500));
+
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${GROQ_API_KEY}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        model: 'moonshotai/kimi-k2-instruct-0905',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...messages,
-        ],
-        stream: true,
-        temperature: 0.7,
-        max_tokens: 2048,
-      }),
+      body: JSON.stringify(groqPayload),
     });
+
+    console.log('Groq API response status:', response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Groq API error:', response.status, errorText);
+      console.error('Groq API error details:', {
+        status: response.status,
+        statusText: response.statusText,
+        errorBody: errorText
+      });
       
       if (response.status === 429) {
         return new Response(
@@ -122,8 +134,13 @@ You have access to the user's current form data and can help them with:
         );
       }
       
+      // Return more specific error information
       return new Response(
-        JSON.stringify({ error: 'AI service error' }),
+        JSON.stringify({ 
+          error: 'AI service error', 
+          details: errorText.substring(0, 200),
+          status: response.status 
+        }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -139,8 +156,12 @@ You have access to the user's current form data and can help them with:
     });
   } catch (error) {
     console.error('Error in groq-chat function:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({ 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        type: error?.constructor?.name || 'Unknown'
+      }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

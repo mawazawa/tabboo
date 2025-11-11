@@ -28,7 +28,7 @@ export const AIAssistant = ({ formContext, vaultData }: AIAssistantProps) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "👋 Hi! I'm your SwiftFill Pro AI Assistant powered by Groq and Kimi 2. I can see your form data and Personal Data Vault. I'll help you fill out forms accurately and flag any missing required information. What would you like help with?"
+      content: "👋 Hi! I'm your SwiftFill Pro AI Assistant powered by Groq's Llama 3.3. I can see your form data and Personal Data Vault. I'll help you fill out forms accurately and flag any missing required information. What would you like help with?"
     }
   ]);
   const [input, setInput] = useState('');
@@ -143,7 +143,11 @@ export const AIAssistant = ({ formContext, vaultData }: AIAssistantProps) => {
         console.log('Stream complete');
       },
       onError: (error) => {
-        toast.error(error);
+        console.error('Stream error details:', error);
+        toast.error(error, {
+          description: "Please check the console for details",
+          duration: 5000
+        });
         setMessages(prev => prev.slice(0, -1));
       }
     });
