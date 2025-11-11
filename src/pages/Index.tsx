@@ -640,42 +640,44 @@ const Index = () => {
           <ResizablePanel 
             id="viewer-panel"
             order={1}
-            defaultSize={showFieldsPanel || showVaultPanel ? 75 : 100} 
+            defaultSize={75}
             minSize={30}
           >
             <ResizablePanelGroup direction="horizontal" className="h-full">
               {/* Resizable Thumbnail Sidebar */}
+              <ResizablePanel 
+                id="thumbnail-panel"
+                order={1}
+                defaultSize={25}
+                minSize={15}
+                maxSize={40}
+                collapsible={true}
+                collapsedSize={0}
+                onResize={(size) => {
+                  // Convert percentage to pixels (approximate)
+                  const containerWidth = window.innerWidth * 0.75; // 75% of viewport
+                  setThumbnailPanelWidth((size / 100) * containerWidth);
+                }}
+                className={showThumbnails ? "" : "hidden"}
+              >
+                <PDFThumbnailSidebar 
+                  currentPage={currentPDFPage}
+                  onPageClick={setCurrentPDFPage}
+                  currentFieldPosition={getCurrentFieldPosition()}
+                  showFieldIndicator={currentFieldIndex >= 0}
+                  panelWidth={thumbnailPanelWidth}
+                />
+              </ResizablePanel>
+              
               {showThumbnails && (
-                <>
-                  <ResizablePanel 
-                    id="thumbnail-panel"
-                    order={1}
-                    defaultSize={30} 
-                    minSize={20} 
-                    maxSize={40}
-                    onResize={(size) => {
-                      // Convert percentage to pixels (approximate)
-                      const containerWidth = window.innerWidth * 0.75; // 75% of viewport
-                      setThumbnailPanelWidth((size / 100) * containerWidth);
-                    }}
-                  >
-                    <PDFThumbnailSidebar 
-                      currentPage={currentPDFPage}
-                      onPageClick={setCurrentPDFPage}
-                      currentFieldPosition={getCurrentFieldPosition()}
-                      showFieldIndicator={currentFieldIndex >= 0}
-                      panelWidth={thumbnailPanelWidth}
-                    />
-                  </ResizablePanel>
-                  <ResizableHandleMulti withHandle className="hover:bg-primary/30 transition-colors" />
-                </>
+                <ResizableHandleMulti withHandle className="hover:bg-primary/30 transition-colors" />
               )}
               
               {/* PDF Viewer */}
               <ResizablePanel 
                 id="pdf-panel"
                 order={2}
-                defaultSize={showThumbnails ? 70 : 100} 
+                defaultSize={75}
                 minSize={50}
               >
                 <FormViewer 
@@ -695,47 +697,46 @@ const Index = () => {
           </ResizablePanel>
 
           {/* Right: Field Navigation Panel OR Vault Panel (collapsible) */}
-          {(showFieldsPanel || showVaultPanel) && (
-            <>
-              <ResizableHandleMulti withHandle className="hover:bg-primary/30 transition-colors" />
-              <ResizablePanel
-                id="right-panel"
-                order={2}
-                defaultSize={25} 
-                minSize={20} 
-                maxSize={35}
-              >
-                <div className="h-full pl-3">
-                  {showVaultPanel ? (
-                    <PersonalDataVaultPanel userId={user?.id || ''} />
-                  ) : (
-                    <FieldNavigationPanel 
-                      formData={formData} 
-                      updateField={updateField}
-                      currentFieldIndex={currentFieldIndex}
-                      setCurrentFieldIndex={setCurrentFieldIndex}
-                      fieldPositions={fieldPositions}
-                      updateFieldPosition={updateFieldPosition}
-                      selectedFields={selectedFields}
-                      setSelectedFields={setSelectedFields}
-                      onSnapToGrid={handleSnapToGrid}
-                      onAlignHorizontal={handleAlignHorizontal}
-                      onAlignVertical={handleAlignVertical}
-                      onDistribute={handleDistribute}
-                      onCopyPositions={handleCopyPositions}
-                      onPastePositions={handlePastePositions}
-                      onTransformPositions={handleTransformPositions}
-                      hasCopiedPositions={!!copiedFieldPositions}
-                      onFieldHover={setHighlightedField}
-                      validationRules={validationRules}
-                      validationErrors={validationErrors}
-                      onSaveValidationRules={handleSaveValidationRules}
-                    />
-                  )}
-                </div>
-              </ResizablePanel>
-            </>
-          )}
+          <ResizableHandleMulti withHandle className="hover:bg-primary/30 transition-colors" />
+          <ResizablePanel
+            id="right-panel"
+            order={2}
+            defaultSize={25}
+            minSize={20}
+            maxSize={40}
+            collapsible={true}
+            collapsedSize={0}
+            className={showFieldsPanel || showVaultPanel ? "" : "hidden"}
+          >
+            <div className="h-full pl-3">
+              {showVaultPanel ? (
+                <PersonalDataVaultPanel userId={user?.id || ''} />
+              ) : (
+                <FieldNavigationPanel 
+                  formData={formData} 
+                  updateField={updateField}
+                  currentFieldIndex={currentFieldIndex}
+                  setCurrentFieldIndex={setCurrentFieldIndex}
+                  fieldPositions={fieldPositions}
+                  updateFieldPosition={updateFieldPosition}
+                  selectedFields={selectedFields}
+                  setSelectedFields={setSelectedFields}
+                  onSnapToGrid={handleSnapToGrid}
+                  onAlignHorizontal={handleAlignHorizontal}
+                  onAlignVertical={handleAlignVertical}
+                  onDistribute={handleDistribute}
+                  onCopyPositions={handleCopyPositions}
+                  onPastePositions={handlePastePositions}
+                  onTransformPositions={handleTransformPositions}
+                  hasCopiedPositions={!!copiedFieldPositions}
+                  onFieldHover={setHighlightedField}
+                  validationRules={validationRules}
+                  validationErrors={validationErrors}
+                  onSaveValidationRules={handleSaveValidationRules}
+                />
+              )}
+            </div>
+          </ResizablePanel>
         </ResizablePanelGroup>
 
         {/* Draggable AI Assistant */}

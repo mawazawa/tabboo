@@ -78,7 +78,7 @@ _Last Updated: [Current Session]_
 - [x] **Field Position Presets**: Implemented snap-to-grid, align (left/right/center), and distribute evenly controls for quicker field positioning.
 - [x] **Template System**: Added ability to import/export JSON mappings of field coordinates to crowdsource form templates via the settings menu.
 - [x] **Thumbnail Sidebar Cleanup**: Updated thumbnail sidebar to display only the PDF content (no UI components) and made field clicking functional.
-- [ ] **Layout Warnings Fix**: Address outstanding layout warnings and ResizablePanel size issues to ensure consistent sizing.
+- [x] **Layout Warnings Fix**: Address outstanding layout warnings and ResizablePanel size issues to ensure consistent sizing.
 - [x] **AI Service Reliability Improvements**: Added detailed error logging and switched to a production model to improve AI assistant reliability.
 - [ ] **Personal Data Vault UI**: Display the Personal Data Vault alongside Form Field components in the top navigation for side-by-side comparison of vault data with required fields.
 - [x] **Drag‑and‑Drop Fix**: Enabled drag-and-drop of form fields in edit mode by ensuring pointer events pass through elements correctly.
