@@ -82,19 +82,19 @@ export const TutorialTooltips = () => {
 
   return (
     <>
-      {/* Backdrop overlay */}
-      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[100] animate-in fade-in duration-300" />
+      {/* Backdrop overlay - pointer events disabled so it doesn't block clicks */}
+      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[9998] pointer-events-none animate-in fade-in duration-300" />
       
       {/* Tutorial tooltip */}
       <div
-        className="fixed z-[101] animate-in fade-in slide-in-from-top-4 duration-500"
+        className="fixed z-[9999] animate-in fade-in slide-in-from-top-4 duration-500"
         style={{
-          top: step.position.top,
-          left: step.position.left,
+          top: "50%",
+          left: "50%",
           transform: "translate(-50%, -50%)"
         }}
       >
-        <div className="bg-card border-2 border-primary rounded-xl shadow-3point max-w-md p-6 chamfered">
+        <div className="bg-card border-2 border-primary rounded-xl shadow-lg max-w-md p-6 pointer-events-auto">
           {/* Header */}
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
