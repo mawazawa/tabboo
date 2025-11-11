@@ -3,6 +3,7 @@ import { FieldNavigationPanel } from "@/components/FieldNavigationPanel";
 import { AIAssistant } from "@/components/AIAssistant";
 import { PersonalDataVault } from "@/components/PersonalDataVault";
 import { PersonalDataVaultPanel } from "@/components/PersonalDataVaultPanel";
+import { PDFThumbnailSidebar } from "@/components/PDFThumbnailSidebar";
 import { FileText, MessageSquare, LogOut, Loader2, Calculator, PanelLeftClose, PanelRightClose, Shield } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import {
   Sheet,
   SheetContent,
@@ -62,6 +64,7 @@ const Index = () => {
   const [showAIPanel, setShowAIPanel] = useState(false);
   const [showFieldsPanel, setShowFieldsPanel] = useState(true);
   const [showVaultPanel, setShowVaultPanel] = useState(false);
+  const [currentPDFPage, setCurrentPDFPage] = useState(1);
   const { toast } = useToast();
   const hasUnsavedChanges = useRef(false);
 
@@ -195,12 +198,21 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      {/* Header */}
-      <header className="border-b-2 bg-card/80 backdrop-blur-sm sticky top-0 z-50 shadow-medium">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+    <SidebarProvider>
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 w-full flex">
+        {/* PDF Thumbnail Sidebar */}
+        <PDFThumbnailSidebar 
+          currentPage={currentPDFPage}
+          onPageClick={setCurrentPDFPage}
+        />
+
+        <div className="flex-1 flex flex-col">
+          {/* Header */}
+          <header className="border-b-2 bg-card/80 backdrop-blur-sm sticky top-0 z-50 shadow-medium">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <SidebarTrigger className="h-9 w-9" />
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-glow">
                 <FileText className="w-6 h-6 text-primary-foreground" strokeWidth={0.5} />
               </div>
@@ -285,13 +297,13 @@ const Index = () => {
                 <LogOut className="h-4 w-4" strokeWidth={0.5} />
                 Logout
               </Button>
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+          </header>
 
-      {/* Main Content with Resizable Panels */}
-      <main className="container mx-auto px-4 py-6">
+          {/* Main Content with Resizable Panels */}
+          <main className="container mx-auto px-4 py-6">
         <ResizablePanelGroup direction="horizontal" className="h-[calc(100vh-140px)] w-full">
           {/* Left: AI Assistant Panel (collapsible) */}
           {showAIPanel && (
@@ -341,9 +353,11 @@ const Index = () => {
               </ResizablePanel>
             </>
           )}
-        </ResizablePanelGroup>
-      </main>
-    </div>
+          </ResizablePanelGroup>
+          </main>
+        </div>
+      </div>
+    </SidebarProvider>
   );
 };
 

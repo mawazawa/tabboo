@@ -202,9 +202,31 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
     updateFieldPosition(targetField, newPosition);
   };
 
-  // Handle keyboard arrow keys
+  // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+      const modKey = isMac ? e.metaKey : e.ctrlKey;
+      
+      // Cmd/Ctrl+K to toggle positioning control
+      if (modKey && e.key === 'k') {
+        e.preventDefault();
+        setShowPositionControl(prev => !prev);
+        return;
+      }
+
+      // Tab to move to next field, Shift+Tab to move to previous field
+      if (e.key === 'Tab' && !['INPUT', 'TEXTAREA'].includes((document.activeElement as HTMLElement)?.tagName)) {
+        e.preventDefault();
+        if (e.shiftKey) {
+          setCurrentFieldIndex(Math.max(0, currentFieldIndex - 1));
+        } else {
+          setCurrentFieldIndex(Math.min(FIELD_CONFIG.length - 1, currentFieldIndex + 1));
+        }
+        return;
+      }
+
+      // Arrow keys for positioning (when not typing in input/textarea)
       if (document.activeElement === positionInputRef.current ||
           !['INPUT', 'TEXTAREA'].includes((document.activeElement as HTMLElement)?.tagName)) {
         if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
@@ -219,11 +241,16 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
           adjustPosition(direction);
         }
       }
+
+      // Escape to close positioning control
+      if (e.key === 'Escape') {
+        setShowPositionControl(false);
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentFieldIndex, fieldPositions]);
+  }, [currentFieldIndex, fieldPositions, showPositionControl]);
 
   return (
     <Card className="h-full border-hairline shadow-3point chamfered flex flex-col">
@@ -233,6 +260,11 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
           <p className="text-xs text-muted-foreground mt-1">
             Field {currentFieldIndex + 1} of {FIELD_CONFIG.length}
           </p>
+          <div className="text-[10px] text-muted-foreground mt-2 space-y-0.5">
+            <div>⌘K • Toggle positioning</div>
+            <div>Tab • Next field</div>
+            <div>Arrows • Adjust position</div>
+          </div>
         </div>
 
         <div className="flex gap-2">
