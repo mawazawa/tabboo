@@ -84,10 +84,13 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   const handlePointerDown = (e: React.PointerEvent, field: string, currentTop: number, currentLeft: number) => {
     const target = e.target as HTMLElement;
     
-    // Only prevent drag if clicking directly on buttons (not the drag handle)
-    if (target.tagName === 'BUTTON' && !target.closest('.drag-handle')) return;
+    // Allow drag from the gear/move icon button
+    const isDragHandle = target.closest('.drag-handle');
     
-    // Allow drag from anywhere on the container or its children (including inputs)
+    // Prevent drag from other buttons (like autofill)
+    if (target.tagName === 'BUTTON' && !isDragHandle) return;
+    
+    // Allow drag from anywhere on the container or the drag handle
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(field);
@@ -385,15 +388,6 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             onClick={(e) => handleFieldClick(overlay.field, e)}
                             onPointerDown={(e) => handlePointerDown(e, overlay.field, position.top, position.left)}
                           >
-                            {/* Visual Drag Handle Indicator */}
-                            <div className="drag-handle absolute -left-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                              <div className="flex flex-col gap-0.5 bg-primary/80 p-1.5 rounded-lg shadow-lg">
-                                <div className="h-0.5 w-3 bg-primary-foreground rounded"></div>
-                                <div className="h-0.5 w-3 bg-primary-foreground rounded"></div>
-                                <div className="h-0.5 w-3 bg-primary-foreground rounded"></div>
-                              </div>
-                            </div>
-                            
                             {isCurrentField && !isEditMode && (
                               <>
                                 <div className="absolute -top-10 left-0 bg-primary text-primary-foreground px-3 py-2 rounded-lg text-sm font-medium shadow-3point whitespace-nowrap chamfered flex items-center gap-2">
@@ -473,7 +467,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             <Button
                               size="icon"
                               variant={isEditMode ? "default" : "default"}
-                              className={`settings-button absolute -top-3 -right-3 h-10 w-10 rounded-full shadow-3point z-10 spring-hover chamfered touch-none ${
+                              className={`settings-button drag-handle absolute -top-3 -right-3 h-10 w-10 rounded-full shadow-3point z-10 spring-hover chamfered cursor-grab ${
                                 isEditMode ? 'bg-green-600 hover:bg-green-700' : ''
                               }`}
                               onClick={(e) => {
@@ -481,15 +475,12 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 e.stopPropagation();
                                 toggleEditMode(overlay.field);
                               }}
-                              onPointerDown={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                              }}
+                              title="Click to toggle edit mode, or drag to move field"
                             >
                               {isEditMode ? (
                                 <Move className="h-5 w-5" strokeWidth={0.5} />
                               ) : (
-                                <Settings className="h-5 w-5" strokeWidth={0.5} />
+                                <Move className="h-5 w-5" strokeWidth={0.5} />
                               )}
                             </Button>
                             
