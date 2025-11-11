@@ -17,12 +17,13 @@ import {
 import type { FormTemplate } from "@/utils/templateManager";
 import { autofillAllFromVault, getAutofillableFields, type PersonalVaultData } from "@/utils/vaultFieldMatcher";
 import { preloadDistributionCalculator } from "@/utils/routePreloader";
+import { prefetchUserData } from "@/utils/dataPrefetcher";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { ResizableHandleMulti } from "@/components/ui/resizable-handle-multi";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -68,6 +69,7 @@ interface FormData {
 
 const Index = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState<FormData>({});
@@ -305,12 +307,14 @@ const Index = () => {
     return fieldPositions[currentFieldName] || fieldConfigs[currentFieldIndex];
   };
 
-  // Check authentication
+  // Check authentication and prefetch data
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         setUser(session.user);
         setLoading(false);
+        // Prefetch user data immediately for faster perceived performance
+        prefetchUserData(queryClient, session.user);
       } else {
         navigate("/auth");
       }
@@ -320,20 +324,35 @@ const Index = () => {
       if (session?.user) {
         setUser(session.user);
         setLoading(false);
+        // Prefetch user data on auth state change
+        prefetchUserData(queryClient, session.user);
       } else {
         navigate("/auth");
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, queryClient]);
 
-  // Load existing data when user is authenticated
+  // Load existing data when user is authenticated (use cached data if available)
   useEffect(() => {
     if (!user) return;
 
     const loadData = async () => {
+      // Try to get cached data first
+      const cachedData = queryClient.getQueryData(['legal-document', user.id, 'FL-320 Form']);
+      
+      if (cachedData) {
+        const data = cachedData as any;
+        setDocumentId(data.id);
+        setFormData(data.content || {});
+        const metadata = data.metadata as any;
+        setFieldPositions(metadata?.fieldPositions || {});
+        setValidationRules(metadata?.validationRules || {});
+        return;
+      }
 
+      // If not cached, fetch from database
       const { data, error } = await supabase
         .from('legal_documents' as any)
         .select('*')
@@ -365,7 +384,7 @@ const Index = () => {
     };
 
     loadData();
-  }, [user]);
+  }, [user, queryClient]);
 
   // Autosave every 5 seconds
   useEffect(() => {
