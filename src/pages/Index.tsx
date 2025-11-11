@@ -22,6 +22,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
+import { ResizableHandleMulti } from "@/components/ui/resizable-handle-multi";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import {
   Sheet,
@@ -625,7 +626,7 @@ const Index = () => {
                       panelWidth={thumbnailPanelWidth}
                     />
                   </ResizablePanel>
-                  <ResizableHandle withHandle className="hover:bg-primary/30 transition-colors" />
+                  <ResizableHandleMulti withHandle className="hover:bg-primary/30 transition-colors" />
                 </>
               )}
               
@@ -654,8 +655,8 @@ const Index = () => {
           {/* Right: Field Navigation Panel OR Vault Panel (collapsible) */}
           {(showFieldsPanel || showVaultPanel) && (
             <>
-              <ResizableHandle withHandle />
-              <ResizablePanel 
+              <ResizableHandleMulti withHandle className="hover:bg-primary/30 transition-colors" />
+              <ResizablePanel
                 id="right-panel"
                 order={2}
                 defaultSize={25} 

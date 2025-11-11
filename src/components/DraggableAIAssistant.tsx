@@ -66,7 +66,7 @@ export const DraggableAIAssistant = ({ formContext, vaultData, isVisible, onTogg
         "fixed z-50 transition-all duration-300 ease-spring rounded-2xl shadow-3point",
         "bg-card/95 backdrop-blur-xl border-2 border-border/30",
         isDragging ? "cursor-grabbing scale-105 shadow-glow" : "cursor-grab",
-        isMinimized ? "w-14 h-14" : "w-[400px] h-[600px]"
+        isMinimized ? "w-14 h-14 animate-float" : "w-[400px] h-[600px]"
       )}
       style={{
         left: `${position.x}px`,
@@ -81,7 +81,7 @@ export const DraggableAIAssistant = ({ formContext, vaultData, isVisible, onTogg
           className="w-full h-full rounded-2xl hover:bg-primary/20"
           onClick={() => setIsMinimized(false)}
         >
-          <MessageSquare className="h-6 w-6 text-primary" strokeWidth={0.5} />
+          <MessageSquare className="h-6 w-6 text-primary animate-pulse" strokeWidth={0.5} />
         </Button>
       ) : (
         <div className="flex flex-col h-full" onClick={(e) => e.stopPropagation()}>
