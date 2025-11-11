@@ -54,7 +54,7 @@ export const PDFThumbnailSidebar = ({
                 <Document
                   file="/fl320.pdf"
                   onLoadSuccess={onDocumentLoadSuccess}
-                  className="flex flex-col items-center"
+                  className="flex flex-col"
                 >
                   {Array.from(new Array(numPages), (el, index) => {
                     const pageNum = index + 1;
