@@ -65,6 +65,8 @@ const Index = () => {
   const [showFieldsPanel, setShowFieldsPanel] = useState(true);
   const [showVaultPanel, setShowVaultPanel] = useState(false);
   const [currentPDFPage, setCurrentPDFPage] = useState(1);
+  const [pdfZoom, setPdfZoom] = useState(1);
+  const [showThumbnails, setShowThumbnails] = useState(true);
   const { toast } = useToast();
   const hasUnsavedChanges = useRef(false);
 
@@ -286,35 +288,6 @@ const Index = () => {
                 </NavigationMenuList>
               </NavigationMenu>
 
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="gap-2"
-                onClick={() => setShowAIPanel(!showAIPanel)}
-              >
-                <MessageSquare className="h-4 w-4" strokeWidth={0.5} />
-                AI Assistant
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="gap-2"
-                onClick={() => setShowFieldsPanel(!showFieldsPanel)}
-              >
-                <PanelRightClose className="h-4 w-4" strokeWidth={0.5} />
-                Fields
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className={`gap-2 ${showVaultPanel ? 'bg-primary/10 border-primary' : ''}`}
-                onClick={() => setShowVaultPanel(!showVaultPanel)}
-              >
-                <Shield className="h-4 w-4" strokeWidth={0.5} />
-                Vault
-              </Button>
               <Button variant="outline" size="sm" onClick={handleLogout} className="gap-2">
                 <LogOut className="h-4 w-4" strokeWidth={0.5} />
                 Logout
@@ -326,7 +299,94 @@ const Index = () => {
 
       {/* Main Content with Resizable Panels */}
       <main className="container mx-auto px-4 py-6">
-        <ResizablePanelGroup direction="horizontal" className="h-[calc(100vh-140px)] w-full">
+        {/* Control Toolbar */}
+        <div className="flex items-center gap-2 mb-4 p-3 bg-card/80 backdrop-blur-sm rounded-lg border shadow-sm">
+          {/* Thumbnail Collapse */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowThumbnails(!showThumbnails)}
+            className="gap-2"
+            title={showThumbnails ? "Hide thumbnails" : "Show thumbnails"}
+          >
+            <PanelLeftClose className={`h-4 w-4 transition-transform ${!showThumbnails ? 'rotate-180' : ''}`} strokeWidth={0.5} />
+            {showThumbnails ? 'Hide' : 'Show'}
+          </Button>
+
+          <div className="h-6 w-px bg-border" />
+
+          {/* AI Assistant Toggle */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowAIPanel(!showAIPanel)}
+            className={`gap-2 ${showAIPanel ? 'bg-primary/10 text-primary' : ''}`}
+            title="Toggle AI Assistant"
+          >
+            <MessageSquare className="h-4 w-4" strokeWidth={0.5} />
+            AI Chat
+          </Button>
+
+          <div className="h-6 w-px bg-border" />
+
+          {/* Zoom Controls */}
+          <div className="flex items-center gap-1 px-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setPdfZoom(Math.max(0.5, pdfZoom - 0.1))}
+              disabled={pdfZoom <= 0.5}
+              title="Zoom out"
+              className="h-8 w-8 p-0"
+            >
+              <span className="text-lg font-semibold">−</span>
+            </Button>
+            <div className="flex items-center gap-1 px-2 min-w-[100px] justify-center">
+              <FileText className="h-3.5 w-3.5 text-muted-foreground" strokeWidth={0.5} />
+              <span className="text-sm font-medium">{Math.round(pdfZoom * 100)}%</span>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setPdfZoom(Math.min(2, pdfZoom + 0.1))}
+              disabled={pdfZoom >= 2}
+              title="Zoom in"
+              className="h-8 w-8 p-0"
+            >
+              <span className="text-lg font-semibold">+</span>
+            </Button>
+          </div>
+
+          <div className="h-6 w-px bg-border" />
+
+          {/* Fields Panel Toggle */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowFieldsPanel(!showFieldsPanel)}
+            className={`gap-2 ${showFieldsPanel && !showVaultPanel ? 'bg-primary/10 text-primary' : ''}`}
+            title="Toggle Fields Panel"
+          >
+            <PanelRightClose className="h-4 w-4" strokeWidth={0.5} />
+            Fields
+          </Button>
+
+          <div className="h-6 w-px bg-border" />
+
+          {/* Personal Data Vault Toggle */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowVaultPanel(!showVaultPanel)}
+            className={`gap-2 ${showVaultPanel ? 'bg-primary/10 text-primary' : ''}`}
+            title="Toggle Personal Data Vault"
+          >
+            <Shield className="h-4 w-4" strokeWidth={0.5} />
+            Vault
+          </Button>
+        </div>
+
+        <ResizablePanelGroup direction="horizontal" className="h-[calc(100vh-220px)] w-full">
           {/* Left: AI Assistant Panel (collapsible) */}
           {showAIPanel && (
             <>
@@ -341,18 +401,25 @@ const Index = () => {
 
           {/* Center: Form Viewer with PDF + Thumbnail Sidebar */}
           <ResizablePanel defaultSize={showAIPanel ? 50 : 70} minSize={30}>
-            <SidebarProvider>
-              <div className="h-full px-3 flex w-full">
-                <PDFThumbnailSidebar 
-                  currentPage={currentPDFPage}
-                  onPageClick={setCurrentPDFPage}
-                  currentFieldPosition={getCurrentFieldPosition()}
-                  showFieldIndicator={currentFieldIndex >= 0}
-                />
-                <div className="flex-1 flex flex-col">
-                  <div className="mb-2">
-                    <SidebarTrigger className="h-9 w-9" />
-                  </div>
+            <ResizablePanelGroup direction="horizontal" className="h-full">
+              {/* Resizable Thumbnail Sidebar */}
+              {showThumbnails && (
+                <>
+                  <ResizablePanel defaultSize={30} minSize={20} maxSize={40}>
+                    <PDFThumbnailSidebar 
+                      currentPage={currentPDFPage}
+                      onPageClick={setCurrentPDFPage}
+                      currentFieldPosition={getCurrentFieldPosition()}
+                      showFieldIndicator={currentFieldIndex >= 0}
+                    />
+                  </ResizablePanel>
+                  <ResizableHandle withHandle className="hover:bg-primary/30 transition-colors" />
+                </>
+              )}
+              
+              {/* PDF Viewer */}
+              <ResizablePanel defaultSize={showThumbnails ? 70 : 100} minSize={50}>
+                <div className="h-full overflow-auto bg-muted/20">
                   <FormViewer 
                     formData={formData} 
                     updateField={updateField}
@@ -360,10 +427,11 @@ const Index = () => {
                     setCurrentFieldIndex={setCurrentFieldIndex}
                     fieldPositions={fieldPositions}
                     updateFieldPosition={updateFieldPosition}
+                    zoom={pdfZoom}
                   />
                 </div>
-              </div>
-            </SidebarProvider>
+              </ResizablePanel>
+            </ResizablePanelGroup>
           </ResizablePanel>
 
           {/* Right: Field Navigation Panel OR Vault Panel (collapsible) */}

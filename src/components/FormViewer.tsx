@@ -54,9 +54,10 @@ interface Props {
   setCurrentFieldIndex: (index: number) => void;
   fieldPositions: Record<string, { top: number; left: number }>;
   updateFieldPosition: (field: string, position: { top: number; left: number }) => void;
+  zoom?: number;
 }
 
-export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition }: Props) => {
+export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, zoom = 1 }: Props) => {
   const [numPages, setNumPages] = useState<number>(0);
   const [pageWidth, setPageWidth] = useState<number>(850);
   const [isDragging, setIsDragging] = useState<string | null>(null);
@@ -223,7 +224,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                 >
                   <Page
                     pageNumber={pageNum}
-                    width={pageWidth}
+                    width={pageWidth * zoom}
                     renderTextLayer={true}
                     renderAnnotationLayer={false}
                   />
