@@ -3,6 +3,77 @@
 ## Overview
 Implement smooth field navigation, unified positioning controls, bi-directional field selection, synchronized highlighting system, enhanced thumbnail sidebar, field position presets, and JSON template system for crowdsourcing form mappings.
 
+---
+
+## 🚨 CRITICAL ISSUES - USER FEEDBACK (Nov 11, 2025)
+
+### Field Movement & Interaction Issues
+- [ ] **FIX: Keyboard arrow keys not working intuitively**
+  - Up arrow should move field UP (decrease Y), not right (increase X)
+  - Down arrow should move field DOWN (increase Y)
+  - Left arrow should move field LEFT (decrease X)
+  - Right arrow should move field RIGHT (increase X)
+  - Current implementation has axes mixed up in the Adjust controls
+
+- [ ] **FIX: Fields are not draggable**
+  - User reports fields cannot be dragged on the PDF viewer
+  - Investigate pointer events and drag handlers in FormViewer.tsx
+  - Ensure drag handle is working properly
+
+- [ ] **FIX: Fields feel sluggish when moving**
+  - Optimize drag performance in FormViewer
+  - Reduce unnecessary re-renders during drag operations
+  - Consider using requestAnimationFrame for smoother movement
+
+- [ ] **FIX: Fields not scaling with PDF zoom**
+  - Fields remain static size when zooming in/out
+  - Need to apply transform: scale() to field overlays based on zoom level
+  - Ensure field content (text, inputs) scales proportionally
+
+### Visual Polish & Design System
+- [ ] **ENHANCE: Blue icons need refined polish + slight 3D look**
+  - Add subtle depth to primary/accent colored components (buttons, badges, icons)
+  - Implement component-level variants (not custom CSS)
+  - Use shadow-sm, shadow-md with primary color tints
+  - Add subtle gradients using design tokens (--gradient-primary)
+  - Update Button, Badge, and icon wrapper components
+
+- [ ] **REDESIGN: Form Field Controls layout is inefficient**
+  - Current layout is cramped and cluttered
+  - Reorganize control panel for better information hierarchy
+  - Consider collapsible sections for less-used controls
+  - Improve spacing and grouping of related controls
+  - Add better visual separation between sections
+
+- [ ] **ENHANCE: AI Assistant modal glassmorphism**
+  - Current implementation is "jittery" - investigate animation issues
+  - Improve backdrop-blur effect for true glassmorphic look
+  - Smooth out drag animations (reduce jank)
+  - Add proper spring physics to floating animation
+  - Fix z-index layering issues
+
+### Functional Bugs
+- [ ] **FIX: "Scale to Fit" button doesn't work**
+  - Button exists but doesn't trigger PDF scaling
+  - Implement proper zoom calculation to fit PDF to viewport
+  - Ensure it works with current zoom state management
+
+### General UX Improvements
+- [ ] **IMPROVE: Overall UI feels cluttered**
+  - Audit all panels for unnecessary elements
+  - Increase whitespace and breathing room
+  - Simplify toolbar icons and actions
+  - Consider hiding advanced features behind "More" menus
+  - Make primary actions more prominent
+
+- [ ] **IMPROVE: Not user-friendly for non-technical users**
+  - Add contextual help tooltips
+  - Simplify terminology in UI labels
+  - Add visual cues for interactive elements
+  - Improve onboarding flow with progressive disclosure
+
+---
+
 ## Latest: Field Position Presets & Template System
 
 ### Feature 1: Field Position Presets
