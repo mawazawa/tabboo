@@ -55,9 +55,10 @@ interface Props {
   fieldPositions: Record<string, { top: number; left: number }>;
   updateFieldPosition: (field: string, position: { top: number; left: number }) => void;
   zoom?: number;
+  highlightedField?: string | null;
 }
 
-export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, zoom = 1 }: Props) => {
+export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, zoom = 1, highlightedField = null }: Props) => {
   const [numPages, setNumPages] = useState<number>(0);
   const [pageWidth, setPageWidth] = useState<number>(850);
   const [isDragging, setIsDragging] = useState<string | null>(null);
@@ -249,6 +250,8 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                               isDragging === overlay.field ? 'cursor-grabbing z-50 ring-4 ring-green-600 opacity-90 shadow-3point' : 
                               isEditMode ? 'cursor-grab ring-4 ring-green-600 shadow-3point' : 'cursor-pointer'
                             } ${
+                              highlightedField === overlay.field
+                                ? 'ring-4 ring-accent shadow-3point-hover animate-pulse bg-accent/20 chamfered' :
                               isEditMode 
                                 ? 'ring-4 ring-green-600 shadow-3point bg-green-600/10 chamfered' :
                               isCurrentField 

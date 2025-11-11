@@ -49,12 +49,12 @@ export const useFormAutoSave = ({
 
     try {
       const { error } = await supabase
-        .from('legal_documents')
+        .from('legal_documents' as any)
         .update({
-          content: formData as any,
-          metadata: { fieldPositions } as any,
+          content: formData,
+          metadata: { fieldPositions },
           updated_at: new Date().toISOString()
-        })
+        } as any)
         .eq('id', documentId);
 
       if (error) throw error;

@@ -57,6 +57,7 @@ interface Props {
   onAlignHorizontal: (alignment: 'left' | 'center' | 'right') => void;
   onAlignVertical: (alignment: 'top' | 'middle' | 'bottom') => void;
   onDistribute: (direction: 'horizontal' | 'vertical') => void;
+  onFieldHover?: (fieldName: string | null) => void;
 }
 
 const FIELD_CONFIG: FieldConfig[] = [
@@ -94,7 +95,8 @@ export const FieldNavigationPanel = ({
   onSnapToGrid,
   onAlignHorizontal,
   onAlignVertical,
-  onDistribute
+  onDistribute,
+  onFieldHover
 }: Props) => {
   const fieldRefs = useRef<(HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | null)[]>([]);
   const scrollViewportRef = useRef<HTMLDivElement>(null);
@@ -635,6 +637,8 @@ export const FieldNavigationPanel = ({
                       setCurrentFieldIndex(originalIndex);
                     }
                   }}
+                  onMouseEnter={() => onFieldHover?.(config.field)}
+                  onMouseLeave={() => onFieldHover?.(null)}
                 >
                   {/* Visual Highlighter Bar */}
                   {isActive && (

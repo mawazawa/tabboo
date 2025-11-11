@@ -79,6 +79,7 @@ const Index = () => {
   const [thumbnailPanelWidth, setThumbnailPanelWidth] = useState(256);
   const [fieldSearchQuery, setFieldSearchQuery] = useState("");
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
+  const [highlightedField, setHighlightedField] = useState<string | null>(null);
   const { toast } = useToast();
   const hasUnsavedChanges = useRef(false);
 
@@ -208,31 +209,31 @@ const Index = () => {
     const loadData = async () => {
 
       const { data, error } = await supabase
-        .from('legal_documents')
+        .from('legal_documents' as any)
         .select('*')
         .eq('user_id', user.id)
         .eq('title', 'FL-320 Form')
         .maybeSingle();
 
       if (data) {
-        setDocumentId(data.id);
-        setFormData((data.content as any) || {});
-        const metadata = data.metadata as any;
+        setDocumentId((data as any).id);
+        setFormData(((data as any).content as any) || {});
+        const metadata = (data as any).metadata as any;
         setFieldPositions(metadata?.fieldPositions || {});
       } else if (!error) {
         // Create new document
         const { data: newDoc } = await supabase
-          .from('legal_documents')
+          .from('legal_documents' as any)
           .insert({
             title: 'FL-320 Form',
-            content: {} as any,
-            metadata: { fieldPositions: {} } as any,
+            content: {},
+            metadata: { fieldPositions: {} },
             user_id: user.id
-          })
+          } as any)
           .select()
           .maybeSingle();
 
-        if (newDoc) setDocumentId(newDoc.id);
+        if (newDoc) setDocumentId((newDoc as any).id);
       }
     };
 
@@ -247,12 +248,12 @@ const Index = () => {
       if (!documentId || !hasUnsavedChanges.current) return;
 
       const { error } = await supabase
-        .from('legal_documents')
+        .from('legal_documents' as any)
         .update({
-          content: formData as any,
-          metadata: { fieldPositions } as any,
+          content: formData,
+          metadata: { fieldPositions },
           updated_at: new Date().toISOString()
-        })
+        } as any)
         .eq('id', documentId);
 
       if (!error) {
@@ -482,12 +483,19 @@ const Index = () => {
 
         <ResizablePanelGroup direction="horizontal" className="h-[calc(100vh-220px)] w-full">
           {/* Center: Form Viewer with PDF + Thumbnail Sidebar */}
-          <ResizablePanel defaultSize={75} minSize={30}>
+          <ResizablePanel 
+            id="viewer-panel"
+            order={1}
+            defaultSize={showFieldsPanel || showVaultPanel ? 75 : 100} 
+            minSize={30}
+          >
             <ResizablePanelGroup direction="horizontal" className="h-full">
               {/* Resizable Thumbnail Sidebar */}
               {showThumbnails && (
                 <>
                   <ResizablePanel 
+                    id="thumbnail-panel"
+                    order={1}
                     defaultSize={30} 
                     minSize={20} 
                     maxSize={40}
@@ -510,7 +518,12 @@ const Index = () => {
               )}
               
               {/* PDF Viewer */}
-              <ResizablePanel defaultSize={showThumbnails ? 70 : 100} minSize={50}>
+              <ResizablePanel 
+                id="pdf-panel"
+                order={2}
+                defaultSize={showThumbnails ? 70 : 100} 
+                minSize={50}
+              >
                 <FormViewer 
                   formData={formData} 
                   updateField={updateField}
@@ -519,6 +532,7 @@ const Index = () => {
                   fieldPositions={fieldPositions}
                   updateFieldPosition={updateFieldPosition}
                   zoom={pdfZoom}
+                  highlightedField={highlightedField}
                 />
               </ResizablePanel>
             </ResizablePanelGroup>
@@ -528,7 +542,13 @@ const Index = () => {
           {(showFieldsPanel || showVaultPanel) && (
             <>
               <ResizableHandle withHandle />
-              <ResizablePanel defaultSize={25} minSize={20} maxSize={35}>
+              <ResizablePanel 
+                id="right-panel"
+                order={2}
+                defaultSize={25} 
+                minSize={20} 
+                maxSize={35}
+              >
                 <div className="h-full pl-3">
                   {showVaultPanel ? (
                     <PersonalDataVaultPanel userId={user?.id || ''} />
@@ -546,6 +566,7 @@ const Index = () => {
                       onAlignHorizontal={handleAlignHorizontal}
                       onAlignVertical={handleAlignVertical}
                       onDistribute={handleDistribute}
+                      onFieldHover={setHighlightedField}
                     />
                   )}
                 </div>

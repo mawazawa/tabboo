@@ -14,500 +14,1205 @@ export type Database = {
   }
   public: {
     Tables: {
-      analytics_events: {
+      _CategoryToRule: {
         Row: {
-          created_at: string
-          event_type: Database["public"]["Enums"]["event_type"]
-          id: string
-          session_id: string | null
-          ttm_seconds: number | null
+          A: string
+          B: string
         }
         Insert: {
-          created_at?: string
-          event_type: Database["public"]["Enums"]["event_type"]
-          id?: string
-          session_id?: string | null
-          ttm_seconds?: number | null
+          A: string
+          B: string
         }
         Update: {
-          created_at?: string
-          event_type?: Database["public"]["Enums"]["event_type"]
-          id?: string
-          session_id?: string | null
-          ttm_seconds?: number | null
+          A?: string
+          B?: string
         }
         Relationships: [
           {
-            foreignKeyName: "analytics_events_session_id_fkey"
-            columns: ["session_id"]
+            foreignKeyName: "_CategoryToRule_A_fkey"
+            columns: ["A"]
             isOneToOne: false
-            referencedRelation: "upload_sessions"
+            referencedRelation: "Category"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "_CategoryToRule_B_fkey"
+            columns: ["B"]
+            isOneToOne: false
+            referencedRelation: "Rule"
             referencedColumns: ["id"]
           },
         ]
       }
-      chat_messages: {
+      Account: {
+        Row: {
+          access_token: string | null
+          createdAt: string
+          expires_at: number | null
+          id: string
+          id_token: string | null
+          provider: string
+          providerAccountId: string
+          refresh_token: string | null
+          scope: string | null
+          session_state: string | null
+          token_type: string | null
+          type: string
+          updatedAt: string
+          userId: string
+        }
+        Insert: {
+          access_token?: string | null
+          createdAt?: string
+          expires_at?: number | null
+          id: string
+          id_token?: string | null
+          provider: string
+          providerAccountId: string
+          refresh_token?: string | null
+          scope?: string | null
+          session_state?: string | null
+          token_type?: string | null
+          type?: string
+          updatedAt: string
+          userId: string
+        }
+        Update: {
+          access_token?: string | null
+          createdAt?: string
+          expires_at?: number | null
+          id?: string
+          id_token?: string | null
+          provider?: string
+          providerAccountId?: string
+          refresh_token?: string | null
+          scope?: string | null
+          session_state?: string | null
+          token_type?: string | null
+          type?: string
+          updatedAt?: string
+          userId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Account_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ApiKey: {
+        Row: {
+          createdAt: string
+          id: string
+          key: string
+          updatedAt: string
+          userId: string
+        }
+        Insert: {
+          createdAt?: string
+          id: string
+          key: string
+          updatedAt: string
+          userId: string
+        }
+        Update: {
+          createdAt?: string
+          id?: string
+          key?: string
+          updatedAt?: string
+          userId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ApiKey_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Bill: {
+        Row: {
+          caseId: string
+          createdAt: string
+          endDate: string
+          id: string
+          startDate: string
+          status: string
+          total: number
+          updatedAt: string
+        }
+        Insert: {
+          caseId: string
+          createdAt?: string
+          endDate: string
+          id: string
+          startDate: string
+          status?: string
+          total?: number
+          updatedAt: string
+        }
+        Update: {
+          caseId?: string
+          createdAt?: string
+          endDate?: string
+          id?: string
+          startDate?: string
+          status?: string
+          total?: number
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Bill_caseId_fkey"
+            columns: ["caseId"]
+            isOneToOne: false
+            referencedRelation: "Case"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      BillLineItem: {
+        Row: {
+          billId: string
+          createdAt: string
+          date: string
+          description: string
+          hours: number
+          id: string
+          rate: number
+          sourceEventId: string | null
+          total: number
+        }
+        Insert: {
+          billId: string
+          createdAt?: string
+          date: string
+          description: string
+          hours: number
+          id: string
+          rate: number
+          sourceEventId?: string | null
+          total: number
+        }
+        Update: {
+          billId?: string
+          createdAt?: string
+          date?: string
+          description?: string
+          hours?: number
+          id?: string
+          rate?: number
+          sourceEventId?: string | null
+          total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "BillLineItem_billId_fkey"
+            columns: ["billId"]
+            isOneToOne: false
+            referencedRelation: "Bill"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Calendar: {
+        Row: {
+          connectionId: string
+          createdAt: string
+          id: string
+          name: string
+          updatedAt: string
+        }
+        Insert: {
+          connectionId: string
+          createdAt?: string
+          id: string
+          name: string
+          updatedAt: string
+        }
+        Update: {
+          connectionId?: string
+          createdAt?: string
+          id?: string
+          name?: string
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Calendar_connectionId_fkey"
+            columns: ["connectionId"]
+            isOneToOne: false
+            referencedRelation: "CalendarConnection"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      CalendarConnection: {
+        Row: {
+          accessToken: string | null
+          accessTokenExpiresAt: string | null
+          createdAt: string
+          emailAccountId: string
+          id: string
+          provider: Database["public"]["Enums"]["CalendarProvider"]
+          refreshToken: string | null
+          updatedAt: string
+        }
+        Insert: {
+          accessToken?: string | null
+          accessTokenExpiresAt?: string | null
+          createdAt?: string
+          emailAccountId: string
+          id: string
+          provider: Database["public"]["Enums"]["CalendarProvider"]
+          refreshToken?: string | null
+          updatedAt: string
+        }
+        Update: {
+          accessToken?: string | null
+          accessTokenExpiresAt?: string | null
+          createdAt?: string
+          emailAccountId?: string
+          id?: string
+          provider?: Database["public"]["Enums"]["CalendarProvider"]
+          refreshToken?: string | null
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "CalendarConnection_emailAccountId_fkey"
+            columns: ["emailAccountId"]
+            isOneToOne: false
+            referencedRelation: "EmailAccount"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Case: {
+        Row: {
+          attorneyId: string
+          caseName: string
+          caseNumber: string
+          createdAt: string
+          description: string | null
+          id: string
+          status: string
+          updatedAt: string
+        }
+        Insert: {
+          attorneyId: string
+          caseName: string
+          caseNumber: string
+          createdAt?: string
+          description?: string | null
+          id: string
+          status?: string
+          updatedAt: string
+        }
+        Update: {
+          attorneyId?: string
+          caseName?: string
+          caseNumber?: string
+          createdAt?: string
+          description?: string | null
+          id?: string
+          status?: string
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Case_attorneyId_fkey"
+            columns: ["attorneyId"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Category: {
+        Row: {
+          createdAt: string
+          description: string | null
+          emailAccountId: string
+          filterJson: string | null
+          filterType: Database["public"]["Enums"]["CategoryFilterType"]
+          id: string
+          name: string
+          updatedAt: string
+        }
+        Insert: {
+          createdAt?: string
+          description?: string | null
+          emailAccountId: string
+          filterJson?: string | null
+          filterType?: Database["public"]["Enums"]["CategoryFilterType"]
+          id: string
+          name: string
+          updatedAt: string
+        }
+        Update: {
+          createdAt?: string
+          description?: string | null
+          emailAccountId?: string
+          filterJson?: string | null
+          filterType?: Database["public"]["Enums"]["CategoryFilterType"]
+          id?: string
+          name?: string
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Category_emailAccountId_fkey"
+            columns: ["emailAccountId"]
+            isOneToOne: false
+            referencedRelation: "EmailAccount"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Chat: {
+        Row: {
+          createdAt: string
+          emailAccountId: string
+          id: string
+          status: Database["public"]["Enums"]["ChatStatus"]
+          updatedAt: string
+        }
+        Insert: {
+          createdAt?: string
+          emailAccountId: string
+          id: string
+          status?: Database["public"]["Enums"]["ChatStatus"]
+          updatedAt: string
+        }
+        Update: {
+          createdAt?: string
+          emailAccountId?: string
+          id?: string
+          status?: Database["public"]["Enums"]["ChatStatus"]
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Chat_emailAccountId_fkey"
+            columns: ["emailAccountId"]
+            isOneToOne: false
+            referencedRelation: "EmailAccount"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ChatMessage: {
+        Row: {
+          chatId: string
+          content: string
+          createdAt: string
+          id: string
+          role: string
+          updatedAt: string
+        }
+        Insert: {
+          chatId: string
+          content: string
+          createdAt?: string
+          id: string
+          role: string
+          updatedAt: string
+        }
+        Update: {
+          chatId?: string
+          content?: string
+          createdAt?: string
+          id?: string
+          role?: string
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ChatMessage_chatId_fkey"
+            columns: ["chatId"]
+            isOneToOne: false
+            referencedRelation: "Chat"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      CleanupJob: {
+        Row: {
+          action: Database["public"]["Enums"]["CleanAction"]
+          createdAt: string
+          emailAccountId: string
+          filterJson: string | null
+          id: string
+          rule: string | null
+          scheduledAt: string
+          status: Database["public"]["Enums"]["ScheduledActionStatus"]
+          updatedAt: string
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["CleanAction"]
+          createdAt?: string
+          emailAccountId: string
+          filterJson?: string | null
+          id: string
+          rule?: string | null
+          scheduledAt: string
+          status?: Database["public"]["Enums"]["ScheduledActionStatus"]
+          updatedAt: string
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["CleanAction"]
+          createdAt?: string
+          emailAccountId?: string
+          filterJson?: string | null
+          id?: string
+          rule?: string | null
+          scheduledAt?: string
+          status?: Database["public"]["Enums"]["ScheduledActionStatus"]
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "CleanupJob_emailAccountId_fkey"
+            columns: ["emailAccountId"]
+            isOneToOne: false
+            referencedRelation: "EmailAccount"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      CleanupThread: {
+        Row: {
+          createdAt: string
+          emailAccountId: string
+          id: string
+          jobId: string
+          threadId: string
+        }
+        Insert: {
+          createdAt?: string
+          emailAccountId: string
+          id: string
+          jobId: string
+          threadId: string
+        }
+        Update: {
+          createdAt?: string
+          emailAccountId?: string
+          id?: string
+          jobId?: string
+          threadId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "CleanupThread_emailAccountId_fkey"
+            columns: ["emailAccountId"]
+            isOneToOne: false
+            referencedRelation: "EmailAccount"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "CleanupThread_jobId_fkey"
+            columns: ["jobId"]
+            isOneToOne: false
+            referencedRelation: "CleanupJob"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ColdEmail: {
+        Row: {
+          createdAt: string
+          email: string
+          emailAccountId: string
+          id: string
+          status: Database["public"]["Enums"]["ColdEmailStatus"]
+          updatedAt: string
+        }
+        Insert: {
+          createdAt?: string
+          email: string
+          emailAccountId: string
+          id: string
+          status?: Database["public"]["Enums"]["ColdEmailStatus"]
+          updatedAt: string
+        }
+        Update: {
+          createdAt?: string
+          email?: string
+          emailAccountId?: string
+          id?: string
+          status?: Database["public"]["Enums"]["ColdEmailStatus"]
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ColdEmail_emailAccountId_fkey"
+            columns: ["emailAccountId"]
+            isOneToOne: false
+            referencedRelation: "EmailAccount"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      DraftSendLog: {
+        Row: {
+          createdAt: string
+          executedActionId: string
+          id: string
+          updatedAt: string
+        }
+        Insert: {
+          createdAt?: string
+          executedActionId: string
+          id: string
+          updatedAt: string
+        }
+        Update: {
+          createdAt?: string
+          executedActionId?: string
+          id?: string
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "DraftSendLog_executedActionId_fkey"
+            columns: ["executedActionId"]
+            isOneToOne: false
+            referencedRelation: "ExecutedAction"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      EmailAccount: {
+        Row: {
+          accessToken: string | null
+          accessTokenExpiresAt: string | null
+          active: boolean
+          createdAt: string
+          email: string
+          forwardingAddress: string | null
+          gmailHistoryId: string | null
+          id: string
+          lastCalendarSyncAt: string | null
+          lastEmailSyncAt: string | null
+          lastSyncAt: string | null
+          name: string | null
+          refreshToken: string | null
+          type: Database["public"]["Enums"]["EmailAccountType"]
+          updatedAt: string
+          userId: string
+          xOAuth: string | null
+        }
+        Insert: {
+          accessToken?: string | null
+          accessTokenExpiresAt?: string | null
+          active?: boolean
+          createdAt?: string
+          email: string
+          forwardingAddress?: string | null
+          gmailHistoryId?: string | null
+          id: string
+          lastCalendarSyncAt?: string | null
+          lastEmailSyncAt?: string | null
+          lastSyncAt?: string | null
+          name?: string | null
+          refreshToken?: string | null
+          type: Database["public"]["Enums"]["EmailAccountType"]
+          updatedAt: string
+          userId: string
+          xOAuth?: string | null
+        }
+        Update: {
+          accessToken?: string | null
+          accessTokenExpiresAt?: string | null
+          active?: boolean
+          createdAt?: string
+          email?: string
+          forwardingAddress?: string | null
+          gmailHistoryId?: string | null
+          id?: string
+          lastCalendarSyncAt?: string | null
+          lastEmailSyncAt?: string | null
+          lastSyncAt?: string | null
+          name?: string | null
+          refreshToken?: string | null
+          type?: Database["public"]["Enums"]["EmailAccountType"]
+          updatedAt?: string
+          userId?: string
+          xOAuth?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "EmailAccount_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      EmailMessage: {
+        Row: {
+          attachmentsJson: string | null
+          bcc: string | null
+          bodyHtml: string | null
+          bodySnippet: string | null
+          bodyText: string | null
+          cc: string | null
+          createdAt: string
+          date: string
+          emailAccountId: string
+          folderId: string | null
+          from: string | null
+          headersJson: string | null
+          id: string
+          labelIds: string | null
+          messageId: string
+          seen: boolean
+          size: number | null
+          subject: string | null
+          threadId: string
+          to: string | null
+          updatedAt: string
+        }
+        Insert: {
+          attachmentsJson?: string | null
+          bcc?: string | null
+          bodyHtml?: string | null
+          bodySnippet?: string | null
+          bodyText?: string | null
+          cc?: string | null
+          createdAt?: string
+          date: string
+          emailAccountId: string
+          folderId?: string | null
+          from?: string | null
+          headersJson?: string | null
+          id: string
+          labelIds?: string | null
+          messageId: string
+          seen?: boolean
+          size?: number | null
+          subject?: string | null
+          threadId: string
+          to?: string | null
+          updatedAt: string
+        }
+        Update: {
+          attachmentsJson?: string | null
+          bcc?: string | null
+          bodyHtml?: string | null
+          bodySnippet?: string | null
+          bodyText?: string | null
+          cc?: string | null
+          createdAt?: string
+          date?: string
+          emailAccountId?: string
+          folderId?: string | null
+          from?: string | null
+          headersJson?: string | null
+          id?: string
+          labelIds?: string | null
+          messageId?: string
+          seen?: boolean
+          size?: number | null
+          subject?: string | null
+          threadId?: string
+          to?: string | null
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "EmailMessage_emailAccountId_fkey"
+            columns: ["emailAccountId"]
+            isOneToOne: false
+            referencedRelation: "EmailAccount"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      EmailToken: {
+        Row: {
+          createdAt: string
+          email: string
+          emailAccountId: string
+          expires: string
+          id: string
+          token: string
+          updatedAt: string
+        }
+        Insert: {
+          createdAt?: string
+          email: string
+          emailAccountId: string
+          expires: string
+          id: string
+          token: string
+          updatedAt: string
+        }
+        Update: {
+          createdAt?: string
+          email?: string
+          emailAccountId?: string
+          expires?: string
+          id?: string
+          token?: string
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "EmailToken_emailAccountId_fkey"
+            columns: ["emailAccountId"]
+            isOneToOne: false
+            referencedRelation: "EmailAccount"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ExecutedAction: {
+        Row: {
+          attachments: string | null
+          bcc: string | null
+          body: string | null
+          bodyHtml: string | null
+          bodyText: string | null
+          cc: string | null
+          createdAt: string
+          executedRuleId: string
+          id: string
+          label: string | null
+          messageId: string
+          subject: string | null
+          threadId: string | null
+          to: string | null
+          type: Database["public"]["Enums"]["ActionType"]
+          updatedAt: string
+          webhookBody: string | null
+          webhookUrl: string | null
+        }
+        Insert: {
+          attachments?: string | null
+          bcc?: string | null
+          body?: string | null
+          bodyHtml?: string | null
+          bodyText?: string | null
+          cc?: string | null
+          createdAt?: string
+          executedRuleId: string
+          id: string
+          label?: string | null
+          messageId: string
+          subject?: string | null
+          threadId?: string | null
+          to?: string | null
+          type: Database["public"]["Enums"]["ActionType"]
+          updatedAt: string
+          webhookBody?: string | null
+          webhookUrl?: string | null
+        }
+        Update: {
+          attachments?: string | null
+          bcc?: string | null
+          body?: string | null
+          bodyHtml?: string | null
+          bodyText?: string | null
+          cc?: string | null
+          createdAt?: string
+          executedRuleId?: string
+          id?: string
+          label?: string | null
+          messageId?: string
+          subject?: string | null
+          threadId?: string | null
+          to?: string | null
+          type?: Database["public"]["Enums"]["ActionType"]
+          updatedAt?: string
+          webhookBody?: string | null
+          webhookUrl?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ExecutedAction_executedRuleId_fkey"
+            columns: ["executedRuleId"]
+            isOneToOne: false
+            referencedRelation: "ExecutedRule"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ExecutedRule: {
+        Row: {
+          createdAt: string
+          emailAccountId: string
+          id: string
+          messageId: string
+          ruleId: string | null
+          status: Database["public"]["Enums"]["ExecutedRuleStatus"]
+          threadId: string | null
+          updatedAt: string
+        }
+        Insert: {
+          createdAt?: string
+          emailAccountId: string
+          id: string
+          messageId: string
+          ruleId?: string | null
+          status?: Database["public"]["Enums"]["ExecutedRuleStatus"]
+          threadId?: string | null
+          updatedAt: string
+        }
+        Update: {
+          createdAt?: string
+          emailAccountId?: string
+          id?: string
+          messageId?: string
+          ruleId?: string | null
+          status?: Database["public"]["Enums"]["ExecutedRuleStatus"]
+          threadId?: string | null
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ExecutedRule_emailAccountId_fkey"
+            columns: ["emailAccountId"]
+            isOneToOne: false
+            referencedRelation: "EmailAccount"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ExecutedRule_ruleId_fkey"
+            columns: ["ruleId"]
+            isOneToOne: false
+            referencedRelation: "Rule"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Group: {
+        Row: {
+          createdAt: string
+          emailAccountId: string
+          id: string
+          name: string
+          updatedAt: string
+        }
+        Insert: {
+          createdAt?: string
+          emailAccountId: string
+          id: string
+          name: string
+          updatedAt: string
+        }
+        Update: {
+          createdAt?: string
+          emailAccountId?: string
+          id?: string
+          name?: string
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Group_emailAccountId_fkey"
+            columns: ["emailAccountId"]
+            isOneToOne: false
+            referencedRelation: "EmailAccount"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      GroupItem: {
+        Row: {
+          createdAt: string
+          groupId: string
+          id: string
+          type: Database["public"]["Enums"]["GroupItemType"]
+          value: string
+        }
+        Insert: {
+          createdAt?: string
+          groupId: string
+          id: string
+          type: Database["public"]["Enums"]["GroupItemType"]
+          value: string
+        }
+        Update: {
+          createdAt?: string
+          groupId?: string
+          id?: string
+          type?: Database["public"]["Enums"]["GroupItemType"]
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "GroupItem_groupId_fkey"
+            columns: ["groupId"]
+            isOneToOne: false
+            referencedRelation: "Group"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Knowledge: {
         Row: {
           content: string
-          created_at: string
-          document_id: string | null
+          createdAt: string
+          emailAccountId: string
           id: string
-          prompt_cache_key: string | null
-          role: string
-          tool_call_id: string | null
-          tool_calls: Json | null
-          user_id: string
+          updatedAt: string
         }
         Insert: {
           content: string
-          created_at?: string
-          document_id?: string | null
-          id?: string
-          prompt_cache_key?: string | null
-          role: string
-          tool_call_id?: string | null
-          tool_calls?: Json | null
-          user_id: string
+          createdAt?: string
+          emailAccountId: string
+          id: string
+          updatedAt: string
         }
         Update: {
           content?: string
-          created_at?: string
-          document_id?: string | null
+          createdAt?: string
+          emailAccountId?: string
           id?: string
-          prompt_cache_key?: string | null
-          role?: string
-          tool_call_id?: string | null
-          tool_calls?: Json | null
-          user_id?: string
+          updatedAt?: string
         }
         Relationships: [
           {
-            foreignKeyName: "chat_messages_document_id_fkey"
-            columns: ["document_id"]
+            foreignKeyName: "Knowledge_emailAccountId_fkey"
+            columns: ["emailAccountId"]
             isOneToOne: false
-            referencedRelation: "legal_documents"
+            referencedRelation: "EmailAccount"
             referencedColumns: ["id"]
           },
         ]
       }
-      credit_batches: {
+      McpConnection: {
         Row: {
-          created_at: string | null
-          credits_purchased: number
-          credits_remaining: number
-          expiration_date: string
+          createdAt: string
+          description: string | null
+          emailAccountId: string
           id: string
-          purchase_date: string
-          transaction_id: string | null
-          user_id: string
+          integrationId: string
+          isEnabled: boolean
+          name: string
+          updatedAt: string
         }
         Insert: {
-          created_at?: string | null
-          credits_purchased: number
-          credits_remaining: number
-          expiration_date: string
-          id?: string
-          purchase_date?: string
-          transaction_id?: string | null
-          user_id: string
+          createdAt?: string
+          description?: string | null
+          emailAccountId: string
+          id: string
+          integrationId: string
+          isEnabled?: boolean
+          name: string
+          updatedAt: string
         }
         Update: {
-          created_at?: string | null
-          credits_purchased?: number
-          credits_remaining?: number
-          expiration_date?: string
+          createdAt?: string
+          description?: string | null
+          emailAccountId?: string
           id?: string
-          purchase_date?: string
-          transaction_id?: string | null
-          user_id?: string
+          integrationId?: string
+          isEnabled?: boolean
+          name?: string
+          updatedAt?: string
         }
         Relationships: [
           {
-            foreignKeyName: "fk_credit_batches_transaction"
-            columns: ["transaction_id"]
+            foreignKeyName: "McpConnection_emailAccountId_fkey"
+            columns: ["emailAccountId"]
             isOneToOne: false
-            referencedRelation: "payment_transactions"
+            referencedRelation: "EmailAccount"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "McpConnection_integrationId_fkey"
+            columns: ["integrationId"]
+            isOneToOne: false
+            referencedRelation: "McpIntegration"
             referencedColumns: ["id"]
           },
         ]
       }
-      document_vault_items: {
+      McpIntegration: {
         Row: {
-          created_at: string
-          embedding: string | null
-          extracted_metadata: Json | null
-          extracted_text: string | null
-          file_size_bytes: number | null
-          file_type: string
+          authHeader: string | null
+          createdAt: string
+          description: string | null
           id: string
-          ocr_provider: string | null
-          ocr_status: string
-          original_filename: string
-          storage_path: string
-          updated_at: string
-          user_id: string
+          name: string
+          type: Database["public"]["Enums"]["McpIntegrationType"]
+          updatedAt: string
+          url: string | null
         }
         Insert: {
-          created_at?: string
-          embedding?: string | null
-          extracted_metadata?: Json | null
-          extracted_text?: string | null
-          file_size_bytes?: number | null
-          file_type: string
-          id?: string
-          ocr_provider?: string | null
-          ocr_status?: string
-          original_filename: string
-          storage_path: string
-          updated_at?: string
-          user_id: string
+          authHeader?: string | null
+          createdAt?: string
+          description?: string | null
+          id: string
+          name: string
+          type: Database["public"]["Enums"]["McpIntegrationType"]
+          updatedAt: string
+          url?: string | null
         }
         Update: {
-          created_at?: string
-          embedding?: string | null
-          extracted_metadata?: Json | null
-          extracted_text?: string | null
-          file_size_bytes?: number | null
-          file_type?: string
+          authHeader?: string | null
+          createdAt?: string
+          description?: string | null
           id?: string
-          ocr_provider?: string | null
-          ocr_status?: string
-          original_filename?: string
-          storage_path?: string
-          updated_at?: string
-          user_id?: string
+          name?: string
+          type?: Database["public"]["Enums"]["McpIntegrationType"]
+          updatedAt?: string
+          url?: string | null
         }
         Relationships: []
       }
-      document_versions: {
+      McpTool: {
         Row: {
-          change_summary: string | null
-          content_snapshot: Json
-          created_at: string
-          document_id: string
+          connectionId: string
+          createdAt: string
+          description: string | null
           id: string
-          version_number: number
+          isEnabled: boolean
+          name: string
+          schema: string | null
+          updatedAt: string
         }
         Insert: {
-          change_summary?: string | null
-          content_snapshot: Json
-          created_at?: string
-          document_id: string
-          id?: string
-          version_number: number
+          connectionId: string
+          createdAt?: string
+          description?: string | null
+          id: string
+          isEnabled?: boolean
+          name: string
+          schema?: string | null
+          updatedAt: string
         }
         Update: {
-          change_summary?: string | null
-          content_snapshot?: Json
-          created_at?: string
-          document_id?: string
+          connectionId?: string
+          createdAt?: string
+          description?: string | null
           id?: string
-          version_number?: number
+          isEnabled?: boolean
+          name?: string
+          schema?: string | null
+          updatedAt?: string
         }
         Relationships: [
           {
-            foreignKeyName: "document_versions_document_id_fkey"
-            columns: ["document_id"]
+            foreignKeyName: "McpTool_connectionId_fkey"
+            columns: ["connectionId"]
             isOneToOne: false
-            referencedRelation: "legal_documents"
+            referencedRelation: "McpConnection"
             referencedColumns: ["id"]
           },
         ]
       }
-      extracted_information: {
+      Newsletter: {
         Row: {
-          confidence_score: number | null
-          context: string | null
-          created_at: string
-          extracted_value: string
+          categoryId: string | null
+          createdAt: string
+          email: string
+          emailAccountId: string
           id: string
-          info_type: string
-          vault_item_id: string
-          verified: boolean | null
-          verified_at: string | null
-          verified_by: string | null
+          status: Database["public"]["Enums"]["NewsletterStatus"]
+          updatedAt: string
         }
         Insert: {
-          confidence_score?: number | null
-          context?: string | null
-          created_at?: string
-          extracted_value: string
-          id?: string
-          info_type: string
-          vault_item_id: string
-          verified?: boolean | null
-          verified_at?: string | null
-          verified_by?: string | null
+          categoryId?: string | null
+          createdAt?: string
+          email: string
+          emailAccountId: string
+          id: string
+          status?: Database["public"]["Enums"]["NewsletterStatus"]
+          updatedAt: string
         }
         Update: {
-          confidence_score?: number | null
-          context?: string | null
-          created_at?: string
-          extracted_value?: string
+          categoryId?: string | null
+          createdAt?: string
+          email?: string
+          emailAccountId?: string
           id?: string
-          info_type?: string
-          vault_item_id?: string
-          verified?: boolean | null
-          verified_at?: string | null
-          verified_by?: string | null
+          status?: Database["public"]["Enums"]["NewsletterStatus"]
+          updatedAt?: string
         }
         Relationships: [
           {
-            foreignKeyName: "extracted_information_vault_item_fkey"
-            columns: ["vault_item_id"]
+            foreignKeyName: "Newsletter_categoryId_fkey"
+            columns: ["categoryId"]
             isOneToOne: false
-            referencedRelation: "document_vault_items"
+            referencedRelation: "Category"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Newsletter_emailAccountId_fkey"
+            columns: ["emailAccountId"]
+            isOneToOne: false
+            referencedRelation: "EmailAccount"
             referencedColumns: ["id"]
           },
         ]
       }
-      legal_documents: {
-        Row: {
-          content: Json
-          created_at: string
-          density_preference: string
-          formatting_mode: string
-          id: string
-          metadata: Json | null
-          thumbnail_urls: string[] | null
-          title: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          content?: Json
-          created_at?: string
-          density_preference?: string
-          formatting_mode?: string
-          id?: string
-          metadata?: Json | null
-          thumbnail_urls?: string[] | null
-          title: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          content?: Json
-          created_at?: string
-          density_preference?: string
-          formatting_mode?: string
-          id?: string
-          metadata?: Json | null
-          thumbnail_urls?: string[] | null
-          title?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      payment_history: {
+      Payment: {
         Row: {
           amount: number
-          amount_refunded: number
-          clerk_user_id: string
-          created_at: string
+          createdAt: string
           currency: string
-          failure_code: string | null
-          failure_message: string | null
           id: string
-          metadata: Json | null
-          payment_method_type: string | null
-          receipt_url: string | null
-          refund_reason: string | null
-          refunded_at: string | null
-          status: Database["public"]["Enums"]["payment_status"]
-          stripe_charge_id: string | null
-          stripe_invoice_id: string | null
-          stripe_payment_intent_id: string
-          subscription_id: string
-          updated_at: string
+          premiumId: string | null
+          provider: Database["public"]["Enums"]["PaymentProvider"]
+          providerPaymentId: string | null
+          status: Database["public"]["Enums"]["PaymentStatus"]
+          type: Database["public"]["Enums"]["PaymentType"]
+          updatedAt: string
+          userId: string
         }
         Insert: {
           amount: number
-          amount_refunded?: number
-          clerk_user_id: string
-          created_at?: string
-          currency?: string
-          failure_code?: string | null
-          failure_message?: string | null
-          id?: string
-          metadata?: Json | null
-          payment_method_type?: string | null
-          receipt_url?: string | null
-          refund_reason?: string | null
-          refunded_at?: string | null
-          status: Database["public"]["Enums"]["payment_status"]
-          stripe_charge_id?: string | null
-          stripe_invoice_id?: string | null
-          stripe_payment_intent_id: string
-          subscription_id: string
-          updated_at?: string
+          createdAt?: string
+          currency: string
+          id: string
+          premiumId?: string | null
+          provider: Database["public"]["Enums"]["PaymentProvider"]
+          providerPaymentId?: string | null
+          status: Database["public"]["Enums"]["PaymentStatus"]
+          type: Database["public"]["Enums"]["PaymentType"]
+          updatedAt: string
+          userId: string
         }
         Update: {
           amount?: number
-          amount_refunded?: number
-          clerk_user_id?: string
-          created_at?: string
+          createdAt?: string
           currency?: string
-          failure_code?: string | null
-          failure_message?: string | null
           id?: string
-          metadata?: Json | null
-          payment_method_type?: string | null
-          receipt_url?: string | null
-          refund_reason?: string | null
-          refunded_at?: string | null
-          status?: Database["public"]["Enums"]["payment_status"]
-          stripe_charge_id?: string | null
-          stripe_invoice_id?: string | null
-          stripe_payment_intent_id?: string
-          subscription_id?: string
-          updated_at?: string
+          premiumId?: string | null
+          provider?: Database["public"]["Enums"]["PaymentProvider"]
+          providerPaymentId?: string | null
+          status?: Database["public"]["Enums"]["PaymentStatus"]
+          type?: Database["public"]["Enums"]["PaymentType"]
+          updatedAt?: string
+          userId?: string
         }
         Relationships: [
           {
-            foreignKeyName: "payment_history_subscription_id_fkey"
-            columns: ["subscription_id"]
+            foreignKeyName: "Payment_premiumId_fkey"
+            columns: ["premiumId"]
             isOneToOne: false
-            referencedRelation: "user_subscriptions"
+            referencedRelation: "Premium"
             referencedColumns: ["id"]
           },
         ]
-      }
-      payment_refunds: {
-        Row: {
-          amount_refunded: number
-          created_at: string | null
-          credits_deducted: number
-          currency: string
-          id: string
-          metadata: Json | null
-          reason: string | null
-          refund_date: string | null
-          stripe_refund_id: string
-          transaction_id: string
-        }
-        Insert: {
-          amount_refunded: number
-          created_at?: string | null
-          credits_deducted: number
-          currency: string
-          id?: string
-          metadata?: Json | null
-          reason?: string | null
-          refund_date?: string | null
-          stripe_refund_id: string
-          transaction_id: string
-        }
-        Update: {
-          amount_refunded?: number
-          created_at?: string | null
-          credits_deducted?: number
-          currency?: string
-          id?: string
-          metadata?: Json | null
-          reason?: string | null
-          refund_date?: string | null
-          stripe_refund_id?: string
-          transaction_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "payment_refunds_transaction_id_fkey"
-            columns: ["transaction_id"]
-            isOneToOne: false
-            referencedRelation: "payment_transactions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      payment_transactions: {
-        Row: {
-          amount: number
-          created_at: string | null
-          credits_purchased: number
-          currency: string
-          id: string
-          metadata: Json | null
-          status: string
-          stripe_customer_id: string | null
-          stripe_payment_intent_id: string | null
-          stripe_session_id: string
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          amount: number
-          created_at?: string | null
-          credits_purchased: number
-          currency?: string
-          id?: string
-          metadata?: Json | null
-          status: string
-          stripe_customer_id?: string | null
-          stripe_payment_intent_id?: string | null
-          stripe_session_id: string
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          amount?: number
-          created_at?: string | null
-          credits_purchased?: number
-          currency?: string
-          id?: string
-          metadata?: Json | null
-          status?: string
-          stripe_customer_id?: string | null
-          stripe_payment_intent_id?: string | null
-          stripe_session_id?: string
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      personal_data_vault_entries: {
-        Row: {
-          created_at: string
-          encrypted_value: string
-          encryption_key_id: string
-          field_key: string
-          id: string
-          last_used_at: string | null
-          updated_at: string
-          usage_count: number | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          encrypted_value: string
-          encryption_key_id: string
-          field_key: string
-          id?: string
-          last_used_at?: string | null
-          updated_at?: string
-          usage_count?: number | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          encrypted_value?: string
-          encryption_key_id?: string
-          field_key?: string
-          id?: string
-          last_used_at?: string | null
-          updated_at?: string
-          usage_count?: number | null
-          user_id?: string
-        }
-        Relationships: []
       }
       personal_info: {
         Row: {
           attorney_name: string | null
           bar_number: string | null
           city: string | null
-          created_at: string
+          created_at: string | null
           email_address: string | null
           fax_no: string | null
           firm_name: string | null
@@ -516,7 +1221,7 @@ export type Database = {
           state: string | null
           street_address: string | null
           telephone_no: string | null
-          updated_at: string
+          updated_at: string | null
           user_id: string
           zip_code: string | null
         }
@@ -524,7 +1229,7 @@ export type Database = {
           attorney_name?: string | null
           bar_number?: string | null
           city?: string | null
-          created_at?: string
+          created_at?: string | null
           email_address?: string | null
           fax_no?: string | null
           firm_name?: string | null
@@ -533,7 +1238,7 @@ export type Database = {
           state?: string | null
           street_address?: string | null
           telephone_no?: string | null
-          updated_at?: string
+          updated_at?: string | null
           user_id: string
           zip_code?: string | null
         }
@@ -541,7 +1246,7 @@ export type Database = {
           attorney_name?: string | null
           bar_number?: string | null
           city?: string | null
-          created_at?: string
+          created_at?: string | null
           email_address?: string | null
           fax_no?: string | null
           firm_name?: string | null
@@ -550,441 +1255,386 @@ export type Database = {
           state?: string | null
           street_address?: string | null
           telephone_no?: string | null
-          updated_at?: string
+          updated_at?: string | null
           user_id?: string
           zip_code?: string | null
         }
         Relationships: []
       }
-      refund_requests: {
+      Premium: {
         Row: {
-          clerk_user_id: string
-          created_at: string
-          id: string
-          ineligibility_reason: string | null
-          is_eligible: boolean
-          metadata: Json | null
-          processed_at: string | null
-          processed_by: string | null
-          reason: Database["public"]["Enums"]["refund_reason"]
-          refund_amount: number | null
-          refund_currency: string | null
-          requested_at: string
-          status: Database["public"]["Enums"]["refund_request_status"]
-          stripe_refund_id: string | null
-          subscription_id: string
-          updated_at: string
-          user_feedback: string | null
-        }
-        Insert: {
-          clerk_user_id: string
-          created_at?: string
-          id?: string
-          ineligibility_reason?: string | null
-          is_eligible: boolean
-          metadata?: Json | null
-          processed_at?: string | null
-          processed_by?: string | null
-          reason: Database["public"]["Enums"]["refund_reason"]
-          refund_amount?: number | null
-          refund_currency?: string | null
-          requested_at?: string
-          status?: Database["public"]["Enums"]["refund_request_status"]
-          stripe_refund_id?: string | null
-          subscription_id: string
-          updated_at?: string
-          user_feedback?: string | null
-        }
-        Update: {
-          clerk_user_id?: string
-          created_at?: string
-          id?: string
-          ineligibility_reason?: string | null
-          is_eligible?: boolean
-          metadata?: Json | null
-          processed_at?: string | null
-          processed_by?: string | null
-          reason?: Database["public"]["Enums"]["refund_reason"]
-          refund_amount?: number | null
-          refund_currency?: string | null
-          requested_at?: string
-          status?: Database["public"]["Enums"]["refund_request_status"]
-          stripe_refund_id?: string | null
-          subscription_id?: string
-          updated_at?: string
-          user_feedback?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "refund_requests_subscription_id_fkey"
-            columns: ["subscription_id"]
-            isOneToOne: true
-            referencedRelation: "user_subscriptions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      restoration_results: {
-        Row: {
-          cdn_cached: boolean
-          created_at: string
-          deep_link: string
-          gif_url: string
-          id: string
-          og_card_url: string
-          restored_url: string
-          session_id: string
-          watermark_applied: boolean
-        }
-        Insert: {
-          cdn_cached?: boolean
-          created_at?: string
-          deep_link: string
-          gif_url: string
-          id?: string
-          og_card_url: string
-          restored_url: string
-          session_id: string
-          watermark_applied?: boolean
-        }
-        Update: {
-          cdn_cached?: boolean
-          created_at?: string
-          deep_link?: string
-          gif_url?: string
-          id?: string
-          og_card_url?: string
-          restored_url?: string
-          session_id?: string
-          watermark_applied?: boolean
-        }
-        Relationships: [
-          {
-            foreignKeyName: "restoration_results_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: true
-            referencedRelation: "upload_sessions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      stripe_webhook_events: {
-        Row: {
-          created_at: string | null
-          error_message: string | null
-          event_id: string
-          event_type: string
-          id: string
-          payload: Json
-          processed_at: string | null
-          processing_status: string
-          retry_count: number
-        }
-        Insert: {
-          created_at?: string | null
-          error_message?: string | null
-          event_id: string
-          event_type: string
-          id?: string
-          payload: Json
-          processed_at?: string | null
-          processing_status: string
-          retry_count?: number
-        }
-        Update: {
-          created_at?: string | null
-          error_message?: string | null
-          event_id?: string
-          event_type?: string
-          id?: string
-          payload?: Json
-          processed_at?: string | null
-          processing_status?: string
-          retry_count?: number
-        }
-        Relationships: []
-      }
-      subscription_changes: {
-        Row: {
-          change_type: Database["public"]["Enums"]["change_type"]
-          changed_at: string
-          clerk_user_id: string
-          id: string
-          metadata: Json | null
-          new_price_id: string | null
-          new_status: Database["public"]["Enums"]["subscription_status"] | null
-          new_tier: Database["public"]["Enums"]["subscription_tier"] | null
-          previous_price_id: string | null
-          previous_status:
-            | Database["public"]["Enums"]["subscription_status"]
-            | null
-          previous_tier: Database["public"]["Enums"]["subscription_tier"] | null
-          proration_amount: number | null
-          reason: string | null
-          subscription_id: string
-          triggered_by: string
-        }
-        Insert: {
-          change_type: Database["public"]["Enums"]["change_type"]
-          changed_at?: string
-          clerk_user_id: string
-          id?: string
-          metadata?: Json | null
-          new_price_id?: string | null
-          new_status?: Database["public"]["Enums"]["subscription_status"] | null
-          new_tier?: Database["public"]["Enums"]["subscription_tier"] | null
-          previous_price_id?: string | null
-          previous_status?:
-            | Database["public"]["Enums"]["subscription_status"]
-            | null
-          previous_tier?:
-            | Database["public"]["Enums"]["subscription_tier"]
-            | null
-          proration_amount?: number | null
-          reason?: string | null
-          subscription_id: string
-          triggered_by: string
-        }
-        Update: {
-          change_type?: Database["public"]["Enums"]["change_type"]
-          changed_at?: string
-          clerk_user_id?: string
-          id?: string
-          metadata?: Json | null
-          new_price_id?: string | null
-          new_status?: Database["public"]["Enums"]["subscription_status"] | null
-          new_tier?: Database["public"]["Enums"]["subscription_tier"] | null
-          previous_price_id?: string | null
-          previous_status?:
-            | Database["public"]["Enums"]["subscription_status"]
-            | null
-          previous_tier?:
-            | Database["public"]["Enums"]["subscription_tier"]
-            | null
-          proration_amount?: number | null
-          reason?: string | null
-          subscription_id?: string
-          triggered_by?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "subscription_changes_subscription_id_fkey"
-            columns: ["subscription_id"]
-            isOneToOne: false
-            referencedRelation: "user_subscriptions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      upload_sessions: {
-        Row: {
-          created_at: string
-          id: string
-          original_url: string
-          retry_count: number
-          status: Database["public"]["Enums"]["session_status"]
-          ttl_expires_at: string
-          user_fingerprint: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          original_url: string
-          retry_count?: number
-          status?: Database["public"]["Enums"]["session_status"]
-          ttl_expires_at?: string
-          user_fingerprint: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          original_url?: string
-          retry_count?: number
-          status?: Database["public"]["Enums"]["session_status"]
-          ttl_expires_at?: string
-          user_fingerprint?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "upload_sessions_user_fingerprint_fkey"
-            columns: ["user_fingerprint"]
-            isOneToOne: false
-            referencedRelation: "user_quota"
-            referencedColumns: ["fingerprint"]
-          },
-        ]
-      }
-      user_credits: {
-        Row: {
-          created_at: string
-          credits_balance: number
-          credits_expired: number
-          credits_purchased: number
-          credits_used: number
-          fingerprint: string
-          id: string
-          last_purchase_at: string | null
-          stripe_customer_id: string | null
-          total_credits_purchased: number
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          credits_balance?: number
-          credits_expired?: number
-          credits_purchased?: number
-          credits_used?: number
-          fingerprint: string
-          id?: string
-          last_purchase_at?: string | null
-          stripe_customer_id?: string | null
-          total_credits_purchased?: number
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          credits_balance?: number
-          credits_expired?: number
-          credits_purchased?: number
-          credits_used?: number
-          fingerprint?: string
-          id?: string
-          last_purchase_at?: string | null
-          stripe_customer_id?: string | null
-          total_credits_purchased?: number
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      user_preferences: {
-        Row: {
-          ai_assistant_enabled: boolean | null
-          ai_auto_format_enabled: boolean | null
-          created_at: string
-          default_density_mode: string
-          default_formatting_mode: string
-          sidebar_collapsed: boolean | null
-          theme: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          ai_assistant_enabled?: boolean | null
-          ai_auto_format_enabled?: boolean | null
-          created_at?: string
-          default_density_mode?: string
-          default_formatting_mode?: string
-          sidebar_collapsed?: boolean | null
-          theme?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          ai_assistant_enabled?: boolean | null
-          ai_auto_format_enabled?: boolean | null
-          created_at?: string
-          default_density_mode?: string
-          default_formatting_mode?: string
-          sidebar_collapsed?: boolean | null
-          theme?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      user_quota: {
-        Row: {
-          created_at: string
-          fingerprint: string
-          last_restore_at: string | null
-          restore_count: number
-        }
-        Insert: {
-          created_at?: string
-          fingerprint: string
-          last_restore_at?: string | null
-          restore_count?: number
-        }
-        Update: {
-          created_at?: string
-          fingerprint?: string
-          last_restore_at?: string | null
-          restore_count?: number
-        }
-        Relationships: []
-      }
-      user_subscriptions: {
-        Row: {
-          billing_interval: string
-          cancel_at_period_end: boolean
-          canceled_at: string | null
-          clerk_user_id: string
-          created_at: string
+          aiMessages: number
+          createdAt: string
+          credits: number
           currency: string
-          current_period_end: string
-          current_period_start: string
+          features: string | null
           id: string
-          metadata: Json | null
-          price_id: string
-          refund_eligible_until: string
-          refund_requested_at: string | null
-          refunded_at: string | null
-          status: Database["public"]["Enums"]["subscription_status"]
-          stripe_customer_id: string
-          stripe_subscription_id: string
-          subscription_started_at: string
-          tier: Database["public"]["Enums"]["subscription_tier"]
-          unit_amount: number
-          updated_at: string
+          interval: string
+          name: string
+          price: number
+          tier: Database["public"]["Enums"]["PremiumTier"]
+          updatedAt: string
         }
         Insert: {
-          billing_interval: string
-          cancel_at_period_end?: boolean
-          canceled_at?: string | null
-          clerk_user_id: string
-          created_at?: string
-          currency?: string
-          current_period_end: string
-          current_period_start: string
-          id?: string
-          metadata?: Json | null
-          price_id: string
-          refund_eligible_until: string
-          refund_requested_at?: string | null
-          refunded_at?: string | null
-          status?: Database["public"]["Enums"]["subscription_status"]
-          stripe_customer_id: string
-          stripe_subscription_id: string
-          subscription_started_at?: string
-          tier: Database["public"]["Enums"]["subscription_tier"]
-          unit_amount: number
-          updated_at?: string
+          aiMessages?: number
+          createdAt?: string
+          credits?: number
+          currency: string
+          features?: string | null
+          id: string
+          interval: string
+          name: string
+          price: number
+          tier: Database["public"]["Enums"]["PremiumTier"]
+          updatedAt: string
         }
         Update: {
-          billing_interval?: string
-          cancel_at_period_end?: boolean
-          canceled_at?: string | null
-          clerk_user_id?: string
-          created_at?: string
+          aiMessages?: number
+          createdAt?: string
+          credits?: number
           currency?: string
-          current_period_end?: string
-          current_period_start?: string
+          features?: string | null
           id?: string
-          metadata?: Json | null
-          price_id?: string
-          refund_eligible_until?: string
-          refund_requested_at?: string | null
-          refunded_at?: string | null
-          status?: Database["public"]["Enums"]["subscription_status"]
-          stripe_customer_id?: string
-          stripe_subscription_id?: string
-          subscription_started_at?: string
-          tier?: Database["public"]["Enums"]["subscription_tier"]
-          unit_amount?: number
-          updated_at?: string
+          interval?: string
+          name?: string
+          price?: number
+          tier?: Database["public"]["Enums"]["PremiumTier"]
+          updatedAt?: string
+        }
+        Relationships: []
+      }
+      Referral: {
+        Row: {
+          createdAt: string
+          id: string
+          referredUserId: string | null
+          referrerUserId: string | null
+          status: Database["public"]["Enums"]["ReferralStatus"]
+          updatedAt: string
+        }
+        Insert: {
+          createdAt?: string
+          id: string
+          referredUserId?: string | null
+          referrerUserId?: string | null
+          status?: Database["public"]["Enums"]["ReferralStatus"]
+          updatedAt: string
+        }
+        Update: {
+          createdAt?: string
+          id?: string
+          referredUserId?: string | null
+          referrerUserId?: string | null
+          status?: Database["public"]["Enums"]["ReferralStatus"]
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Referral_referredUserId_fkey"
+            columns: ["referredUserId"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Referral_referrerUserId_fkey"
+            columns: ["referrerUserId"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Rule: {
+        Row: {
+          actionType: Database["public"]["Enums"]["RuleActionType"]
+          aiInstructions: string | null
+          automated: boolean
+          categoryId: string | null
+          createdAt: string
+          filterJson: string | null
+          id: string
+          includeNewsletters: boolean
+          instructions: string | null
+          name: string
+          runOnThreads: boolean
+          status: Database["public"]["Enums"]["RuleStatus"]
+          triggerType: Database["public"]["Enums"]["RuleTriggerType"]
+          type: Database["public"]["Enums"]["RuleType"]
+          updatedAt: string
+          userId: string
+        }
+        Insert: {
+          actionType?: Database["public"]["Enums"]["RuleActionType"]
+          aiInstructions?: string | null
+          automated?: boolean
+          categoryId?: string | null
+          createdAt?: string
+          filterJson?: string | null
+          id: string
+          includeNewsletters?: boolean
+          instructions?: string | null
+          name: string
+          runOnThreads?: boolean
+          status?: Database["public"]["Enums"]["RuleStatus"]
+          triggerType?: Database["public"]["Enums"]["RuleTriggerType"]
+          type?: Database["public"]["Enums"]["RuleType"]
+          updatedAt: string
+          userId: string
+        }
+        Update: {
+          actionType?: Database["public"]["Enums"]["RuleActionType"]
+          aiInstructions?: string | null
+          automated?: boolean
+          categoryId?: string | null
+          createdAt?: string
+          filterJson?: string | null
+          id?: string
+          includeNewsletters?: boolean
+          instructions?: string | null
+          name?: string
+          runOnThreads?: boolean
+          status?: Database["public"]["Enums"]["RuleStatus"]
+          triggerType?: Database["public"]["Enums"]["RuleTriggerType"]
+          type?: Database["public"]["Enums"]["RuleType"]
+          updatedAt?: string
+          userId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Rule_categoryId_fkey"
+            columns: ["categoryId"]
+            isOneToOne: false
+            referencedRelation: "Category"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Rule_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ScheduledAction: {
+        Row: {
+          createdAt: string
+          emailAccountId: string
+          executedActionId: string | null
+          executedRuleId: string | null
+          id: string
+          messageId: string
+          scheduledAt: string
+          status: Database["public"]["Enums"]["ScheduledActionStatus"]
+          threadId: string | null
+          updatedAt: string
+        }
+        Insert: {
+          createdAt?: string
+          emailAccountId: string
+          executedActionId?: string | null
+          executedRuleId?: string | null
+          id: string
+          messageId: string
+          scheduledAt: string
+          status?: Database["public"]["Enums"]["ScheduledActionStatus"]
+          threadId?: string | null
+          updatedAt: string
+        }
+        Update: {
+          createdAt?: string
+          emailAccountId?: string
+          executedActionId?: string | null
+          executedRuleId?: string | null
+          id?: string
+          messageId?: string
+          scheduledAt?: string
+          status?: Database["public"]["Enums"]["ScheduledActionStatus"]
+          threadId?: string | null
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ScheduledAction_emailAccountId_fkey"
+            columns: ["emailAccountId"]
+            isOneToOne: false
+            referencedRelation: "EmailAccount"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ScheduledAction_executedActionId_fkey"
+            columns: ["executedActionId"]
+            isOneToOne: false
+            referencedRelation: "ExecutedAction"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ScheduledAction_executedRuleId_fkey"
+            columns: ["executedRuleId"]
+            isOneToOne: false
+            referencedRelation: "ExecutedRule"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Session: {
+        Row: {
+          createdAt: string
+          expires: string
+          id: string
+          sessionToken: string
+          updatedAt: string
+          userId: string
+        }
+        Insert: {
+          createdAt?: string
+          expires: string
+          id: string
+          sessionToken: string
+          updatedAt: string
+          userId: string
+        }
+        Update: {
+          createdAt?: string
+          expires?: string
+          id?: string
+          sessionToken?: string
+          updatedAt?: string
+          userId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Session_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ThreadTracker: {
+        Row: {
+          createdAt: string
+          emailAccountId: string
+          id: string
+          threadId: string
+          type: Database["public"]["Enums"]["ThreadTrackerType"]
+          updatedAt: string
+        }
+        Insert: {
+          createdAt?: string
+          emailAccountId: string
+          id: string
+          threadId: string
+          type: Database["public"]["Enums"]["ThreadTrackerType"]
+          updatedAt: string
+        }
+        Update: {
+          createdAt?: string
+          emailAccountId?: string
+          id?: string
+          threadId?: string
+          type?: Database["public"]["Enums"]["ThreadTrackerType"]
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ThreadTracker_emailAccountId_fkey"
+            columns: ["emailAccountId"]
+            isOneToOne: false
+            referencedRelation: "EmailAccount"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      User: {
+        Row: {
+          about: string | null
+          aiInstructions: string | null
+          aiModel: Database["public"]["Enums"]["AiModel"]
+          aiProvider: Database["public"]["Enums"]["AiProvider"]
+          anthropicApiKey: string | null
+          classificationModel: Database["public"]["Enums"]["AiModel"]
+          completionModel: Database["public"]["Enums"]["AiModel"]
+          createdAt: string
+          defaultEmailAccountId: string | null
+          email: string
+          emailVerified: string | null
+          embeddingModel: Database["public"]["Enums"]["AiModel"]
+          googleApiKey: string | null
+          id: string
+          image: string | null
+          name: string | null
+          openaiApiKey: string | null
+          prompt: string | null
+          timezone: string | null
+          updatedAt: string
+        }
+        Insert: {
+          about?: string | null
+          aiInstructions?: string | null
+          aiModel?: Database["public"]["Enums"]["AiModel"]
+          aiProvider?: Database["public"]["Enums"]["AiProvider"]
+          anthropicApiKey?: string | null
+          classificationModel?: Database["public"]["Enums"]["AiModel"]
+          completionModel?: Database["public"]["Enums"]["AiModel"]
+          createdAt?: string
+          defaultEmailAccountId?: string | null
+          email: string
+          emailVerified?: string | null
+          embeddingModel?: Database["public"]["Enums"]["AiModel"]
+          googleApiKey?: string | null
+          id: string
+          image?: string | null
+          name?: string | null
+          openaiApiKey?: string | null
+          prompt?: string | null
+          timezone?: string | null
+          updatedAt: string
+        }
+        Update: {
+          about?: string | null
+          aiInstructions?: string | null
+          aiModel?: Database["public"]["Enums"]["AiModel"]
+          aiProvider?: Database["public"]["Enums"]["AiProvider"]
+          anthropicApiKey?: string | null
+          classificationModel?: Database["public"]["Enums"]["AiModel"]
+          completionModel?: Database["public"]["Enums"]["AiModel"]
+          createdAt?: string
+          defaultEmailAccountId?: string | null
+          email?: string
+          emailVerified?: string | null
+          embeddingModel?: Database["public"]["Enums"]["AiModel"]
+          googleApiKey?: string | null
+          id?: string
+          image?: string | null
+          name?: string | null
+          openaiApiKey?: string | null
+          prompt?: string | null
+          timezone?: string | null
+          updatedAt?: string
+        }
+        Relationships: []
+      }
+      VerificationToken: {
+        Row: {
+          createdAt: string
+          expires: string
+          identifier: string
+          token: string
+        }
+        Insert: {
+          createdAt?: string
+          expires: string
+          identifier: string
+          token: string
+        }
+        Update: {
+          createdAt?: string
+          expires?: string
+          identifier?: string
+          token?: string
         }
         Relationships: []
       }
@@ -993,134 +1643,90 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      add_credits:
-        | {
-            Args: {
-              p_credits_to_add: number
-              p_fingerprint: string
-              p_stripe_customer_id?: string
-              p_user_id: string
-            }
-            Returns: {
-              new_balance: number
-              success: boolean
-            }[]
-          }
-        | {
-            Args: {
-              p_credits_to_add: number
-              p_transaction_id: string
-              p_user_id: string
-            }
-            Returns: Json
-          }
-      check_quota: {
-        Args: { user_fingerprint: string }
-        Returns: {
-          last_restore_at: string
-          limit_value: number
-          remaining: number
-          requires_upgrade: boolean
-          upgrade_url: string
-        }[]
-      }
-      cleanup_expired_sessions: {
-        Args: never
-        Returns: {
-          cleanup_timestamp: string
-          deleted_count: number
-        }[]
-      }
-      consume_credit: {
-        Args: { p_fingerprint: string; p_user_id: string }
-        Returns: {
-          remaining_balance: number
-          success: boolean
-        }[]
-      }
-      deduct_credit: { Args: { p_user_id: string }; Returns: Json }
-      expire_credits: { Args: never; Returns: Json }
-      get_credit_balance: {
-        Args: { p_fingerprint: string; p_user_id: string }
-        Returns: number
-      }
-      process_refund: {
-        Args: {
-          p_amount_refunded: number
-          p_currency: string
-          p_stripe_refund_id: string
-          p_transaction_id: string
-        }
-        Returns: Json
-      }
-      search_document_vault: {
-        Args: {
-          match_count?: number
-          match_threshold?: number
-          query_embedding: string
-          user_id_param: string
-        }
-        Returns: {
-          extracted_text: string
-          id: string
-          original_filename: string
-          similarity: number
-        }[]
-      }
+      [_ in never]: never
     }
     Enums: {
-      change_type:
-        | "created"
-        | "upgraded"
-        | "downgraded"
-        | "canceled"
-        | "reactivated"
-        | "refunded"
-        | "payment_failed"
-        | "payment_succeeded"
-        | "renewed"
-      event_type:
-        | "upload_start"
-        | "restore_complete"
-        | "share_click"
-        | "upgrade_view"
-      payment_status:
-        | "succeeded"
-        | "processing"
-        | "requires_action"
-        | "requires_capture"
-        | "requires_confirmation"
-        | "requires_payment_method"
-        | "failed"
-        | "canceled"
-        | "refunded"
-        | "partially_refunded"
-      refund_reason:
-        | "not_as_expected"
-        | "found_alternative"
-        | "too_expensive"
-        | "technical_issues"
-        | "missing_features"
-        | "too_complex"
-        | "no_longer_needed"
-        | "other"
-      refund_request_status:
-        | "pending"
-        | "approved"
-        | "completed"
-        | "rejected"
-        | "failed"
-      session_status: "pending" | "processing" | "complete" | "failed"
-      subscription_status:
-        | "active"
-        | "past_due"
-        | "canceled"
-        | "incomplete"
-        | "incomplete_expired"
-        | "trialing"
-        | "unpaid"
-        | "refunded"
-      subscription_tier: "basic" | "professional" | "enterprise"
+      ActionType:
+        | "ARCHIVE"
+        | "LABEL"
+        | "REPLY"
+        | "SEND_EMAIL"
+        | "FORWARD"
+        | "DRAFT_EMAIL"
+        | "MARK_SPAM"
+        | "CALL_WEBHOOK"
+        | "MARK_READ"
+        | "DIGEST"
+        | "MOVE_FOLDER"
+      AiModel: "GPT_4O" | "GPT_4O_MINI" | "GPT_4_TURBO" | "GPT_3_5_TURBO"
+      AiProvider: "OPENAI" | "ANTHROPIC" | "GOOGLE"
+      CalendarProvider: "GOOGLE" | "OUTLOOK"
+      CategoryFilterType: "INCLUDE" | "EXCLUDE"
+      ChatStatus: "ACTIVE" | "PAUSED" | "COMPLETED"
+      CleanAction: "ARCHIVE" | "MARK_READ"
+      ColdEmailSetting:
+        | "DISABLED"
+        | "LIST"
+        | "LABEL"
+        | "ARCHIVE_AND_LABEL"
+        | "ARCHIVE_AND_READ_AND_LABEL"
+      ColdEmailStatus: "AI_LABELED_COLD" | "USER_REJECTED_COLD"
+      DigestStatus: "PENDING" | "PROCESSING" | "SENT" | "FAILED"
+      EmailAccountType: "GMAIL" | "OUTLOOK"
+      ExecutedRuleStatus:
+        | "APPLIED"
+        | "APPLYING"
+        | "REJECTED"
+        | "PENDING"
+        | "SKIPPED"
+        | "ERROR"
+      Frequency: "NEVER" | "DAILY" | "WEEKLY"
+      GroupItemType: "FROM" | "SUBJECT" | "BODY"
+      LogicalOperator: "AND" | "OR"
+      McpIntegrationType: "HTTP" | "WEBSOCKET" | "STANDARD"
+      NewsletterStatus: "APPROVED" | "UNSUBSCRIBED" | "AUTO_ARCHIVED"
+      PaymentProvider: "STRIPE" | "LEMONSQUEEZY"
+      PaymentStatus: "PENDING" | "COMPLETED" | "FAILED"
+      PaymentType: "SUBSCRIPTION" | "CREDITS" | "ONE_TIME"
+      PlanType: "FREE" | "PREMIUM"
+      PremiumTier:
+        | "BASIC_MONTHLY"
+        | "BASIC_ANNUALLY"
+        | "PRO_MONTHLY"
+        | "PRO_ANNUALLY"
+        | "BUSINESS_MONTHLY"
+        | "BUSINESS_ANNUALLY"
+        | "BUSINESS_PLUS_MONTHLY"
+        | "BUSINESS_PLUS_ANNUALLY"
+        | "COPILOT_MONTHLY"
+        | "LIFETIME"
+      ProcessorType: "LEMON_SQUEEZY" | "STRIPE"
+      ReferralStatus: "PENDING" | "COMPLETED"
+      RuleActionType: "AI" | "SIMPLE"
+      RuleStatus: "ENABLED" | "DISABLED"
+      RuleTriggerType: "AI" | "SIMPLE"
+      RuleType: "AI" | "SIMPLE"
+      ScheduledActionStatus:
+        | "PENDING"
+        | "EXECUTING"
+        | "COMPLETED"
+        | "FAILED"
+        | "CANCELLED"
+      SchedulingStatus: "PENDING" | "SCHEDULED" | "FAILED"
+      SubscriptionStatus: "ACTIVE" | "CANCELED" | "PAST_DUE" | "UNPAID"
+      SubscriptionType: "STANDARD" | "TEAM"
+      SystemType:
+        | "TO_REPLY"
+        | "FYI"
+        | "AWAITING_REPLY"
+        | "ACTIONED"
+        | "COLD_EMAIL"
+        | "NEWSLETTER"
+        | "MARKETING"
+        | "CALENDAR"
+        | "RECEIPT"
+        | "NOTIFICATION"
+      ThreadTrackerType: "AWAITING" | "NEEDS_REPLY" | "NEEDS_ACTION"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1248,64 +1854,93 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      change_type: [
-        "created",
-        "upgraded",
-        "downgraded",
-        "canceled",
-        "reactivated",
-        "refunded",
-        "payment_failed",
-        "payment_succeeded",
-        "renewed",
+      ActionType: [
+        "ARCHIVE",
+        "LABEL",
+        "REPLY",
+        "SEND_EMAIL",
+        "FORWARD",
+        "DRAFT_EMAIL",
+        "MARK_SPAM",
+        "CALL_WEBHOOK",
+        "MARK_READ",
+        "DIGEST",
+        "MOVE_FOLDER",
       ],
-      event_type: [
-        "upload_start",
-        "restore_complete",
-        "share_click",
-        "upgrade_view",
+      AiModel: ["GPT_4O", "GPT_4O_MINI", "GPT_4_TURBO", "GPT_3_5_TURBO"],
+      AiProvider: ["OPENAI", "ANTHROPIC", "GOOGLE"],
+      CalendarProvider: ["GOOGLE", "OUTLOOK"],
+      CategoryFilterType: ["INCLUDE", "EXCLUDE"],
+      ChatStatus: ["ACTIVE", "PAUSED", "COMPLETED"],
+      CleanAction: ["ARCHIVE", "MARK_READ"],
+      ColdEmailSetting: [
+        "DISABLED",
+        "LIST",
+        "LABEL",
+        "ARCHIVE_AND_LABEL",
+        "ARCHIVE_AND_READ_AND_LABEL",
       ],
-      payment_status: [
-        "succeeded",
-        "processing",
-        "requires_action",
-        "requires_capture",
-        "requires_confirmation",
-        "requires_payment_method",
-        "failed",
-        "canceled",
-        "refunded",
-        "partially_refunded",
+      ColdEmailStatus: ["AI_LABELED_COLD", "USER_REJECTED_COLD"],
+      DigestStatus: ["PENDING", "PROCESSING", "SENT", "FAILED"],
+      EmailAccountType: ["GMAIL", "OUTLOOK"],
+      ExecutedRuleStatus: [
+        "APPLIED",
+        "APPLYING",
+        "REJECTED",
+        "PENDING",
+        "SKIPPED",
+        "ERROR",
       ],
-      refund_reason: [
-        "not_as_expected",
-        "found_alternative",
-        "too_expensive",
-        "technical_issues",
-        "missing_features",
-        "too_complex",
-        "no_longer_needed",
-        "other",
+      Frequency: ["NEVER", "DAILY", "WEEKLY"],
+      GroupItemType: ["FROM", "SUBJECT", "BODY"],
+      LogicalOperator: ["AND", "OR"],
+      McpIntegrationType: ["HTTP", "WEBSOCKET", "STANDARD"],
+      NewsletterStatus: ["APPROVED", "UNSUBSCRIBED", "AUTO_ARCHIVED"],
+      PaymentProvider: ["STRIPE", "LEMONSQUEEZY"],
+      PaymentStatus: ["PENDING", "COMPLETED", "FAILED"],
+      PaymentType: ["SUBSCRIPTION", "CREDITS", "ONE_TIME"],
+      PlanType: ["FREE", "PREMIUM"],
+      PremiumTier: [
+        "BASIC_MONTHLY",
+        "BASIC_ANNUALLY",
+        "PRO_MONTHLY",
+        "PRO_ANNUALLY",
+        "BUSINESS_MONTHLY",
+        "BUSINESS_ANNUALLY",
+        "BUSINESS_PLUS_MONTHLY",
+        "BUSINESS_PLUS_ANNUALLY",
+        "COPILOT_MONTHLY",
+        "LIFETIME",
       ],
-      refund_request_status: [
-        "pending",
-        "approved",
-        "completed",
-        "rejected",
-        "failed",
+      ProcessorType: ["LEMON_SQUEEZY", "STRIPE"],
+      ReferralStatus: ["PENDING", "COMPLETED"],
+      RuleActionType: ["AI", "SIMPLE"],
+      RuleStatus: ["ENABLED", "DISABLED"],
+      RuleTriggerType: ["AI", "SIMPLE"],
+      RuleType: ["AI", "SIMPLE"],
+      ScheduledActionStatus: [
+        "PENDING",
+        "EXECUTING",
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
       ],
-      session_status: ["pending", "processing", "complete", "failed"],
-      subscription_status: [
-        "active",
-        "past_due",
-        "canceled",
-        "incomplete",
-        "incomplete_expired",
-        "trialing",
-        "unpaid",
-        "refunded",
+      SchedulingStatus: ["PENDING", "SCHEDULED", "FAILED"],
+      SubscriptionStatus: ["ACTIVE", "CANCELED", "PAST_DUE", "UNPAID"],
+      SubscriptionType: ["STANDARD", "TEAM"],
+      SystemType: [
+        "TO_REPLY",
+        "FYI",
+        "AWAITING_REPLY",
+        "ACTIONED",
+        "COLD_EMAIL",
+        "NEWSLETTER",
+        "MARKETING",
+        "CALENDAR",
+        "RECEIPT",
+        "NOTIFICATION",
       ],
-      subscription_tier: ["basic", "professional", "enterprise"],
+      ThreadTrackerType: ["AWAITING", "NEEDS_REPLY", "NEEDS_ACTION"],
     },
   },
 } as const
