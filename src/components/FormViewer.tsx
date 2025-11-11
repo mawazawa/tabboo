@@ -388,6 +388,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                               pointerEvents: 'auto',
                               // Expand clickable area with negative margin
                               margin: '-8px',
+                              // Scale with zoom
+                              transform: `scale(${zoom})`,
+                              transformOrigin: 'top left',
                             }}
                             onClick={(e) => handleFieldClick(overlay.field, e)}
                             onPointerDown={(e) => handlePointerDown(e, overlay.field, position.top, position.left)}
