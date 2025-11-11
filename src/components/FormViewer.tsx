@@ -83,10 +83,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     const target = e.target as HTMLElement;
     if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.closest('button')) return;
     
-    // Allow direct drag without edit mode - but only if holding Ctrl/Cmd or field is in edit mode
-    const isDragAllowed = editModeField === field || e.ctrlKey || e.metaKey;
-    if (!isDragAllowed) return;
-    
+    // Allow direct drag on the field container itself
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(field);
@@ -247,9 +244,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                           return (
                             <div
                             key={idx}
-                            className={`field-container absolute select-none touch-none spring-hover ${
-                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-4 ring-green-600 opacity-90 shadow-3point' : 
-                              isEditMode ? 'cursor-grab ring-4 ring-green-600 shadow-3point' : 'cursor-pointer'
+                            className={`field-container absolute select-none touch-none spring-hover p-1 ${
+                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-4 ring-primary opacity-90 shadow-3point' : 
+                              'cursor-grab'
                             } ${
                               highlightedField === overlay.field
                                 ? 'ring-4 ring-accent shadow-3point-hover animate-pulse bg-accent/20 chamfered' :
@@ -355,11 +352,6 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 value={formData[overlay.field as keyof FormData] as string || ''}
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
-                                onPointerDown={(e) => {
-                                  if (!isEditMode) {
-                                    e.stopPropagation();
-                                  }
-                                }}
                                 disabled={isEditMode}
                                 className={`h-12 text-base border-hairline shadow-3point chamfered ${
                                   isEditMode
@@ -377,11 +369,6 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 value={formData[overlay.field as keyof FormData] as string || ''}
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
-                                onMouseDown={(e) => {
-                                  if (!isEditMode) {
-                                    e.stopPropagation();
-                                  }
-                                }}
                                 disabled={isEditMode}
                                 className={`text-sm resize-none ${
                                   isEditMode
