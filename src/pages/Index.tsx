@@ -1,12 +1,16 @@
-import { FormViewer } from "@/components/FormViewer";
-import { FieldNavigationPanel } from "@/components/FieldNavigationPanel";
-import { DraggableAIAssistant } from "@/components/DraggableAIAssistant";
-import { PersonalDataVaultPanel } from "@/components/PersonalDataVaultPanel";
-import { PDFThumbnailSidebar } from "@/components/PDFThumbnailSidebar";
-import { FieldSearchBar } from "@/components/FieldSearchBar";
-import { TemplateManager } from "@/components/TemplateManager";
-import { FieldGroupManager } from "@/components/FieldGroupManager";
-import { CommandPalette } from "@/components/CommandPalette";
+import { lazy, Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Aggressive code splitting - lazy load all heavy components
+const FormViewer = lazy(() => import("@/components/FormViewer").then(m => ({ default: m.FormViewer })));
+const FieldNavigationPanel = lazy(() => import("@/components/FieldNavigationPanel").then(m => ({ default: m.FieldNavigationPanel })));
+const DraggableAIAssistant = lazy(() => import("@/components/DraggableAIAssistant").then(m => ({ default: m.DraggableAIAssistant })));
+const PersonalDataVaultPanel = lazy(() => import("@/components/PersonalDataVaultPanel").then(m => ({ default: m.PersonalDataVaultPanel })));
+const PDFThumbnailSidebar = lazy(() => import("@/components/PDFThumbnailSidebar").then(m => ({ default: m.PDFThumbnailSidebar })));
+const FieldSearchBar = lazy(() => import("@/components/FieldSearchBar").then(m => ({ default: m.FieldSearchBar })));
+const TemplateManager = lazy(() => import("@/components/TemplateManager").then(m => ({ default: m.TemplateManager })));
+const FieldGroupManager = lazy(() => import("@/components/FieldGroupManager").then(m => ({ default: m.FieldGroupManager })));
+const CommandPalette = lazy(() => import("@/components/CommandPalette").then(m => ({ default: m.CommandPalette })));
 import { FileText, MessageSquare, LogOut, Loader2, Calculator, PanelLeftClose, PanelRightClose, Shield, Settings, Sparkles } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { 
@@ -20,6 +24,24 @@ import { autofillAllFromVault, getAutofillableFields, type PersonalVaultData } f
 import { preloadDistributionCalculator } from "@/utils/routePreloader";
 import { prefetchUserData } from "@/utils/dataPrefetcher";
 import { useState, useEffect, useRef } from "react";
+
+// Loading fallbacks for code-split components
+const PanelSkeleton = () => (
+  <div className="w-full h-full p-4 space-y-4">
+    <Skeleton className="h-12 w-full" />
+    <Skeleton className="h-24 w-full" />
+    <Skeleton className="h-24 w-full" />
+  </div>
+);
+
+const ViewerSkeleton = () => (
+  <div className="w-full h-full flex items-center justify-center">
+    <div className="space-y-4 text-center">
+      <Skeleton className="h-96 w-full max-w-2xl mx-auto" />
+      <Skeleton className="h-4 w-48 mx-auto" />
+    </div>
+  </div>
+);
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -471,16 +493,18 @@ const Index = () => {
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-background via-background to-primary/5 w-full overflow-hidden">
       {/* Command Palette - Cmd+K */}
-      <CommandPalette
-        onToggleAI={() => setShowAIPanel(!showAIPanel)}
-        onToggleFields={() => setShowFieldsPanel(!showFieldsPanel)}
-        onToggleVault={() => setShowVaultPanel(!showVaultPanel)}
-        onToggleThumbnails={() => setShowThumbnails(!showThumbnails)}
-        onOpenSettings={() => setSettingsSheetOpen(true)}
-        onAutofillAll={handleAutofillAll}
-        onLogout={handleLogout}
-        userId={user?.id}
-      />
+      <Suspense fallback={null}>
+        <CommandPalette
+          onToggleAI={() => setShowAIPanel(!showAIPanel)}
+          onToggleFields={() => setShowFieldsPanel(!showFieldsPanel)}
+          onToggleVault={() => setShowVaultPanel(!showVaultPanel)}
+          onToggleThumbnails={() => setShowThumbnails(!showThumbnails)}
+          onOpenSettings={() => setSettingsSheetOpen(true)}
+          onAutofillAll={handleAutofillAll}
+          onLogout={handleLogout}
+          userId={user?.id}
+        />
+      </Suspense>
       
       {/* Header */}
       <header className="border-b-2 bg-card/80 backdrop-blur-sm z-50 shadow-medium flex-shrink-0">
@@ -757,13 +781,15 @@ const Index = () => {
                 }}
                 className={showThumbnails ? "" : "hidden"}
               >
-                <PDFThumbnailSidebar 
-                  currentPage={currentPDFPage}
-                  onPageClick={setCurrentPDFPage}
-                  currentFieldPositions={getCurrentFieldPositions()}
-                  showFieldIndicator={currentFieldIndex >= 0 || selectedFields.length > 0 || !!highlightedField}
-                  panelWidth={thumbnailPanelWidth}
-                />
+                <Suspense fallback={<PanelSkeleton />}>
+                  <PDFThumbnailSidebar 
+                    currentPage={currentPDFPage}
+                    onPageClick={setCurrentPDFPage}
+                    currentFieldPositions={getCurrentFieldPositions()}
+                    showFieldIndicator={currentFieldIndex >= 0 || selectedFields.length > 0 || !!highlightedField}
+                    panelWidth={thumbnailPanelWidth}
+                  />
+                </Suspense>
               </ResizablePanel>
               
               {showThumbnails && (
@@ -777,18 +803,20 @@ const Index = () => {
                 defaultSize={75}
                 minSize={50}
               >
-                <FormViewer 
-                  formData={formData} 
-                  updateField={updateField}
-                  currentFieldIndex={currentFieldIndex}
-                  setCurrentFieldIndex={setCurrentFieldIndex}
-                  fieldPositions={fieldPositions}
-                  updateFieldPosition={updateFieldPosition}
-                  zoom={pdfZoom}
-                  highlightedField={highlightedField}
-                  validationErrors={validationErrors}
-                  vaultData={vaultData as PersonalVaultData}
-                />
+                <Suspense fallback={<ViewerSkeleton />}>
+                  <FormViewer 
+                    formData={formData} 
+                    updateField={updateField}
+                    currentFieldIndex={currentFieldIndex}
+                    setCurrentFieldIndex={setCurrentFieldIndex}
+                    fieldPositions={fieldPositions}
+                    updateFieldPosition={updateFieldPosition}
+                    zoom={pdfZoom}
+                    highlightedField={highlightedField}
+                    validationErrors={validationErrors}
+                    vaultData={vaultData as PersonalVaultData}
+                  />
+                </Suspense>
               </ResizablePanel>
             </ResizablePanelGroup>
           </ResizablePanel>
@@ -806,47 +834,51 @@ const Index = () => {
             className={showFieldsPanel || showVaultPanel ? "" : "hidden"}
           >
             <div className="h-full pl-3">
-              {showVaultPanel ? (
-                <PersonalDataVaultPanel userId={user?.id || ''} />
-              ) : (
-                <FieldNavigationPanel 
-                  formData={formData} 
-                  updateField={updateField}
-                  currentFieldIndex={currentFieldIndex}
-                  setCurrentFieldIndex={setCurrentFieldIndex}
-                  fieldPositions={fieldPositions}
-                  updateFieldPosition={updateFieldPosition}
-                  selectedFields={selectedFields}
-                  setSelectedFields={setSelectedFields}
-                  onSnapToGrid={handleSnapToGrid}
-                  onAlignHorizontal={handleAlignHorizontal}
-                  onAlignVertical={handleAlignVertical}
-                  onDistribute={handleDistribute}
-                  onCopyPositions={handleCopyPositions}
-                  onPastePositions={handlePastePositions}
-                  onTransformPositions={handleTransformPositions}
-                  hasCopiedPositions={!!copiedFieldPositions}
-                  onFieldHover={setHighlightedField}
-                  validationRules={validationRules}
-                  validationErrors={validationErrors}
-                  onSaveValidationRules={handleSaveValidationRules}
-                  settingsSheetOpen={settingsSheetOpen}
-                  onSettingsSheetChange={setSettingsSheetOpen}
-                  onApplyTemplate={handleApplyTemplate}
-                  onApplyGroup={handleApplyGroup}
-                />
-              )}
+              <Suspense fallback={<PanelSkeleton />}>
+                {showVaultPanel ? (
+                  <PersonalDataVaultPanel userId={user?.id || ''} />
+                ) : (
+                  <FieldNavigationPanel 
+                    formData={formData} 
+                    updateField={updateField}
+                    currentFieldIndex={currentFieldIndex}
+                    setCurrentFieldIndex={setCurrentFieldIndex}
+                    fieldPositions={fieldPositions}
+                    updateFieldPosition={updateFieldPosition}
+                    selectedFields={selectedFields}
+                    setSelectedFields={setSelectedFields}
+                    onSnapToGrid={handleSnapToGrid}
+                    onAlignHorizontal={handleAlignHorizontal}
+                    onAlignVertical={handleAlignVertical}
+                    onDistribute={handleDistribute}
+                    onCopyPositions={handleCopyPositions}
+                    onPastePositions={handlePastePositions}
+                    onTransformPositions={handleTransformPositions}
+                    hasCopiedPositions={!!copiedFieldPositions}
+                    onFieldHover={setHighlightedField}
+                    validationRules={validationRules}
+                    validationErrors={validationErrors}
+                    onSaveValidationRules={handleSaveValidationRules}
+                    settingsSheetOpen={settingsSheetOpen}
+                    onSettingsSheetChange={setSettingsSheetOpen}
+                    onApplyTemplate={handleApplyTemplate}
+                    onApplyGroup={handleApplyGroup}
+                  />
+                )}
+              </Suspense>
             </div>
           </ResizablePanel>
         </ResizablePanelGroup>
 
         {/* Draggable AI Assistant */}
-        <DraggableAIAssistant 
-          formContext={formData}
-          vaultData={vaultData}
-          isVisible={showAIPanel}
-          onToggleVisible={() => setShowAIPanel(!showAIPanel)}
-        />
+        <Suspense fallback={null}>
+          <DraggableAIAssistant 
+            formContext={formData}
+            vaultData={vaultData}
+            isVisible={showAIPanel}
+            onToggleVisible={() => setShowAIPanel(!showAIPanel)}
+          />
+        </Suspense>
       </main>
 
       {/* Personal Data Vault Sheet */}
@@ -859,7 +891,9 @@ const Index = () => {
             </SheetDescription>
           </SheetHeader>
           <div className="mt-6">
-            {user?.id && <PersonalDataVaultPanel userId={user.id} />}
+            <Suspense fallback={<PanelSkeleton />}>
+              {user?.id && <PersonalDataVaultPanel userId={user.id} />}
+            </Suspense>
           </div>
         </SheetContent>
       </Sheet>
