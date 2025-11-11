@@ -454,15 +454,20 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                           >
                             {/* Field Controls - Always visible for current field, or on hover */}
                             <div className={`transition-opacity duration-200 ${isCurrentField || isEditMode ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-                              {isCurrentField && !isEditMode && (
+                              {isCurrentField && (
                                 <>
-                                  <div className="absolute -top-10 left-0 bg-primary text-primary-foreground px-3 py-2 rounded-lg text-sm font-medium shadow-3point whitespace-nowrap chamfered flex items-center gap-2">
-                                    {overlay.placeholder || overlay.field}
-                                    {canAutofillField && !hasValue && (
+                                  <div className={`absolute -top-10 left-0 px-3 py-2 rounded-lg text-sm font-medium shadow-3point whitespace-nowrap chamfered flex items-center gap-2 ${
+                                    isEditMode 
+                                      ? 'bg-green-600 text-white' 
+                                      : 'bg-primary text-primary-foreground'
+                                  }`}>
+                                    {isEditMode && <Move className="h-4 w-4" strokeWidth={1.5} />}
+                                    {isEditMode ? 'Move Mode Active' : overlay.placeholder || overlay.field}
+                                    {!isEditMode && canAutofillField && !hasValue && (
                                       <Sparkles className="h-3 w-3 animate-pulse" strokeWidth={2} />
                                     )}
                                   </div>
-                                  {/* Premium Touch-Friendly Control Arrows */}
+                                  {/* Premium Touch-Friendly Control Arrows - visible in both modes */}
                                   <div className="absolute -top-40 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
                                     <Tooltip>
                                       <TooltipTrigger asChild>
@@ -514,7 +519,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                         </TooltipTrigger>
                                         <TooltipContent>
                                           <p>Move field right</p>
-                                        </TooltipContent>
+                                          </TooltipContent>
                                       </Tooltip>
                                     </div>
                                     <Tooltip>
@@ -536,12 +541,6 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                     </Tooltip>
                                   </div>
                                 </>
-                              )}
-                              {isEditMode && (
-                                <div className="absolute -top-10 left-0 bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium shadow-3point whitespace-nowrap flex items-center gap-2 chamfered">
-                                  <Move className="h-4 w-4" strokeWidth={1.5} />
-                                  Swipe to Move: {overlay.placeholder || overlay.field}
-                                </div>
                               )}
                               {canAutofillField && !hasValue && (
                                 <Tooltip>
