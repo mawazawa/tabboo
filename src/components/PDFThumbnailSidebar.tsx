@@ -50,7 +50,7 @@ export const PDFThumbnailSidebar = ({
           {open && <SidebarGroupLabel>Document Pages</SidebarGroupLabel>}
           <SidebarGroupContent>
             <ScrollArea className="h-[calc(100vh-140px)]">
-              <div className="pl-2 pb-2 space-y-3">
+              <div className="pb-2 space-y-3">
                 <Document
                   file="/fl320.pdf"
                   onLoadSuccess={onDocumentLoadSuccess}
