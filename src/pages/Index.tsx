@@ -82,6 +82,8 @@ const Index = () => {
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [highlightedField, setHighlightedField] = useState<string | null>(null);
   const [copiedFieldPositions, setCopiedFieldPositions] = useState<Record<string, { top: number; left: number }> | null>(null);
+  const [validationRules, setValidationRules] = useState<Record<string, any[]>>({});
+  const [validationErrors, setValidationErrors] = useState<Record<string, any[]>>({});
   const { toast } = useToast();
   const hasUnsavedChanges = useRef(false);
 
@@ -108,6 +110,16 @@ const Index = () => {
   const updateField = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     hasUnsavedChanges.current = true;
+    
+    // Validate field if it has rules
+    if (validationRules[field]) {
+      const { validateField } = require('@/utils/fieldValidator');
+      const errors = validateField(field, value, validationRules[field]);
+      setValidationErrors(prev => ({
+        ...prev,
+        [field]: errors
+      }));
+    }
   };
 
   const updateFieldPosition = (field: string, position: { top: number; left: number }) => {
@@ -222,6 +234,22 @@ const Index = () => {
     toast({ title: "Template applied", description: `Loaded ${Object.keys(template.fields).length} field positions` });
   };
 
+  const handleSaveValidationRules = (fieldName: string, rules: any[]) => {
+    setValidationRules(prev => ({
+      ...prev,
+      [fieldName]: rules
+    }));
+    hasUnsavedChanges.current = true;
+    
+    // Re-validate the field immediately with new rules
+    const { validateField } = require('@/utils/fieldValidator');
+    const errors = validateField(fieldName, formData[fieldName], rules);
+    setValidationErrors(prev => ({
+      ...prev,
+      [fieldName]: errors
+    }));
+  };
+
   // Get current field position for minimap indicator
   const getCurrentFieldPosition = () => {
     const fieldConfigs = [
@@ -294,6 +322,7 @@ const Index = () => {
         setFormData(((data as any).content as any) || {});
         const metadata = (data as any).metadata as any;
         setFieldPositions(metadata?.fieldPositions || {});
+        setValidationRules(metadata?.validationRules || {});
       } else if (!error) {
         // Create new document
         const { data: newDoc } = await supabase
@@ -301,7 +330,7 @@ const Index = () => {
           .insert({
             title: 'FL-320 Form',
             content: {},
-            metadata: { fieldPositions: {} },
+            metadata: { fieldPositions: {}, validationRules: {} },
             user_id: user.id
           } as any)
           .select()
@@ -325,7 +354,7 @@ const Index = () => {
         .from('legal_documents' as any)
         .update({
           content: formData,
-          metadata: { fieldPositions },
+          metadata: { fieldPositions, validationRules },
           updated_at: new Date().toISOString()
         } as any)
         .eq('id', documentId);
@@ -616,6 +645,7 @@ const Index = () => {
                   updateFieldPosition={updateFieldPosition}
                   zoom={pdfZoom}
                   highlightedField={highlightedField}
+                  validationErrors={validationErrors}
                 />
               </ResizablePanel>
             </ResizablePanelGroup>
@@ -654,6 +684,9 @@ const Index = () => {
                       onTransformPositions={handleTransformPositions}
                       hasCopiedPositions={!!copiedFieldPositions}
                       onFieldHover={setHighlightedField}
+                      validationRules={validationRules}
+                      validationErrors={validationErrors}
+                      onSaveValidationRules={handleSaveValidationRules}
                     />
                   )}
                 </div>

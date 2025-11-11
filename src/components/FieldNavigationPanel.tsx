@@ -5,12 +5,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Copy, Move, Search, X } from "lucide-react";
+import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Copy, Move, Search, X, AlertCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ValidationRuleEditor } from "./ValidationRuleEditor";
 import { FieldPresetsToolbar } from "./FieldPresetsToolbar";
 
 interface FormData {
@@ -62,6 +63,9 @@ interface Props {
   onTransformPositions: (transformation: { offsetX?: number; offsetY?: number; scale?: number }) => void;
   hasCopiedPositions: boolean;
   onFieldHover?: (fieldName: string | null) => void;
+  validationRules?: Record<string, any[]>;
+  validationErrors?: Record<string, any[]>;
+  onSaveValidationRules?: (fieldName: string, rules: any[]) => void;
 }
 
 const FIELD_CONFIG: FieldConfig[] = [
@@ -104,7 +108,10 @@ export const FieldNavigationPanel = ({
   onPastePositions,
   onTransformPositions,
   hasCopiedPositions,
-  onFieldHover
+  onFieldHover,
+  validationRules = {},
+  validationErrors = {},
+  onSaveValidationRules,
 }: Props) => {
   const fieldRefs = useRef<(HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | null)[]>([]);
   const scrollViewportRef = useRef<HTMLDivElement>(null);
@@ -620,6 +627,8 @@ export const FieldNavigationPanel = ({
               const originalIndex = FIELD_CONFIG.findIndex(f => f.field === config.field);
               const isActive = originalIndex === currentFieldIndex;
               const isSelected = selectedFields.includes(config.field);
+              const fieldErrors = validationErrors[config.field] || [];
+              const hasErrors = fieldErrors.length > 0;
               
               return (
                 <div
@@ -630,6 +639,8 @@ export const FieldNavigationPanel = ({
                       ? 'border-primary bg-primary/5 shadow-3point-hover scale-[1.02]' 
                       : isSelected
                       ? 'border-blue-500 bg-blue-500/10 shadow-3point-hover'
+                      : hasErrors
+                      ? 'border-destructive bg-destructive/5'
                       : 'border-transparent hover:border-muted'
                   }`}
                   onClick={(e) => {
@@ -660,16 +671,28 @@ export const FieldNavigationPanel = ({
                   {isSelected && !isActive && (
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 via-blue-500 to-blue-500/50 rounded-l-lg" />
                   )}
+                  {/* Error Indicator */}
+                  {hasErrors && !isActive && (
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-destructive via-destructive to-destructive/50 rounded-l-lg" />
+                  )}
                   <div className="flex items-center justify-between gap-2">
                     <Label 
                       htmlFor={config.field} 
                       className={`text-xs font-medium transition-colors duration-200 ${
-                        isActive ? 'text-primary' : isSelected ? 'text-blue-600' : 'text-muted-foreground'
+                        isActive ? 'text-primary' : isSelected ? 'text-blue-600' : hasErrors ? 'text-destructive' : 'text-muted-foreground'
                       }`}
                     >
                       {originalIndex + 1}. {config.label}
                     </Label>
                     <div className="flex items-center gap-2">
+                      {onSaveValidationRules && (
+                        <ValidationRuleEditor
+                          fieldName={config.field}
+                          currentRules={validationRules[config.field] || []}
+                          onSave={onSaveValidationRules}
+                          triggerless={false}
+                        />
+                      )}
                       {config.vaultField && personalInfo && personalInfo[config.vaultField as keyof typeof personalInfo] && (
                         <Button
                           size="sm"
@@ -697,6 +720,18 @@ export const FieldNavigationPanel = ({
                 {config.vaultField && personalInfo && personalInfo[config.vaultField as keyof typeof personalInfo] && (
                   <div className="text-xs text-muted-foreground bg-muted/50 rounded px-2 py-1 font-mono truncate">
                     Saved: {personalInfo[config.vaultField as keyof typeof personalInfo]}
+                  </div>
+                )}
+
+                {/* Validation Errors */}
+                {hasErrors && (
+                  <div className="space-y-1">
+                    {fieldErrors.map((error, idx) => (
+                      <div key={idx} className="text-xs text-destructive bg-destructive/10 rounded px-2 py-1 flex items-start gap-1">
+                        <AlertCircle className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                        <span>{error.message}</span>
+                      </div>
+                    ))}
                   </div>
                 )}
 

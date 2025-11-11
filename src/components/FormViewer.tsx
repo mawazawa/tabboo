@@ -56,9 +56,10 @@ interface Props {
   updateFieldPosition: (field: string, position: { top: number; left: number }) => void;
   zoom?: number;
   highlightedField?: string | null;
+  validationErrors?: Record<string, any[]>;
 }
 
-export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, zoom = 1, highlightedField = null }: Props) => {
+export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, zoom = 1, highlightedField = null, validationErrors = {} }: Props) => {
   const [numPages, setNumPages] = useState<number>(0);
   const [pageWidth, setPageWidth] = useState<number>(850);
   const [isDragging, setIsDragging] = useState<string | null>(null);
@@ -363,7 +364,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 className={`h-12 text-base border-hairline shadow-3point chamfered ${
                                   isEditMode
                                     ? 'bg-green-600/10 border-green-600 cursor-grab pointer-events-none' :
-                                  isCurrentField 
+                                  validationErrors?.[overlay.field]?.length
+                                    ? 'bg-destructive/10 border-destructive ring-2 ring-destructive/20'
+                                    : isCurrentField 
                                     ? 'bg-primary/10 border-primary' 
                                     : 'bg-white/90 border-primary/50'
                                 }`}
@@ -383,7 +386,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 className={`text-sm resize-none ${
                                   isEditMode
                                     ? 'bg-green-600/10 border-green-600 border-2 cursor-grab pointer-events-none' :
-                                  isCurrentField 
+                                  validationErrors?.[overlay.field]?.length
+                                    ? 'bg-destructive/10 border-destructive border-2 ring-2 ring-destructive/20'
+                                    : isCurrentField 
                                     ? 'bg-primary/10 border-primary border-2' 
                                     : 'bg-white/90 border-primary/50'
                                 }`}
