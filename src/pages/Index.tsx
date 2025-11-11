@@ -130,13 +130,26 @@ const Index = () => {
   };
 
   const handleAutofillAll = () => {
+    console.log('Autofill triggered. Vault data:', vaultData);
+    
+    if (!vaultData) {
+      toast({ 
+        title: "No vault data found", 
+        description: "Please save your information to the Personal Data Vault first",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     const autofilled = autofillAllFromVault(vaultData as PersonalVaultData);
     const fieldsCount = Object.keys(autofilled).length;
     
+    console.log('Autofilled data:', autofilled, 'Fields count:', fieldsCount);
+    
     if (fieldsCount === 0) {
       toast({ 
-        title: "No data available", 
-        description: "Please add information to your Personal Data Vault first",
+        title: "No matching fields", 
+        description: "No form fields match your Personal Data Vault entries",
         variant: "destructive"
       });
       return;
@@ -145,8 +158,9 @@ const Index = () => {
     setFormData(prev => ({ ...prev, ...autofilled }));
     hasUnsavedChanges.current = true;
     toast({ 
-      title: "Autofilled successfully", 
-      description: `${fieldsCount} field(s) filled from your Personal Data Vault` 
+      title: "✨ Magic Complete!", 
+      description: `Autofilled ${fieldsCount} field(s) from your Personal Data Vault`,
+      duration: 3000,
     });
   };
 
@@ -540,19 +554,33 @@ const Index = () => {
           {/* Personal Data Vault Button */}
           <PersonalDataVault userId={user?.id} />
 
-          {/* Autofill All Button */}
-          {vaultData && getAutofillableFields(vaultData as PersonalVaultData).length > 0 && (
-            <Button
-              variant="default"
-              size="sm"
-              onClick={handleAutofillAll}
-              className="gap-2 bg-gradient-to-r from-accent to-primary hover:shadow-3point-hover"
-              title="Autofill all fields from Personal Data Vault"
-            >
-              <Sparkles className="h-4 w-4 animate-pulse" strokeWidth={2} />
-              Autofill All ({getAutofillableFields(vaultData as PersonalVaultData).length})
-            </Button>
-          )}
+          {/* THE LEGENDARY AUTOFILL BUTTON - Most Prominent Button in the App */}
+          <Button
+            variant="default"
+            size="lg"
+            onClick={handleAutofillAll}
+            disabled={!vaultData}
+            className="relative gap-3 px-8 py-6 text-lg font-bold bg-gradient-to-br from-accent via-primary to-accent bg-size-200 animate-gradient-flow hover:scale-105 active:scale-95 shadow-glow hover:shadow-glow-intense border-2 border-accent/50 hover:border-accent transition-all duration-300 ease-out chamfered overflow-hidden group"
+            title={vaultData ? "Autofill all fields from Personal Data Vault" : "Please save your Personal Data Vault first"}
+          >
+            {/* Animated background shine effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
+            
+            {/* Sparkle icon with multiple animations */}
+            <Sparkles className="h-6 w-6 animate-bounce-subtle drop-shadow-glow relative z-10" strokeWidth={2.5} />
+            
+            {/* Button text */}
+            <span className="relative z-10 drop-shadow-md">
+              Autofill All Fields
+            </span>
+            
+            {/* Badge count */}
+            {vaultData && getAutofillableFields(vaultData as PersonalVaultData).length > 0 && (
+              <span className="relative z-10 px-3 py-1 text-sm font-extrabold bg-white/20 backdrop-blur-sm rounded-full border-2 border-white/30 animate-pulse-gentle">
+                {getAutofillableFields(vaultData as PersonalVaultData).length}
+              </span>
+            )}
+          </Button>
 
           <div className="h-6 w-px bg-border" />
 
