@@ -392,8 +392,8 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             onClick={(e) => handleFieldClick(overlay.field, e)}
                             onPointerDown={(e) => handlePointerDown(e, overlay.field, position.top, position.left)}
                           >
-                            {/* Field Controls - Show on hover only */}
-                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                            {/* Field Controls - Always visible for current field, or on hover */}
+                            <div className={`transition-opacity duration-200 ${isCurrentField || isEditMode ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
                               {isCurrentField && !isEditMode && (
                                 <>
                                   <div className="absolute -top-10 left-0 bg-primary text-primary-foreground px-3 py-2 rounded-lg text-sm font-medium shadow-3point whitespace-nowrap chamfered flex items-center gap-2">
@@ -403,7 +403,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                     )}
                                   </div>
                                   {/* Premium Touch-Friendly Control Arrows */}
-                                  <div className="absolute -top-32 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+                                  <div className="absolute -top-40 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
                                     <Tooltip>
                                       <TooltipTrigger asChild>
                                         <Button
@@ -445,23 +445,6 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                             size="icon"
                                             onClick={(e) => {
                                               e.stopPropagation();
-                                              adjustPosition('down', overlay.field);
-                                            }}
-                                            className="h-12 w-12 rounded-xl backdrop-blur-xl bg-white/10 border-hairline border-white/20 hover:bg-white/20 shadow-3point chamfered spring-hover group touch-none"
-                                          >
-                                            <ChevronDown className="h-6 w-6 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
-                                          </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          <p>Move field down</p>
-                                        </TooltipContent>
-                                      </Tooltip>
-                                      <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <Button
-                                            size="icon"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
                                               adjustPosition('right', overlay.field);
                                             }}
                                             className="h-12 w-12 rounded-xl backdrop-blur-xl bg-white/10 border-hairline border-white/20 hover:bg-white/20 shadow-3point chamfered spring-hover group touch-none"
@@ -474,6 +457,23 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                         </TooltipContent>
                                       </Tooltip>
                                     </div>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          size="icon"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            adjustPosition('down', overlay.field);
+                                          }}
+                                          className="h-12 w-12 rounded-xl backdrop-blur-xl bg-white/10 border-hairline border-white/20 hover:bg-white/20 shadow-3point chamfered spring-hover group touch-none"
+                                        >
+                                          <ChevronDown className="h-6 w-6 text-white drop-shadow-lg group-hover:scale-110 transition-transform" strokeWidth={2} />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>Move field down</p>
+                                      </TooltipContent>
+                                    </Tooltip>
                                   </div>
                                 </>
                               )}
