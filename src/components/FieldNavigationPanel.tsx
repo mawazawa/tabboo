@@ -246,141 +246,145 @@ export const FieldNavigationPanel = ({ formData, updateField, currentFieldIndex,
   }, [currentFieldIndex, fieldPositions, showPositionControl]);
 
   return (
-    <Card className="h-full border-hairline shadow-3point chamfered flex flex-col">
-      <div className="p-4 border-b-hairline bg-muted/30 space-y-3">
-        <div>
-          <h2 className="font-semibold text-sm">Form Field Controls</h2>
-          <p className="text-xs text-muted-foreground mt-1">
-            Field {currentFieldIndex + 1} of {FIELD_CONFIG.length}
-          </p>
-          <div className="text-[10px] text-muted-foreground mt-2 space-y-0.5">
-            <div>⌘K • Toggle positioning</div>
-            <div>Tab • Next field</div>
-            <div>Arrows • Adjust position</div>
-          </div>
-        </div>
-
-        <div className="flex gap-2">
-          <Button
-            size="lg"
-            variant="outline"
-            onClick={goToPrevField}
-            disabled={currentFieldIndex === 0}
-            className="flex-1 shadow-3point chamfered spring-hover border-hairline"
-          >
-            <ChevronUp className="h-5 w-5 mr-1" strokeWidth={0.5} />
-            Previous
-          </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            onClick={goToNextField}
-            disabled={currentFieldIndex === FIELD_CONFIG.length - 1}
-            className="flex-1 shadow-3point chamfered spring-hover border-hairline"
-          >
-            Next
-            <ChevronDown className="h-5 w-5 ml-1" strokeWidth={0.5} />
-          </Button>
-        </div>
-
-        {/* Unified Positioning Control */}
-        {currentFieldIndex >= 0 && currentFieldIndex < FIELD_CONFIG.length && (
-          <div className="p-3 bg-background rounded-lg border-hairline shadow-3point chamfered">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-semibold">
-                {FIELD_CONFIG[currentFieldIndex]?.label}
-              </h3>
-              <Popover open={showPositionControl} onOpenChange={setShowPositionControl}>
-                <PopoverTrigger asChild>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-8 px-3 gap-2 shadow-3point chamfered spring-hover"
-                  >
-                    <Move className="h-4 w-4" strokeWidth={0.5} />
-                    Adjust
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-56 p-4 shadow-3point chamfered border-hairline" side="left" align="start">
-                  <h4 className="text-sm font-semibold mb-3">Position Adjustment</h4>
-                  <div className="grid grid-cols-2 gap-2 mb-3">
-                    <div>
-                      <label className="text-[10px] text-muted-foreground">X %</label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        value={currentPosition.left.toFixed(1)}
-                        onChange={(e) => updateFieldPosition(currentFieldName, { 
-                          ...currentPosition, 
-                          left: parseFloat(e.target.value) || 0 
-                        })}
-                        className="h-7 text-xs"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10px] text-muted-foreground">Y %</label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        value={currentPosition.top.toFixed(1)}
-                        onChange={(e) => updateFieldPosition(currentFieldName, { 
-                          ...currentPosition, 
-                          top: parseFloat(e.target.value) || 0 
-                        })}
-                        className="h-7 text-xs"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-3 gap-1">
-                    <div></div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => adjustPosition('up')}
-                      className="h-7 px-1"
-                    >
-                      <ChevronUp className="h-3 w-3" strokeWidth={0.5} />
-                    </Button>
-                    <div></div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => adjustPosition('left')}
-                      className="h-7 px-1"
-                    >
-                      <ChevronLeft className="h-3 w-3" strokeWidth={0.5} />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => adjustPosition('down')}
-                      className="h-7 px-1"
-                    >
-                      <ChevronDown className="h-3 w-3" strokeWidth={0.5} />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => adjustPosition('right')}
-                      className="h-7 px-1"
-                    >
-                      <ChevronRight className="h-3 w-3" strokeWidth={0.5} />
-                    </Button>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-3">
-                    Use arrow keys or buttons to fine-tune position
-                  </p>
-                </PopoverContent>
-              </Popover>
-            </div>
-            <div className="text-xs text-muted-foreground">
-              Position: X {currentPosition.left.toFixed(1)}% • Y {currentPosition.top.toFixed(1)}%
+    <Card className="h-full border-hairline shadow-3point chamfered flex flex-col overflow-hidden">
+      {/* Sticky Header - Fixed Interaction Surface */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-sm">
+        <div className="p-4 space-y-3">
+          <div>
+            <h2 className="font-semibold text-sm">Form Field Controls</h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              Field {currentFieldIndex + 1} of {FIELD_CONFIG.length}
+            </p>
+            <div className="text-[10px] text-muted-foreground mt-2 space-y-0.5">
+              <div>⌘K • Toggle positioning</div>
+              <div>Tab • Next field</div>
+              <div>Arrows • Adjust position</div>
             </div>
           </div>
-        )}
+
+          <div className="flex gap-2">
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={goToPrevField}
+              disabled={currentFieldIndex === 0}
+              className="flex-1 shadow-3point chamfered spring-hover border-hairline"
+            >
+              <ChevronUp className="h-5 w-5 mr-1" strokeWidth={0.5} />
+              Previous
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={goToNextField}
+              disabled={currentFieldIndex === FIELD_CONFIG.length - 1}
+              className="flex-1 shadow-3point chamfered spring-hover border-hairline"
+            >
+              Next
+              <ChevronDown className="h-5 w-5 ml-1" strokeWidth={0.5} />
+            </Button>
+          </div>
+
+          {/* Unified Positioning Control */}
+          {currentFieldIndex >= 0 && currentFieldIndex < FIELD_CONFIG.length && (
+            <div className="p-3 bg-background rounded-lg border-hairline shadow-3point chamfered">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-semibold">
+                  {FIELD_CONFIG[currentFieldIndex]?.label}
+                </h3>
+                <Popover open={showPositionControl} onOpenChange={setShowPositionControl}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-8 px-3 gap-2 shadow-3point chamfered spring-hover"
+                    >
+                      <Move className="h-4 w-4" strokeWidth={0.5} />
+                      Adjust
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-56 p-4 shadow-3point chamfered border-hairline" side="left" align="start">
+                    <h4 className="text-sm font-semibold mb-3">Position Adjustment</h4>
+                    <div className="grid grid-cols-2 gap-2 mb-3">
+                      <div>
+                        <label className="text-[10px] text-muted-foreground">X %</label>
+                        <Input
+                          type="number"
+                          step="0.1"
+                          value={currentPosition.left.toFixed(1)}
+                          onChange={(e) => updateFieldPosition(currentFieldName, { 
+                            ...currentPosition, 
+                            left: parseFloat(e.target.value) || 0 
+                          })}
+                          className="h-7 text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-muted-foreground">Y %</label>
+                        <Input
+                          type="number"
+                          step="0.1"
+                          value={currentPosition.top.toFixed(1)}
+                          onChange={(e) => updateFieldPosition(currentFieldName, { 
+                            ...currentPosition, 
+                            top: parseFloat(e.target.value) || 0 
+                          })}
+                          className="h-7 text-xs"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-1">
+                      <div></div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => adjustPosition('up')}
+                        className="h-7 px-1"
+                      >
+                        <ChevronUp className="h-3 w-3" strokeWidth={0.5} />
+                      </Button>
+                      <div></div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => adjustPosition('left')}
+                        className="h-7 px-1"
+                      >
+                        <ChevronLeft className="h-3 w-3" strokeWidth={0.5} />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => adjustPosition('down')}
+                        className="h-7 px-1"
+                      >
+                        <ChevronDown className="h-3 w-3" strokeWidth={0.5} />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => adjustPosition('right')}
+                        className="h-7 px-1"
+                      >
+                        <ChevronRight className="h-3 w-3" strokeWidth={0.5} />
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-3">
+                      Use arrow keys or buttons to fine-tune position
+                    </p>
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Position: X {currentPosition.left.toFixed(1)}% • Y {currentPosition.top.toFixed(1)}%
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
-      <ScrollArea className="flex-1">
+      {/* Scrollable Content Area - Independent Scroll Container */}
+      <ScrollArea className="flex-1 relative">
         <div ref={scrollContainerRef} className="p-4 space-y-3">
           {FIELD_CONFIG.map((config, index) => {
             const isActive = index === currentFieldIndex;
