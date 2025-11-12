@@ -334,7 +334,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
               </div>
             </div>
           )}
-        <div className="w-full" style={{ maxWidth: `${pageWidth * zoom}px` }}>
+          <div className="w-full" style={{ maxWidth: `${pageWidth * zoom}px` }}>
             <Document
               file="/fl320.pdf"
               onLoadSuccess={onDocumentLoadSuccess}
@@ -643,9 +643,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
               );
             })}
           </Document>
+          </div>
         </div>
       </div>
-    </div>
     </TooltipProvider>
   );
 };
