@@ -9,7 +9,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useRef, memo, useCallback } from "react";
 import { Document, Page, pdfjs } from 'react-pdf';
-import { Settings, Move, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Sparkles, Loader2 } from "lucide-react";
+import { Settings, Move, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Sparkles, Loader2, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from "lucide-react";
 import { canAutofill, getVaultValueForField, type PersonalVaultData } from "@/utils/vaultFieldMatcher";
 import { TutorialTooltips } from "@/components/TutorialTooltips";
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
@@ -434,6 +434,12 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                         const canAutofillField = canAutofill(overlay.field, vaultData);
                         const hasValue = !!formData[overlay.field as keyof FormData];
                         
+                        // Determine which directions are available for movement
+                        const canMoveUp = position.top > 1;
+                        const canMoveDown = position.top < 94;
+                        const canMoveLeft = position.left > 1;
+                        const canMoveRight = position.left < 94;
+                        
                           return (
                             <div
                             key={idx}
@@ -462,6 +468,39 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             onClick={(e) => handleFieldClick(overlay.field, e)}
                             onPointerDown={(e) => handlePointerDown(e, overlay.field, position.top, position.left)}
                           >
+                            {/* Visual Direction Indicators */}
+                            {isEditMode && (
+                              <>
+                                {/* Up Arrow Indicator */}
+                                {canMoveUp && (
+                                  <div className="absolute -top-10 left-1/2 -translate-x-1/2 pointer-events-none">
+                                    <ArrowUp className="h-5 w-5 text-primary animate-pulse drop-shadow-lg" strokeWidth={2.5} />
+                                  </div>
+                                )}
+                                
+                                {/* Down Arrow Indicator */}
+                                {canMoveDown && (
+                                  <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 pointer-events-none">
+                                    <ArrowDown className="h-5 w-5 text-primary animate-pulse drop-shadow-lg" strokeWidth={2.5} />
+                                  </div>
+                                )}
+                                
+                                {/* Left Arrow Indicator */}
+                                {canMoveLeft && (
+                                  <div className="absolute top-1/2 -translate-y-1/2 -left-10 pointer-events-none">
+                                    <ArrowLeft className="h-5 w-5 text-primary animate-pulse drop-shadow-lg" strokeWidth={2.5} />
+                                  </div>
+                                )}
+                                
+                                {/* Right Arrow Indicator */}
+                                {canMoveRight && (
+                                  <div className="absolute top-1/2 -translate-y-1/2 -right-10 pointer-events-none">
+                                    <ArrowRight className="h-5 w-5 text-primary animate-pulse drop-shadow-lg" strokeWidth={2.5} />
+                                  </div>
+                                )}
+                              </>
+                            )}
+                            
                             {/* Simplified Field Controls */}
                             {isCurrentField && (
                               <div className="absolute -top-8 left-0 right-0 flex items-center justify-between gap-2">
@@ -477,6 +516,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                       size="icon"
                                       variant="secondary"
                                       className="h-6 w-6"
+                                      disabled={!canMoveUp}
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         adjustPosition('up', overlay.field);
@@ -488,6 +528,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                       size="icon"
                                       variant="secondary"
                                       className="h-6 w-6"
+                                      disabled={!canMoveDown}
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         adjustPosition('down', overlay.field);
@@ -499,6 +540,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                       size="icon"
                                       variant="secondary"
                                       className="h-6 w-6"
+                                      disabled={!canMoveLeft}
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         adjustPosition('left', overlay.field);
@@ -510,6 +552,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                       size="icon"
                                       variant="secondary"
                                       className="h-6 w-6"
+                                      disabled={!canMoveRight}
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         adjustPosition('right', overlay.field);
