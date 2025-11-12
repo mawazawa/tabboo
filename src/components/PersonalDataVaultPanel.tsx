@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { personalInfoSchema, type PersonalInfoFormData } from "@/lib/validations";
 import { useQuery } from "@tanstack/react-query";
+import { sanitizeFormData } from "@/utils/inputSanitizer";
 
 interface PersonalDataVaultPanelProps {
   userId: string;
@@ -96,12 +97,15 @@ export const PersonalDataVaultPanel = ({ userId, onDataChange }: PersonalDataVau
     try {
       // Validate input
       const validatedData = personalInfoSchema.parse(formData);
+      
+      // Sanitize for defense-in-depth XSS protection
+      const sanitizedData = sanitizeFormData(validatedData);
 
       const { error } = await supabase
         .from('personal_info')
         .upsert({
           user_id: userId,
-          ...validatedData,
+          ...sanitizedData,
         });
 
       if (error) throw error;

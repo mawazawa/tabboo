@@ -14,6 +14,7 @@ import { Shield, Save, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { personalInfoSchema, type PersonalInfoFormData } from "@/lib/validations";
+import { sanitizeFormData } from "@/utils/inputSanitizer";
 
 interface PersonalDataVaultProps {
   userId: string;
@@ -79,12 +80,15 @@ export const PersonalDataVault = ({ userId }: PersonalDataVaultProps) => {
     try {
       // Validate input
       const validatedData = personalInfoSchema.parse(formData);
+      
+      // Sanitize for defense-in-depth XSS protection
+      const sanitizedData = sanitizeFormData(validatedData);
 
       const { error } = await supabase
         .from('personal_info')
         .upsert({
           user_id: userId,
-          ...validatedData,
+          ...sanitizedData,
         });
 
       if (error) throw error;
