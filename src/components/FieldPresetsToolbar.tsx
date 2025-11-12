@@ -4,7 +4,6 @@ import { Separator } from './ui/separator';
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from './ui/tooltip';
 import {
@@ -63,8 +62,7 @@ export const FieldPresetsToolbar = ({
   };
 
   return (
-    <TooltipProvider>
-      <div className="flex items-center gap-1 px-2 py-1 bg-muted/50 rounded-lg">
+    <div className="flex items-center gap-1 px-2 py-1 bg-muted/50 rounded-lg">
         {/* Snap to Grid */}
         <Tooltip>
           <TooltipTrigger asChild>
@@ -278,6 +276,5 @@ export const FieldPresetsToolbar = ({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </TooltipProvider>
   );
 };

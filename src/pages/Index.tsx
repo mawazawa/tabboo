@@ -13,7 +13,7 @@ const FieldGroupManager = lazy(() => import("@/components/FieldGroupManager").th
 const CommandPalette = lazy(() => import("@/components/CommandPalette").then(m => ({ default: m.CommandPalette })));
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { FileText, MessageSquare, LogOut, Loader2, Calculator, PanelLeftClose, PanelRightClose, Shield, Settings, Sparkles } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { 
   snapAllToGrid, 
   alignHorizontal, 
@@ -500,8 +500,7 @@ const Index = () => {
   }
 
   return (
-    <TooltipProvider>
-      <div className="flex flex-col h-screen bg-gradient-to-br from-background via-background to-primary/5 w-full overflow-hidden">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-background via-background to-primary/5 w-full overflow-hidden">
       {/* Command Palette - Cmd+K */}
       <Suspense fallback={null}>
         <CommandPalette
@@ -912,7 +911,6 @@ const Index = () => {
         </SheetContent>
       </Sheet>
     </div>
-    </TooltipProvider>
   );
 };
 
