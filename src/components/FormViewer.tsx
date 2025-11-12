@@ -67,12 +67,16 @@ interface Props {
 export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, zoom = 1, highlightedField = null, validationErrors = {}, vaultData = null }: Props) => {
   const [numPages, setNumPages] = useState<number>(0);
   const [pageWidth, setPageWidth] = useState<number>(850);
+  const [isGlobalEditMode, setIsGlobalEditMode] = useState<boolean>(false);
   const [isDragging, setIsDragging] = useState<string | null>(null);
-  const [editModeField, setEditModeField] = useState<string | null>(null);
   const [alignmentGuides, setAlignmentGuides] = useState<{ x: number[]; y: number[] }>({ x: [], y: [] });
   const [pdfLoading, setPdfLoading] = useState(true);
   const [loadProgress, setLoadProgress] = useState(0);
+  
+  // Use refs for drag state to avoid re-render storms
   const dragStartPos = useRef<{ x: number; y: number; top: number; left: number }>({ x: 0, y: 0, top: 0, left: 0 });
+  const dragElementRef = useRef<HTMLElement | null>(null);
+  const draggedPositionRef = useRef<{ top: number; left: number } | null>(null);
   const rafRef = useRef<number | null>(null);
 
   // Map field names to indices
@@ -90,41 +94,18 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   };
 
   const handlePointerDown = (e: React.PointerEvent, field: string, currentTop: number, currentLeft: number) => {
-    const target = e.target as HTMLElement;
-    const isInEditMode = editModeField === field;
-    
-    // If in edit mode, allow dragging from anywhere (inputs are disabled)
-    if (isInEditMode) {
-      e.preventDefault();
-      e.stopPropagation();
-      setIsDragging(field);
-      
-      const container = target.closest('.field-container') as HTMLElement;
-      if (container) {
-        container.setPointerCapture(e.pointerId);
-      }
-      
-      dragStartPos.current = {
-        x: e.clientX,
-        y: e.clientY,
-        top: currentTop,
-        left: currentLeft
-      };
-      return;
-    }
-    
-    // When not in edit mode, only drag from the move button
-    const isDragHandle = target.closest('.drag-handle');
-    if (!isDragHandle) return;
+    // Only allow dragging in global edit mode
+    if (!isGlobalEditMode) return;
     
     e.preventDefault();
     e.stopPropagation();
-    setIsDragging(field);
     
-    const container = target.closest('.field-container') as HTMLElement;
-    if (container) {
-      container.setPointerCapture(e.pointerId);
-    }
+    const container = (e.currentTarget as HTMLElement).closest('.field-container') as HTMLElement;
+    if (!container) return;
+    
+    container.setPointerCapture(e.pointerId);
+    dragElementRef.current = container;
+    setIsDragging(field);
     
     dragStartPos.current = {
       x: e.clientX,
@@ -132,11 +113,12 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
       top: currentTop,
       left: currentLeft
     };
+    
+    draggedPositionRef.current = { top: currentTop, left: currentLeft };
   };
 
-  const toggleEditMode = (field: string) => {
-    const newEditMode = editModeField === field ? null : field;
-    setEditModeField(newEditMode);
+  const toggleGlobalEditMode = () => {
+    setIsGlobalEditMode(prev => !prev);
   };
 
   const handleFieldClick = (field: string, e: React.MouseEvent) => {
@@ -151,7 +133,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   };
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
-    if (!isDragging) return;
+    if (!isDragging || !dragElementRef.current) return;
     
     e.preventDefault();
     
@@ -160,7 +142,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
       cancelAnimationFrame(rafRef.current);
     }
     
-    // Use requestAnimationFrame for smooth 60fps updates
+    // Use requestAnimationFrame + CSS transform (no React state updates during drag!)
     rafRef.current = requestAnimationFrame(() => {
       const deltaX = e.clientX - dragStartPos.current.x;
       const deltaY = e.clientY - dragStartPos.current.y;
@@ -174,93 +156,68 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
       newTop = Math.max(0, Math.min(95, newTop));
 
       // Smart snapping to other fields
-      const snapThreshold = 1.5; // Snap within 1.5% distance
+      const snapThreshold = 1.5;
       const guides: { x: number[]; y: number[] } = { x: [], y: [] };
       
-      // Get all other field positions
       Object.entries(fieldPositions).forEach(([field, pos]) => {
-        if (field === isDragging) return; // Skip the field being dragged
+        if (field === isDragging) return;
         
-        // Snap to left edge
         if (Math.abs(newLeft - pos.left) < snapThreshold) {
           newLeft = pos.left;
           guides.x.push(pos.left);
         }
         
-        // Snap to right edge (assuming ~20% width for fields)
-        const draggedRight = newLeft + 20;
-        const otherRight = pos.left + 20;
-        if (Math.abs(draggedRight - otherRight) < snapThreshold) {
-          newLeft = pos.left;
-          guides.x.push(pos.left);
-        }
-        
-        // Snap left edge to other's right edge
-        if (Math.abs(newLeft - otherRight) < snapThreshold) {
-          newLeft = otherRight;
-          guides.x.push(otherRight);
-        }
-        
-        // Snap to top edge
         if (Math.abs(newTop - pos.top) < snapThreshold) {
           newTop = pos.top;
           guides.y.push(pos.top);
-        }
-        
-        // Snap to bottom edge (assuming ~5% height for most fields)
-        const draggedBottom = newTop + 5;
-        const otherBottom = pos.top + 5;
-        if (Math.abs(draggedBottom - otherBottom) < snapThreshold) {
-          newTop = pos.top;
-          guides.y.push(pos.top);
-        }
-        
-        // Snap top edge to other's bottom edge
-        if (Math.abs(newTop - otherBottom) < snapThreshold) {
-          newTop = otherBottom;
-          guides.y.push(otherBottom);
-        }
-        
-        // Snap to vertical center alignment
-        const draggedCenterY = newTop + 2.5;
-        const otherCenterY = pos.top + 2.5;
-        if (Math.abs(draggedCenterY - otherCenterY) < snapThreshold) {
-          newTop = pos.top;
-          guides.y.push(pos.top);
-        }
-        
-        // Snap to horizontal center alignment
-        const draggedCenterX = newLeft + 10;
-        const otherCenterX = pos.left + 10;
-        if (Math.abs(draggedCenterX - otherCenterX) < snapThreshold) {
-          newLeft = pos.left;
-          guides.x.push(pos.left);
         }
       });
       
       // Update alignment guides
       setAlignmentGuides(guides);
       
-      updateFieldPosition(isDragging, { top: newTop, left: newLeft });
+      // Store position in ref (not state!)
+      draggedPositionRef.current = { top: newTop, left: newLeft };
+      
+      // Apply via CSS transform for smooth 60fps movement
+      if (dragElementRef.current) {
+        const deltaLeftPx = (newLeft - dragStartPos.current.left) * parentRect.width / 100;
+        const deltaTopPx = (newTop - dragStartPos.current.top) * parentRect.height / 100;
+        dragElementRef.current.style.transform = `translate(${deltaLeftPx}px, ${deltaTopPx}px)`;
+      }
     });
-  }, [isDragging, fieldPositions, updateFieldPosition]);
+  }, [isDragging, fieldPositions]);
 
   const handlePointerUp = useCallback((e: React.PointerEvent) => {
+    if (!isDragging) return;
+    
     if (rafRef.current !== null) {
       cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     }
-    if (isDragging) {
-      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    
+    // Release pointer capture
+    if (dragElementRef.current) {
+      dragElementRef.current.releasePointerCapture(e.pointerId);
+      // Reset transform
+      dragElementRef.current.style.transform = '';
     }
+    
+    // COMMIT: Now update React state with final position
+    if (draggedPositionRef.current && isDragging) {
+      updateFieldPosition(isDragging, draggedPositionRef.current);
+    }
+    
+    // Clean up
     setIsDragging(null);
-    setAlignmentGuides({ x: [], y: [] }); // Clear guides when done dragging
-  }, [isDragging]);
+    dragElementRef.current = null;
+    draggedPositionRef.current = null;
+    setAlignmentGuides({ x: [], y: [] });
+  }, [isDragging, updateFieldPosition]);
 
   const handlePDFClick = (e: React.MouseEvent) => {
-    // Only deselect if clicking directly on the PDF container, not on input fields
+    // Clicking PDF background does nothing in edit mode
     if ((e.target as HTMLElement).closest('.field-container')) return;
-    setEditModeField(null);
   };
 
   const adjustPosition = (direction: 'up' | 'down' | 'left' | 'right', field: string) => {
@@ -328,6 +285,27 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     <TooltipProvider delayDuration={300}>
       <div className="h-full w-full overflow-auto bg-muted/20">
         <TutorialTooltips />
+        
+        {/* Global Edit Mode Toggle */}
+        <div className="fixed top-4 right-4 z-50">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="lg"
+                variant={isGlobalEditMode ? "default" : "secondary"}
+                className="shadow-lg hover:scale-105 transition-transform"
+                onClick={toggleGlobalEditMode}
+              >
+                <Move className="h-5 w-5 mr-2" />
+                {isGlobalEditMode ? 'Lock Fields' : 'Edit Positions'}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{isGlobalEditMode ? 'Exit edit mode to fill form' : 'Enter edit mode to move fields'}</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+        
         <div className="relative min-h-full w-full flex items-center justify-center p-4">
           {pdfLoading && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-background/80 backdrop-blur-sm z-50">
@@ -430,7 +408,6 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                         };
                         
                         const isCurrentField = fieldNameToIndex[overlay.field] === currentFieldIndex;
-                        const isEditMode = editModeField === overlay.field;
                         const canAutofillField = canAutofill(overlay.field, vaultData);
                         const hasValue = !!formData[overlay.field as keyof FormData];
                         
@@ -445,7 +422,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             key={idx}
                             className={`field-container group absolute select-none touch-none ${
                               isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary shadow-lg scale-105' : 
-                              isEditMode ? 'cursor-move ring-2 ring-primary/70' : 'cursor-pointer'
+                              isGlobalEditMode ? 'cursor-move ring-2 ring-primary/70' : 'cursor-pointer'
                             } ${
                               highlightedField === overlay.field
                                 ? 'ring-2 ring-accent shadow-lg animate-pulse' :
@@ -469,7 +446,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             onPointerDown={(e) => handlePointerDown(e, overlay.field, position.top, position.left)}
                           >
                             {/* Visual Direction Indicators */}
-                            {isEditMode && (
+                            {isGlobalEditMode && (
                               <>
                                 {/* Up Arrow Indicator */}
                                 {canMoveUp && (
@@ -510,7 +487,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                     <Sparkles className="inline h-3 w-3 ml-1 animate-pulse" />
                                   )}
                                 </div>
-                                {isEditMode && (
+                                {isGlobalEditMode && (
                                   <div className="flex gap-1">
                                     <Button
                                       size="icon"
@@ -591,19 +568,19 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                   <TooltipTrigger asChild>
                                     <Button
                                       size="icon"
-                                      variant={isEditMode ? "default" : "secondary"}
+                                      variant={isGlobalEditMode ? "default" : "secondary"}
                                       className="absolute -top-2 -right-2 h-7 w-7 rounded-full"
                                       onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
-                                        toggleEditMode(overlay.field);
+                                        toggleGlobalEditMode();
                                       }}
                                     >
                                       <Move className="h-4 w-4" />
                                     </Button>
                                   </TooltipTrigger>
                                   <TooltipContent>
-                                    <p>{isEditMode ? 'Lock position' : 'Move field'}</p>
+                                    <p>{isGlobalEditMode ? 'Exit Edit Mode' : 'Enter Edit Mode'}</p>
                                   </TooltipContent>
                                 </Tooltip>
                               </>
@@ -614,9 +591,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 value={formData[overlay.field as keyof FormData] as string || ''}
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
-                                disabled={isEditMode}
+                                disabled={isGlobalEditMode}
                                 className={`field-input h-10 text-sm ${
-                                  isEditMode
+                                  isGlobalEditMode
                                     ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   validationErrors?.[overlay.field]?.length
                                     ? 'bg-destructive/10 border-destructive'
@@ -631,9 +608,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 value={formData[overlay.field as keyof FormData] as string || ''}
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
-                                disabled={isEditMode}
+                                disabled={isGlobalEditMode}
                                 className={`field-input text-sm resize-none ${
-                                  isEditMode
+                                  isGlobalEditMode
                                     ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   validationErrors?.[overlay.field]?.length
                                     ? 'bg-destructive/10 border-destructive'
@@ -646,10 +623,10 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             {overlay.type === 'checkbox' && (
                               <Checkbox
                                 checked={!!formData[overlay.field as keyof FormData]}
-                                onCheckedChange={(checked) => !isEditMode && updateField(overlay.field, checked as boolean)}
-                                disabled={isEditMode}
+                                onCheckedChange={(checked) => !isGlobalEditMode && updateField(overlay.field, checked as boolean)}
+                                disabled={isGlobalEditMode}
                                 className={`border-2 ${
-                                  isEditMode
+                                  isGlobalEditMode
                                     ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   isCurrentField 
                                     ? 'bg-primary/5 border-primary' 
