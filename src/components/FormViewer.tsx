@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useRef, memo, useCallback } from "react";
 import { Document, Page, pdfjs } from 'react-pdf';
@@ -282,7 +282,8 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   }];
 
   return (
-    <div className="h-full w-full overflow-auto bg-muted/20">
+    <TooltipProvider>
+      <div className="h-full w-full overflow-auto bg-muted/20">
         <TutorialTooltips />
         
         {/* Global Edit Mode Toggle */}
@@ -643,8 +644,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
               );
             })}
           </Document>
-          </div>
         </div>
       </div>
+      </div>
+    </TooltipProvider>
   );
 };
