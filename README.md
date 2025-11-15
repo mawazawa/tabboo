@@ -1,8 +1,12 @@
-# Welcome to your Lovable project
+# SwiftFill - AI-Powered PDF Form Filling
+
+An intelligent form assistant built with React, TypeScript, and Groq AI. SwiftFill helps users fill out PDF forms quickly and accurately using advanced AI technology.
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/b0cb0fc9-be0c-49b1-aa3d-6d651123ae15
+**Project**: SwiftFill (formerly form-ai-forge)
+**Lovable URL**: https://lovable.dev/projects/b0cb0fc9-be0c-49b1-aa3d-6d651123ae15
+**Supabase**: https://sbwgkocarqvonkdlitdx.supabase.co
 
 ## How can I edit this code?
 
