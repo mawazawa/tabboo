@@ -9,7 +9,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useRef, memo, useCallback, useEffect } from "react";
 import { Document, Page, pdfjs } from 'react-pdf';
-import { Settings, Move, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Sparkles, Loader2, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Keyboard } from "lucide-react";
+import { Settings, Move, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Sparkles, Loader2, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Keyboard } from "@/icons";
 import { canAutofill, getVaultValueForField, type PersonalVaultData } from "@/utils/vaultFieldMatcher";
 import { TutorialTooltips } from "@/components/TutorialTooltips";
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';

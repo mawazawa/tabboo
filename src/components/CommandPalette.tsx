@@ -20,7 +20,7 @@ import {
   PanelLeftClose,
   PanelRightClose,
   Search,
-} from "lucide-react";
+} from "@/icons";
 
 interface CommandPaletteProps {
   onToggleAI?: () => void;

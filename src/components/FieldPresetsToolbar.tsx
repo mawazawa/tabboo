@@ -1,4 +1,4 @@
-import { AlignLeft, AlignCenter, AlignRight, AlignVerticalJustifyStart, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd, Grid3x3, MoveHorizontal, MoveVertical, Copy, Clipboard, ArrowUpDown } from 'lucide-react';
+import { AlignLeft, AlignCenter, AlignRight, AlignVerticalJustifyStart, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd, Grid3x3, MoveHorizontal, MoveVertical, Copy, Clipboard, ArrowUpDown } from '@/icons';
 import { Button } from './ui/button';
 import { Separator } from './ui/separator';
 import {

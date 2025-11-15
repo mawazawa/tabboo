@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, memo } from "react";
-import { MessageSquare, Minimize2, Maximize2, GripVertical } from "lucide-react";
+import { MessageSquare, Minimize2, Maximize2, GripVertical } from "@/icons";
 import { AIAssistant } from "./AIAssistant";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";

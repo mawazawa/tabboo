@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { Calculator, AlertTriangle, CheckCircle, ArrowLeft, GripVertical } from "lucide-react";
+import { Calculator, AlertTriangle, CheckCircle, ArrowLeft, GripVertical } from "@/icons";
 import { supabase } from "@/integrations/supabase/client";
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { InlineMath, BlockMath } from 'react-katex';

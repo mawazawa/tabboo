@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, MessageSquare } from "lucide-react";
+import { Search, MessageSquare } from "@/icons";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";

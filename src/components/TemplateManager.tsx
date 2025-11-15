@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Upload, Download, Trash2, FileJson } from 'lucide-react';
+import { Upload, Download, Trash2, FileJson } from '@/icons';
 import { Button } from './ui/button';
 import {
   Dialog,

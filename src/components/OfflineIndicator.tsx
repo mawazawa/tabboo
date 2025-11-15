@@ -1,4 +1,4 @@
-import { CloudOff, Cloud, RefreshCw } from "lucide-react";
+import { CloudOff, Cloud, RefreshCw } from "@/icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useOfflineSync } from "@/hooks/useOfflineSync";

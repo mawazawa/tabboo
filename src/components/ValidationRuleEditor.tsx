@@ -5,7 +5,7 @@ import { Label } from './ui/label';
 import { Switch } from './ui/switch';
 import { ScrollArea } from './ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { AlertCircle, Plus, Trash2, Save } from 'lucide-react';
+import { AlertCircle, Plus, Trash2, Save } from '@/icons';
 import { toast } from 'sonner';
 import {
   Dialog,

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FileText, Loader2 } from "lucide-react";
+import { FileText, Loader2 } from "@/icons";
 import { FieldMinimapIndicator } from "./FieldMinimapIndicator";
 
 // Configure PDF.js worker

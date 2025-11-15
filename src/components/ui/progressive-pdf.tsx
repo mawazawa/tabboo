@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Document, Page, pdfjs } from 'react-pdf';
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Loader2 } from "lucide-react";
+import { Loader2 } from "@/icons";
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
