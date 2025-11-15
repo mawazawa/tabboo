@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useState, useRef, memo, useCallback } from "react";
+import { useState, useRef, memo, useCallback, useEffect } from "react";
 import { Document, Page, pdfjs } from 'react-pdf';
-import { Settings, Move, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Sparkles, Loader2, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from "lucide-react";
+import { Settings, Move, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Sparkles, Loader2, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Keyboard } from "lucide-react";
 import { canAutofill, getVaultValueForField, type PersonalVaultData } from "@/utils/vaultFieldMatcher";
 import { TutorialTooltips } from "@/components/TutorialTooltips";
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
@@ -220,14 +220,14 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     if ((e.target as HTMLElement).closest('.field-container')) return;
   };
 
-  const adjustPosition = (direction: 'up' | 'down' | 'left' | 'right', field: string) => {
+  const adjustPosition = (direction: 'up' | 'down' | 'left' | 'right', field: string, customStep?: number) => {
     const position = fieldPositions[field] || {
       top: parseFloat(fieldOverlays[0].fields.find(f => f.field === field)?.top || '0'),
       left: parseFloat(fieldOverlays[0].fields.find(f => f.field === field)?.left || '0')
     };
-    const step = 0.5; // Fine-tuned for precise control
+    const step = customStep ?? 0.5; // Fine-tuned for precise control, allow override
     const newPosition = { ...position };
-    
+
     switch (direction) {
       case 'up':
         newPosition.top = Math.max(0, newPosition.top - step);
@@ -242,7 +242,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
         newPosition.left = Math.min(100, newPosition.left + step);
         break;
     }
-    
+
     updateFieldPosition(field, newPosition);
   };
 
@@ -253,6 +253,56 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
       updateField(field, value);
     }
   };
+
+  // Keyboard shortcuts for field positioning
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is typing in an input field
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+
+      // Toggle edit mode with 'E' key
+      if (e.key === 'e' && !e.metaKey && !e.ctrlKey && !e.shiftKey) {
+        e.preventDefault();
+        setIsGlobalEditMode(prev => !prev);
+        return;
+      }
+
+      // Exit edit mode with Escape
+      if (e.key === 'Escape' && isGlobalEditMode) {
+        e.preventDefault();
+        setIsGlobalEditMode(false);
+        return;
+      }
+
+      // Move selected field with arrow keys (only in edit mode)
+      if (isGlobalEditMode && currentFieldIndex >= 0) {
+        const field = Object.keys(fieldNameToIndex).find(
+          f => fieldNameToIndex[f] === currentFieldIndex
+        );
+        if (!field) return;
+
+        const step = e.shiftKey ? 5 : 0.5; // Shift key for faster movement
+
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          adjustPosition('up', field, step);
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          adjustPosition('down', field, step);
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          adjustPosition('left', field, step);
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          adjustPosition('right', field, step);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isGlobalEditMode, currentFieldIndex, fieldNameToIndex, adjustPosition]);
 
   // Field overlays with default positions
   const fieldOverlays: { page: number; fields: FieldOverlays[] }[] = [{
@@ -292,19 +342,43 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
               <Button
                 size="lg"
                 variant={isGlobalEditMode ? "default" : "secondary"}
-                className="shadow-lg hover:scale-105 transition-transform"
+                className={`shadow-lg hover:scale-105 transition-transform ${!isGlobalEditMode ? 'animate-pulse' : ''}`}
                 onClick={toggleGlobalEditMode}
               >
                 <Move className="h-5 w-5 mr-2" />
                 {isGlobalEditMode ? 'Lock Fields' : 'Edit Positions'}
               </Button>
             </TooltipTrigger>
-            <TooltipContent>
-              <p>{isGlobalEditMode ? 'Exit edit mode to fill form' : 'Enter edit mode to move fields'}</p>
+            <TooltipContent side="left" className="max-w-xs">
+              <div className="space-y-1">
+                <p className="font-semibold">{isGlobalEditMode ? 'Exit edit mode to fill form' : 'Enter edit mode to move fields'}</p>
+                <p className="text-xs text-muted-foreground">Keyboard: Press E to toggle</p>
+              </div>
             </TooltipContent>
           </Tooltip>
         </div>
-        
+
+        {/* Edit Mode Active Banner */}
+        {isGlobalEditMode && (
+          <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 px-6 py-3 bg-amber-500/95 text-white rounded-lg shadow-lg backdrop-blur-sm animate-in slide-in-from-top border-2 border-amber-400">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <Move className="h-5 w-5" />
+                <div className="absolute inset-0 bg-white/30 blur-sm animate-pulse" />
+              </div>
+              <div>
+                <div className="font-bold text-sm">EDIT MODE ACTIVE</div>
+                <div className="text-xs flex items-center gap-2 mt-0.5">
+                  <span>Drag fields or use</span>
+                  <Keyboard className="h-3 w-3 inline" />
+                  <span>arrow keys</span>
+                  <span className="opacity-70">• Press E or Esc to exit</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="relative min-h-full w-full flex items-center justify-center p-4">
           {pdfLoading && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-background/80 backdrop-blur-sm z-50">

@@ -849,9 +849,9 @@ const Index = () => {
           <ResizablePanel
             id="right-panel"
             order={2}
-            defaultSize={25}
-            minSize={20}
-            maxSize={40}
+            defaultSize={30}
+            minSize={25}
+            maxSize={50}
             collapsible={true}
             collapsedSize={0}
             className={showFieldsPanel || showVaultPanel ? "" : "hidden"}
