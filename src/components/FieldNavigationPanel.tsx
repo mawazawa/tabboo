@@ -60,6 +60,7 @@ interface Props {
 }
 
 const FIELD_CONFIG: FieldConfig[] = [
+  // Attorney/Party Information (Item 1)
   { field: 'partyName', label: 'Name', type: 'input', placeholder: 'Full name', vaultField: 'full_name' },
   { field: 'streetAddress', label: 'Street Address', type: 'input', placeholder: 'Street address', vaultField: 'street_address' },
   { field: 'city', label: 'City', type: 'input', placeholder: 'City', vaultField: 'city' },
@@ -69,17 +70,52 @@ const FIELD_CONFIG: FieldConfig[] = [
   { field: 'faxNo', label: 'Fax', type: 'input', placeholder: 'Fax number', vaultField: 'fax_no' },
   { field: 'email', label: 'Email', type: 'input', placeholder: 'Email address', vaultField: 'email_address' },
   { field: 'attorneyFor', label: 'Attorney For', type: 'input', placeholder: 'Attorney for', vaultField: 'attorney_name' },
+  { field: 'attorneyBarNumber', label: 'Bar Number', type: 'input', placeholder: 'State bar number' },
+
+  // Case Information
   { field: 'county', label: 'County', type: 'input', placeholder: 'County' },
   { field: 'petitioner', label: 'Petitioner', type: 'input', placeholder: 'Petitioner name' },
   { field: 'respondent', label: 'Respondent', type: 'input', placeholder: 'Respondent name' },
   { field: 'caseNumber', label: 'Case Number', type: 'input', placeholder: 'Case number' },
+
+  // Hearing Information (Item 2)
+  { field: 'hearingDate', label: 'Hearing Date', type: 'input', placeholder: 'MM/DD/YYYY' },
+  { field: 'hearingTime', label: 'Hearing Time', type: 'input', placeholder: 'HH:MM AM/PM' },
+  { field: 'hearingDepartment', label: 'Department', type: 'input', placeholder: 'Department' },
+  { field: 'hearingRoom', label: 'Room', type: 'input', placeholder: 'Room number' },
+
+  // Child Information (Item 3)
+  { field: 'child1Name', label: 'Child 1 Name', type: 'input', placeholder: 'First child full name' },
+  { field: 'child1BirthDate', label: 'Child 1 Birth Date', type: 'input', placeholder: 'MM/DD/YYYY' },
+  { field: 'child2Name', label: 'Child 2 Name', type: 'input', placeholder: 'Second child full name' },
+  { field: 'child2BirthDate', label: 'Child 2 Birth Date', type: 'input', placeholder: 'MM/DD/YYYY' },
+  { field: 'child3Name', label: 'Child 3 Name', type: 'input', placeholder: 'Third child full name' },
+  { field: 'child3BirthDate', label: 'Child 3 Birth Date', type: 'input', placeholder: 'MM/DD/YYYY' },
+
+  // Order Types (Items 4-7)
+  { field: 'orderChildCustody', label: 'Order: Child Custody', type: 'checkbox' },
+  { field: 'orderVisitation', label: 'Order: Visitation', type: 'checkbox' },
+  { field: 'orderChildSupport', label: 'Order: Child Support', type: 'checkbox' },
+  { field: 'orderSpousalSupport', label: 'Order: Spousal Support', type: 'checkbox' },
+  { field: 'orderAttorneyFees', label: 'Order: Attorney Fees', type: 'checkbox' },
+  { field: 'orderPropertyControl', label: 'Order: Property Control', type: 'checkbox' },
+  { field: 'orderOther', label: 'Order: Other', type: 'checkbox' },
+  { field: 'orderOtherText', label: 'Other Order Details', type: 'input', placeholder: 'Specify other orders' },
+
+  // Response Type
   { field: 'noOrders', label: 'No orders requested', type: 'checkbox' },
   { field: 'agreeOrders', label: 'Agree to orders', type: 'checkbox' },
   { field: 'consentCustody', label: 'Consent to custody', type: 'checkbox' },
   { field: 'consentVisitation', label: 'Consent to visitation', type: 'checkbox' },
+
+  // Facts and Declaration
   { field: 'facts', label: 'Facts', type: 'textarea', placeholder: 'Enter facts and details' },
+  { field: 'declarationUnderPenalty', label: 'Declaration under penalty of perjury', type: 'checkbox' },
+
+  // Signature
   { field: 'signatureDate', label: 'Date', type: 'input', placeholder: 'Date' },
-  { field: 'signatureName', label: 'Signature Name', type: 'input', placeholder: 'Your name', vaultField: 'full_name' },
+  { field: 'signatureName', label: 'Signature', type: 'input', placeholder: 'Sign your name', vaultField: 'full_name' },
+  { field: 'printName', label: 'Print Name', type: 'input', placeholder: 'Print your name', vaultField: 'full_name' },
 ];
 
 export const FieldNavigationPanel = ({ 
@@ -210,6 +246,7 @@ export const FieldNavigationPanel = ({
   // Get default position for a field
   const getDefaultPosition = (field: string) => {
     const defaults: Record<string, { top: number; left: number }> = {
+      // Attorney/Party Information
       partyName: { top: 15.8, left: 5 },
       streetAddress: { top: 19, left: 5 },
       city: { top: 22.5, left: 5 },
@@ -219,17 +256,52 @@ export const FieldNavigationPanel = ({
       faxNo: { top: 25.8, left: 23 },
       email: { top: 29.2, left: 5 },
       attorneyFor: { top: 32.5, left: 5 },
+      attorneyBarNumber: { top: 32.5, left: 42 },
+
+      // Case Information
       county: { top: 15.8, left: 55 },
       petitioner: { top: 22.5, left: 55 },
       respondent: { top: 26.5, left: 55 },
       caseNumber: { top: 32.5, left: 55 },
-      noOrders: { top: 43.5, left: 25.5 },
-      agreeOrders: { top: 46.5, left: 25.5 },
-      consentCustody: { top: 53, left: 25.5 },
-      consentVisitation: { top: 56, left: 25.5 },
-      facts: { top: 68, left: 5 },
-      signatureDate: { top: 90, left: 5 },
-      signatureName: { top: 90, left: 50 },
+
+      // Hearing Information
+      hearingDate: { top: 38, left: 20 },
+      hearingTime: { top: 38, left: 37 },
+      hearingDepartment: { top: 38, left: 51 },
+      hearingRoom: { top: 38, left: 63 },
+
+      // Child Information
+      child1Name: { top: 41.5, left: 20 },
+      child1BirthDate: { top: 41.5, left: 57 },
+      child2Name: { top: 44.5, left: 20 },
+      child2BirthDate: { top: 44.5, left: 57 },
+      child3Name: { top: 47.5, left: 20 },
+      child3BirthDate: { top: 47.5, left: 57 },
+
+      // Order Types
+      orderChildCustody: { top: 51, left: 5 },
+      orderVisitation: { top: 54, left: 5 },
+      orderChildSupport: { top: 57, left: 5 },
+      orderSpousalSupport: { top: 60, left: 5 },
+      orderAttorneyFees: { top: 63, left: 5 },
+      orderPropertyControl: { top: 66, left: 5 },
+      orderOther: { top: 69, left: 5 },
+      orderOtherText: { top: 69, left: 25 },
+
+      // Response Type
+      noOrders: { top: 72.5, left: 5 },
+      agreeOrders: { top: 75.5, left: 5 },
+      consentCustody: { top: 78.5, left: 5 },
+      consentVisitation: { top: 81.5, left: 5 },
+
+      // Facts and Declaration
+      facts: { top: 85, left: 5 },
+      declarationUnderPenalty: { top: 93.5, left: 5 },
+
+      // Signature
+      signatureDate: { top: 96, left: 5 },
+      signatureName: { top: 96, left: 30 },
+      printName: { top: 96, left: 65 },
     };
     return defaults[field] || { top: 0, left: 0 };
   };

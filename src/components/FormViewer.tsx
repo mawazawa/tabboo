@@ -50,10 +50,25 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
 
   // Map field names to indices
   const fieldNameToIndex: Record<string, number> = {
+    // Attorney/Party Info (0-9)
     partyName: 0, streetAddress: 1, city: 2, state: 3, zipCode: 4,
-    telephoneNo: 5, faxNo: 6, email: 7, attorneyFor: 8, county: 9,
-    petitioner: 10, respondent: 11, caseNumber: 12, noOrders: 13, agreeOrders: 14,
-    consentCustody: 15, consentVisitation: 16, facts: 17, signatureDate: 18, signatureName: 19
+    telephoneNo: 5, faxNo: 6, email: 7, attorneyFor: 8, attorneyBarNumber: 9,
+    // Case Info (10-13)
+    county: 10, petitioner: 11, respondent: 12, caseNumber: 13,
+    // Hearing Info (14-17)
+    hearingDate: 14, hearingTime: 15, hearingDepartment: 16, hearingRoom: 17,
+    // Child Info (18-23)
+    child1Name: 18, child1BirthDate: 19, child2Name: 20, child2BirthDate: 21,
+    child3Name: 22, child3BirthDate: 23,
+    // Order Types (24-31)
+    orderChildCustody: 24, orderVisitation: 25, orderChildSupport: 26, orderSpousalSupport: 27,
+    orderAttorneyFees: 28, orderPropertyControl: 29, orderOther: 30, orderOtherText: 31,
+    // Response Types (32-35)
+    noOrders: 32, agreeOrders: 33, consentCustody: 34, consentVisitation: 35,
+    // Facts & Declaration (36-37)
+    facts: 36, declarationUnderPenalty: 37,
+    // Signature (38-40)
+    signatureDate: 38, signatureName: 39, printName: 40
   };
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
@@ -274,9 +289,10 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   }, [isGlobalEditMode, currentFieldIndex, fieldNameToIndex, adjustPosition]);
 
   // Field overlays with default positions
-  const fieldOverlays: { page: number; fields: FieldOverlays[] }[] = [{
+  const fieldOverlays: { page: number; fields: FieldOverlay[] }[] = [{
     page: 1,
     fields: [
+      // Attorney/Party Information (Item 1)
       { type: 'input', field: 'partyName', top: '15.8', left: '5', width: '40%', placeholder: 'NAME' },
       { type: 'input', field: 'streetAddress', top: '19', left: '5', width: '40%', placeholder: 'STREET ADDRESS' },
       { type: 'input', field: 'city', top: '22.5', left: '5', width: '23%', placeholder: 'CITY' },
@@ -285,18 +301,53 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
       { type: 'input', field: 'telephoneNo', top: '25.8', left: '5', width: '16%', placeholder: 'PHONE' },
       { type: 'input', field: 'faxNo', top: '25.8', left: '23', width: '22%', placeholder: 'FAX' },
       { type: 'input', field: 'email', top: '29.2', left: '5', width: '40%', placeholder: 'EMAIL' },
-      { type: 'input', field: 'attorneyFor', top: '32.5', left: '5', width: '40%', placeholder: 'ATTORNEY FOR' },
+      { type: 'input', field: 'attorneyFor', top: '32.5', left: '5', width: '35%', placeholder: 'ATTORNEY FOR' },
+      { type: 'input', field: 'attorneyBarNumber', top: '32.5', left: '42', width: '8%', placeholder: 'BAR #' },
+
+      // Case Information (right column)
       { type: 'input', field: 'county', top: '15.8', left: '55', width: '40%', placeholder: 'COUNTY' },
       { type: 'input', field: 'petitioner', top: '22.5', left: '55', width: '40%', placeholder: 'PETITIONER' },
       { type: 'input', field: 'respondent', top: '26.5', left: '55', width: '40%', placeholder: 'RESPONDENT' },
       { type: 'input', field: 'caseNumber', top: '32.5', left: '55', width: '40%', placeholder: 'CASE #' },
-      { type: 'checkbox', field: 'noOrders', top: '43.5', left: '25.5', placeholder: '' },
-      { type: 'checkbox', field: 'agreeOrders', top: '46.5', left: '25.5', placeholder: '' },
-      { type: 'checkbox', field: 'consentCustody', top: '53', left: '25.5', placeholder: '' },
-      { type: 'checkbox', field: 'consentVisitation', top: '56', left: '25.5', placeholder: '' },
-      { type: 'textarea', field: 'facts', top: '68', left: '5', width: '90%', height: '15%', placeholder: 'FACTS' },
-      { type: 'input', field: 'signatureDate', top: '90', left: '5', width: '20%', placeholder: 'DATE' },
-      { type: 'input', field: 'signatureName', top: '90', left: '50', width: '40%', placeholder: 'SIGNATURE' },
+
+      // Hearing Information (Item 2)
+      { type: 'input', field: 'hearingDate', top: '38', left: '20', width: '15%', placeholder: 'HEARING DATE' },
+      { type: 'input', field: 'hearingTime', top: '38', left: '37', width: '12%', placeholder: 'TIME' },
+      { type: 'input', field: 'hearingDepartment', top: '38', left: '51', width: '10%', placeholder: 'DEPT' },
+      { type: 'input', field: 'hearingRoom', top: '38', left: '63', width: '10%', placeholder: 'ROOM' },
+
+      // Child Information (Item 3)
+      { type: 'input', field: 'child1Name', top: '41.5', left: '20', width: '35%', placeholder: 'CHILD 1 NAME' },
+      { type: 'input', field: 'child1BirthDate', top: '41.5', left: '57', width: '15%', placeholder: 'BIRTHDATE' },
+      { type: 'input', field: 'child2Name', top: '44.5', left: '20', width: '35%', placeholder: 'CHILD 2 NAME' },
+      { type: 'input', field: 'child2BirthDate', top: '44.5', left: '57', width: '15%', placeholder: 'BIRTHDATE' },
+      { type: 'input', field: 'child3Name', top: '47.5', left: '20', width: '35%', placeholder: 'CHILD 3 NAME' },
+      { type: 'input', field: 'child3BirthDate', top: '47.5', left: '57', width: '15%', placeholder: 'BIRTHDATE' },
+
+      // Order Types (Items 4-7)
+      { type: 'checkbox', field: 'orderChildCustody', top: '51', left: '5', placeholder: '' },
+      { type: 'checkbox', field: 'orderVisitation', top: '54', left: '5', placeholder: '' },
+      { type: 'checkbox', field: 'orderChildSupport', top: '57', left: '5', placeholder: '' },
+      { type: 'checkbox', field: 'orderSpousalSupport', top: '60', left: '5', placeholder: '' },
+      { type: 'checkbox', field: 'orderAttorneyFees', top: '63', left: '5', placeholder: '' },
+      { type: 'checkbox', field: 'orderPropertyControl', top: '66', left: '5', placeholder: '' },
+      { type: 'checkbox', field: 'orderOther', top: '69', left: '5', placeholder: '' },
+      { type: 'input', field: 'orderOtherText', top: '69', left: '25', width: '70%', placeholder: 'SPECIFY OTHER' },
+
+      // Response Type
+      { type: 'checkbox', field: 'noOrders', top: '72.5', left: '5', placeholder: '' },
+      { type: 'checkbox', field: 'agreeOrders', top: '75.5', left: '5', placeholder: '' },
+      { type: 'checkbox', field: 'consentCustody', top: '78.5', left: '5', placeholder: '' },
+      { type: 'checkbox', field: 'consentVisitation', top: '81.5', left: '5', placeholder: '' },
+
+      // Facts and Declaration
+      { type: 'textarea', field: 'facts', top: '85', left: '5', width: '90%', height: '8%', placeholder: 'FACTS' },
+      { type: 'checkbox', field: 'declarationUnderPenalty', top: '93.5', left: '5', placeholder: '' },
+
+      // Signature
+      { type: 'input', field: 'signatureDate', top: '96', left: '5', width: '15%', placeholder: 'DATE' },
+      { type: 'input', field: 'signatureName', top: '96', left: '30', width: '30%', placeholder: 'SIGNATURE' },
+      { type: 'input', field: 'printName', top: '96', left: '65', width: '30%', placeholder: 'PRINT NAME' },
     ]
   }];
 
@@ -635,13 +686,13 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
                                 disabled={isGlobalEditMode}
-                                className={`field-input h-10 text-sm ${
+                                className={`field-input h-6 text-[12pt] font-mono ${
                                   isGlobalEditMode
                                     ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   validationErrors?.[overlay.field]?.length
                                     ? 'bg-destructive/10 border-destructive'
-                                    : isCurrentField 
-                                    ? 'bg-primary/5 border-primary' 
+                                    : isCurrentField
+                                    ? 'bg-primary/5 border-primary'
                                     : 'bg-background border-border'
                                 }`}
                               />
@@ -652,13 +703,13 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
                                 disabled={isGlobalEditMode}
-                                className={`field-input text-sm resize-none ${
+                                className={`field-input text-[12pt] font-mono resize-none min-h-[48px] ${
                                   isGlobalEditMode
                                     ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   validationErrors?.[overlay.field]?.length
                                     ? 'bg-destructive/10 border-destructive'
-                                    : isCurrentField 
-                                    ? 'bg-primary/5 border-primary' 
+                                    : isCurrentField
+                                    ? 'bg-primary/5 border-primary'
                                     : 'bg-background border-border'
                                 }`}
                               />

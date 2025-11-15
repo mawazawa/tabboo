@@ -7,6 +7,7 @@
  * Main form data structure for PDF form fields
  */
 export interface FormData {
+  // Attorney/Party Information (Item 1)
   partyName?: string;
   streetAddress?: string;
   city?: string;
@@ -16,17 +17,52 @@ export interface FormData {
   faxNo?: string;
   email?: string;
   attorneyFor?: string;
+  attorneyBarNumber?: string;
+
+  // Case Information
   county?: string;
   petitioner?: string;
   respondent?: string;
   caseNumber?: string;
-  facts?: string;
-  signatureDate?: string;
-  signatureName?: string;
+
+  // Hearing Information (Item 2)
+  hearingDate?: string;
+  hearingTime?: string;
+  hearingDepartment?: string;
+  hearingRoom?: string;
+
+  // Child Information (Item 3)
+  child1Name?: string;
+  child1BirthDate?: string;
+  child2Name?: string;
+  child2BirthDate?: string;
+  child3Name?: string;
+  child3BirthDate?: string;
+
+  // Order Types (Items 4-7)
+  orderChildCustody?: boolean;
+  orderVisitation?: boolean;
+  orderChildSupport?: boolean;
+  orderSpousalSupport?: boolean;
+  orderAttorneyFees?: boolean;
+  orderPropertyControl?: boolean;
+  orderOther?: boolean;
+  orderOtherText?: string;
+
+  // Response Type
   noOrders?: boolean;
   agreeOrders?: boolean;
   consentCustody?: boolean;
   consentVisitation?: boolean;
+
+  // Facts and Declaration
+  facts?: string;
+  declarationUnderPenalty?: boolean;
+
+  // Signature
+  signatureDate?: string;
+  signatureName?: string;
+  printName?: string;
 }
 
 /**
