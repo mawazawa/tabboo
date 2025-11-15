@@ -360,108 +360,107 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isGlobalEditMode, currentFieldIndex, fieldNameToIndex, adjustPosition]);
 
-  // Field overlays with default positions (updated to match actual FL-320 structure)
+  // Field overlays with PRECISE positions from PDF visual analysis
   const fieldOverlays: { page: number; fields: FieldOverlay[] }[] = [
     {
       page: 1,
       fields: [
         // HEADER SECTION - Party/Attorney Information (Left Column)
-        { type: 'input', field: 'partyName', top: '8', left: '5', width: '40%', placeholder: 'NAME' },
-        { type: 'input', field: 'firmName', top: '10', left: '5', width: '40%', placeholder: 'FIRM NAME' },
-        { type: 'input', field: 'streetAddress', top: '12', left: '5', width: '40%', placeholder: 'STREET ADDRESS' },
-        { type: 'input', field: 'mailingAddress', top: '14', left: '5', width: '40%', placeholder: 'MAILING ADDRESS' },
-        { type: 'input', field: 'city', top: '16', left: '5', width: '20%', placeholder: 'CITY' },
-        { type: 'input', field: 'state', top: '16', left: '26', width: '7%', placeholder: 'STATE' },
-        { type: 'input', field: 'zipCode', top: '16', left: '34', width: '11%', placeholder: 'ZIP CODE' },
-        { type: 'input', field: 'telephoneNo', top: '18', left: '5', width: '17%', placeholder: 'TELEPHONE NO' },
-        { type: 'input', field: 'faxNo', top: '18', left: '23', width: '22%', placeholder: 'FAX NO' },
-        { type: 'input', field: 'email', top: '20', left: '5', width: '40%', placeholder: 'E-MAIL ADDRESS' },
-        { type: 'input', field: 'attorneyFor', top: '22', left: '5', width: '30%', placeholder: 'ATTORNEY FOR' },
-        { type: 'input', field: 'stateBarNumber', top: '22', left: '36', width: '9%', placeholder: 'STATE BAR NO' },
+        { type: 'input', field: 'partyName', top: '3.5', left: '2', width: '38%', placeholder: 'NAME' },
+        { type: 'input', field: 'firmName', top: '6.5', left: '2', width: '38%', placeholder: 'FIRM NAME' },
+        { type: 'input', field: 'streetAddress', top: '9.5', left: '2', width: '38%', placeholder: 'STREET ADDRESS' },
+        { type: 'input', field: 'city', top: '12.5', left: '2', width: '18%', placeholder: 'CITY' },
+        { type: 'input', field: 'state', top: '12.5', left: '21', width: '6%', placeholder: 'STATE' },
+        { type: 'input', field: 'zipCode', top: '12.5', left: '28', width: '10%', placeholder: 'ZIP CODE' },
+        { type: 'input', field: 'telephoneNo', top: '15.5', left: '2', width: '18%', placeholder: 'TELEPHONE NO' },
+        { type: 'input', field: 'faxNo', top: '15.5', left: '21', width: '17%', placeholder: 'FAX NO' },
+        { type: 'input', field: 'email', top: '18.5', left: '2', width: '38%', placeholder: 'E-MAIL ADDRESS' },
+        { type: 'input', field: 'attorneyFor', top: '21.5', left: '2', width: '28%', placeholder: 'ATTORNEY FOR' },
+        { type: 'input', field: 'stateBarNumber', top: '21.5', left: '31', width: '9%', placeholder: 'STATE BAR NO' },
 
         // HEADER SECTION - Court Information (Center)
-        { type: 'input', field: 'county', top: '8', left: '50', width: '25%', placeholder: 'COUNTY' },
-        { type: 'input', field: 'courtStreetAddress', top: '10', left: '50', width: '25%', placeholder: 'STREET ADDRESS' },
-        { type: 'input', field: 'courtMailingAddress', top: '12', left: '50', width: '25%', placeholder: 'MAILING ADDRESS' },
-        { type: 'input', field: 'courtCityAndZip', top: '14', left: '50', width: '25%', placeholder: 'CITY AND ZIP CODE' },
-        { type: 'input', field: 'branchName', top: '16', left: '50', width: '25%', placeholder: 'BRANCH NAME' },
+        { type: 'input', field: 'county', top: '4.5', left: '42', width: '30%', placeholder: 'COUNTY OF' },
+        { type: 'input', field: 'courtStreetAddress', top: '7.5', left: '42', width: '30%', placeholder: 'STREET ADDRESS' },
+        { type: 'input', field: 'courtMailingAddress', top: '10', left: '42', width: '30%', placeholder: 'MAILING ADDRESS' },
+        { type: 'input', field: 'courtCityAndZip', top: '12.5', left: '42', width: '30%', placeholder: 'CITY AND ZIP CODE' },
+        { type: 'input', field: 'branchName', top: '15', left: '42', width: '30%', placeholder: 'BRANCH NAME' },
 
         // HEADER SECTION - Case Information (Right Column)
-        { type: 'input', field: 'petitioner', top: '20', left: '77', width: '18%', placeholder: 'PETITIONER' },
-        { type: 'input', field: 'respondent', top: '22', left: '77', width: '18%', placeholder: 'RESPONDENT' },
-        { type: 'input', field: 'otherParentParty', top: '24', left: '77', width: '18%', placeholder: 'OTHER PARENT/PARTY' },
-        { type: 'input', field: 'caseNumber', top: '27', left: '77', width: '18%', placeholder: 'CASE NUMBER' },
+        { type: 'input', field: 'petitioner', top: '19', left: '74', width: '24%', placeholder: 'PETITIONER' },
+        { type: 'input', field: 'respondent', top: '21', left: '74', width: '24%', placeholder: 'RESPONDENT' },
+        { type: 'input', field: 'otherParentParty', top: '23', left: '74', width: '24%', placeholder: 'OTHER PARENT/PARTY' },
+        { type: 'input', field: 'caseNumber', top: '27.5', left: '74', width: '24%', placeholder: 'CASE NUMBER' },
 
         // HEADER SECTION - Hearing Information
-        { type: 'input', field: 'hearingDate', top: '29', left: '77', width: '18%', placeholder: 'HEARING DATE' },
-        { type: 'input', field: 'hearingTime', top: '30', left: '77', width: '8%', placeholder: 'TIME' },
-        { type: 'input', field: 'hearingDepartment', top: '30', left: '86', width: '9%', placeholder: 'DEPT' },
-        { type: 'input', field: 'hearingRoom', top: '31', left: '86', width: '9%', placeholder: 'ROOM' },
+        { type: 'input', field: 'hearingDate', top: '29', left: '74', width: '11%', placeholder: 'HEARING DATE' },
+        { type: 'input', field: 'hearingTime', top: '29', left: '86', width: '6%', placeholder: 'TIME' },
+        { type: 'input', field: 'hearingDepartment', top: '29', left: '93', width: '5%', placeholder: 'DEPT' },
+        { type: 'input', field: 'hearingRoom', top: '29', left: '93', width: '5%', placeholder: 'ROOM' },
 
         // ITEM 1: Restraining Order Information
-        { type: 'checkbox', field: 'restrainingOrderNone', top: '36', left: '5', placeholder: 'No restraining orders' },
-        { type: 'checkbox', field: 'restrainingOrderActive', top: '38', left: '5', placeholder: 'Restraining orders active' },
+        { type: 'checkbox', field: 'restrainingOrderNone', top: '34', left: '6.5', placeholder: 'No restraining orders' },
+        { type: 'checkbox', field: 'restrainingOrderActive', top: '36', left: '6.5', placeholder: 'Restraining orders active' },
 
         // ITEM 2: Child Custody/Visitation
-        { type: 'checkbox', field: 'childCustodyConsent', top: '42', left: '5', placeholder: 'Consent to child custody' },
-        { type: 'checkbox', field: 'visitationConsent', top: '44', left: '5', placeholder: 'Consent to visitation' },
-        { type: 'checkbox', field: 'childCustodyDoNotConsent', top: '46', left: '7', placeholder: 'Do not consent - custody' },
-        { type: 'checkbox', field: 'visitationDoNotConsent', top: '46', left: '25', placeholder: 'Do not consent - visitation' },
-        { type: 'input', field: 'custodyAlternativeOrder', top: '48', left: '10', width: '85%', placeholder: 'Alternative custody order' },
+        { type: 'checkbox', field: 'childCustodyConsent', top: '42', left: '6.5', placeholder: 'Consent to child custody' },
+        { type: 'checkbox', field: 'visitationConsent', top: '44', left: '6.5', placeholder: 'Consent to visitation' },
+        { type: 'checkbox', field: 'childCustodyDoNotConsent', top: '46.5', left: '6.5', placeholder: 'Do not consent - custody' },
+        { type: 'checkbox', field: 'visitationDoNotConsent', top: '46.5', left: '32', placeholder: 'Do not consent - visitation' },
+        { type: 'input', field: 'custodyAlternativeOrder', top: '48', left: '9', width: '89%', placeholder: 'Alternative custody order' },
 
         // ITEM 3: Child Support
-        { type: 'checkbox', field: 'childSupportFiledFL150', top: '52', left: '5', placeholder: 'Filed FL-150' },
-        { type: 'checkbox', field: 'childSupportConsent', top: '54', left: '5', placeholder: 'Consent to child support' },
-        { type: 'checkbox', field: 'childSupportGuidelineConsent', top: '56', left: '5', placeholder: 'Consent to guideline support' },
-        { type: 'checkbox', field: 'childSupportDoNotConsent', top: '58', left: '5', placeholder: 'Do not consent to support' },
-        { type: 'input', field: 'childSupportAlternativeOrder', top: '60', left: '10', width: '85%', placeholder: 'Alternative support order' },
+        { type: 'checkbox', field: 'childSupportFiledFL150', top: '59.5', left: '6.5', placeholder: 'Filed FL-150' },
+        { type: 'checkbox', field: 'childSupportConsent', top: '64', left: '6.5', placeholder: 'Consent to child support' },
+        { type: 'checkbox', field: 'childSupportGuidelineConsent', top: '66', left: '6.5', placeholder: 'Consent to guideline support' },
+        { type: 'checkbox', field: 'childSupportDoNotConsent', top: '68', left: '6.5', placeholder: 'Do not consent to support' },
+        { type: 'input', field: 'childSupportAlternativeOrder', top: '68', left: '35', width: '63%', placeholder: 'Alternative support order' },
 
         // ITEM 4: Spousal Support
-        { type: 'checkbox', field: 'spousalSupportFiledFL150', top: '64', left: '5', placeholder: 'Filed FL-150 (spousal)' },
-        { type: 'checkbox', field: 'spousalSupportConsent', top: '66', left: '5', placeholder: 'Consent to spousal support' },
-        { type: 'checkbox', field: 'spousalSupportDoNotConsent', top: '68', left: '5', placeholder: 'Do not consent (spousal)' },
-        { type: 'input', field: 'spousalSupportAlternativeOrder', top: '70', left: '10', width: '85%', placeholder: 'Alternative spousal support' },
+        { type: 'checkbox', field: 'spousalSupportFiledFL150', top: '82', left: '6.5', placeholder: 'Filed FL-150 (spousal)' },
+        { type: 'checkbox', field: 'spousalSupportConsent', top: '87', left: '6.5', placeholder: 'Consent to spousal support' },
+        { type: 'checkbox', field: 'spousalSupportDoNotConsent', top: '89.5', left: '6.5', placeholder: 'Do not consent (spousal)' },
+        { type: 'input', field: 'spousalSupportAlternativeOrder', top: '89.5', left: '35', width: '63%', placeholder: 'Alternative spousal support' },
       ]
     },
     {
       page: 2,
       fields: [
         // ITEM 5: Property Control
-        { type: 'checkbox', field: 'propertyControlConsent', top: '10', left: '5', placeholder: 'Consent to property control' },
-        { type: 'checkbox', field: 'propertyControlDoNotConsent', top: '12', left: '5', placeholder: 'Do not consent (property)' },
-        { type: 'input', field: 'propertyControlAlternativeOrder', top: '14', left: '10', width: '85%', placeholder: 'Alternative property order' },
+        { type: 'checkbox', field: 'propertyControlConsent', top: '9', left: '6.5', placeholder: 'Consent to property control' },
+        { type: 'checkbox', field: 'propertyControlDoNotConsent', top: '11', left: '6.5', placeholder: 'Do not consent (property)' },
+        { type: 'input', field: 'propertyControlAlternativeOrder', top: '11', left: '35', width: '63%', placeholder: 'Alternative property order' },
 
         // ITEM 6: Attorney's Fees and Costs
-        { type: 'checkbox', field: 'attorneyFeesFiledFL150', top: '18', left: '5', placeholder: 'Filed FL-150 (fees)' },
-        { type: 'checkbox', field: 'attorneyFeesFiledFL158', top: '20', left: '5', placeholder: 'Filed FL-158' },
-        { type: 'checkbox', field: 'attorneyFeesConsent', top: '22', left: '5', placeholder: 'Consent to attorney fees' },
-        { type: 'checkbox', field: 'attorneyFeesDoNotConsent', top: '24', left: '5', placeholder: 'Do not consent (fees)' },
-        { type: 'input', field: 'attorneyFeesAlternativeOrder', top: '26', left: '10', width: '85%', placeholder: 'Alternative fees order' },
+        { type: 'checkbox', field: 'attorneyFeesFiledFL150', top: '18', left: '6.5', placeholder: 'Filed FL-150 (fees)' },
+        { type: 'checkbox', field: 'attorneyFeesFiledFL158', top: '21', left: '6.5', placeholder: 'Filed FL-158' },
+        { type: 'checkbox', field: 'attorneyFeesConsent', top: '25', left: '6.5', placeholder: 'Consent to attorney fees' },
+        { type: 'checkbox', field: 'attorneyFeesDoNotConsent', top: '27', left: '6.5', placeholder: 'Do not consent (fees)' },
+        { type: 'input', field: 'attorneyFeesAlternativeOrder', top: '27', left: '35', width: '63%', placeholder: 'Alternative fees order' },
 
         // ITEM 7: Domestic Violence Order
-        { type: 'checkbox', field: 'domesticViolenceConsent', top: '30', left: '5', placeholder: 'Consent to DV order' },
-        { type: 'checkbox', field: 'domesticViolenceDoNotConsent', top: '32', left: '5', placeholder: 'Do not consent (DV)' },
-        { type: 'input', field: 'domesticViolenceAlternativeOrder', top: '34', left: '10', width: '85%', placeholder: 'Alternative DV order' },
+        { type: 'checkbox', field: 'domesticViolenceConsent', top: '38', left: '6.5', placeholder: 'Consent to DV order' },
+        { type: 'checkbox', field: 'domesticViolenceDoNotConsent', top: '40.5', left: '6.5', placeholder: 'Do not consent (DV)' },
+        { type: 'input', field: 'domesticViolenceAlternativeOrder', top: '40.5', left: '35', width: '63%', placeholder: 'Alternative DV order' },
 
         // ITEM 8: Other Orders Requested
-        { type: 'checkbox', field: 'otherOrdersConsent', top: '38', left: '5', placeholder: 'Consent to other orders' },
-        { type: 'checkbox', field: 'otherOrdersDoNotConsent', top: '40', left: '5', placeholder: 'Do not consent (other)' },
-        { type: 'input', field: 'otherOrdersAlternativeOrder', top: '42', left: '10', width: '85%', placeholder: 'Specify other orders' },
+        { type: 'checkbox', field: 'otherOrdersConsent', top: '48', left: '6.5', placeholder: 'Consent to other orders' },
+        { type: 'checkbox', field: 'otherOrdersDoNotConsent', top: '50.5', left: '6.5', placeholder: 'Do not consent (other)' },
+        { type: 'input', field: 'otherOrdersAlternativeOrder', top: '50.5', left: '35', width: '63%', placeholder: 'Specify other orders' },
 
         // ITEM 9: Time for Service / Time Until Hearing
-        { type: 'checkbox', field: 'timeForServiceConsent', top: '46', left: '5', placeholder: 'Consent to service time' },
-        { type: 'checkbox', field: 'timeForServiceDoNotConsent', top: '48', left: '5', placeholder: 'Do not consent (time)' },
-        { type: 'input', field: 'timeForServiceAlternativeOrder', top: '50', left: '10', width: '85%', placeholder: 'Alternative service order' },
+        { type: 'checkbox', field: 'timeForServiceConsent', top: '58', left: '6.5', placeholder: 'Consent to service time' },
+        { type: 'checkbox', field: 'timeForServiceDoNotConsent', top: '60.5', left: '6.5', placeholder: 'Do not consent (time)' },
+        { type: 'input', field: 'timeForServiceAlternativeOrder', top: '60.5', left: '35', width: '63%', placeholder: 'Alternative service order' },
 
         // ITEM 10: Facts to Support
-        { type: 'textarea', field: 'facts', top: '54', left: '5', width: '90%', height: '30%', placeholder: 'FACTS TO SUPPORT (max 10 pages)' },
-        { type: 'checkbox', field: 'factsAttachment', top: '85', left: '5', placeholder: 'Attachment 10 included' },
+        { type: 'textarea', field: 'facts', top: '70', left: '2', width: '96%', height: '12%', placeholder: 'FACTS TO SUPPORT (max 10 pages)' },
+        { type: 'checkbox', field: 'factsAttachment', top: '82.5', left: '72', placeholder: 'Attachment 10 included' },
 
         // SIGNATURE SECTION
-        { type: 'checkbox', field: 'declarationUnderPenalty', top: '88', left: '5', placeholder: 'Declaration under penalty' },
-        { type: 'input', field: 'signatureDate', top: '91', left: '5', width: '15%', placeholder: 'DATE' },
-        { type: 'input', field: 'printName', top: '93', left: '5', width: '30%', placeholder: 'TYPE OR PRINT NAME' },
-        { type: 'input', field: 'signatureName', top: '95', left: '5', width: '30%', placeholder: 'SIGNATURE OF DECLARANT' },
+        { type: 'checkbox', field: 'declarationUnderPenalty', top: '85', left: '2', placeholder: 'Declaration under penalty' },
+        { type: 'input', field: 'signatureDate', top: '90', left: '2', width: '15%', placeholder: 'DATE' },
+        { type: 'input', field: 'printName', top: '93.5', left: '2', width: '35%', placeholder: 'TYPE OR PRINT NAME' },
+        { type: 'input', field: 'signatureName', top: '93.5', left: '50', width: '48%', placeholder: 'SIGNATURE OF DECLARANT' },
       ]
     }
   ];
