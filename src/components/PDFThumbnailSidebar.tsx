@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from "react";
-import { Document, Page, pdfjs } from "react-pdf";
+import { Document, Page } from "react-pdf";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FileText, Loader2 } from "@/icons";
 import { FieldMinimapIndicator } from "./FieldMinimapIndicator";
 
-// Configure PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+// Import centralized PDF.js configuration
+import '@/lib/pdfConfig';
 
 interface Props {
   currentPage?: number;

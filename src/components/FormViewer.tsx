@@ -8,7 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useRef, memo, useCallback, useEffect } from "react";
-import { Document, Page, pdfjs } from 'react-pdf';
+import { Document, Page } from 'react-pdf';
 import { Settings, Move, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Sparkles, Loader2, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Keyboard } from "@/icons";
 import { canAutofill, getVaultValueForField, type PersonalVaultData } from "@/utils/vaultFieldMatcher";
 import { TutorialTooltips } from "@/components/TutorialTooltips";
@@ -17,8 +17,8 @@ import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 import type { FormData, FieldOverlay, FieldPosition, ValidationErrors, PersonalVaultData } from "@/types/FormData";
 
-// Configure PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+// Import centralized PDF.js configuration
+import '@/lib/pdfConfig';
 
 interface Props {
   formData: FormData;
