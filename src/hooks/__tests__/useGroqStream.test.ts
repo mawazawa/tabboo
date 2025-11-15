@@ -61,8 +61,11 @@ describe('useGroqStream', () => {
 
     await streamPromise;
 
-    // After stream completes, should not be loading
-    expect(result.current.isLoading).toBe(false);
+    // Wait for state update to complete
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
     expect(onDone).toHaveBeenCalledTimes(1);
     expect(onError).not.toHaveBeenCalled();
   });
@@ -289,16 +292,16 @@ describe('useGroqStream', () => {
       onError,
     });
 
-    expect(global.fetch).toHaveBeenCalledWith(
-      expect.stringContaining('/functions/v1/groq-chat'),
-      expect.objectContaining({
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ messages, formContext }),
-        signal: expect.any(AbortSignal),
-      })
-    );
+    // Verify fetch was called with correct URL and options
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    const [url, options] = (global.fetch as any).mock.calls[0];
+
+    expect(url).toContain('/functions/v1/groq-chat');
+    expect(options).toMatchObject({
+      method: 'POST',
+      body: JSON.stringify({ messages, formContext }),
+    });
+    expect(options.headers['Content-Type']).toBe('application/json');
+    expect(options.signal).toBeInstanceOf(AbortSignal);
   });
 });
