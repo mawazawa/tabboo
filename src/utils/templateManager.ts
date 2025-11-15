@@ -3,6 +3,8 @@
  * Handles import/export of field position templates for crowdsourcing form mappings
  */
 
+import { createStorage } from './storageManager';
+
 export interface FieldTemplate {
   top: number;
   left: number;
@@ -20,17 +22,16 @@ export interface FormTemplate {
 }
 
 const STORAGE_KEY = 'form_templates';
+const templatesStorage = createStorage<Record<string, FormTemplate>>(STORAGE_KEY);
 
 /**
  * Save template to local storage
  */
 export const saveTemplate = (template: FormTemplate): void => {
-  try {
-    const templates = getStoredTemplates();
-    templates[template.formId] = template;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(templates));
-  } catch (error) {
-    console.error('Failed to save template:', error);
+  const templates = getStoredTemplates();
+  templates[template.formId] = template;
+  const success = templatesStorage.set(templates);
+  if (!success) {
     throw new Error('Failed to save template');
   }
 };
@@ -39,13 +40,7 @@ export const saveTemplate = (template: FormTemplate): void => {
  * Get all stored templates
  */
 export const getStoredTemplates = (): Record<string, FormTemplate> => {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : {};
-  } catch (error) {
-    console.error('Failed to load templates:', error);
-    return {};
-  }
+  return templatesStorage.get({ defaultValue: {} }) || {};
 };
 
 /**
@@ -62,7 +57,7 @@ export const getTemplate = (formId: string): FormTemplate | null => {
 export const deleteTemplate = (formId: string): void => {
   const templates = getStoredTemplates();
   delete templates[formId];
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(templates));
+  templatesStorage.set(templates);
 };
 
 /**

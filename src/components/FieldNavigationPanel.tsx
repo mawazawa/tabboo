@@ -24,36 +24,12 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import type { FormData, FieldConfig, FieldPosition, ValidationRules, ValidationErrors } from "@/types/FormData";
 
-interface FormData {
-  partyName?: string;
-  streetAddress?: string;
-  city?: string;
-  state?: string;
-  zipCode?: string;
-  telephoneNo?: string;
-  faxNo?: string;
-  email?: string;
-  attorneyFor?: string;
-  county?: string;
-  petitioner?: string;
-  respondent?: string;
-  caseNumber?: string;
-  facts?: string;
-  signatureDate?: string;
-  signatureName?: string;
-  noOrders?: boolean;
-  agreeOrders?: boolean;
-  consentCustody?: boolean;
-  consentVisitation?: boolean;
-}
-
-interface FieldConfig {
-  field: keyof FormData;
-  label: string;
-  type: 'input' | 'textarea' | 'checkbox';
-  placeholder?: string;
-  vaultField?: string; // Maps to personal_info column
+interface Template {
+  name: string;
+  formData: FormData;
+  fieldPositions: Record<string, FieldPosition>;
 }
 
 interface Props {
@@ -61,8 +37,8 @@ interface Props {
   updateField: (field: string, value: string | boolean) => void;
   currentFieldIndex: number;
   setCurrentFieldIndex: (index: number) => void;
-  fieldPositions: Record<string, { top: number; left: number }>;
-  updateFieldPosition: (field: string, position: { top: number; left: number }) => void;
+  fieldPositions: Record<string, FieldPosition>;
+  updateFieldPosition: (field: string, position: FieldPosition) => void;
   selectedFields: string[];
   setSelectedFields: React.Dispatch<React.SetStateAction<string[]>>;
   onSnapToGrid: (gridSize: number) => void;
@@ -74,13 +50,13 @@ interface Props {
   onTransformPositions: (transformation: { offsetX?: number; offsetY?: number; scale?: number }) => void;
   hasCopiedPositions: boolean;
   onFieldHover?: (fieldName: string | null) => void;
-  validationRules?: Record<string, any[]>;
-  validationErrors?: Record<string, any[]>;
-  onSaveValidationRules?: (fieldName: string, rules: any[]) => void;
+  validationRules?: ValidationRules;
+  validationErrors?: ValidationErrors;
+  onSaveValidationRules?: (fieldName: string, rules: ValidationRules[string]) => void;
   settingsSheetOpen: boolean;
   onSettingsSheetChange: (open: boolean) => void;
-  onApplyTemplate: (template: any) => void;
-  onApplyGroup: (groupPositions: Record<string, { top: number; left: number }>) => void;
+  onApplyTemplate: (template: Template) => void;
+  onApplyGroup: (groupPositions: Record<string, FieldPosition>) => void;
 }
 
 const FIELD_CONFIG: FieldConfig[] = [

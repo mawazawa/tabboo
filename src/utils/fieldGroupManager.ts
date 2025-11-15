@@ -3,6 +3,8 @@
  * Handles saving and applying sets of fields together for repeating patterns
  */
 
+import { createStorage } from './storageManager';
+
 export interface FieldGroupItem {
   fieldName: string;
   relativeTop: number;
@@ -18,6 +20,7 @@ export interface FieldGroup {
 }
 
 const STORAGE_KEY = 'field_groups';
+const groupsStorage = createStorage<Record<string, FieldGroup>>(STORAGE_KEY);
 
 /**
  * Calculate relative positions from absolute positions
@@ -80,12 +83,10 @@ export const applyGroupToFields = (
  * Save group to local storage
  */
 export const saveGroup = (group: FieldGroup): void => {
-  try {
-    const groups = getStoredGroups();
-    groups[group.id] = group;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
-  } catch (error) {
-    console.error('Failed to save group:', error);
+  const groups = getStoredGroups();
+  groups[group.id] = group;
+  const success = groupsStorage.set(groups);
+  if (!success) {
     throw new Error('Failed to save group');
   }
 };
@@ -94,13 +95,7 @@ export const saveGroup = (group: FieldGroup): void => {
  * Get all stored groups
  */
 export const getStoredGroups = (): Record<string, FieldGroup> => {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : {};
-  } catch (error) {
-    console.error('Failed to load groups:', error);
-    return {};
-  }
+  return groupsStorage.get({ defaultValue: {} }) || {};
 };
 
 /**
@@ -117,7 +112,7 @@ export const getGroup = (id: string): FieldGroup | null => {
 export const deleteGroup = (id: string): void => {
   const groups = getStoredGroups();
   delete groups[id];
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
+  groupsStorage.set(groups);
 };
 
 /**

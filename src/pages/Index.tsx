@@ -28,7 +28,7 @@ import {
   preloadCriticalRoutes 
 } from "@/utils/routePreloader";
 import { prefetchUserData } from "@/utils/dataPrefetcher";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 
 // Loading fallbacks for code-split components
 const PanelSkeleton = () => (
@@ -71,38 +71,16 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-
-interface FormData {
-  partyName?: string;
-  streetAddress?: string;
-  city?: string;
-  state?: string;
-  zipCode?: string;
-  telephoneNo?: string;
-  faxNo?: string;
-  email?: string;
-  attorneyFor?: string;
-  county?: string;
-  petitioner?: string;
-  respondent?: string;
-  caseNumber?: string;
-  facts?: string;
-  signatureDate?: string;
-  signatureName?: string;
-  noOrders?: boolean;
-  agreeOrders?: boolean;
-  consentCustody?: boolean;
-  consentVisitation?: boolean;
-}
+import type { FormData, User, ValidationRules, ValidationErrors, FieldPositions } from "@/types/FormData";
 
 const Index = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState<FormData>({});
   const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
-  const [fieldPositions, setFieldPositions] = useState<Record<string, { top: number; left: number }>>({});
+  const [fieldPositions, setFieldPositions] = useState<FieldPositions>({});
   const [documentId, setDocumentId] = useState<string | null>(null);
   const [showAIPanel, setShowAIPanel] = useState(false);
   const [showFieldsPanel, setShowFieldsPanel] = useState(true);
@@ -114,9 +92,9 @@ const Index = () => {
   const [fieldSearchQuery, setFieldSearchQuery] = useState("");
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [highlightedField, setHighlightedField] = useState<string | null>(null);
-  const [copiedFieldPositions, setCopiedFieldPositions] = useState<Record<string, { top: number; left: number }> | null>(null);
-  const [validationRules, setValidationRules] = useState<Record<string, any[]>>({});
-  const [validationErrors, setValidationErrors] = useState<Record<string, any[]>>({});
+  const [copiedFieldPositions, setCopiedFieldPositions] = useState<FieldPositions | null>(null);
+  const [validationRules, setValidationRules] = useState<ValidationRules>({});
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const [settingsSheetOpen, setSettingsSheetOpen] = useState(false);
   const [vaultSheetOpen, setVaultSheetOpen] = useState(false);
   const { toast } = useToast();
@@ -144,10 +122,10 @@ const Index = () => {
     refetchOnWindowFocus: true,
   });
 
-  const updateField = (field: string, value: string | boolean) => {
+  const updateField = useCallback((field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     hasUnsavedChanges.current = true;
-    
+
     // Validate field if it has rules
     if (validationRules[field]) {
       const { validateField } = require('@/utils/fieldValidator');
@@ -157,24 +135,24 @@ const Index = () => {
         [field]: errors
       }));
     }
-  };
+  }, [validationRules]);
 
-  const handleAutofillAll = () => {
+  const handleAutofillAll = useCallback(() => {
     if (!vaultData) {
-      toast({ 
-        title: "No vault data", 
+      toast({
+        title: "No vault data",
         description: "Please fill out your Personal Data Vault first",
         variant: "destructive"
       });
       return;
     }
-    
+
     const autofilled = autofillAllFromVault(vaultData as PersonalVaultData);
     const fieldsCount = Object.keys(autofilled).length;
-    
+
     if (fieldsCount === 0) {
-      toast({ 
-        title: "Nothing to autofill", 
+      toast({
+        title: "Nothing to autofill",
         description: "No matching fields found for your vault data",
         variant: "destructive"
       });
@@ -183,47 +161,47 @@ const Index = () => {
 
     setFormData(prev => ({ ...prev, ...autofilled }));
     hasUnsavedChanges.current = true;
-    toast({ 
-      title: "Success!", 
+    toast({
+      title: "Success!",
       description: `Autofilled ${fieldsCount} field(s)`,
     });
-  };
+  }, [vaultData, toast]);
 
-  const updateFieldPosition = (field: string, position: { top: number; left: number }) => {
+  const updateFieldPosition = useCallback((field: string, position: { top: number; left: number }) => {
     setFieldPositions(prev => ({ ...prev, [field]: position }));
     hasUnsavedChanges.current = true;
-  };
+  }, []);
 
   // Preset handlers
-  const handleSnapToGrid = (gridSize: number) => {
+  const handleSnapToGrid = useCallback((gridSize: number) => {
     const updated = snapAllToGrid(fieldPositions, selectedFields, gridSize);
     setFieldPositions(updated);
     hasUnsavedChanges.current = true;
     toast({ title: "Snapped to grid", description: `${selectedFields.length} field(s) aligned to ${gridSize}% grid` });
-  };
+  }, [fieldPositions, selectedFields, toast]);
 
-  const handleAlignHorizontal = (alignment: 'left' | 'center' | 'right') => {
+  const handleAlignHorizontal = useCallback((alignment: 'left' | 'center' | 'right') => {
     const updated = alignHorizontal(fieldPositions, selectedFields, alignment);
     setFieldPositions(updated);
     hasUnsavedChanges.current = true;
     toast({ title: "Aligned horizontally", description: `${selectedFields.length} field(s) aligned ${alignment}` });
-  };
+  }, [fieldPositions, selectedFields, toast]);
 
-  const handleAlignVertical = (alignment: 'top' | 'middle' | 'bottom') => {
+  const handleAlignVertical = useCallback((alignment: 'top' | 'middle' | 'bottom') => {
     const updated = alignVertical(fieldPositions, selectedFields, alignment);
     setFieldPositions(updated);
     hasUnsavedChanges.current = true;
     toast({ title: "Aligned vertically", description: `${selectedFields.length} field(s) aligned ${alignment}` });
-  };
+  }, [fieldPositions, selectedFields, toast]);
 
-  const handleDistribute = (direction: 'horizontal' | 'vertical') => {
+  const handleDistribute = useCallback((direction: 'horizontal' | 'vertical') => {
     const updated = distributeEvenly(fieldPositions, selectedFields, direction);
     setFieldPositions(updated);
     hasUnsavedChanges.current = true;
     toast({ title: "Distributed evenly", description: `${selectedFields.length} field(s) spaced ${direction}ly` });
-  };
+  }, [fieldPositions, selectedFields, toast]);
 
-  const handleCopyPositions = () => {
+  const handleCopyPositions = useCallback(() => {
     if (selectedFields.length === 0) return;
     const copied: Record<string, { top: number; left: number }> = {};
     selectedFields.forEach(field => {
@@ -233,16 +211,16 @@ const Index = () => {
     });
     setCopiedFieldPositions(copied);
     toast({ title: "Copied", description: `${selectedFields.length} field position(s) copied to clipboard` });
-  };
+  }, [selectedFields, fieldPositions, toast]);
 
-  const handlePastePositions = () => {
+  const handlePastePositions = useCallback(() => {
     if (!copiedFieldPositions || selectedFields.length === 0) return;
-    
+
     const copiedFields = Object.keys(copiedFieldPositions);
     if (copiedFields.length === 0) return;
 
     const updated = { ...fieldPositions };
-    
+
     // If pasting to same number of fields, apply directly with slight offset
     if (selectedFields.length === copiedFields.length) {
       selectedFields.forEach((targetField, index) => {
@@ -268,11 +246,11 @@ const Index = () => {
     setFieldPositions(updated);
     hasUnsavedChanges.current = true;
     toast({ title: "Pasted", description: `Applied positions to ${selectedFields.length} field(s)` });
-  };
+  }, [copiedFieldPositions, selectedFields, fieldPositions, toast]);
 
-  const handleTransformPositions = (transformation: { offsetX?: number; offsetY?: number; scale?: number }) => {
+  const handleTransformPositions = useCallback((transformation: { offsetX?: number; offsetY?: number; scale?: number }) => {
     if (selectedFields.length === 0) return;
-    
+
     const updated = { ...fieldPositions };
     selectedFields.forEach(field => {
       if (updated[field]) {
@@ -287,27 +265,27 @@ const Index = () => {
     setFieldPositions(updated);
     hasUnsavedChanges.current = true;
     toast({ title: "Transformed", description: `Applied transformation to ${selectedFields.length} field(s)` });
-  };
+  }, [selectedFields, fieldPositions, toast]);
 
-  const handleApplyGroup = (groupPositions: Record<string, { top: number; left: number }>) => {
+  const handleApplyGroup = useCallback((groupPositions: Record<string, { top: number; left: number }>) => {
     const updated = { ...fieldPositions, ...groupPositions };
     setFieldPositions(updated);
     hasUnsavedChanges.current = true;
-  };
+  }, [fieldPositions]);
 
-  const handleApplyTemplate = (template: FormTemplate) => {
+  const handleApplyTemplate = useCallback((template: FormTemplate) => {
     setFieldPositions(template.fields);
     hasUnsavedChanges.current = true;
     toast({ title: "Template applied", description: `Loaded ${Object.keys(template.fields).length} field positions` });
-  };
+  }, [toast]);
 
-  const handleSaveValidationRules = (fieldName: string, rules: any[]) => {
+  const handleSaveValidationRules = useCallback((fieldName: string, rules: any[]) => {
     setValidationRules(prev => ({
       ...prev,
       [fieldName]: rules
     }));
     hasUnsavedChanges.current = true;
-    
+
     // Re-validate the field immediately with new rules
     const { validateField } = require('@/utils/fieldValidator');
     const errors = validateField(fieldName, formData[fieldName], rules);
@@ -315,7 +293,7 @@ const Index = () => {
       ...prev,
       [fieldName]: errors
     }));
-  };
+  }, [formData]);
 
   // Get current field positions for minimap indicators (supports multiple fields)
   const getCurrentFieldPositions = () => {
