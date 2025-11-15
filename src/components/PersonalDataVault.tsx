@@ -68,7 +68,7 @@ export const PersonalDataVault = ({ userId }: PersonalDataVaultProps) => {
           bar_number: data.bar_number || '',
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Failed to load personal information");
     } finally {
       setLoading(false);
@@ -80,7 +80,7 @@ export const PersonalDataVault = ({ userId }: PersonalDataVaultProps) => {
     try {
       // Validate input
       const validatedData = personalInfoSchema.parse(formData);
-      
+
       // Sanitize for defense-in-depth XSS protection
       const sanitizedData = sanitizeFormData(validatedData);
 
@@ -94,14 +94,18 @@ export const PersonalDataVault = ({ userId }: PersonalDataVaultProps) => {
       if (error) throw error;
       toast.success('Personal information saved securely!');
       setOpen(false);
-    } catch (error: any) {
-      if (error.errors) {
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'errors' in error && Array.isArray(error.errors)) {
         // Zod validation errors
-        error.errors.forEach((err: any) => {
-          toast.error(err.message);
+        error.errors.forEach((err: unknown) => {
+          if (err && typeof err === 'object' && 'message' in err && typeof err.message === 'string') {
+            toast.error(err.message);
+          }
         });
+      } else if (error instanceof Error) {
+        toast.error(error.message);
       } else {
-        toast.error(error.message || "Failed to save personal information");
+        toast.error("Failed to save personal information");
       }
     } finally {
       setLoading(false);

@@ -55,8 +55,9 @@ export default function Auth() {
         if (error) throw error;
         toast.success("Account created! Please check your email to verify.");
       }
-    } catch (error: any) {
-      toast.error(error.message || "An error occurred");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

@@ -71,7 +71,15 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import type { FormData, User, ValidationRules, ValidationErrors, FieldPositions } from "@/types/FormData";
+import type { FormData, User, ValidationRules, ValidationErrors, FieldPositions, ValidationRule } from "@/types/FormData";
+import type { Database } from "@/integrations/supabase/types";
+
+type LegalDocument = Database['public']['Tables']['legal_documents']['Row'];
+
+interface LegalDocumentMetadata {
+  fieldPositions?: FieldPositions;
+  validationRules?: ValidationRules;
+}
 
 const Index = () => {
   const navigate = useNavigate();
@@ -279,7 +287,7 @@ const Index = () => {
     toast({ title: "Template applied", description: `Loaded ${Object.keys(template.fields).length} field positions` });
   }, [toast]);
 
-  const handleSaveValidationRules = useCallback((fieldName: string, rules: any[]) => {
+  const handleSaveValidationRules = useCallback((fieldName: string, rules: ValidationRule[]) => {
     setValidationRules(prev => ({
       ...prev,
       [fieldName]: rules
@@ -393,13 +401,12 @@ const Index = () => {
 
     const loadData = async () => {
       // Try to get cached data first
-      const cachedData = queryClient.getQueryData(['legal-document', user.id, 'FL-320 Form']);
-      
+      const cachedData = queryClient.getQueryData<LegalDocument>(['legal-document', user.id, 'FL-320 Form']);
+
       if (cachedData) {
-        const data = cachedData as any;
-        setDocumentId(data.id);
-        setFormData(data.content || {});
-        const metadata = data.metadata as any;
+        setDocumentId(cachedData.id);
+        setFormData((cachedData.content as FormData) || {});
+        const metadata = cachedData.metadata as LegalDocumentMetadata | null;
         setFieldPositions(metadata?.fieldPositions || {});
         setValidationRules(metadata?.validationRules || {});
         return;
@@ -407,32 +414,32 @@ const Index = () => {
 
       // If not cached, fetch from database
       const { data, error } = await supabase
-        .from('legal_documents' as any)
+        .from('legal_documents')
         .select('*')
         .eq('user_id', user.id)
         .eq('title', 'FL-320 Form')
         .maybeSingle();
 
       if (data) {
-        setDocumentId((data as any).id);
-        setFormData(((data as any).content as any) || {});
-        const metadata = (data as any).metadata as any;
+        setDocumentId(data.id);
+        setFormData((data.content as FormData) || {});
+        const metadata = data.metadata as LegalDocumentMetadata | null;
         setFieldPositions(metadata?.fieldPositions || {});
         setValidationRules(metadata?.validationRules || {});
       } else if (!error) {
         // Create new document
         const { data: newDoc } = await supabase
-          .from('legal_documents' as any)
+          .from('legal_documents')
           .insert({
             title: 'FL-320 Form',
             content: {},
             metadata: { fieldPositions: {}, validationRules: {} },
             user_id: user.id
-          } as any)
+          })
           .select()
           .maybeSingle();
 
-        if (newDoc) setDocumentId((newDoc as any).id);
+        if (newDoc) setDocumentId(newDoc.id);
       }
     };
 
@@ -447,12 +454,12 @@ const Index = () => {
       if (!documentId || !hasUnsavedChanges.current) return;
 
       const { error } = await supabase
-        .from('legal_documents' as any)
+        .from('legal_documents')
         .update({
           content: formData,
           metadata: { fieldPositions, validationRules },
           updated_at: new Date().toISOString()
-        } as any)
+        })
         .eq('id', documentId);
 
       if (!error) {

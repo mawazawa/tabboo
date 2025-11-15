@@ -162,23 +162,25 @@ export const importGroup = (file: File): Promise<FieldGroup> => {
 /**
  * Validate group structure
  */
-export const validateGroup = (group: any): group is FieldGroup => {
+export const validateGroup = (group: unknown): group is FieldGroup => {
   if (!group || typeof group !== 'object') return false;
-  
+
   const required = ['id', 'name', 'createdAt', 'fields'];
   for (const key of required) {
     if (!(key in group)) return false;
   }
-  
-  if (!Array.isArray(group.fields)) return false;
-  
+
+  const groupObj = group as Record<string, unknown>;
+  if (!Array.isArray(groupObj.fields)) return false;
+
   // Validate each field has required properties
-  for (const field of group.fields) {
-    if (typeof field !== 'object') return false;
-    if (!field.fieldName || typeof field.relativeTop !== 'number' || typeof field.relativeLeft !== 'number') {
+  for (const field of groupObj.fields) {
+    if (typeof field !== 'object' || field === null) return false;
+    const f = field as Record<string, unknown>;
+    if (typeof f.fieldName !== 'string' || typeof f.relativeTop !== 'number' || typeof f.relativeLeft !== 'number') {
       return false;
     }
   }
-  
+
   return true;
 };

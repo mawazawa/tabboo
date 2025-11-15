@@ -54,22 +54,22 @@ export const sanitizeZipCode = (input: string): string => {
  * Sanitize form data object
  * Applies appropriate sanitization to all fields
  */
-export const sanitizeFormData = <T extends Record<string, any>>(data: T): T => {
-  const sanitized: any = {};
-  
+export const sanitizeFormData = <T extends Record<string, string | number | boolean | null | undefined>>(data: T): T => {
+  const sanitized = {} as T;
+
   for (const [key, value] of Object.entries(data)) {
     if (typeof value === 'string') {
-      sanitized[key] = sanitizeString(value);
+      sanitized[key as keyof T] = sanitizeString(value) as T[keyof T];
     } else if (typeof value === 'boolean' || typeof value === 'number') {
-      sanitized[key] = value;
+      sanitized[key as keyof T] = value as T[keyof T];
     } else if (value === null || value === undefined) {
-      sanitized[key] = value;
+      sanitized[key as keyof T] = value as T[keyof T];
     } else {
-      sanitized[key] = value;
+      sanitized[key as keyof T] = value;
     }
   }
-  
-  return sanitized as T;
+
+  return sanitized;
 };
 
 /**

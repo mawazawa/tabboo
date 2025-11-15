@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { InlineMath, BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
+import type { User } from '@/types/FormData';
 
 interface FieldPosition {
   x: number;
@@ -19,7 +20,7 @@ interface FieldPosition {
 
 const DistributionCalculator = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Input states

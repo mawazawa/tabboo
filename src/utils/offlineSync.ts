@@ -3,6 +3,8 @@
  * Handles queuing updates when offline and syncing when back online
  */
 
+import type { FormData, FieldPositions } from '@/types/FormData';
+
 const DB_NAME = 'FormDataSync';
 const STORE_NAME = 'pendingUpdates';
 const DB_VERSION = 1;
@@ -10,8 +12,8 @@ const DB_VERSION = 1;
 interface PendingUpdate {
   id?: number;
   documentId: string;
-  formData: any;
-  fieldPositions: any;
+  formData: FormData;
+  fieldPositions: FieldPositions;
   timestamp: number;
   url: string;
   headers: Record<string, string>;

@@ -107,23 +107,24 @@ export const importTemplate = (file: File): Promise<FormTemplate> => {
 /**
  * Validate template structure
  */
-export const validateTemplate = (template: any): template is FormTemplate => {
+export const validateTemplate = (template: unknown): template is FormTemplate => {
   if (!template || typeof template !== 'object') return false;
-  
+
   const required = ['formId', 'formName', 'version', 'createdAt', 'fields'];
   for (const key of required) {
     if (!(key in template)) return false;
   }
-  
-  if (typeof template.fields !== 'object') return false;
-  
+
+  const templateObj = template as Record<string, unknown>;
+  if (typeof templateObj.fields !== 'object' || !templateObj.fields) return false;
+
   // Validate each field has required properties
-  for (const field of Object.values(template.fields)) {
-    if (typeof field !== 'object') return false;
-    const f = field as any;
+  for (const field of Object.values(templateObj.fields)) {
+    if (typeof field !== 'object' || field === null) return false;
+    const f = field as Record<string, unknown>;
     if (typeof f.top !== 'number' || typeof f.left !== 'number') return false;
   }
-  
+
   return true;
 };
 
