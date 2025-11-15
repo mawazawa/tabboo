@@ -23,12 +23,12 @@ export const useOfflineSync = () => {
       await offlineSyncManager.syncPendingUpdates(async (update) => {
         try {
           const { error } = await supabase
-            .from('legal_documents' as any)
+            .from('legal_documents')
             .update({
               content: update.formData,
               metadata: { fieldPositions: update.fieldPositions },
               updated_at: new Date().toISOString()
-            } as any)
+            })
             .eq('id', update.documentId);
 
           if (error) throw error;

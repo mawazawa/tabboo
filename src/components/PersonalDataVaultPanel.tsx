@@ -97,7 +97,7 @@ export const PersonalDataVaultPanel = ({ userId, onDataChange }: PersonalDataVau
     try {
       // Validate input
       const validatedData = personalInfoSchema.parse(formData);
-      
+
       // Sanitize for defense-in-depth XSS protection
       const sanitizedData = sanitizeFormData(validatedData);
 
@@ -109,17 +109,21 @@ export const PersonalDataVaultPanel = ({ userId, onDataChange }: PersonalDataVau
         });
 
       if (error) throw error;
-      
+
       toast.success('Personal information saved securely!');
       refetch();
       onDataChange?.();
-    } catch (error: any) {
-      if (error.errors) {
-        error.errors.forEach((err: any) => {
-          toast.error(err.message);
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'errors' in error && Array.isArray(error.errors)) {
+        error.errors.forEach((err: unknown) => {
+          if (err && typeof err === 'object' && 'message' in err && typeof err.message === 'string') {
+            toast.error(err.message);
+          }
         });
+      } else if (error instanceof Error) {
+        toast.error(error.message);
       } else {
-        toast.error(error.message || "Failed to save personal information");
+        toast.error("Failed to save personal information");
       }
     } finally {
       setLoading(false);

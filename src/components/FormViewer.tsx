@@ -15,52 +15,21 @@ import { TutorialTooltips } from "@/components/TutorialTooltips";
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
+import type { FormData, FieldOverlay, FieldPosition, ValidationErrors, PersonalVaultData } from "@/types/FormData";
+
 // Configure PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
-
-interface FormData {
-  partyName?: string;
-  streetAddress?: string;
-  city?: string;
-  state?: string;
-  zipCode?: string;
-  telephoneNo?: string;
-  faxNo?: string;
-  email?: string;
-  attorneyFor?: string;
-  county?: string;
-  petitioner?: string;
-  respondent?: string;
-  caseNumber?: string;
-  facts?: string;
-  signatureDate?: string;
-  signatureName?: string;
-  noOrders?: boolean;
-  agreeOrders?: boolean;
-  consentCustody?: boolean;
-  consentVisitation?: boolean;
-}
-
-interface FieldOverlays {
-  type: 'input' | 'textarea' | 'checkbox';
-  field: string;
-  top: string;
-  left: string;
-  width?: string;
-  height?: string;
-  placeholder?: string;
-}
 
 interface Props {
   formData: FormData;
   updateField: (field: string, value: string | boolean) => void;
   currentFieldIndex: number;
   setCurrentFieldIndex: (index: number) => void;
-  fieldPositions: Record<string, { top: number; left: number }>;
-  updateFieldPosition: (field: string, position: { top: number; left: number }) => void;
+  fieldPositions: Record<string, FieldPosition>;
+  updateFieldPosition: (field: string, position: FieldPosition) => void;
   zoom?: number;
   highlightedField?: string | null;
-  validationErrors?: Record<string, any[]>;
+  validationErrors?: ValidationErrors;
   vaultData?: PersonalVaultData | null;
 }
 

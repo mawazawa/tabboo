@@ -2,18 +2,20 @@ import { useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { offlineSyncManager } from '@/utils/offlineSync';
+import { formDataSchema, fieldPositionsSchema } from '@/lib/validations';
+import type { FormData, FieldPositions } from '@/types/FormData';
 
 interface AutoSaveOptions {
   documentId: string | null;
-  formData: any;
-  fieldPositions: Record<string, { top: number; left: number }>;
+  formData: FormData;
+  fieldPositions: FieldPositions;
   enabled?: boolean;
   debounceMs?: number;
 }
 
 /**
  * Custom hook for auto-saving form data with proper debouncing
- * Implements optimistic updates and retry logic
+ * Implements optimistic updates and retry logic with Zod validation
  */
 export const useFormAutoSave = ({
   documentId,
@@ -25,16 +27,16 @@ export const useFormAutoSave = ({
   const { toast } = useToast();
   const hasUnsavedChanges = useRef(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
-  const lastSaveRef = useRef<{ formData: any; fieldPositions: any }>();
+  const lastSaveRef = useRef<{ formData: FormData; fieldPositions: FieldPositions }>();
   const isSavingRef = useRef(false);
 
   // Mark as having unsaved changes whenever data changes
   useEffect(() => {
     if (lastSaveRef.current) {
-      const dataChanged = 
+      const dataChanged =
         JSON.stringify(formData) !== JSON.stringify(lastSaveRef.current.formData) ||
         JSON.stringify(fieldPositions) !== JSON.stringify(lastSaveRef.current.fieldPositions);
-      
+
       if (dataChanged) {
         hasUnsavedChanges.current = true;
       }
@@ -49,13 +51,39 @@ export const useFormAutoSave = ({
     isSavingRef.current = true;
 
     try {
+      // Validate data before saving
+      const formDataValidation = formDataSchema.safeParse(formData);
+      const fieldPositionsValidation = fieldPositionsSchema.safeParse(fieldPositions);
+
+      if (!formDataValidation.success) {
+        console.error('Form data validation failed:', formDataValidation.error);
+        toast({
+          title: "Validation error",
+          description: "Form data contains invalid values. Please check your inputs.",
+          variant: "destructive",
+        });
+        isSavingRef.current = false;
+        return;
+      }
+
+      if (!fieldPositionsValidation.success) {
+        console.error('Field positions validation failed:', fieldPositionsValidation.error);
+        toast({
+          title: "Validation error",
+          description: "Field positions are invalid. Please reset field positions.",
+          variant: "destructive",
+        });
+        isSavingRef.current = false;
+        return;
+      }
+
       // Check if online
       if (!navigator.onLine) {
         // Queue for offline sync
         await offlineSyncManager.queueUpdate({
           documentId,
-          formData,
-          fieldPositions,
+          formData: formDataValidation.data,
+          fieldPositions: fieldPositionsValidation.data,
           url: `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/legal_documents?id=eq.${documentId}`,
           headers: {
             'Content-Type': 'application/json',
@@ -63,32 +91,32 @@ export const useFormAutoSave = ({
           },
         });
 
-        lastSaveRef.current = { formData, fieldPositions };
+        lastSaveRef.current = { formData: formDataValidation.data, fieldPositions: fieldPositionsValidation.data };
         hasUnsavedChanges.current = false;
-        
+
         console.log('Saved offline - will sync when online');
         return;
       }
 
       const { error } = await supabase
-        .from('legal_documents' as any)
+        .from('legal_documents')
         .update({
-          content: formData,
-          metadata: { fieldPositions },
+          content: formDataValidation.data,
+          metadata: { fieldPositions: fieldPositionsValidation.data },
           updated_at: new Date().toISOString()
-        } as any)
+        })
         .eq('id', documentId);
 
       if (error) throw error;
 
       // Update last save reference
-      lastSaveRef.current = { formData, fieldPositions };
+      lastSaveRef.current = { formData: formDataValidation.data, fieldPositions: fieldPositionsValidation.data };
       hasUnsavedChanges.current = false;
-      
+
       console.log('Auto-save successful');
     } catch (error) {
       console.error('Auto-save failed:', error);
-      
+
       // If network error, queue offline
       if (!navigator.onLine) {
         await offlineSyncManager.queueUpdate({
@@ -101,18 +129,18 @@ export const useFormAutoSave = ({
             'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
           },
         });
-        
+
         lastSaveRef.current = { formData, fieldPositions };
         hasUnsavedChanges.current = false;
         return;
       }
-      
+
       toast({
         title: "Auto-save failed",
         description: "Your changes could not be saved. Please try again.",
         variant: "destructive",
       });
-      
+
       // Retry after 5 seconds
       setTimeout(() => {
         isSavingRef.current = false;
@@ -158,13 +186,13 @@ export const useFormAutoSave = ({
   // Manual save function
   const saveNow = useCallback(async () => {
     if (!documentId) return;
-    
+
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
-    
+
     await performSave();
-    
+
     toast({
       title: "Saved",
       description: "Your changes have been saved.",

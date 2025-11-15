@@ -15,7 +15,7 @@ interface LogContext {
   sessionId?: string;
   page?: string;
   action?: string;
-  [key: string]: any;
+  [key: string]: string | number | boolean | undefined | Record<string, unknown>;
 }
 
 /**
@@ -101,7 +101,7 @@ class ErrorTracker {
   /**
    * Track user action
    */
-  trackAction(action: string, details?: Record<string, any>) {
+  trackAction(action: string, details?: Record<string, string | number | boolean | undefined>) {
     this.info(`User action: ${action}`, {
       action,
       ...details,
@@ -111,16 +111,16 @@ class ErrorTracker {
   /**
    * Store log in sessionStorage (last 100 logs)
    */
-  private storeLog(logData: any) {
+  private storeLog(logData: Record<string, unknown>) {
     try {
       const logs = this.getLogs();
       logs.push(logData);
-      
+
       // Keep only last 100 logs
       if (logs.length > 100) {
         logs.shift();
       }
-      
+
       sessionStorage.setItem('app_logs', JSON.stringify(logs));
     } catch (e) {
       // Silent fail if storage is full
@@ -130,7 +130,7 @@ class ErrorTracker {
   /**
    * Get stored logs
    */
-  getLogs(): any[] {
+  getLogs(): Record<string, unknown>[] {
     try {
       const stored = sessionStorage.getItem('app_logs');
       return stored ? JSON.parse(stored) : [];
@@ -149,7 +149,7 @@ class ErrorTracker {
   /**
    * Send to external monitoring service (e.g., Sentry)
    */
-  private sendToMonitoringService(logData: any) {
+  private sendToMonitoringService(logData: Record<string, unknown>) {
     // TODO: Implement integration with monitoring service
     // Example for Sentry:
     // if (window.Sentry) {
@@ -157,7 +157,7 @@ class ErrorTracker {
     //     contexts: { log: logData }
     //   });
     // }
-    
+
     // For now, just log that we would send it
     console.log('[MONITORING]', 'Would send to monitoring service:', logData);
   }
@@ -187,4 +187,4 @@ export const logDebug = (message: string, context?: LogContext) => errorTracker.
 export const logInfo = (message: string, context?: LogContext) => errorTracker.info(message, context);
 export const logWarn = (message: string, context?: LogContext) => errorTracker.warn(message, context);
 export const logError = (message: string, error?: Error, context?: LogContext) => errorTracker.error(message, error, context);
-export const trackAction = (action: string, details?: Record<string, any>) => errorTracker.trackAction(action, details);
+export const trackAction = (action: string, details?: Record<string, string | number | boolean | undefined>) => errorTracker.trackAction(action, details);

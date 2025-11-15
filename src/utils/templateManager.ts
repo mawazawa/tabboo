@@ -3,6 +3,8 @@
  * Handles import/export of field position templates for crowdsourcing form mappings
  */
 
+import { createStorage } from './storageManager';
+
 export interface FieldTemplate {
   top: number;
   left: number;
@@ -20,17 +22,16 @@ export interface FormTemplate {
 }
 
 const STORAGE_KEY = 'form_templates';
+const templatesStorage = createStorage<Record<string, FormTemplate>>(STORAGE_KEY);
 
 /**
  * Save template to local storage
  */
 export const saveTemplate = (template: FormTemplate): void => {
-  try {
-    const templates = getStoredTemplates();
-    templates[template.formId] = template;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(templates));
-  } catch (error) {
-    console.error('Failed to save template:', error);
+  const templates = getStoredTemplates();
+  templates[template.formId] = template;
+  const success = templatesStorage.set(templates);
+  if (!success) {
     throw new Error('Failed to save template');
   }
 };
@@ -39,13 +40,7 @@ export const saveTemplate = (template: FormTemplate): void => {
  * Get all stored templates
  */
 export const getStoredTemplates = (): Record<string, FormTemplate> => {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : {};
-  } catch (error) {
-    console.error('Failed to load templates:', error);
-    return {};
-  }
+  return templatesStorage.get({ defaultValue: {} }) || {};
 };
 
 /**
@@ -62,7 +57,7 @@ export const getTemplate = (formId: string): FormTemplate | null => {
 export const deleteTemplate = (formId: string): void => {
   const templates = getStoredTemplates();
   delete templates[formId];
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(templates));
+  templatesStorage.set(templates);
 };
 
 /**
@@ -112,23 +107,24 @@ export const importTemplate = (file: File): Promise<FormTemplate> => {
 /**
  * Validate template structure
  */
-export const validateTemplate = (template: any): template is FormTemplate => {
+export const validateTemplate = (template: unknown): template is FormTemplate => {
   if (!template || typeof template !== 'object') return false;
-  
+
   const required = ['formId', 'formName', 'version', 'createdAt', 'fields'];
   for (const key of required) {
     if (!(key in template)) return false;
   }
-  
-  if (typeof template.fields !== 'object') return false;
-  
+
+  const templateObj = template as Record<string, unknown>;
+  if (typeof templateObj.fields !== 'object' || !templateObj.fields) return false;
+
   // Validate each field has required properties
-  for (const field of Object.values(template.fields)) {
-    if (typeof field !== 'object') return false;
-    const f = field as any;
+  for (const field of Object.values(templateObj.fields)) {
+    if (typeof field !== 'object' || field === null) return false;
+    const f = field as Record<string, unknown>;
     if (typeof f.top !== 'number' || typeof f.left !== 'number') return false;
   }
-  
+
   return true;
 };
 

@@ -31,7 +31,7 @@ export const prefetchUserData = async (queryClient: QueryClient, user: User) => 
     queryKey: ['legal-document', user.id, 'FL-320 Form'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('legal_documents' as any)
+        .from('legal_documents')
         .select('*')
         .eq('user_id', user.id)
         .eq('title', 'FL-320 Form')

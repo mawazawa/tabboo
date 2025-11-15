@@ -19,12 +19,13 @@ import {
   saveTemplate,
   createTemplateFromPositions,
   type FormTemplate,
+  type FieldTemplate,
 } from '@/utils/templateManager';
 
 interface TemplateManagerProps {
   currentFormId: string;
   currentFormName: string;
-  currentFieldPositions: Record<string, any>;
+  currentFieldPositions: Record<string, FieldTemplate>;
   onApplyTemplate: (template: FormTemplate) => void;
   triggerless?: boolean; // If true, renders without Dialog wrapper
 }

@@ -5,9 +5,13 @@ interface Message {
   content: string;
 }
 
+interface FormContext {
+  [key: string]: string | number | boolean | undefined;
+}
+
 interface StreamChatParams {
   messages: Message[];
-  formContext?: any;
+  formContext?: FormContext;
   onDelta: (chunk: string) => void;
   onDone: () => void;
   onError: (error: string) => void;
