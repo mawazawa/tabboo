@@ -60,62 +60,99 @@ interface Props {
 }
 
 const FIELD_CONFIG: FieldConfig[] = [
-  // Attorney/Party Information (Item 1)
+  // HEADER - Party/Attorney Information
   { field: 'partyName', label: 'Name', type: 'input', placeholder: 'Full name', vaultField: 'full_name' },
+  { field: 'firmName', label: 'Firm Name', type: 'input', placeholder: 'Law firm name' },
   { field: 'streetAddress', label: 'Street Address', type: 'input', placeholder: 'Street address', vaultField: 'street_address' },
+  { field: 'mailingAddress', label: 'Mailing Address', type: 'input', placeholder: 'P.O. Box or mailing address' },
   { field: 'city', label: 'City', type: 'input', placeholder: 'City', vaultField: 'city' },
   { field: 'state', label: 'State', type: 'input', placeholder: 'CA', vaultField: 'state' },
   { field: 'zipCode', label: 'ZIP Code', type: 'input', placeholder: 'ZIP code', vaultField: 'zip_code' },
   { field: 'telephoneNo', label: 'Telephone', type: 'input', placeholder: 'Phone number', vaultField: 'telephone_no' },
   { field: 'faxNo', label: 'Fax', type: 'input', placeholder: 'Fax number', vaultField: 'fax_no' },
   { field: 'email', label: 'Email', type: 'input', placeholder: 'Email address', vaultField: 'email_address' },
-  { field: 'attorneyFor', label: 'Attorney For', type: 'input', placeholder: 'Attorney for', vaultField: 'attorney_name' },
-  { field: 'attorneyBarNumber', label: 'Bar Number', type: 'input', placeholder: 'State bar number' },
+  { field: 'attorneyFor', label: 'Attorney For', type: 'input', placeholder: 'Self-Represented or attorney name', vaultField: 'attorney_name' },
+  { field: 'stateBarNumber', label: 'State Bar Number', type: 'input', placeholder: 'State bar number' },
 
-  // Case Information
+  // HEADER - Court Information
   { field: 'county', label: 'County', type: 'input', placeholder: 'County' },
+  { field: 'courtStreetAddress', label: 'Court Street Address', type: 'input', placeholder: 'Court street address' },
+  { field: 'courtMailingAddress', label: 'Court Mailing Address', type: 'input', placeholder: 'Court mailing address' },
+  { field: 'courtCityAndZip', label: 'Court City and ZIP', type: 'input', placeholder: 'City and ZIP code' },
+  { field: 'branchName', label: 'Branch Name', type: 'input', placeholder: 'Court branch name' },
+
+  // HEADER - Case Information
   { field: 'petitioner', label: 'Petitioner', type: 'input', placeholder: 'Petitioner name' },
   { field: 'respondent', label: 'Respondent', type: 'input', placeholder: 'Respondent name' },
+  { field: 'otherParentParty', label: 'Other Parent/Party', type: 'input', placeholder: 'Third party name' },
   { field: 'caseNumber', label: 'Case Number', type: 'input', placeholder: 'Case number' },
 
-  // Hearing Information (Item 2)
+  // HEADER - Hearing Information
   { field: 'hearingDate', label: 'Hearing Date', type: 'input', placeholder: 'MM/DD/YYYY' },
   { field: 'hearingTime', label: 'Hearing Time', type: 'input', placeholder: 'HH:MM AM/PM' },
   { field: 'hearingDepartment', label: 'Department', type: 'input', placeholder: 'Department' },
   { field: 'hearingRoom', label: 'Room', type: 'input', placeholder: 'Room number' },
 
-  // Child Information (Item 3)
-  { field: 'child1Name', label: 'Child 1 Name', type: 'input', placeholder: 'First child full name' },
-  { field: 'child1BirthDate', label: 'Child 1 Birth Date', type: 'input', placeholder: 'MM/DD/YYYY' },
-  { field: 'child2Name', label: 'Child 2 Name', type: 'input', placeholder: 'Second child full name' },
-  { field: 'child2BirthDate', label: 'Child 2 Birth Date', type: 'input', placeholder: 'MM/DD/YYYY' },
-  { field: 'child3Name', label: 'Child 3 Name', type: 'input', placeholder: 'Third child full name' },
-  { field: 'child3BirthDate', label: 'Child 3 Birth Date', type: 'input', placeholder: 'MM/DD/YYYY' },
+  // ITEM 1: Restraining Order Information
+  { field: 'restrainingOrderNone', label: 'No restraining orders', type: 'checkbox' },
+  { field: 'restrainingOrderActive', label: 'Restraining orders active', type: 'checkbox' },
 
-  // Order Types (Items 4-7)
-  { field: 'orderChildCustody', label: 'Order: Child Custody', type: 'checkbox' },
-  { field: 'orderVisitation', label: 'Order: Visitation', type: 'checkbox' },
-  { field: 'orderChildSupport', label: 'Order: Child Support', type: 'checkbox' },
-  { field: 'orderSpousalSupport', label: 'Order: Spousal Support', type: 'checkbox' },
-  { field: 'orderAttorneyFees', label: 'Order: Attorney Fees', type: 'checkbox' },
-  { field: 'orderPropertyControl', label: 'Order: Property Control', type: 'checkbox' },
-  { field: 'orderOther', label: 'Order: Other', type: 'checkbox' },
-  { field: 'orderOtherText', label: 'Other Order Details', type: 'input', placeholder: 'Specify other orders' },
+  // ITEM 2: Child Custody/Visitation
+  { field: 'childCustodyConsent', label: 'Consent to child custody', type: 'checkbox' },
+  { field: 'visitationConsent', label: 'Consent to visitation', type: 'checkbox' },
+  { field: 'childCustodyDoNotConsent', label: 'Do not consent to custody', type: 'checkbox' },
+  { field: 'visitationDoNotConsent', label: 'Do not consent to visitation', type: 'checkbox' },
+  { field: 'custodyAlternativeOrder', label: 'Alternative custody order', type: 'input', placeholder: 'Describe alternative order' },
 
-  // Response Type
-  { field: 'noOrders', label: 'No orders requested', type: 'checkbox' },
-  { field: 'agreeOrders', label: 'Agree to orders', type: 'checkbox' },
-  { field: 'consentCustody', label: 'Consent to custody', type: 'checkbox' },
-  { field: 'consentVisitation', label: 'Consent to visitation', type: 'checkbox' },
+  // ITEM 3: Child Support
+  { field: 'childSupportFiledFL150', label: 'Filed FL-150 (child support)', type: 'checkbox' },
+  { field: 'childSupportConsent', label: 'Consent to child support', type: 'checkbox' },
+  { field: 'childSupportGuidelineConsent', label: 'Consent to guideline support', type: 'checkbox' },
+  { field: 'childSupportDoNotConsent', label: 'Do not consent to child support', type: 'checkbox' },
+  { field: 'childSupportAlternativeOrder', label: 'Alternative child support order', type: 'input', placeholder: 'Describe alternative order' },
 
-  // Facts and Declaration
-  { field: 'facts', label: 'Facts', type: 'textarea', placeholder: 'Enter facts and details' },
+  // ITEM 4: Spousal Support
+  { field: 'spousalSupportFiledFL150', label: 'Filed FL-150 (spousal support)', type: 'checkbox' },
+  { field: 'spousalSupportConsent', label: 'Consent to spousal support', type: 'checkbox' },
+  { field: 'spousalSupportDoNotConsent', label: 'Do not consent to spousal support', type: 'checkbox' },
+  { field: 'spousalSupportAlternativeOrder', label: 'Alternative spousal support order', type: 'input', placeholder: 'Describe alternative order' },
+
+  // ITEM 5: Property Control
+  { field: 'propertyControlConsent', label: 'Consent to property control', type: 'checkbox' },
+  { field: 'propertyControlDoNotConsent', label: 'Do not consent to property control', type: 'checkbox' },
+  { field: 'propertyControlAlternativeOrder', label: 'Alternative property order', type: 'input', placeholder: 'Describe alternative order' },
+
+  // ITEM 6: Attorney's Fees and Costs
+  { field: 'attorneyFeesFiledFL150', label: 'Filed FL-150 (attorney fees)', type: 'checkbox' },
+  { field: 'attorneyFeesFiledFL158', label: 'Filed FL-158', type: 'checkbox' },
+  { field: 'attorneyFeesConsent', label: 'Consent to attorney fees', type: 'checkbox' },
+  { field: 'attorneyFeesDoNotConsent', label: 'Do not consent to attorney fees', type: 'checkbox' },
+  { field: 'attorneyFeesAlternativeOrder', label: 'Alternative fees order', type: 'input', placeholder: 'Describe alternative order' },
+
+  // ITEM 7: Domestic Violence Order
+  { field: 'domesticViolenceConsent', label: 'Consent to DV order', type: 'checkbox' },
+  { field: 'domesticViolenceDoNotConsent', label: 'Do not consent to DV order', type: 'checkbox' },
+  { field: 'domesticViolenceAlternativeOrder', label: 'Alternative DV order', type: 'input', placeholder: 'Describe alternative order' },
+
+  // ITEM 8: Other Orders Requested
+  { field: 'otherOrdersConsent', label: 'Consent to other orders', type: 'checkbox' },
+  { field: 'otherOrdersDoNotConsent', label: 'Do not consent to other orders', type: 'checkbox' },
+  { field: 'otherOrdersAlternativeOrder', label: 'Other orders description', type: 'input', placeholder: 'Specify other orders' },
+
+  // ITEM 9: Time for Service
+  { field: 'timeForServiceConsent', label: 'Consent to service time', type: 'checkbox' },
+  { field: 'timeForServiceDoNotConsent', label: 'Do not consent to service time', type: 'checkbox' },
+  { field: 'timeForServiceAlternativeOrder', label: 'Alternative service time', type: 'input', placeholder: 'Describe alternative' },
+
+  // ITEM 10: Facts to Support
+  { field: 'facts', label: 'Facts to Support', type: 'textarea', placeholder: 'Enter facts (max 10 pages)' },
+  { field: 'factsAttachment', label: 'Attachment 10 included', type: 'checkbox' },
+
+  // SIGNATURE SECTION
   { field: 'declarationUnderPenalty', label: 'Declaration under penalty of perjury', type: 'checkbox' },
-
-  // Signature
-  { field: 'signatureDate', label: 'Date', type: 'input', placeholder: 'Date' },
-  { field: 'signatureName', label: 'Signature', type: 'input', placeholder: 'Sign your name', vaultField: 'full_name' },
-  { field: 'printName', label: 'Print Name', type: 'input', placeholder: 'Print your name', vaultField: 'full_name' },
+  { field: 'signatureDate', label: 'Date', type: 'input', placeholder: 'MM/DD/YYYY' },
+  { field: 'printName', label: 'Type or Print Name', type: 'input', placeholder: 'Print your name', vaultField: 'full_name' },
+  { field: 'signatureName', label: 'Signature of Declarant', type: 'input', placeholder: 'Sign your name', vaultField: 'full_name' },
 ];
 
 export const FieldNavigationPanel = ({ 
