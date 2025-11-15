@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, memo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { useGroqStream } from "@/hooks/useGroqStream";
 import { toast } from "sonner";
 import { ProgressiveImage } from "@/components/ui/progressive-image";
 import aiAssistant from "@/assets/ai-assistant.png";
+import type { FormData, PersonalVaultData } from "@/types/FormData";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -21,8 +22,8 @@ interface SuggestedAction {
 }
 
 interface AIAssistantProps {
-  formContext?: any;
-  vaultData?: any;
+  formContext?: FormData;
+  vaultData?: PersonalVaultData | null;
 }
 
 export const AIAssistant = ({ formContext, vaultData }: AIAssistantProps) => {
@@ -280,3 +281,6 @@ export const AIAssistant = ({ formContext, vaultData }: AIAssistantProps) => {
     </Card>
   );
 };
+
+// Wrap with memo to prevent unnecessary re-renders
+export default memo(AIAssistant);
