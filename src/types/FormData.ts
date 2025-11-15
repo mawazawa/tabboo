@@ -4,12 +4,15 @@
  */
 
 /**
- * Main form data structure for PDF form fields
+ * Main form data structure for FL-320 Responsive Declaration to Request for Order
+ * Based on official California Judicial Council form (Rev. July 1, 2025)
  */
 export interface FormData {
-  // Attorney/Party Information (Item 1)
+  // Header - Party/Attorney Information
   partyName?: string;
+  firmName?: string;
   streetAddress?: string;
+  mailingAddress?: string;
   city?: string;
   state?: string;
   zipCode?: string;
@@ -17,52 +20,87 @@ export interface FormData {
   faxNo?: string;
   email?: string;
   attorneyFor?: string;
-  attorneyBarNumber?: string;
+  stateBarNumber?: string;
 
-  // Case Information
+  // Header - Court Information
   county?: string;
+  courtStreetAddress?: string;
+  courtMailingAddress?: string;
+  courtCityAndZip?: string;
+  branchName?: string;
+
+  // Header - Case Information
   petitioner?: string;
   respondent?: string;
+  otherParentParty?: string;
   caseNumber?: string;
 
-  // Hearing Information (Item 2)
+  // Header - Hearing Information
   hearingDate?: string;
   hearingTime?: string;
   hearingDepartment?: string;
   hearingRoom?: string;
 
-  // Child Information (Item 3)
-  child1Name?: string;
-  child1BirthDate?: string;
-  child2Name?: string;
-  child2BirthDate?: string;
-  child3Name?: string;
-  child3BirthDate?: string;
+  // Item 1: Restraining Order Information
+  restrainingOrderNone?: boolean;
+  restrainingOrderActive?: boolean;
 
-  // Order Types (Items 4-7)
-  orderChildCustody?: boolean;
-  orderVisitation?: boolean;
-  orderChildSupport?: boolean;
-  orderSpousalSupport?: boolean;
-  orderAttorneyFees?: boolean;
-  orderPropertyControl?: boolean;
-  orderOther?: boolean;
-  orderOtherText?: string;
+  // Item 2: Child Custody / Visitation (Parenting Time)
+  childCustodyConsent?: boolean;
+  visitationConsent?: boolean;
+  childCustodyDoNotConsent?: boolean;
+  visitationDoNotConsent?: boolean;
+  custodyAlternativeOrder?: string;
 
-  // Response Type
-  noOrders?: boolean;
-  agreeOrders?: boolean;
-  consentCustody?: boolean;
-  consentVisitation?: boolean;
+  // Item 3: Child Support
+  childSupportFiledFL150?: boolean;
+  childSupportConsent?: boolean;
+  childSupportGuidelineConsent?: boolean;
+  childSupportDoNotConsent?: boolean;
+  childSupportAlternativeOrder?: string;
 
-  // Facts and Declaration
+  // Item 4: Spousal or Domestic Partner Support
+  spousalSupportFiledFL150?: boolean;
+  spousalSupportConsent?: boolean;
+  spousalSupportDoNotConsent?: boolean;
+  spousalSupportAlternativeOrder?: string;
+
+  // Item 5: Property Control
+  propertyControlConsent?: boolean;
+  propertyControlDoNotConsent?: boolean;
+  propertyControlAlternativeOrder?: string;
+
+  // Item 6: Attorney's Fees and Costs
+  attorneyFeesFiledFL150?: boolean;
+  attorneyFeesFiledFL158?: boolean;
+  attorneyFeesConsent?: boolean;
+  attorneyFeesDoNotConsent?: boolean;
+  attorneyFeesAlternativeOrder?: string;
+
+  // Item 7: Domestic Violence Order
+  domesticViolenceConsent?: boolean;
+  domesticViolenceDoNotConsent?: boolean;
+  domesticViolenceAlternativeOrder?: string;
+
+  // Item 8: Other Orders Requested
+  otherOrdersConsent?: boolean;
+  otherOrdersDoNotConsent?: boolean;
+  otherOrdersAlternativeOrder?: string;
+
+  // Item 9: Time for Service / Time Until Hearing
+  timeForServiceConsent?: boolean;
+  timeForServiceDoNotConsent?: boolean;
+  timeForServiceAlternativeOrder?: string;
+
+  // Item 10: Facts to Support
   facts?: string;
-  declarationUnderPenalty?: boolean;
+  factsAttachment?: boolean;
 
-  // Signature
+  // Signature Section
+  declarationUnderPenalty?: boolean;
   signatureDate?: string;
-  signatureName?: string;
   printName?: string;
+  signatureName?: string;
 }
 
 /**
