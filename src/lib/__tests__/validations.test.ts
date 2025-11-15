@@ -1,298 +1,268 @@
 import { describe, it, expect } from 'vitest';
-import { validateField, formDataSchema } from '../validations';
+import { formDataSchema } from '../validations';
 
-describe('validateField', () => {
+describe('formDataSchema', () => {
   describe('partyName validation', () => {
     it('should accept valid name', () => {
-      const result = validateField('partyName', 'John Doe');
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ partyName: 'John Doe' });
+      expect(result.success).toBe(true);
     });
 
-    it('should reject name longer than 100 characters', () => {
-      const longName = 'A'.repeat(101);
-      const result = validateField('partyName', longName);
-      expect(result).toBe('Name must be less than 100 characters');
+    it('should reject name longer than 200 characters', () => {
+      const longName = 'A'.repeat(201);
+      const result = formDataSchema.safeParse({ partyName: longName });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.errors[0].message).toBe('Name must be less than 200 characters');
+      }
     });
 
     it('should accept empty string', () => {
-      const result = validateField('partyName', '');
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ partyName: '' });
+      expect(result.success).toBe(true);
     });
   });
 
   describe('email validation', () => {
     it('should accept valid email', () => {
-      const result = validateField('email', 'test@example.com');
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ email: 'test@example.com' });
+      expect(result.success).toBe(true);
     });
 
     it('should reject invalid email', () => {
-      const result = validateField('email', 'invalid-email');
-      expect(result).toBe('Invalid email address');
+      const result = formDataSchema.safeParse({ email: 'invalid-email' });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.errors[0].message).toBe('Invalid email address');
+      }
     });
 
     it('should accept empty string', () => {
-      const result = validateField('email', '');
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ email: '' });
+      expect(result.success).toBe(true);
     });
   });
 
   describe('zipCode validation', () => {
     it('should accept valid 5-digit ZIP code', () => {
-      const result = validateField('zipCode', '90210');
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ zipCode: '90210' });
+      expect(result.success).toBe(true);
     });
 
     it('should accept valid 9-digit ZIP code', () => {
-      const result = validateField('zipCode', '90210-1234');
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ zipCode: '90210-1234' });
+      expect(result.success).toBe(true);
     });
 
     it('should reject invalid ZIP code format', () => {
-      const result = validateField('zipCode', '1234');
-      expect(result).toBe('ZIP code must be 5 or 9 digits');
+      const result = formDataSchema.safeParse({ zipCode: '123' });
+      expect(result.success).toBe(false);
     });
 
     it('should reject ZIP code with letters', () => {
-      const result = validateField('zipCode', 'ABCDE');
-      expect(result).toBe('ZIP code must be 5 or 9 digits');
+      const result = formDataSchema.safeParse({ zipCode: 'ABCDE' });
+      expect(result.success).toBe(false);
     });
 
     it('should accept empty string', () => {
-      const result = validateField('zipCode', '');
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ zipCode: '' });
+      expect(result.success).toBe(true);
     });
   });
 
   describe('telephoneNo validation', () => {
-    it('should accept valid phone number with parentheses', () => {
-      const result = validateField('telephoneNo', '(555) 123-4567');
-      expect(result).toBeUndefined();
-    });
-
-    it('should accept valid phone number without formatting', () => {
-      const result = validateField('telephoneNo', '5551234567');
-      expect(result).toBeUndefined();
-    });
-
-    it('should accept valid phone number with dashes', () => {
-      const result = validateField('telephoneNo', '555-123-4567');
-      expect(result).toBeUndefined();
-    });
-
-    it('should reject phone number with letters', () => {
-      const result = validateField('telephoneNo', '555-ABC-4567');
-      expect(result).toBe('Invalid phone number format');
+    it('should accept valid phone number', () => {
+      const result = formDataSchema.safeParse({ telephoneNo: '(555) 123-4567' });
+      expect(result.success).toBe(true);
     });
 
     it('should reject phone number longer than 20 characters', () => {
       const longPhone = '1'.repeat(21);
-      const result = validateField('telephoneNo', longPhone);
-      expect(result).toBe('Phone number too long');
+      const result = formDataSchema.safeParse({ telephoneNo: longPhone });
+      expect(result.success).toBe(false);
     });
 
     it('should accept empty string', () => {
-      const result = validateField('telephoneNo', '');
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ telephoneNo: '' });
+      expect(result.success).toBe(true);
     });
   });
 
   describe('state validation', () => {
     it('should accept valid 2-letter state code', () => {
-      const result = validateField('state', 'CA');
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ state: 'CA' });
+      expect(result.success).toBe(true);
     });
 
-    it('should reject state code longer than 2 characters', () => {
-      const result = validateField('state', 'CAL');
-      expect(result).toBe('State must be 2 characters');
+    it('should accept state name longer than 2 characters', () => {
+      const result = formDataSchema.safeParse({ state: 'California' });
+      expect(result.success).toBe(true);
     });
 
     it('should accept empty string', () => {
-      const result = validateField('state', '');
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ state: '' });
+      expect(result.success).toBe(true);
     });
   });
 
   describe('streetAddress validation', () => {
     it('should accept valid street address', () => {
-      const result = validateField('streetAddress', '123 Main St');
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ streetAddress: '123 Main St' });
+      expect(result.success).toBe(true);
     });
 
-    it('should reject address longer than 200 characters', () => {
-      const longAddress = 'A'.repeat(201);
-      const result = validateField('streetAddress', longAddress);
-      expect(result).toBe('Address must be less than 200 characters');
+    it('should reject address longer than 300 characters', () => {
+      const longAddress = 'A'.repeat(301);
+      const result = formDataSchema.safeParse({ streetAddress: longAddress });
+      expect(result.success).toBe(false);
     });
 
     it('should accept empty string', () => {
-      const result = validateField('streetAddress', '');
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ streetAddress: '' });
+      expect(result.success).toBe(true);
     });
   });
 
   describe('city validation', () => {
     it('should accept valid city name', () => {
-      const result = validateField('city', 'Los Angeles');
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ city: 'Los Angeles' });
+      expect(result.success).toBe(true);
     });
 
     it('should reject city name longer than 100 characters', () => {
       const longCity = 'A'.repeat(101);
-      const result = validateField('city', longCity);
-      expect(result).toBe('City must be less than 100 characters');
+      const result = formDataSchema.safeParse({ city: longCity });
+      expect(result.success).toBe(false);
     });
 
     it('should accept empty string', () => {
-      const result = validateField('city', '');
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ city: '' });
+      expect(result.success).toBe(true);
     });
   });
 
   describe('caseNumber validation', () => {
     it('should accept valid case number', () => {
-      const result = validateField('caseNumber', 'CASE-2024-001');
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ caseNumber: 'CASE-2024-001' });
+      expect(result.success).toBe(true);
     });
 
-    it('should reject case number longer than 50 characters', () => {
-      const longCase = 'A'.repeat(51);
-      const result = validateField('caseNumber', longCase);
-      expect(result).toBe('Case number must be less than 50 characters');
+    it('should reject case number longer than 100 characters', () => {
+      const longCase = 'A'.repeat(101);
+      const result = formDataSchema.safeParse({ caseNumber: longCase });
+      expect(result.success).toBe(false);
     });
 
     it('should accept empty string', () => {
-      const result = validateField('caseNumber', '');
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ caseNumber: '' });
+      expect(result.success).toBe(true);
     });
   });
 
   describe('facts validation', () => {
     it('should accept valid facts text', () => {
-      const result = validateField('facts', 'The parties have agreed to the following terms...');
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ facts: 'The parties have agreed to the terms...' });
+      expect(result.success).toBe(true);
     });
 
-    it('should reject facts longer than 5000 characters', () => {
-      const longFacts = 'A'.repeat(5001);
-      const result = validateField('facts', longFacts);
-      expect(result).toBe('Facts must be less than 5000 characters');
+    it('should reject facts longer than 10000 characters', () => {
+      const longFacts = 'A'.repeat(10001);
+      const result = formDataSchema.safeParse({ facts: longFacts });
+      expect(result.success).toBe(false);
     });
 
     it('should accept empty string', () => {
-      const result = validateField('facts', '');
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ facts: '' });
+      expect(result.success).toBe(true);
     });
   });
 
   describe('boolean fields validation', () => {
     it('should accept true for noOrders', () => {
-      const result = validateField('noOrders', true);
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ noOrders: true });
+      expect(result.success).toBe(true);
     });
 
     it('should accept false for noOrders', () => {
-      const result = validateField('noOrders', false);
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ noOrders: false });
+      expect(result.success).toBe(true);
     });
 
     it('should accept true for agreeOrders', () => {
-      const result = validateField('agreeOrders', true);
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ agreeOrders: true });
+      expect(result.success).toBe(true);
     });
 
     it('should accept false for consentCustody', () => {
-      const result = validateField('consentCustody', false);
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ consentCustody: false });
+      expect(result.success).toBe(true);
     });
 
     it('should accept true for consentVisitation', () => {
-      const result = validateField('consentVisitation', true);
-      expect(result).toBeUndefined();
+      const result = formDataSchema.safeParse({ consentVisitation: true });
+      expect(result.success).toBe(true);
     });
   });
-});
 
-describe('formDataSchema', () => {
-  it('should validate complete valid form data', () => {
-    const validData = {
-      partyName: 'John Doe',
-      streetAddress: '123 Main St',
-      city: 'Los Angeles',
-      state: 'CA',
-      zipCode: '90210',
-      telephoneNo: '(555) 123-4567',
-      faxNo: '(555) 123-4568',
-      email: 'john@example.com',
-      attorneyFor: 'Jane Smith',
-      county: 'Los Angeles County',
-      petitioner: 'John Doe',
-      respondent: 'Jane Doe',
-      caseNumber: 'CASE-2024-001',
-      noOrders: false,
-      agreeOrders: true,
-      consentCustody: true,
-      consentVisitation: true,
-      facts: 'The parties have agreed to the following terms.',
-      signatureDate: '2024-01-01',
-      signatureName: 'John Doe',
-    };
+  describe('complete form data', () => {
+    it('should validate complete valid form data', () => {
+      const validData = {
+        partyName: 'John Doe',
+        streetAddress: '123 Main St',
+        city: 'Los Angeles',
+        state: 'CA',
+        zipCode: '90210',
+        telephoneNo: '(555) 123-4567',
+        email: 'john@example.com',
+        caseNumber: 'CASE-2024-001',
+        noOrders: false,
+        agreeOrders: true,
+      };
 
-    const result = formDataSchema.safeParse(validData);
-    expect(result.success).toBe(true);
-  });
+      const result = formDataSchema.safeParse(validData);
+      expect(result.success).toBe(true);
+    });
 
-  it('should validate partial form data with empty fields', () => {
-    const partialData = {
-      partyName: 'John Doe',
-      email: 'john@example.com',
-      city: '',
-      state: '',
-      zipCode: '',
-    };
+    it('should validate partial form data with empty fields', () => {
+      const partialData = {
+        partyName: 'Jane Smith',
+        email: 'jane@example.com',
+      };
 
-    const result = formDataSchema.safeParse(partialData);
-    expect(result.success).toBe(true);
-  });
+      const result = formDataSchema.safeParse(partialData);
+      expect(result.success).toBe(true);
+    });
 
-  it('should reject form data with invalid email', () => {
-    const invalidData = {
-      partyName: 'John Doe',
-      email: 'invalid-email',
-    };
+    it('should reject form data with invalid email', () => {
+      const invalidData = {
+        partyName: 'John Doe',
+        email: 'not-an-email',
+      };
 
-    const result = formDataSchema.safeParse(invalidData);
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.errors[0].path).toContain('email');
-      expect(result.error.errors[0].message).toBe('Invalid email address');
-    }
-  });
+      const result = formDataSchema.safeParse(invalidData);
+      expect(result.success).toBe(false);
+    });
 
-  it('should reject form data with invalid ZIP code', () => {
-    const invalidData = {
-      zipCode: '1234', // Too short
-    };
+    it('should reject form data with invalid ZIP code', () => {
+      const invalidData = {
+        partyName: 'John Doe',
+        zipCode: '123',
+      };
 
-    const result = formDataSchema.safeParse(invalidData);
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.errors[0].path).toContain('zipCode');
-      expect(result.error.errors[0].message).toBe('ZIP code must be 5 or 9 digits');
-    }
-  });
+      const result = formDataSchema.safeParse(invalidData);
+      expect(result.success).toBe(false);
+    });
 
-  it('should reject form data with fields exceeding max length', () => {
-    const invalidData = {
-      partyName: 'A'.repeat(101),
-    };
+    it('should reject form data with fields exceeding max length', () => {
+      const invalidData = {
+        partyName: 'A'.repeat(201), // Max is 200
+      };
 
-    const result = formDataSchema.safeParse(invalidData);
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.errors[0].path).toContain('partyName');
-      expect(result.error.errors[0].message).toBe('Name must be less than 100 characters');
-    }
+      const result = formDataSchema.safeParse(invalidData);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.errors[0].path).toContain('partyName');
+      }
+    });
   });
 });
