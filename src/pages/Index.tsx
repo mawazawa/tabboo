@@ -107,6 +107,7 @@ const Index = () => {
   const [vaultSheetOpen, setVaultSheetOpen] = useState(false);
   const { toast } = useToast();
   const hasUnsavedChanges = useRef(false);
+  const pdfPanelRef = useRef<HTMLDivElement>(null);
 
   // Fetch vault data for AI Assistant context
   const { data: vaultData, isLoading: isVaultLoading } = useQuery({
@@ -694,17 +695,25 @@ const Index = () => {
                   variant={pdfZoom === 1 ? "default" : "ghost"}
                   size="sm"
                   onClick={() => {
-                    // Get actual PDF container element
-                    const pdfPanel = document.getElementById('pdf-panel');
-                    if (pdfPanel) {
-                      // Use actual panel width minus padding
-                      const viewportWidth = pdfPanel.clientWidth - 48; // Account for padding
+                    // Get PDF panel container from ref
+                    if (pdfPanelRef.current) {
+                      // Use actual panel width minus padding (24px each side)
+                      const viewportWidth = pdfPanelRef.current.clientWidth - 48;
                       const targetWidth = 850; // Default PDF width
                       const calculatedZoom = Math.min(2, Math.max(0.5, viewportWidth / targetWidth));
                       setPdfZoom(calculatedZoom);
                     } else {
-                      // Fallback to 1:1 if element not found
-                      setPdfZoom(1);
+                      // Fallback: Try to get element by ID as backup
+                      const pdfPanel = document.getElementById('pdf-panel');
+                      if (pdfPanel) {
+                        const viewportWidth = pdfPanel.clientWidth - 48;
+                        const targetWidth = 850;
+                        const calculatedZoom = Math.min(2, Math.max(0.5, viewportWidth / targetWidth));
+                        setPdfZoom(calculatedZoom);
+                      } else {
+                        // Last resort: set to 1:1
+                        setPdfZoom(1);
+                      }
                     }
                   }}
                   className="flex items-center gap-1 px-3 min-w-[120px] justify-center transition-colors"
@@ -820,26 +829,28 @@ const Index = () => {
               )}
               
               {/* PDF Viewer */}
-              <ResizablePanel 
+              <ResizablePanel
                 id="pdf-panel"
                 order={2}
                 defaultSize={75}
                 minSize={50}
               >
-                <Suspense fallback={<ViewerSkeleton />}>
-                  <FormViewer 
-                    formData={formData} 
-                    updateField={updateField}
-                    currentFieldIndex={currentFieldIndex}
-                    setCurrentFieldIndex={setCurrentFieldIndex}
-                    fieldPositions={fieldPositions}
-                    updateFieldPosition={updateFieldPosition}
-                    zoom={pdfZoom}
-                    highlightedField={highlightedField}
-                    validationErrors={validationErrors}
-                    vaultData={vaultData as PersonalVaultData}
-                  />
-                </Suspense>
+                <div ref={pdfPanelRef} className="h-full w-full">
+                  <Suspense fallback={<ViewerSkeleton />}>
+                    <FormViewer
+                      formData={formData}
+                      updateField={updateField}
+                      currentFieldIndex={currentFieldIndex}
+                      setCurrentFieldIndex={setCurrentFieldIndex}
+                      fieldPositions={fieldPositions}
+                      updateFieldPosition={updateFieldPosition}
+                      zoom={pdfZoom}
+                      highlightedField={highlightedField}
+                      validationErrors={validationErrors}
+                      vaultData={vaultData as PersonalVaultData}
+                    />
+                  </Suspense>
+                </div>
               </ResizablePanel>
             </ResizablePanelGroup>
           </ResizablePanel>
