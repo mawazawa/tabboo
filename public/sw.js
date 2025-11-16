@@ -86,7 +86,15 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache First for app assets
+  // Skip caching for development files (Vite dev server files)
+  // These include files with query parameters (?t=...) or from /src/ path
+  if (url.search || url.pathname.startsWith('/src/') || url.pathname.includes('node_modules')) {
+    // Network only for development files
+    event.respondWith(fetch(request));
+    return;
+  }
+
+  // Cache First for app assets (production only)
   event.respondWith(
     caches.match(request).then((response) => {
       return response || fetch(request).then((response) => {
@@ -97,6 +105,9 @@ self.addEventListener('fetch', (event) => {
           });
         }
         return response;
+      }).catch((error) => {
+        // If fetch fails, try cache as fallback
+        return caches.match(request);
       });
     })
   );

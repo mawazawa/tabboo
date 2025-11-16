@@ -267,7 +267,11 @@ describe('Auto-Save Integration Tests', () => {
    */
   test('saves data when component unmounts', async () => {
     const { unmount } = renderHook(() =>
-      useFormAutoSave(mockFormData, mockFieldPositions, mockDocumentId)
+      useFormAutoSave({
+        documentId: mockDocumentId,
+        formData: mockFormData,
+        fieldPositions: mockFieldPositions,
+      })
     );
 
     // Unmount without waiting for auto-save timer
