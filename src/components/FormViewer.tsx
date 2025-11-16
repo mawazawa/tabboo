@@ -34,9 +34,10 @@ interface Props {
   vaultData?: PersonalVaultData | null;
   isEditMode?: boolean;
   onToggleEditMode?: () => void;
+  fieldFontSize?: number;
 }
 
-export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, zoom = 1, highlightedField = null, validationErrors = {}, vaultData = null, isEditMode: externalEditMode, onToggleEditMode }: Props) => {
+export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, zoom = 1, highlightedField = null, validationErrors = {}, vaultData = null, isEditMode: externalEditMode, onToggleEditMode, fieldFontSize = 12 }: Props) => {
   // Fetch FL-320 form fields from database
   const { data: fieldMappings, isLoading: isLoadingFields, error: fieldsError } = useFormFields('FL-320');
 
@@ -871,7 +872,8 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
                                 disabled={isGlobalEditMode}
-                                className={`field-input h-6 text-[12pt] font-mono ${
+                                style={{ fontSize: `${fieldFontSize}pt`, height: `${fieldFontSize * 2}px` }}
+                                className={`field-input font-mono ${
                                   isGlobalEditMode
                                     ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   validationErrors?.[overlay.field]?.length
@@ -888,7 +890,8 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
                                 disabled={isGlobalEditMode}
-                                className={`field-input text-[12pt] font-mono resize-none min-h-[48px] ${
+                                style={{ fontSize: `${fieldFontSize}pt`, minHeight: `${fieldFontSize * 4}px` }}
+                                className={`field-input font-mono resize-none ${
                                   isGlobalEditMode
                                     ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   validationErrors?.[overlay.field]?.length

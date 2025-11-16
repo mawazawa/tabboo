@@ -106,6 +106,7 @@ const Index = () => {
   const [settingsSheetOpen, setSettingsSheetOpen] = useState(false);
   const [vaultSheetOpen, setVaultSheetOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [fieldFontSize, setFieldFontSize] = useState(12); // Default 12pt
   const { toast } = useToast();
   const hasUnsavedChanges = useRef(false);
   const pdfPanelRef = useRef<HTMLDivElement>(null);
@@ -672,73 +673,128 @@ const Index = () => {
             </Tooltip>
           </div>
 
-          {/* Center: Zoom Controls - Compact Group */}
-          <div className="flex items-center gap-1 bg-muted/30 rounded-md px-1 py-0.5">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setPdfZoom(Math.max(0.5, pdfZoom - 0.1))}
-                  disabled={pdfZoom <= 0.5}
-                  className="h-7 w-7 p-0"
-                >
-                  <span className="text-base font-semibold">−</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Zoom out (minimum 50%)</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={pdfZoom === 1 ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => {
-                    if (pdfPanelRef.current) {
-                      const viewportWidth = pdfPanelRef.current.clientWidth - 48;
-                      const targetWidth = 850;
-                      const calculatedZoom = Math.min(2, Math.max(0.5, viewportWidth / targetWidth));
-                      setPdfZoom(calculatedZoom);
-                    } else {
-                      const pdfPanel = document.getElementById('pdf-panel');
-                      if (pdfPanel) {
-                        const viewportWidth = pdfPanel.clientWidth - 48;
+          {/* Center: View Controls - Compact Group */}
+          <div className="flex items-center gap-3">
+            {/* PDF Zoom Controls */}
+            <div className="flex items-center gap-1 bg-muted/30 rounded-md px-1 py-0.5">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setPdfZoom(Math.max(0.5, pdfZoom - 0.1))}
+                    disabled={pdfZoom <= 0.5}
+                    className="h-7 w-7 p-0"
+                  >
+                    <span className="text-base font-semibold">−</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Zoom out (minimum 50%)</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={pdfZoom === 1 ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => {
+                      if (pdfPanelRef.current) {
+                        const viewportWidth = pdfPanelRef.current.clientWidth - 48;
                         const targetWidth = 850;
                         const calculatedZoom = Math.min(2, Math.max(0.5, viewportWidth / targetWidth));
                         setPdfZoom(calculatedZoom);
                       } else {
-                        setPdfZoom(1);
+                        const pdfPanel = document.getElementById('pdf-panel');
+                        if (pdfPanel) {
+                          const viewportWidth = pdfPanel.clientWidth - 48;
+                          const targetWidth = 850;
+                          const calculatedZoom = Math.min(2, Math.max(0.5, viewportWidth / targetWidth));
+                          setPdfZoom(calculatedZoom);
+                        } else {
+                          setPdfZoom(1);
+                        }
                       }
-                    }
-                  }}
-                  className="flex items-center gap-1 px-2.5 min-w-[100px] justify-center h-7 text-xs font-semibold"
-                >
-                  <FileText className="h-3 w-3" strokeWidth={1.5} />
-                  {pdfZoom === 1 ? 'Fit' : `${Math.round(pdfZoom * 100)}%`}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Scale PDF to fit viewport perfectly</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setPdfZoom(Math.min(2, pdfZoom + 0.1))}
-                  disabled={pdfZoom >= 2}
-                  className="h-7 w-7 p-0"
-                >
-                  <span className="text-base font-semibold">+</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Zoom in (maximum 200%)</p>
-              </TooltipContent>
-            </Tooltip>
+                    }}
+                    className="flex items-center gap-1 px-2.5 min-w-[100px] justify-center h-7 text-xs font-semibold"
+                  >
+                    <FileText className="h-3 w-3" strokeWidth={1.5} />
+                    {pdfZoom === 1 ? 'Fit' : `${Math.round(pdfZoom * 100)}%`}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Scale PDF to fit viewport perfectly</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setPdfZoom(Math.min(2, pdfZoom + 0.1))}
+                    disabled={pdfZoom >= 2}
+                    className="h-7 w-7 p-0"
+                  >
+                    <span className="text-base font-semibold">+</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Zoom in (maximum 200%)</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+
+            {/* Field Font Size Controls */}
+            <div className="flex items-center gap-1 bg-muted/30 rounded-md px-1 py-0.5">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setFieldFontSize(Math.max(8, fieldFontSize - 1))}
+                    disabled={fieldFontSize <= 8}
+                    className="h-7 w-7 p-0"
+                  >
+                    <span className="text-sm">A</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Decrease field font size (minimum 8pt)</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={fieldFontSize === 12 ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setFieldFontSize(12)}
+                    className="flex items-center gap-1 px-2.5 min-w-[70px] justify-center h-7 text-xs font-semibold"
+                  >
+                    <span className="text-xs">Font</span>
+                    <span className="font-mono">{fieldFontSize}pt</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Reset to default 12pt font size</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setFieldFontSize(Math.min(16, fieldFontSize + 1))}
+                    disabled={fieldFontSize >= 16}
+                    className="h-7 w-7 p-0"
+                  >
+                    <span className="text-base font-semibold">A</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Increase field font size (maximum 16pt)</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
           </div>
 
           {/* Right: Panel Toggles - Compact */}
@@ -845,6 +901,7 @@ const Index = () => {
                       vaultData={vaultData as PersonalVaultData}
                       isEditMode={isEditMode}
                       onToggleEditMode={() => setIsEditMode(!isEditMode)}
+                      fieldFontSize={fieldFontSize}
                     />
                   </Suspense>
                 </div>
@@ -862,7 +919,7 @@ const Index = () => {
             maxSize={60}
             collapsible={false}
           >
-            <div className="h-full w-full min-w-0 pl-3 flex flex-col overflow-hidden">
+            <div className="h-full w-full min-w-0 px-3 flex flex-col overflow-hidden">
               <Suspense fallback={<PanelSkeleton />}>
                 {showVaultPanel ? (
                   <PersonalDataVaultPanel userId={user?.id || ''} />
