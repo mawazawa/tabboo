@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Copy, Move, Search, X, AlertCircle, Settings, Package, Keyboard } from "@/icons";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -26,6 +26,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import type { FormData, FieldConfig, FieldPosition, ValidationRules, ValidationErrors } from "@/types/FormData";
+import { useFormFields, generateFieldNameToIndex } from "@/hooks/use-form-fields";
 
 interface Template {
   name: string;
@@ -221,8 +222,19 @@ export const FieldNavigationPanel = ({
     },
   });
 
+  // Fetch field mappings from database to ensure consistent ordering with FormViewer
+  const { data: fieldMappings, isLoading: isLoadingFields } = useFormFields();
+
+  // Generate field name to index mapping from database (same as FormViewer)
+  const fieldNameToIndex: Record<string, number> = useMemo(() => {
+    if (!fieldMappings || fieldMappings.length === 0) {
+      return {};
+    }
+    return generateFieldNameToIndex(fieldMappings);
+  }, [fieldMappings]);
+
   // Filter fields based on search query
-  const filteredFields = FIELD_CONFIG.filter(config => 
+  const filteredFields = FIELD_CONFIG.filter(config =>
     config.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
     config.field.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -885,8 +897,13 @@ export const FieldNavigationPanel = ({
             </div>
           ) : (
             filteredFields.map((config) => {
-              const originalIndex = FIELD_CONFIG.findIndex(f => f.field === config.field);
-              const isActive = originalIndex === currentFieldIndex;
+              // Use database index for highlighting synchronization with FormViewer
+              const databaseIndex = fieldNameToIndex[config.field];
+              const isActive = databaseIndex !== undefined && databaseIndex === currentFieldIndex;
+
+              // Use UI index for field refs and display numbering
+              const uiIndex = FIELD_CONFIG.findIndex(f => f.field === config.field);
+
               const isSelected = selectedFields.includes(config.field);
               const fieldErrors = validationErrors[config.field] || [];
               const hasErrors = fieldErrors.length > 0;
@@ -917,8 +934,10 @@ export const FieldNavigationPanel = ({
                           : [...prev, config.field]
                       );
                     } else {
-                      // Normal navigation
-                      setCurrentFieldIndex(originalIndex);
+                      // Normal navigation - use database index for consistency with FormViewer
+                      if (databaseIndex !== undefined) {
+                        setCurrentFieldIndex(databaseIndex);
+                      }
                     }
                   }}
                   onMouseEnter={() => onFieldHover?.(config.field)}
@@ -943,7 +962,7 @@ export const FieldNavigationPanel = ({
                         isActive ? 'text-primary' : isSelected ? 'text-blue-600' : hasErrors ? 'text-destructive' : 'text-muted-foreground'
                       }`}
                     >
-                      {originalIndex + 1}. {config.label}
+                      {uiIndex + 1}. {config.label}
                     </Label>
                     <div className="flex items-center gap-2">
                       {onSaveValidationRules && (
@@ -999,13 +1018,16 @@ export const FieldNavigationPanel = ({
                   {config.type === 'input' && (
                     <Input
                       id={config.field}
-                      ref={el => fieldRefs.current[originalIndex] = el}
+                      ref={el => fieldRefs.current[uiIndex] = el}
                       value={formData[config.field] as string || ''}
                       onChange={(e) => updateField(config.field, e.target.value)}
-                      onKeyDown={(e) => handleKeyDown(e, originalIndex)}
+                      onKeyDown={(e) => handleKeyDown(e, uiIndex)}
                       onFocus={(e) => {
                         e.stopPropagation();
-                        setCurrentFieldIndex(originalIndex);
+                        // Use database index for global state synchronization
+                        if (databaseIndex !== undefined) {
+                          setCurrentFieldIndex(databaseIndex);
+                        }
                       }}
                       onClick={(e) => e.stopPropagation()}
                       placeholder={config.placeholder}
@@ -1017,13 +1039,16 @@ export const FieldNavigationPanel = ({
                   {config.type === 'textarea' && (
                     <Textarea
                       id={config.field}
-                      ref={el => fieldRefs.current[originalIndex] = el as HTMLTextAreaElement}
+                      ref={el => fieldRefs.current[uiIndex] = el as HTMLTextAreaElement}
                       value={formData[config.field] as string || ''}
                       onChange={(e) => updateField(config.field, e.target.value)}
-                      onKeyDown={(e) => handleKeyDown(e, originalIndex)}
+                      onKeyDown={(e) => handleKeyDown(e, uiIndex)}
                       onFocus={(e) => {
                         e.stopPropagation();
-                        setCurrentFieldIndex(originalIndex);
+                        // Use database index for global state synchronization
+                        if (databaseIndex !== undefined) {
+                          setCurrentFieldIndex(databaseIndex);
+                        }
                       }}
                       onClick={(e) => e.stopPropagation()}
                       placeholder={config.placeholder}
@@ -1035,11 +1060,16 @@ export const FieldNavigationPanel = ({
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id={config.field}
-                        ref={el => fieldRefs.current[originalIndex] = el as unknown as HTMLButtonElement}
+                        ref={el => fieldRefs.current[uiIndex] = el as unknown as HTMLButtonElement}
                         checked={!!formData[config.field]}
                         onCheckedChange={(checked) => updateField(config.field, checked as boolean)}
-                        onKeyDown={(e) => handleKeyDown(e, originalIndex)}
-                        onFocus={() => setCurrentFieldIndex(originalIndex)}
+                        onKeyDown={(e) => handleKeyDown(e, uiIndex)}
+                        onFocus={() => {
+                          // Use database index for global state synchronization
+                          if (databaseIndex !== undefined) {
+                            setCurrentFieldIndex(databaseIndex);
+                          }
+                        }}
                       />
                       <label 
                         htmlFor={config.field} 
