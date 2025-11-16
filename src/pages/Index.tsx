@@ -182,10 +182,11 @@ const Index = () => {
 
   // Preset handlers
   const handleSnapToGrid = useCallback((gridSize: number) => {
-    const updated = snapAllToGrid(fieldPositions, selectedFields, gridSize);
+    const fieldNames = selectedFields.length > 0 ? selectedFields : Object.keys(fieldPositions);
+    const updated = snapAllToGrid(fieldPositions, fieldNames, gridSize);
     setFieldPositions(updated);
     hasUnsavedChanges.current = true;
-    toast({ title: "Snapped to grid", description: `${selectedFields.length} field(s) aligned to ${gridSize}% grid` });
+    toast({ title: "Snapped to grid", description: `${fieldNames.length} field(s) aligned to ${gridSize}% grid` });
   }, [fieldPositions, selectedFields, toast]);
 
   const handleAlignHorizontal = useCallback((alignment: 'left' | 'center' | 'right') => {

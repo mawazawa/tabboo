@@ -69,8 +69,7 @@ export const FieldPresetsToolbar = ({
             <Button
               variant="ghost"
               size="sm"
-              disabled={!hasSelection}
-              onClick={() => handleAction(() => onSnapToGrid(5))}
+              onClick={() => onSnapToGrid(5)}
               className="h-7 w-7 p-0"
             >
               <Grid3x3 className="h-4 w-4" />
