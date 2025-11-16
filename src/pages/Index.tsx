@@ -919,7 +919,7 @@ const Index = () => {
             maxSize={60}
             collapsible={false}
           >
-            <div className="h-full w-full px-3 flex flex-col overflow-auto">
+            <div className="h-full w-full min-w-0 px-3 flex flex-col overflow-hidden">
               <Suspense fallback={<PanelSkeleton />}>
                 {showVaultPanel ? (
                   <PersonalDataVaultPanel userId={user?.id || ''} />
