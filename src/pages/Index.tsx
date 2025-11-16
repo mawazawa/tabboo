@@ -793,8 +793,9 @@ const Index = () => {
           <ResizablePanel
             id="viewer-panel"
             order={1}
-            defaultSize={70}
-            minSize={40}
+            defaultSize={showFieldsPanel || showVaultPanel ? 70 : 100}
+            minSize={showFieldsPanel || showVaultPanel ? 40 : 60}
+            maxSize={showFieldsPanel || showVaultPanel ? undefined : 100}
           >
             <ResizablePanelGroup direction="horizontal" className="h-full">
               {/* Resizable Thumbnail Sidebar */}
@@ -856,18 +857,20 @@ const Index = () => {
           </ResizablePanel>
 
           {/* Right: Field Navigation Panel OR Vault Panel (collapsible) */}
-          <ResizableHandleMulti withHandle className="hover:bg-primary/30 transition-colors" />
+          {(showFieldsPanel || showVaultPanel) && (
+            <ResizableHandleMulti withHandle className="hover:bg-primary/30 transition-colors" />
+          )}
           <ResizablePanel
             id="right-panel"
             order={2}
             defaultSize={30}
-            minSize={25}
-            maxSize={50}
+            minSize={showFieldsPanel || showVaultPanel ? 20 : 0}
+            maxSize={60}
             collapsible={true}
             collapsedSize={0}
             className={showFieldsPanel || showVaultPanel ? "" : "hidden"}
           >
-            <div className="h-full pl-3 flex flex-col overflow-hidden">
+            <div className="h-full w-full pl-3 flex flex-col overflow-hidden">
               <Suspense fallback={<PanelSkeleton />}>
                 {showVaultPanel ? (
                   <PersonalDataVaultPanel userId={user?.id || ''} />

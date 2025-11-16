@@ -87,10 +87,9 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Skip caching for development files (Vite dev server files)
-  // These include files with query parameters (?t=...) or from /src/ path
-  if (url.search || url.pathname.startsWith('/src/') || url.pathname.includes('node_modules')) {
-    // Network only for development files
-    event.respondWith(fetch(request));
+  // These include files with query parameters (?t=...), from /src/ path, or node_modules
+  if (url.search || url.pathname.startsWith('/src/') || url.pathname.includes('node_modules') || url.hostname === 'localhost') {
+    // Network only for development files - don't intercept in dev mode
     return;
   }
 
