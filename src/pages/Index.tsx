@@ -599,9 +599,9 @@ const Index = () => {
       {/* Main Content with Resizable Panels */}
       <main className="flex-1 flex flex-col container mx-auto px-4 py-6 overflow-hidden">
         {/* Control Toolbar */}
-        <div className="flex items-center justify-between gap-2 mb-4 p-3 bg-card/80 backdrop-blur-sm rounded-lg border shadow-sm flex-shrink-0">
+        <div className="flex items-center justify-between gap-3 mb-4 p-3 bg-card/80 backdrop-blur-sm rounded-lg border shadow-sm flex-shrink-0">
           {/* Left Section */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {/* AI Assistant Toggle */}
             <Tooltip>
               <TooltipTrigger asChild>
@@ -672,7 +672,7 @@ const Index = () => {
           </div>
 
           {/* Center Section - Zoom Controls */}
-          <div className="flex items-center gap-1 px-2">
+          <div className="flex items-center gap-2 px-2">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
