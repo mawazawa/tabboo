@@ -298,6 +298,17 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     if ((e.target as HTMLElement).closest('.field-container')) return;
   };
 
+  /**
+   * Adjust field position by moving it in the specified direction
+   *
+   * @param direction - Direction to move the field
+   *   - 'up': Decrease Y coordinate (move field UP on PDF)
+   *   - 'down': Increase Y coordinate (move field DOWN on PDF)
+   *   - 'left': Decrease X coordinate (move field LEFT on PDF)
+   *   - 'right': Increase X coordinate (move field RIGHT on PDF)
+   * @param field - Field name to adjust
+   * @param customStep - Optional custom step size (default: 0.5%)
+   */
   const adjustPosition = (direction: 'up' | 'down' | 'left' | 'right', field: string, customStep?: number) => {
     const position = fieldPositions[field] || {
       top: parseFloat(fieldOverlays[0].fields.find(f => f.field === field)?.top || '0'),
@@ -308,15 +319,19 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
 
     switch (direction) {
       case 'up':
+        // Move UP on PDF = decrease top position (Y coordinate)
         newPosition.top = Math.max(0, newPosition.top - step);
         break;
       case 'down':
+        // Move DOWN on PDF = increase top position (Y coordinate)
         newPosition.top = Math.min(100, newPosition.top + step);
         break;
       case 'left':
+        // Move LEFT on PDF = decrease left position (X coordinate)
         newPosition.left = Math.max(0, newPosition.left - step);
         break;
       case 'right':
+        // Move RIGHT on PDF = increase left position (X coordinate)
         newPosition.left = Math.min(100, newPosition.left + step);
         break;
     }
@@ -442,7 +457,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
               <Button
                 size="lg"
                 variant={isGlobalEditMode ? "default" : "secondary"}
-                className={`shadow-lg hover:scale-105 transition-transform ${!isGlobalEditMode ? 'animate-pulse' : ''}`}
+                className={`shadow-lg hover:scale-105 transition-transform ${!isGlobalEditMode ? 'animate-pulse ring-2 ring-primary/50' : ''}`}
                 onClick={toggleGlobalEditMode}
               >
                 <Move className="h-5 w-5 mr-2" />
@@ -451,8 +466,12 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
             </TooltipTrigger>
             <TooltipContent side="left" className="max-w-xs">
               <div className="space-y-1">
-                <p className="font-semibold">{isGlobalEditMode ? 'Exit edit mode to fill form' : 'Enter edit mode to move fields'}</p>
-                <p className="text-xs text-muted-foreground">Keyboard: Press E to toggle</p>
+                <p className="font-semibold">{isGlobalEditMode ? 'Exit edit mode to fill form' : 'Click to enable dragging'}</p>
+                <p className="text-xs text-muted-foreground">
+                  {isGlobalEditMode
+                    ? 'Keyboard: Press E or Esc to exit'
+                    : 'Enable this to drag fields into position'}
+                </p>
               </div>
             </TooltipContent>
           </Tooltip>
@@ -467,11 +486,12 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                 <div className="absolute inset-0 bg-white/30 blur-sm animate-pulse" />
               </div>
               <div>
-                <div className="font-bold text-sm">EDIT MODE ACTIVE</div>
+                <div className="font-bold text-sm">✅ DRAG MODE ACTIVE</div>
                 <div className="text-xs flex items-center gap-2 mt-0.5">
-                  <span>Drag fields or use</span>
+                  <span className="font-semibold">Click & drag any field to reposition</span>
+                  <span className="opacity-70">• Or use</span>
                   <Keyboard className="h-3 w-3 inline" />
-                  <span>arrow keys</span>
+                  <span className="opacity-70">arrow keys</span>
                   <span className="opacity-70">• Press E or Esc to exit</span>
                 </div>
               </div>

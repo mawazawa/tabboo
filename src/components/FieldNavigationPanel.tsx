@@ -346,27 +346,41 @@ export const FieldNavigationPanel = ({
   const currentFieldName = FIELD_CONFIG[currentFieldIndex]?.field;
   const currentPosition = fieldPositions[currentFieldName] || getDefaultPosition(currentFieldName);
 
+  /**
+   * Adjust field position by moving it in the specified direction
+   *
+   * @param direction - Direction to move the field
+   *   - 'up': Decrease Y coordinate (move field UP on PDF)
+   *   - 'down': Increase Y coordinate (move field DOWN on PDF)
+   *   - 'left': Decrease X coordinate (move field LEFT on PDF)
+   *   - 'right': Increase X coordinate (move field RIGHT on PDF)
+   * @param fieldName - Optional field name, defaults to current field
+   */
   const adjustPosition = (direction: 'up' | 'down' | 'left' | 'right', fieldName?: string) => {
     const targetField = fieldName || currentFieldName;
     const position = fieldPositions[targetField] || getDefaultPosition(targetField);
-    const step = 1.0; // Increased from 0.1 for faster keyboard movement
+    const step = 1.0; // Step size in percentage points (1.0 = 1%)
     const newPosition = { ...position };
-    
+
     switch (direction) {
       case 'up':
+        // Move UP on PDF = decrease top position (Y coordinate)
         newPosition.top = Math.max(0, newPosition.top - step);
         break;
       case 'down':
+        // Move DOWN on PDF = increase top position (Y coordinate)
         newPosition.top = Math.min(100, newPosition.top + step);
         break;
       case 'left':
+        // Move LEFT on PDF = decrease left position (X coordinate)
         newPosition.left = Math.max(0, newPosition.left - step);
         break;
       case 'right':
+        // Move RIGHT on PDF = increase left position (X coordinate)
         newPosition.left = Math.min(100, newPosition.left + step);
         break;
     }
-    
+
     updateFieldPosition(targetField, newPosition);
   };
 
@@ -664,7 +678,9 @@ export const FieldNavigationPanel = ({
                         />
                       </div>
                     </div>
+                    {/* Arrow key controls in intuitive cross/diamond pattern */}
                     <div className="grid grid-cols-3 gap-1">
+                      {/* Row 1: Up button centered */}
                       <div></div>
                       <Button
                         size="sm"
@@ -673,10 +689,13 @@ export const FieldNavigationPanel = ({
                         className={`h-8 px-2 transition-all duration-75 hover:bg-primary/20 hover:border-primary ${
                           pressedKey === 'up' ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 shadow-lg scale-95' : ''
                         }`}
+                        title="Move field UP (↑)"
                       >
                         <ChevronUp className="h-4 w-4" strokeWidth={2} />
                       </Button>
                       <div></div>
+
+                      {/* Row 2: Left and Right buttons */}
                       <Button
                         size="sm"
                         variant="outline"
@@ -684,19 +703,14 @@ export const FieldNavigationPanel = ({
                         className={`h-8 px-2 transition-all duration-75 hover:bg-primary/20 hover:border-primary ${
                           pressedKey === 'left' ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 shadow-lg scale-95' : ''
                         }`}
+                        title="Move field LEFT (←)"
                       >
                         <ChevronLeft className="h-4 w-4" strokeWidth={2} />
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => adjustPosition('down')}
-                        className={`h-8 px-2 transition-all duration-75 hover:bg-primary/20 hover:border-primary ${
-                          pressedKey === 'down' ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 shadow-lg scale-95' : ''
-                        }`}
-                      >
-                        <ChevronDown className="h-4 w-4" strokeWidth={2} />
-                      </Button>
+                      <div className="flex items-center justify-center text-xs text-muted-foreground">
+                        {/* Center indicator showing this is a directional pad */}
+                        <div className="w-2 h-2 rounded-full bg-muted"></div>
+                      </div>
                       <Button
                         size="sm"
                         variant="outline"
@@ -704,9 +718,25 @@ export const FieldNavigationPanel = ({
                         className={`h-8 px-2 transition-all duration-75 hover:bg-primary/20 hover:border-primary ${
                           pressedKey === 'right' ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 shadow-lg scale-95' : ''
                         }`}
+                        title="Move field RIGHT (→)"
                       >
                         <ChevronRight className="h-4 w-4" strokeWidth={2} />
                       </Button>
+
+                      {/* Row 3: Down button centered */}
+                      <div></div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => adjustPosition('down')}
+                        className={`h-8 px-2 transition-all duration-75 hover:bg-primary/20 hover:border-primary ${
+                          pressedKey === 'down' ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 shadow-lg scale-95' : ''
+                        }`}
+                        title="Move field DOWN (↓)"
+                      >
+                        <ChevronDown className="h-4 w-4" strokeWidth={2} />
+                      </Button>
+                      <div></div>
                     </div>
                     <p className="text-xs text-muted-foreground mt-3">
                       Use arrow keys or buttons to fine-tune position
