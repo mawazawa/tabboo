@@ -32,16 +32,22 @@ interface Props {
   highlightedField?: string | null;
   validationErrors?: ValidationErrors;
   vaultData?: PersonalVaultData | null;
+  isEditMode?: boolean;
+  onToggleEditMode?: () => void;
 }
 
-export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, zoom = 1, highlightedField = null, validationErrors = {}, vaultData = null }: Props) => {
+export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, zoom = 1, highlightedField = null, validationErrors = {}, vaultData = null, isEditMode: externalEditMode, onToggleEditMode }: Props) => {
   // Fetch FL-320 form fields from database
   const { data: fieldMappings, isLoading: isLoadingFields, error: fieldsError } = useFormFields('FL-320');
 
   const [numPages, setNumPages] = useState<number>(0);
   const [pageWidth, setPageWidth] = useState<number>(850);
-  const [isGlobalEditMode, setIsGlobalEditMode] = useState<boolean>(false);
+  const [internalEditMode, setInternalEditMode] = useState<boolean>(false);
   const [isDragging, setIsDragging] = useState<string | null>(null);
+
+  // Use external edit mode if provided, otherwise use internal state
+  const isGlobalEditMode = externalEditMode !== undefined ? externalEditMode : internalEditMode;
+  const setIsGlobalEditMode = onToggleEditMode || setInternalEditMode;
   const [alignmentGuides, setAlignmentGuides] = useState<{ x: number[]; y: number[] }>({ x: [], y: [] });
   const [pdfLoading, setPdfLoading] = useState(true);
   const [loadProgress, setLoadProgress] = useState(0);
@@ -174,6 +180,12 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   };
 
   const handlePointerDown = (e: React.PointerEvent, field: string, currentTop: number, currentLeft: number) => {
+    // Always allow selection
+    const fieldIndex = fieldNameToIndex[field];
+    if (fieldIndex !== undefined) {
+      setCurrentFieldIndex(fieldIndex);
+    }
+
     // Only allow dragging in global edit mode
     if (!isGlobalEditMode) {
       return;
@@ -323,14 +335,18 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   };
 
   const toggleGlobalEditMode = () => {
-    setIsGlobalEditMode(prev => !prev);
+    if (onToggleEditMode) {
+      onToggleEditMode();
+    } else {
+      setInternalEditMode(prev => !prev);
+    }
   };
 
   const handleFieldClick = (field: string, e: React.MouseEvent) => {
     // Prevent event propagation to avoid triggering PDF click
     e.stopPropagation();
 
-    // Set this field as active in the control panel
+    // PRIORITY: Set this field as active in the control panel ALWAYS (not just in edit mode)
     const fieldIndex = fieldNameToIndex[field];
     if (fieldIndex !== undefined) {
       setCurrentFieldIndex(fieldIndex);
@@ -548,33 +564,6 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   return (
     <div className="h-full w-full overflow-auto bg-muted/20">
         <TutorialTooltips />
-        
-        {/* Global Edit Mode Toggle */}
-        <div className="fixed top-4 right-4 z-50">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="lg"
-                variant={isGlobalEditMode ? "default" : "secondary"}
-                className={`shadow-lg hover:scale-105 transition-transform ${!isGlobalEditMode ? 'animate-pulse ring-2 ring-primary/50' : ''}`}
-                onClick={toggleGlobalEditMode}
-              >
-                <Move className="h-5 w-5 mr-2" />
-                {isGlobalEditMode ? 'Lock Fields' : 'Edit Positions'}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="left" className="max-w-xs">
-              <div className="space-y-1">
-                <p className="font-semibold">{isGlobalEditMode ? 'Exit edit mode to fill form' : 'Click to enable dragging'}</p>
-                <p className="text-xs text-muted-foreground">
-                  {isGlobalEditMode
-                    ? 'Keyboard: Press E or Esc to exit'
-                    : 'Enable this to drag fields into position'}
-                </p>
-              </div>
-            </TooltipContent>
-          </Tooltip>
-        </div>
 
         {/* Edit Mode Active Banner */}
         {isGlobalEditMode && (
@@ -712,35 +701,51 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             key={idx}
                             className={`field-container group absolute select-none ${
                               isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary shadow-lg scale-105' :
-                              isGlobalEditMode ? 'cursor-grab ring-2 ring-primary/70' : 'cursor-pointer'
+                              isGlobalEditMode && isCurrentField ? 'cursor-grab ring-2 ring-primary/70' :
+                              isGlobalEditMode ? 'cursor-default ring-1 ring-border/30' : 'cursor-pointer'
                             } ${
                               highlightedField === overlay.field
                                 ? 'ring-2 ring-accent shadow-lg animate-pulse' :
                               isCurrentField
                                 ? 'ring-2 ring-primary shadow-md bg-primary/5'
                                 : 'ring-1 ring-border/50 hover:ring-primary/50'
-                            } rounded-lg bg-background/80 backdrop-blur-sm p-2 transition-all duration-200`}
+                            } rounded-lg bg-background/80 backdrop-blur-sm p-1.5 transition-all duration-200`}
                             style={{
                               top: `${position.top}%`,
                               left: `${position.left}%`,
                               width: overlay.width || 'auto',
                               height: overlay.height || 'auto',
                               pointerEvents: 'auto',
-                              // Expand clickable area with negative margin
-                              margin: '-8px',
-                              // REMOVED: Scale transform - PDF already scales via width
-                              // transform: `scale(${zoom})`,
-                              // transformOrigin: 'top left',
+                              // Smaller clickable area
+                              margin: '-4px',
+                              // Make overlays smaller relative to page (85% of original size)
+                              transform: `scale(0.85)`,
+                              transformOrigin: 'top left',
                               // CRITICAL: Disable touch scrolling to enable dragging
                               touchAction: 'none',
                               // GPU acceleration hint when dragging
                               willChange: isDragging === overlay.field ? 'transform' : 'auto',
                             }}
-                            onClick={(e) => handleFieldClick(overlay.field, e)}
-                            onPointerDown={(e) => handlePointerDown(e, overlay.field, position.top, position.left)}
+                            onClick={(e) => {
+                              // Always allow clicking for selection
+                              handleFieldClick(overlay.field, e);
+                            }}
+                            onPointerDown={(e) => {
+                              // In edit mode: start drag, otherwise just select
+                              if (isGlobalEditMode) {
+                                handlePointerDown(e, overlay.field, position.top, position.left);
+                              } else {
+                                // In non-edit mode, ensure field is selected
+                                e.stopPropagation();
+                                const fieldIndex = fieldNameToIndex[overlay.field];
+                                if (fieldIndex !== undefined) {
+                                  setCurrentFieldIndex(fieldIndex);
+                                }
+                              }
+                            }}
                           >
-                            {/* Visual Direction Indicators */}
-                            {isGlobalEditMode && (
+                            {/* Visual Direction Indicators - ONLY show for currently selected field */}
+                            {isGlobalEditMode && isCurrentField && (
                               <>
                                 {/* Up Arrow Indicator */}
                                 {canMoveUp && (
@@ -858,25 +863,6 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                     </TooltipContent>
                                   </Tooltip>
                                 )}
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Button
-                                      size="icon"
-                                      variant={isGlobalEditMode ? "default" : "secondary"}
-                                      className="absolute -top-2 -right-2 h-7 w-7 rounded-full"
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        toggleGlobalEditMode();
-                                      }}
-                                    >
-                                      <Move className="h-4 w-4" />
-                                    </Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>{isGlobalEditMode ? 'Exit Edit Mode' : 'Enter Edit Mode'}</p>
-                                  </TooltipContent>
-                                </Tooltip>
                               </>
                             )}
                             

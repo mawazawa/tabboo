@@ -6,7 +6,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Copy, Move, Search, X, AlertCircle, Settings, Package } from "@/icons";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Copy, Move, Search, X, AlertCircle, Settings, Package, Keyboard } from "@/icons";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -57,6 +58,8 @@ interface Props {
   onSettingsSheetChange: (open: boolean) => void;
   onApplyTemplate: (template: Template) => void;
   onApplyGroup: (groupPositions: Record<string, FieldPosition>) => void;
+  isEditMode?: boolean;
+  onToggleEditMode?: () => void;
 }
 
 const FIELD_CONFIG: FieldConfig[] = [
@@ -155,12 +158,12 @@ const FIELD_CONFIG: FieldConfig[] = [
   { field: 'signatureName', label: 'Signature of Declarant', type: 'input', placeholder: 'Sign your name', vaultField: 'full_name' },
 ];
 
-export const FieldNavigationPanel = ({ 
-  formData, 
-  updateField, 
-  currentFieldIndex, 
-  setCurrentFieldIndex, 
-  fieldPositions, 
+export const FieldNavigationPanel = ({
+  formData,
+  updateField,
+  currentFieldIndex,
+  setCurrentFieldIndex,
+  fieldPositions,
   updateFieldPosition,
   selectedFields,
   setSelectedFields,
@@ -180,6 +183,8 @@ export const FieldNavigationPanel = ({
   onSettingsSheetChange,
   onApplyTemplate,
   onApplyGroup,
+  isEditMode = false,
+  onToggleEditMode,
 }: Props) => {
   const fieldRefs = useRef<(HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | null)[]>([]);
   const scrollViewportRef = useRef<HTMLDivElement>(null);
@@ -686,13 +691,33 @@ export const FieldNavigationPanel = ({
                         <span className="ml-1 text-[10px] text-muted-foreground">({selectedFields.length})</span>
                       )}
                     </h3>
-                    <Popover open={showPositionControl} onOpenChange={setShowPositionControl}>
-                      <PopoverTrigger asChild>
-                        <Button size="sm" variant="outline" className="h-7 px-2 gap-1">
-                          <Move className="h-3 w-3" strokeWidth={1.5} />
-                          <span className="text-xs">Adjust</span>
-                        </Button>
-                      </PopoverTrigger>
+                    <div className="flex items-center gap-1">
+                      {/* Toggle Edit Mode Button (4 arrows) */}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            size="sm"
+                            variant={isEditMode ? "default" : "outline"}
+                            className="h-7 px-2 gap-1"
+                            onClick={() => onToggleEditMode?.()}
+                          >
+                            <Move className="h-3 w-3" strokeWidth={1.5} />
+                            <span className="text-xs">{isEditMode ? 'Lock' : 'Move'}</span>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{isEditMode ? 'Exit edit mode' : 'Enable drag mode to reposition fields'}</p>
+                        </TooltipContent>
+                      </Tooltip>
+
+                      {/* Position Adjustment Popover */}
+                      <Popover open={showPositionControl} onOpenChange={setShowPositionControl}>
+                        <PopoverTrigger asChild>
+                          <Button size="sm" variant="outline" className="h-7 px-2 gap-1">
+                            <Keyboard className="h-3 w-3" strokeWidth={1.5} />
+                            <span className="text-xs">Adjust</span>
+                          </Button>
+                        </PopoverTrigger>
                       <PopoverContent className="w-[min(224px,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] p-4" side="left" align="start">
                         <h4 className="text-sm font-semibold mb-3">Position Adjustment</h4>
                         <div className="grid grid-cols-2 gap-2 mb-3">
@@ -811,8 +836,9 @@ export const FieldNavigationPanel = ({
                   </PopoverContent>
                 </Popover>
               </div>
-              
-              {/* Quick Edit Input */}
+            </div>
+
+            {/* Quick Edit Input */}
               {FIELD_CONFIG[currentFieldIndex]?.type === 'input' && (
                 <Input
                   value={formData[currentFieldName] as string || ''}

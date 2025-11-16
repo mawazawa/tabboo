@@ -105,6 +105,7 @@ const Index = () => {
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const [settingsSheetOpen, setSettingsSheetOpen] = useState(false);
   const [vaultSheetOpen, setVaultSheetOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   const { toast } = useToast();
   const hasUnsavedChanges = useRef(false);
   const pdfPanelRef = useRef<HTMLDivElement>(null);
@@ -850,6 +851,8 @@ const Index = () => {
                       highlightedField={highlightedField}
                       validationErrors={validationErrors}
                       vaultData={vaultData as PersonalVaultData}
+                      isEditMode={isEditMode}
+                      onToggleEditMode={() => setIsEditMode(!isEditMode)}
                     />
                   </Suspense>
                 </div>
@@ -857,27 +860,23 @@ const Index = () => {
             </ResizablePanelGroup>
           </ResizablePanel>
 
-          {/* Right: Field Navigation Panel OR Vault Panel (collapsible) */}
-          {(showFieldsPanel || showVaultPanel) && (
-            <ResizableHandleMulti withHandle className="hover:bg-primary/30 transition-colors" />
-          )}
+          {/* Right: Field Navigation Panel OR Vault Panel (ALWAYS VISIBLE) */}
+          <ResizableHandleMulti withHandle className="hover:bg-primary/30 transition-colors" />
           <ResizablePanel
             id="right-panel"
             order={2}
             defaultSize={30}
             minSize={25}
             maxSize={60}
-            collapsible={true}
-            collapsedSize={0}
-            collapsed={!(showFieldsPanel || showVaultPanel)}
+            collapsible={false}
           >
             <div className="h-full w-full min-w-0 pl-3 flex flex-col overflow-hidden">
               <Suspense fallback={<PanelSkeleton />}>
                 {showVaultPanel ? (
                   <PersonalDataVaultPanel userId={user?.id || ''} />
                 ) : (
-                  <FieldNavigationPanel 
-                    formData={formData} 
+                  <FieldNavigationPanel
+                    formData={formData}
                     updateField={updateField}
                     currentFieldIndex={currentFieldIndex}
                     setCurrentFieldIndex={setCurrentFieldIndex}
@@ -901,6 +900,8 @@ const Index = () => {
                     onSettingsSheetChange={setSettingsSheetOpen}
                     onApplyTemplate={handleApplyTemplate}
                     onApplyGroup={handleApplyGroup}
+                    isEditMode={isEditMode}
+                    onToggleEditMode={() => setIsEditMode(!isEditMode)}
                   />
                 )}
               </Suspense>
