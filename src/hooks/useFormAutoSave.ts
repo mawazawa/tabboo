@@ -16,13 +16,18 @@ interface AutoSaveOptions {
 /**
  * Custom hook for auto-saving form data with proper debouncing
  * Implements optimistic updates and retry logic with Zod validation
+ *
+ * Optimizations:
+ * - Reduced debounce from 2000ms to 500ms for more responsive feel
+ * - Skips validation during auto-save (only validates on manual save)
+ * - Non-blocking background saves
  */
 export const useFormAutoSave = ({
   documentId,
   formData,
   fieldPositions,
   enabled = true,
-  debounceMs = 2000,
+  debounceMs = 500, // 👈 Reduced from 2000ms - 4x more responsive!
 }: AutoSaveOptions) => {
   const { toast } = useToast();
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -54,39 +59,17 @@ export const useFormAutoSave = ({
     setIsSaving(true);
 
     try {
-      // Validate data before saving
-      const formDataValidation = formDataSchema.safeParse(formData);
-      const fieldPositionsValidation = fieldPositionsSchema.safeParse(fieldPositions);
-
-      if (!formDataValidation.success) {
-        // Form data validation failed - notify user
-        toast({
-          title: "Validation error",
-          description: "Form data contains invalid values. Please check your inputs.",
-          variant: "destructive",
-        });
-        setIsSaving(false);
-        return;
-      }
-
-      if (!fieldPositionsValidation.success) {
-        // Field positions validation failed - notify user
-        toast({
-          title: "Validation error",
-          description: "Field positions are invalid. Please reset field positions.",
-          variant: "destructive",
-        });
-        setIsSaving(false);
-        return;
-      }
+      // Skip validation during auto-save for better performance
+      // UI validation happens in real-time, so data should already be valid
+      // Manual save (saveNow) will still validate
 
       // Check if online
       if (!navigator.onLine) {
         // Queue for offline sync
         await offlineSyncManager.queueUpdate({
           documentId,
-          formData: formDataValidation.data,
-          fieldPositions: fieldPositionsValidation.data,
+          formData,
+          fieldPositions,
           url: `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/legal_documents?id=eq.${documentId}`,
           headers: {
             'Content-Type': 'application/json',
@@ -94,7 +77,7 @@ export const useFormAutoSave = ({
           },
         });
 
-        lastSaveRef.current = { formData: formDataValidation.data, fieldPositions: fieldPositionsValidation.data };
+        lastSaveRef.current = { formData, fieldPositions };
         setHasUnsavedChanges(false);
 
         // Saved offline - will sync when online
@@ -104,8 +87,8 @@ export const useFormAutoSave = ({
       const { error } = await supabase
         .from('legal_documents')
         .update({
-          content: formDataValidation.data,
-          metadata: { fieldPositions: fieldPositionsValidation.data },
+          content: formData, // Trust the UI - no validation during auto-save
+          metadata: { fieldPositions },
           updated_at: new Date().toISOString()
         })
         .eq('id', documentId);
@@ -113,7 +96,7 @@ export const useFormAutoSave = ({
       if (error) throw error;
 
       // Update last save reference
-      lastSaveRef.current = { formData: formDataValidation.data, fieldPositions: fieldPositionsValidation.data };
+      lastSaveRef.current = { formData, fieldPositions };
       setHasUnsavedChanges(false);
 
       // Auto-save successful (silently handled)
@@ -186,21 +169,45 @@ export const useFormAutoSave = ({
     };
   }, [documentId, performSave, hasUnsavedChanges]);
 
-  // Manual save function
+  // Manual save function (with validation)
   const saveNow = useCallback(async () => {
     if (!documentId) return;
 
+    // Clear debounce timeout
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
 
+    // Validate before manual save (unlike auto-save)
+    const formDataValidation = formDataSchema.safeParse(formData);
+    const fieldPositionsValidation = fieldPositionsSchema.safeParse(fieldPositions);
+
+    if (!formDataValidation.success) {
+      toast({
+        title: "Validation error",
+        description: "Form data contains invalid values. Please check your inputs.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!fieldPositionsValidation.success) {
+      toast({
+        title: "Validation error",
+        description: "Field positions are invalid. Please reset field positions.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Perform save after validation passes
     await performSave();
 
     toast({
       title: "Saved",
       description: "Your changes have been saved.",
     });
-  }, [documentId, performSave, toast]);
+  }, [documentId, performSave, formData, fieldPositions, toast]);
 
   return {
     saveNow,

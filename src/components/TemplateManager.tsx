@@ -84,9 +84,14 @@ export const TemplateManager = ({
   };
 
   const handleDelete = (formId: string) => {
-    deleteTemplate(formId);
-    setTemplates(getStoredTemplates());
-    toast.success('Template deleted');
+    const template = templates.find(t => t.formId === formId);
+    if (!template) return;
+
+    if (window.confirm(`Delete template "${template.formName}"?\n\nThis action cannot be undone.`)) {
+      deleteTemplate(formId);
+      setTemplates(getStoredTemplates());
+      toast.success('Template deleted');
+    }
   };
 
   const content = (
