@@ -121,7 +121,7 @@ const Index = () => {
         .maybeSingle();
       
       if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching vault data:', error);
+        // Error occurred fetching vault data (silently handled)
         return null;
       }
       return data;

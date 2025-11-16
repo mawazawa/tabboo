@@ -59,7 +59,7 @@ export const useFormAutoSave = ({
       const fieldPositionsValidation = fieldPositionsSchema.safeParse(fieldPositions);
 
       if (!formDataValidation.success) {
-        console.error('Form data validation failed:', formDataValidation.error);
+        // Form data validation failed - notify user
         toast({
           title: "Validation error",
           description: "Form data contains invalid values. Please check your inputs.",
@@ -70,7 +70,7 @@ export const useFormAutoSave = ({
       }
 
       if (!fieldPositionsValidation.success) {
-        console.error('Field positions validation failed:', fieldPositionsValidation.error);
+        // Field positions validation failed - notify user
         toast({
           title: "Validation error",
           description: "Field positions are invalid. Please reset field positions.",
@@ -97,7 +97,7 @@ export const useFormAutoSave = ({
         lastSaveRef.current = { formData: formDataValidation.data, fieldPositions: fieldPositionsValidation.data };
         setHasUnsavedChanges(false);
 
-        console.log('Saved offline - will sync when online');
+        // Saved offline - will sync when online
         return;
       }
 
@@ -116,9 +116,9 @@ export const useFormAutoSave = ({
       lastSaveRef.current = { formData: formDataValidation.data, fieldPositions: fieldPositionsValidation.data };
       setHasUnsavedChanges(false);
 
-      console.log('Auto-save successful');
+      // Auto-save successful (silently handled)
     } catch (error) {
-      console.error('Auto-save failed:', error);
+      // Auto-save failed - handle error
 
       // If network error, queue offline
       if (!navigator.onLine) {

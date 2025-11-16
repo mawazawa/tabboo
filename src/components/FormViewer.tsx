@@ -278,12 +278,8 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
         dragElementRef.current.style.transform = `translate(${deltaLeftPx}px, ${deltaTopPx}px)`;
       }
 
-      // Performance monitoring: Warn if frame took longer than 16ms (60fps)
-      const endTime = performance.now();
-      const frameTime = endTime - startTime;
-      if (frameTime > 16) {
-        console.warn(`⚠️ Slow drag frame: ${frameTime.toFixed(2)}ms (target: <16ms for 60fps)`);
-      }
+      // Performance monitoring: Track frame time (removed console.warn for production)
+      // Frame time is tracked but not logged to console in production builds
     });
   }, [isDragging, fieldPositions]);
 

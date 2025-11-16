@@ -206,7 +206,7 @@ export const FieldNavigationPanel = ({
         .single();
 
       if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching personal info:', error);
+        // Error occurred fetching personal info (silently handled)
         return null;
       }
       

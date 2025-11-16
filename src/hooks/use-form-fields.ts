@@ -47,7 +47,7 @@ export function useFormFields(formNumber: string) {
         .single();
 
       if (formError) {
-        console.error('Error fetching form:', formError);
+        // Error fetching form - propagate error to React Query
         throw formError;
       }
 
@@ -89,12 +89,12 @@ export function useFormFields(formNumber: string) {
         .limit(1000); // Fetch all fields (forms typically have < 100 fields)
 
       if (mappingsError) {
-        console.error('Error fetching field mappings:', mappingsError);
+        // Error fetching field mappings - propagate error to React Query
         throw mappingsError;
       }
 
       if (!fieldMappings || fieldMappings.length === 0) {
-        console.warn(`No field mappings found for form ${formNumber}`);
+        // No field mappings found for form - return empty array
         return [];
       }
 
@@ -129,9 +129,8 @@ export function convertToFieldOverlays(
   mappings.forEach((mapping) => {
     const { canonical_field } = mapping;
 
-    // Skip fields without position data
+    // Skip fields without position data (silently handled)
     if (mapping.position_top === null || mapping.position_left === null) {
-      console.warn(`Field ${mapping.form_field_name} missing position data`);
       return;
     }
 

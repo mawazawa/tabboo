@@ -134,11 +134,11 @@ export const useGroqStream = () => {
     } catch (error) {
       // Don't report AbortError as an actual error
       if (error instanceof Error && error.name === 'AbortError') {
-        console.log('Stream cancelled by user');
+        // Stream cancelled by user (silently handled)
         return;
       }
 
-      console.error('Stream error:', error);
+      // Stream error occurred - pass to error handler
       onError(error instanceof Error ? error.message : 'Unknown error occurred');
     } finally {
       // Clean up controller reference

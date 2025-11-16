@@ -149,12 +149,12 @@ export const AIAssistant = ({ formContext, vaultData }: AIAssistantProps) => {
         });
       },
       onDone: () => {
-        console.log('Stream complete');
+        // Stream completed successfully
       },
       onError: (error) => {
-        console.error('Stream error details:', error);
+        // Stream error occurred - show user toast
         toast.error(error, {
-          description: "Please check the console for details",
+          description: "The AI service encountered an error. Please try again.",
           duration: 5000
         });
         setMessages(prev => prev.slice(0, -1));

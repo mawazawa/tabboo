@@ -50,7 +50,7 @@ export const useOfflineSync = () => {
           if (error) throw error;
           return true;
         } catch (error) {
-          console.error('Sync error:', error);
+          // Sync error occurred - return false to retry
           return false;
         }
       });
@@ -64,7 +64,7 @@ export const useOfflineSync = () => {
         });
       }
     } catch (error) {
-      console.error('Sync failed:', error);
+      // Sync failed - notify user
       toast({
         title: "Sync failed",
         description: "Could not sync offline changes. Will retry automatically.",
