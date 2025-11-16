@@ -578,6 +578,32 @@ export const FieldNavigationPanel = ({
             </div>
           </div>
 
+          {/* Form Completion Progress */}
+          {(() => {
+            const filledFields = FIELD_CONFIG.filter(field => {
+              const value = formData[field.field];
+              if (field.type === 'checkbox') return value === true;
+              return typeof value === 'string' && value.trim() !== '';
+            }).length;
+            const totalFields = FIELD_CONFIG.length;
+            const percentage = Math.round((filledFields / totalFields) * 100);
+
+            return (
+              <div className="space-y-1.5 px-3 pb-3 border-b">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground font-medium">Form Progress</span>
+                  <span className="text-primary font-semibold">{filledFields}/{totalFields} ({percentage}%)</span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-500 ease-out"
+                    style={{ width: `${percentage}%` }}
+                  />
+                </div>
+              </div>
+            );
+          })()}
+
           <Sheet open={settingsSheetOpen} onOpenChange={onSettingsSheetChange}>
             <SheetContent side="right" className="w-[min(540px,calc(100vw-2rem))] max-w-[calc(100vw-2rem)]">
               <SheetHeader>

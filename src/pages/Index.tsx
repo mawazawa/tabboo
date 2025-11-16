@@ -457,6 +457,89 @@ const Index = () => {
     loadData();
   }, [user, queryClient]);
 
+  // Smart defaults: Auto-zoom to fit and pre-select first empty field on load
+  useEffect(() => {
+    // Run after a short delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      // Auto-zoom to fit (calculates optimal zoom based on container width)
+      const targetWidth = 850; // Desired PDF width in pixels
+      const container = document.querySelector('.pdf-container');
+      if (container) {
+        const containerWidth = container.clientWidth;
+        const optimalZoom = Math.min(Math.max(containerWidth / targetWidth, 0.5), 2.0);
+        setPdfZoom(optimalZoom);
+      }
+
+      // Pre-select first empty field (if formData is loaded)
+      const fieldOrder = ['partyName', 'streetAddress', 'city', 'state', 'zipCode', 'telephoneNo', 'email'];
+      for (const fieldName of fieldOrder) {
+        const value = formData[fieldName as keyof typeof formData];
+        if (!value || (typeof value === 'string' && value.trim() === '')) {
+          // Find the index of this field
+          const fieldIndex = fieldOrder.indexOf(fieldName);
+          if (fieldIndex >= 0) {
+            setCurrentFieldIndex(fieldIndex);
+            setHighlightedField(fieldName);
+            break;
+          }
+        }
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []); // Run only once on mount
+
+  // Zoom keyboard shortcuts (Cmd/Ctrl +/-/0)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+      const modKey = isMac ? e.metaKey : e.ctrlKey;
+
+      // Ignore shortcuts when typing in inputs
+      const target = e.target as HTMLElement;
+      if (['INPUT', 'TEXTAREA'].includes(target.tagName)) return;
+
+      // Cmd/Ctrl + Plus/Equals: Zoom in
+      if (modKey && (e.key === '+' || e.key === '=')) {
+        e.preventDefault();
+        setPdfZoom(prev => {
+          const newZoom = Math.min(prev + 0.1, 2.0);
+          toast({
+            title: "Zoomed In",
+            description: `${Math.round(newZoom * 100)}%`,
+          });
+          return newZoom;
+        });
+      }
+
+      // Cmd/Ctrl + Minus: Zoom out
+      if (modKey && e.key === '-') {
+        e.preventDefault();
+        setPdfZoom(prev => {
+          const newZoom = Math.max(prev - 0.1, 0.5);
+          toast({
+            title: "Zoomed Out",
+            description: `${Math.round(newZoom * 100)}%`,
+          });
+          return newZoom;
+        });
+      }
+
+      // Cmd/Ctrl + 0: Reset zoom to 100%
+      if (modKey && e.key === '0') {
+        e.preventDefault();
+        setPdfZoom(1.0);
+        toast({
+          title: "Zoom Reset",
+          description: "100%",
+        });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [toast]);
+
   // Autosave every 5 seconds
   useEffect(() => {
     if (!user) return;
