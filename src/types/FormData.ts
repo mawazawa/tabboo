@@ -13,7 +13,7 @@ export interface FormData {
   stateBarNumber?: string;
 
   /** Name of attorney or self-represented party */
-  attorneyOrPartyName?: string;
+  partyName?: string;
 
   /** Law firm name */
   firmName?: string;
@@ -37,7 +37,7 @@ export interface FormData {
   faxNo?: string;
 
   /** Email address */
-  emailAddress?: string;
+  email?: string;
 
   /** Name of person attorney represents */
   attorneyFor?: string;
@@ -204,7 +204,10 @@ export interface FormData {
   signatureDate?: string;
 
   /** Typed or printed name for signature */
-  typeOrPrintName?: string;
+  printName?: string;
+
+  /** Name used as the visible signature on the form */
+  signatureName?: string;
 
   /** Electronic or handwritten signature */
   signature?: string;
@@ -300,7 +303,7 @@ export interface User {
  */
 export interface PersonalVaultData {
   user_id: string;
-  attorney_name?: string;       // Maps to attorneyOrPartyName
+  attorney_name?: string;       // Maps to partyName
   bar_number?: string;           // Maps to stateBarNumber
   firm_name?: string;            // Maps to firmName
   street_address?: string;       // Maps to streetAddress
@@ -309,7 +312,7 @@ export interface PersonalVaultData {
   zip_code?: string;             // Maps to zipCode
   telephone_no?: string;         // Maps to telephoneNo
   fax_no?: string;               // Maps to faxNo
-  email_address?: string;        // Maps to emailAddress
+  email_address?: string;        // Maps to email
   full_name?: string;            // Alternative to attorney_name for self-represented
   created_at?: string;
   updated_at?: string;

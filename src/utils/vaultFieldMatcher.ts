@@ -3,19 +3,11 @@
  * Intelligent matching between form fields and personal data vault entries
  */
 
-export interface PersonalVaultData {
-  full_name?: string;
-  street_address?: string;
-  city?: string;
-  state?: string;
-  zip_code?: string;
-  telephone_no?: string;
-  fax_no?: string;
-  email_address?: string;
-  attorney_name?: string;
-  firm_name?: string;
-  bar_number?: string;
-}
+import type { PersonalVaultData as FormPersonalVaultData } from "@/types/FormData";
+
+// Re-export PersonalVaultData so existing imports from this module continue to work,
+// while ensuring there is a single canonical definition in src/types/FormData.ts
+export type PersonalVaultData = FormPersonalVaultData;
 
 export interface FieldMapping {
   formField: string;

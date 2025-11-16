@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useRef, memo, useCallback, useEffect, useMemo } from "react";
 import { Document, Page } from 'react-pdf';
 import { Settings, Move, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Sparkles, Loader2, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Keyboard, AlertCircle, AlertTriangle } from "@/icons";
-import { canAutofill, getVaultValueForField, type PersonalVaultData } from "@/utils/vaultFieldMatcher";
+import { canAutofill, getVaultValueForField } from "@/utils/vaultFieldMatcher";
 import { TutorialTooltips } from "@/components/TutorialTooltips";
 import { useFormFields, convertToFieldOverlays, generateFieldNameToIndex } from "@/hooks/use-form-fields";
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
