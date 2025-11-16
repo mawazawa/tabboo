@@ -275,7 +275,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
       });
     };
 
-    const onPointerUp = () => {
+    const cleanupDrag = () => {
       if (rafRef.current !== null) {
         cancelAnimationFrame(rafRef.current);
         rafRef.current = null;
@@ -283,26 +283,32 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
 
       if (dragElementRef.current) {
         dragElementRef.current.style.transform = '';
+        dragElementRef.current = null;
       }
 
       if (draggedPositionRef.current) {
         updateFieldPosition(field, draggedPositionRef.current);
+        draggedPositionRef.current = null;
       }
 
       setIsDragging(null);
-      dragElementRef.current = null;
-      draggedPositionRef.current = null;
       setAlignmentGuides({ x: [], y: [] });
       lastGuidesRef.current = { x: [], y: [] };
 
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
       window.removeEventListener('pointercancel', onPointerUp);
+      window.removeEventListener('pointerleave', onPointerUp);
+    };
+
+    const onPointerUp = () => {
+      cleanupDrag();
     };
 
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp, { once: true });
     window.addEventListener('pointercancel', onPointerUp, { once: true });
+    window.addEventListener('pointerleave', onPointerUp, { once: true });
   };
 
   const toggleGlobalEditMode = () => {
@@ -374,15 +380,53 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     }
   };
 
-  // RAF cleanup on unmount to prevent memory leaks
+  // Cleanup drag state on unmount or when edit mode is disabled
   useEffect(() => {
     return () => {
+      // Cleanup RAF
       if (rafRef.current !== null) {
         cancelAnimationFrame(rafRef.current);
         rafRef.current = null;
       }
+      
+      // Cleanup drag state if component unmounts during drag
+      if (dragElementRef.current) {
+        dragElementRef.current.style.transform = '';
+        dragElementRef.current = null;
+      }
+      
+      draggedPositionRef.current = null;
+      setIsDragging(null);
+      setAlignmentGuides({ x: [], y: [] });
+      lastGuidesRef.current = { x: [], y: [] };
     };
   }, []);
+
+  // Cleanup drag state when edit mode is toggled off during drag
+  useEffect(() => {
+    if (!isGlobalEditMode && isDragging) {
+      // Edit mode was disabled while dragging - force cleanup
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+      
+      if (dragElementRef.current) {
+        dragElementRef.current.style.transform = '';
+        dragElementRef.current = null;
+      }
+      
+      if (draggedPositionRef.current) {
+        const field = isDragging;
+        updateFieldPosition(field, draggedPositionRef.current);
+        draggedPositionRef.current = null;
+      }
+      
+      setIsDragging(null);
+      setAlignmentGuides({ x: [], y: [] });
+      lastGuidesRef.current = { x: [], y: [] };
+    }
+  }, [isGlobalEditMode, isDragging, updateFieldPosition]);
 
   // Keyboard shortcuts for field positioning
   useEffect(() => {
