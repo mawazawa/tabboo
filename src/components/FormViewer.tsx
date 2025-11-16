@@ -47,7 +47,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   const [loadProgress, setLoadProgress] = useState(0);
 
   // Use refs for drag state to avoid re-render storms
-  const dragStartPos = useRef<{ x: number; y: number; top: number; left: number }>({ x: 0, y: 0, top: 0, left: 0 });
+  const dragStartPos = useRef<{ x: number; y: number; top: number; left: number; parentRect: DOMRect | null }>({ x: 0, y: 0, top: 0, left: 0, parentRect: null });
   const dragElementRef = useRef<HTMLElement | null>(null);
   const draggedPositionRef = useRef<{ top: number; left: number } | null>(null);
   const rafRef = useRef<number | null>(null);
@@ -174,26 +174,116 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
 
   const handlePointerDown = (e: React.PointerEvent, field: string, currentTop: number, currentLeft: number) => {
     // Only allow dragging in global edit mode
-    if (!isGlobalEditMode) return;
-    
+    if (!isGlobalEditMode) {
+      return;
+    }
+
     e.preventDefault();
     e.stopPropagation();
-    
-    const container = (e.currentTarget as HTMLElement).closest('.field-container') as HTMLElement;
-    if (!container) return;
-    
-    container.setPointerCapture(e.pointerId);
+
+    const container = e.currentTarget as HTMLElement;
+    const parent = container.parentElement;
+    if (!parent) return;
+
     dragElementRef.current = container;
     setIsDragging(field);
-    
+
+    const parentRect = parent.getBoundingClientRect();
+
     dragStartPos.current = {
       x: e.clientX,
       y: e.clientY,
       top: currentTop,
-      left: currentLeft
+      left: currentLeft,
+      parentRect
     };
-    
+
     draggedPositionRef.current = { top: currentTop, left: currentLeft };
+
+    // Define handlers HERE with current scope - avoids stale closure
+    const onPointerMove = (moveEvent: PointerEvent) => {
+      moveEvent.preventDefault();
+
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+      }
+
+      rafRef.current = requestAnimationFrame(() => {
+        // Calculate mouse movement delta (no zoom division needed - PDF scales via width)
+        const deltaX = moveEvent.clientX - dragStartPos.current.x;
+        const deltaY = moveEvent.clientY - dragStartPos.current.y;
+
+        let newLeft = dragStartPos.current.left + (deltaX / parentRect.width) * 100;
+        let newTop = dragStartPos.current.top + (deltaY / parentRect.height) * 100;
+
+        newLeft = Math.max(0, Math.min(95, newLeft));
+        newTop = Math.max(0, Math.min(95, newTop));
+
+        // Smart snapping
+        const snapThreshold = 1.5;
+        const guides: { x: number[]; y: number[] } = { x: [], y: [] };
+
+        Object.entries(fieldPositions).forEach(([f, pos]) => {
+          if (f === field) return;
+          if (Math.abs(newLeft - pos.left) < snapThreshold) {
+            newLeft = pos.left;
+            guides.x.push(pos.left);
+          }
+          if (Math.abs(newTop - pos.top) < snapThreshold) {
+            newTop = pos.top;
+            guides.y.push(pos.top);
+          }
+        });
+
+        const guidesChanged =
+          guides.x.length !== lastGuidesRef.current.x.length ||
+          guides.y.length !== lastGuidesRef.current.y.length ||
+          !guides.x.every((val, idx) => val === lastGuidesRef.current.x[idx]) ||
+          !guides.y.every((val, idx) => val === lastGuidesRef.current.y[idx]);
+
+        if (guidesChanged) {
+          lastGuidesRef.current = guides;
+          setAlignmentGuides(guides);
+        }
+
+        draggedPositionRef.current = { top: newTop, left: newLeft };
+
+        if (dragElementRef.current) {
+          const deltaLeftPx = (newLeft - dragStartPos.current.left) * parentRect.width / 100;
+          const deltaTopPx = (newTop - dragStartPos.current.top) * parentRect.height / 100;
+          dragElementRef.current.style.transform = `translate(${deltaLeftPx}px, ${deltaTopPx}px)`;
+        }
+      });
+    };
+
+    const onPointerUp = () => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+
+      if (dragElementRef.current) {
+        dragElementRef.current.style.transform = '';
+      }
+
+      if (draggedPositionRef.current) {
+        updateFieldPosition(field, draggedPositionRef.current);
+      }
+
+      setIsDragging(null);
+      dragElementRef.current = null;
+      draggedPositionRef.current = null;
+      setAlignmentGuides({ x: [], y: [] });
+      lastGuidesRef.current = { x: [], y: [] };
+
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
+    };
+
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp, { once: true });
+    window.addEventListener('pointercancel', onPointerUp, { once: true });
   };
 
   const toggleGlobalEditMode = () => {
@@ -203,113 +293,13 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   const handleFieldClick = (field: string, e: React.MouseEvent) => {
     // Prevent event propagation to avoid triggering PDF click
     e.stopPropagation();
-    
+
     // Set this field as active in the control panel
     const fieldIndex = fieldNameToIndex[field];
     if (fieldIndex !== undefined) {
       setCurrentFieldIndex(fieldIndex);
     }
   };
-
-  const handlePointerMove = useCallback((e: React.PointerEvent) => {
-    if (!isDragging || !dragElementRef.current) return;
-
-    e.preventDefault();
-
-    // Cancel any pending animation frame
-    if (rafRef.current !== null) {
-      cancelAnimationFrame(rafRef.current);
-    }
-
-    // Use requestAnimationFrame + CSS transform (no React state updates during drag!)
-    // Performance: This limits updates to 60fps max for buttery smooth dragging
-    rafRef.current = requestAnimationFrame(() => {
-      const startTime = performance.now();
-
-      const deltaX = e.clientX - dragStartPos.current.x;
-      const deltaY = e.clientY - dragStartPos.current.y;
-      const parentRect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-
-      let newLeft = dragStartPos.current.left + (deltaX / parentRect.width) * 100;
-      let newTop = dragStartPos.current.top + (deltaY / parentRect.height) * 100;
-
-      // Constrain within bounds
-      newLeft = Math.max(0, Math.min(95, newLeft));
-      newTop = Math.max(0, Math.min(95, newTop));
-
-      // Smart snapping to other fields
-      const snapThreshold = 1.5;
-      const guides: { x: number[]; y: number[] } = { x: [], y: [] };
-
-      Object.entries(fieldPositions).forEach(([field, pos]) => {
-        if (field === isDragging) return;
-
-        if (Math.abs(newLeft - pos.left) < snapThreshold) {
-          newLeft = pos.left;
-          guides.x.push(pos.left);
-        }
-
-        if (Math.abs(newTop - pos.top) < snapThreshold) {
-          newTop = pos.top;
-          guides.y.push(pos.top);
-        }
-      });
-
-      // Performance: Only update alignment guides state if they changed
-      // This avoids unnecessary re-renders during drag
-      const guidesChanged =
-        guides.x.length !== lastGuidesRef.current.x.length ||
-        guides.y.length !== lastGuidesRef.current.y.length ||
-        !guides.x.every((val, idx) => val === lastGuidesRef.current.x[idx]) ||
-        !guides.y.every((val, idx) => val === lastGuidesRef.current.y[idx]);
-
-      if (guidesChanged) {
-        lastGuidesRef.current = guides;
-        setAlignmentGuides(guides);
-      }
-
-      // Store position in ref (not state!)
-      draggedPositionRef.current = { top: newTop, left: newLeft };
-
-      // Apply via CSS transform for smooth 60fps movement (bypasses React)
-      if (dragElementRef.current) {
-        const deltaLeftPx = (newLeft - dragStartPos.current.left) * parentRect.width / 100;
-        const deltaTopPx = (newTop - dragStartPos.current.top) * parentRect.height / 100;
-        dragElementRef.current.style.transform = `translate(${deltaLeftPx}px, ${deltaTopPx}px)`;
-      }
-
-      // Performance monitoring: Track frame time (removed console.warn for production)
-      // Frame time is tracked but not logged to console in production builds
-    });
-  }, [isDragging, fieldPositions]);
-
-  const handlePointerUp = useCallback((e: React.PointerEvent) => {
-    if (!isDragging) return;
-    
-    if (rafRef.current !== null) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    }
-    
-    // Release pointer capture
-    if (dragElementRef.current) {
-      dragElementRef.current.releasePointerCapture(e.pointerId);
-      // Reset transform
-      dragElementRef.current.style.transform = '';
-    }
-    
-    // COMMIT: Now update React state with final position
-    if (draggedPositionRef.current && isDragging) {
-      updateFieldPosition(isDragging, draggedPositionRef.current);
-    }
-    
-    // Clean up
-    setIsDragging(null);
-    dragElementRef.current = null;
-    draggedPositionRef.current = null;
-    setAlignmentGuides({ x: [], y: [] });
-    lastGuidesRef.current = { x: [], y: [] };
-  }, [isDragging, updateFieldPosition]);
 
   const handlePDFClick = (e: React.MouseEvent) => {
     // Clicking PDF background does nothing in edit mode
@@ -380,7 +370,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ignore if user is typing in an input field
       const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+        return;
+      }
 
       // Toggle edit mode with 'E' key
       if (e.key === 'e' && !e.metaKey && !e.ctrlKey && !e.shiftKey) {
@@ -573,12 +565,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                 const pageOverlays = fieldOverlays.find(o => o.page === pageNum);
 
                 return (
-                  <div 
+                  <div
                     key={`page_${pageNum}`}
-                    className="relative mb-4 touch-none w-full"
-                    onPointerMove={handlePointerMove}
-                    onPointerUp={handlePointerUp}
-                    onPointerLeave={handlePointerUp}
+                    className="relative mb-4 w-full"
                     onClick={handlePDFClick}
                   >
                     <Page
@@ -642,14 +631,14 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                           return (
                             <div
                             key={idx}
-                            className={`field-container group absolute select-none touch-none ${
-                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary shadow-lg scale-105' : 
-                              isGlobalEditMode ? 'cursor-move ring-2 ring-primary/70' : 'cursor-pointer'
+                            className={`field-container group absolute select-none ${
+                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary shadow-lg scale-105' :
+                              isGlobalEditMode ? 'cursor-grab ring-2 ring-primary/70' : 'cursor-pointer'
                             } ${
                               highlightedField === overlay.field
                                 ? 'ring-2 ring-accent shadow-lg animate-pulse' :
-                              isCurrentField 
-                                ? 'ring-2 ring-primary shadow-md bg-primary/5' 
+                              isCurrentField
+                                ? 'ring-2 ring-primary shadow-md bg-primary/5'
                                 : 'ring-1 ring-border/50 hover:ring-primary/50'
                             } rounded-lg bg-background/80 backdrop-blur-sm p-2 transition-all duration-200`}
                             style={{
@@ -660,9 +649,11 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                               pointerEvents: 'auto',
                               // Expand clickable area with negative margin
                               margin: '-8px',
-                              // Scale with zoom
-                              transform: `scale(${zoom})`,
-                              transformOrigin: 'top left',
+                              // REMOVED: Scale transform - PDF already scales via width
+                              // transform: `scale(${zoom})`,
+                              // transformOrigin: 'top left',
+                              // CRITICAL: Disable touch scrolling to enable dragging
+                              touchAction: 'none',
                             }}
                             onClick={(e) => handleFieldClick(overlay.field, e)}
                             onPointerDown={(e) => handlePointerDown(e, overlay.field, position.top, position.left)}

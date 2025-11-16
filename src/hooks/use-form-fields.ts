@@ -56,6 +56,7 @@ export function useFormFields(formNumber: string) {
       }
 
       // Fetch all field mappings for this form with canonical field data
+      // Use explicit foreign key name to disambiguate (field_id, not depends_on_field_id)
       const { data: fieldMappings, error: mappingsError } = await supabase
         .from('form_field_mappings')
         .select(`
@@ -75,7 +76,7 @@ export function useFormFields(formNumber: string) {
           is_required,
           is_readonly,
           default_value,
-          canonical_fields!inner(
+          canonical_fields!form_field_mappings_field_id_fkey(
             field_key,
             field_label,
             field_type,

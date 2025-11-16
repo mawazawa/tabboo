@@ -36,6 +36,13 @@ self.addEventListener('activate', (event) => {
 // Fetch event - cache strategy
 self.addEventListener('fetch', (event) => {
   const { request } = event;
+
+  // Only handle GET requests in the service worker cache logic.
+  // Non-GET requests (POST, PATCH, DELETE, etc.) bypass the cache and go directly to the network.
+  if (request.method !== 'GET') {
+    return;
+  }
+
   const url = new URL(request.url);
 
   // Cache PDFs with Cache First strategy
