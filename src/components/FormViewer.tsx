@@ -47,8 +47,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   const [loadProgress, setLoadProgress] = useState(0);
 
   // Use refs for drag state to avoid re-render storms
-  const dragStartPos = useRef<{ x: number; y: number; top: number; left: number; parentRect: DOMRect | null }>({ x: 0, y: 0, top: 0, left: 0, parentRect: null });
+  const dragStartPos = useRef<{ x: number; y: number; top: number; left: number }>({ x: 0, y: 0, top: 0, left: 0 });
   const dragElementRef = useRef<HTMLElement | null>(null);
+  const dragParentRef = useRef<HTMLElement | null>(null); // Store parent element, not rect
   const draggedPositionRef = useRef<{ top: number; left: number } | null>(null);
   const rafRef = useRef<number | null>(null);
   const lastGuidesRef = useRef<{ x: number[]; y: number[] }>({ x: [], y: [] });
@@ -186,16 +187,15 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     if (!parent) return;
 
     dragElementRef.current = container;
+    dragParentRef.current = parent; // Store parent element for fresh getBoundingClientRect
     setIsDragging(field);
 
-    const parentRect = parent.getBoundingClientRect();
-
+    // Capture initial positions (rect will be recalculated on each move)
     dragStartPos.current = {
       x: e.clientX,
       y: e.clientY,
       top: currentTop,
       left: currentLeft,
-      parentRect
     };
 
     draggedPositionRef.current = { top: currentTop, left: currentLeft };
@@ -209,6 +209,11 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
       }
 
       rafRef.current = requestAnimationFrame(() => {
+        // CRITICAL: Recalculate parent rect on each move to avoid stale values
+        // This handles parent resizing, scrolling, or transform changes
+        if (!dragParentRef.current) return;
+        const parentRect = dragParentRef.current.getBoundingClientRect();
+        
         // Calculate mouse movement delta (no zoom division needed - PDF scales via width)
         const deltaX = moveEvent.clientX - dragStartPos.current.x;
         const deltaY = moveEvent.clientY - dragStartPos.current.y;
@@ -267,10 +272,13 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
 
         draggedPositionRef.current = { top: newTop, left: newLeft };
 
-        if (dragElementRef.current) {
+        if (dragElementRef.current && dragParentRef.current) {
+          const parentRect = dragParentRef.current.getBoundingClientRect();
           const deltaLeftPx = (newLeft - dragStartPos.current.left) * parentRect.width / 100;
           const deltaTopPx = (newTop - dragStartPos.current.top) * parentRect.height / 100;
           dragElementRef.current.style.transform = `translate(${deltaLeftPx}px, ${deltaTopPx}px)`;
+          // GPU acceleration hint for smooth movement
+          dragElementRef.current.style.willChange = 'transform';
         }
       });
     };
@@ -392,9 +400,11 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
       // Cleanup drag state if component unmounts during drag
       if (dragElementRef.current) {
         dragElementRef.current.style.transform = '';
+        dragElementRef.current.style.willChange = 'auto';
         dragElementRef.current = null;
       }
       
+      dragParentRef.current = null;
       draggedPositionRef.current = null;
       setIsDragging(null);
       setAlignmentGuides({ x: [], y: [] });
@@ -413,8 +423,11 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
       
       if (dragElementRef.current) {
         dragElementRef.current.style.transform = '';
+        dragElementRef.current.style.willChange = 'auto';
         dragElementRef.current = null;
       }
+      
+      dragParentRef.current = null;
       
       if (draggedPositionRef.current) {
         const field = isDragging;
@@ -717,6 +730,8 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                               // transformOrigin: 'top left',
                               // CRITICAL: Disable touch scrolling to enable dragging
                               touchAction: 'none',
+                              // GPU acceleration hint when dragging
+                              willChange: isDragging === overlay.field ? 'transform' : 'auto',
                             }}
                             onClick={(e) => handleFieldClick(overlay.field, e)}
                             onPointerDown={(e) => handlePointerDown(e, overlay.field, position.top, position.left)}
