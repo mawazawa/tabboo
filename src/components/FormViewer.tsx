@@ -291,8 +291,11 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
 
       if (dragElementRef.current) {
         dragElementRef.current.style.transform = '';
+        dragElementRef.current.style.willChange = 'auto'; // Remove GPU hint after drag
         dragElementRef.current = null;
       }
+      
+      dragParentRef.current = null; // Clear parent ref
 
       if (draggedPositionRef.current) {
         updateFieldPosition(field, draggedPositionRef.current);
