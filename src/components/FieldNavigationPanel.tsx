@@ -532,7 +532,7 @@ export const FieldNavigationPanel = ({
     }, [currentFieldIndex, showPositionControl, showSearch, currentFieldName, currentPosition, updateFieldPosition]);
 
   return (
-    <Card className="h-full w-full min-w-0 border-hairline shadow-3point chamfered flex flex-col overflow-hidden">
+    <Card className="h-full w-full border-hairline shadow-3point chamfered flex flex-col overflow-auto">
       {/* Compact Sticky Header */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-sm">
         <div className="p-3 space-y-2">

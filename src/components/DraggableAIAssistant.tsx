@@ -74,6 +74,8 @@ export const DraggableAIAssistant = ({ formContext, vaultData, isVisible, onTogg
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
+        pointerEvents: 'auto',
+        touchAction: isDragging ? 'none' : 'auto',
       }}
       onMouseDown={handleMouseDown}
     >

@@ -649,7 +649,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                     />
                   
                   {pageOverlays && (
-                    <div className="absolute inset-0">
+                    <div className="absolute inset-0 z-10" style={{ pointerEvents: 'none' }}>
                       {/* Alignment Guides */}
                       {isDragging && (
                         <>
@@ -700,10 +700,12 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                           return (
                             <div
                             key={idx}
-                            className={`field-container group absolute select-none ${
+                            className={`field-container group absolute z-20 ${
+                              isGlobalEditMode ? 'select-none' : ''
+                            } ${
                               isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary shadow-lg scale-105' :
                               isGlobalEditMode && isCurrentField ? 'cursor-grab ring-2 ring-primary/70' :
-                              isGlobalEditMode ? 'cursor-default ring-1 ring-border/30' : 'cursor-pointer'
+                              isGlobalEditMode ? 'cursor-default ring-1 ring-border/30' : 'cursor-auto'
                             } ${
                               highlightedField === overlay.field
                                 ? 'ring-2 ring-accent shadow-lg animate-pulse' :
@@ -716,32 +718,23 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                               left: `${position.left}%`,
                               width: overlay.width || 'auto',
                               height: overlay.height || 'auto',
-                              pointerEvents: 'auto',
+                              pointerEvents: isGlobalEditMode ? 'auto' : 'none',
                               // Smaller clickable area
                               margin: '-4px',
                               // REMOVED transform: scale() - it breaks click event coordinates
                               // Instead using: smaller padding (p-1 instead of p-1.5) + text-xs class
-                              // CRITICAL: Disable touch scrolling to enable dragging
-                              touchAction: 'none',
+                              // CRITICAL: Only disable touch scrolling when in edit mode
+                              touchAction: isGlobalEditMode ? 'none' : 'auto',
                               // GPU acceleration hint when dragging (only applies during actual drag transform)
                               willChange: isDragging === overlay.field ? 'transform' : 'auto',
                             }}
-                            onClick={(e) => {
-                              // Always allow clicking for selection
-                              handleFieldClick(overlay.field, e);
-                            }}
                             onPointerDown={(e) => {
-                              // In edit mode: start drag, otherwise just select
+                              // In edit mode: drag the container
+                              // In normal mode: let clicks pass through to the input
                               if (isGlobalEditMode) {
                                 handlePointerDown(e, overlay.field, position.top, position.left);
-                              } else {
-                                // In non-edit mode, ensure field is selected
-                                e.stopPropagation();
-                                const fieldIndex = fieldNameToIndex[overlay.field];
-                                if (fieldIndex !== undefined) {
-                                  setCurrentFieldIndex(fieldIndex);
-                                }
                               }
+                              // Don't handle pointer down in normal mode - let the input handle it
                             }}
                           >
                             {/* Visual Direction Indicators - ONLY show for currently selected field */}
@@ -871,11 +864,19 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 value={formData[overlay.field as keyof FormData] as string || ''}
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
-                                disabled={isGlobalEditMode}
-                                style={{ fontSize: `${fieldFontSize}pt`, height: `${fieldFontSize * 2}px` }}
+                                onFocus={() => {
+                                  const fieldIndex = fieldNameToIndex[overlay.field];
+                                  if (fieldIndex !== undefined) {
+                                    setCurrentFieldIndex(fieldIndex);
+                                  }
+                                }}
+                                style={{
+                                  fontSize: `${fieldFontSize}pt`,
+                                  height: `${fieldFontSize * 2}px`,
+                                  pointerEvents: 'auto',
+                                  cursor: isGlobalEditMode ? 'move' : 'text'
+                                }}
                                 className={`field-input font-mono ${
-                                  isGlobalEditMode
-                                    ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   validationErrors?.[overlay.field]?.length
                                     ? 'bg-destructive/10 border-destructive'
                                     : isCurrentField
@@ -889,11 +890,19 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 value={formData[overlay.field as keyof FormData] as string || ''}
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
-                                disabled={isGlobalEditMode}
-                                style={{ fontSize: `${fieldFontSize}pt`, minHeight: `${fieldFontSize * 4}px` }}
+                                onFocus={() => {
+                                  const fieldIndex = fieldNameToIndex[overlay.field];
+                                  if (fieldIndex !== undefined) {
+                                    setCurrentFieldIndex(fieldIndex);
+                                  }
+                                }}
+                                style={{
+                                  fontSize: `${fieldFontSize}pt`,
+                                  minHeight: `${fieldFontSize * 4}px`,
+                                  pointerEvents: 'auto',
+                                  cursor: isGlobalEditMode ? 'move' : 'text'
+                                }}
                                 className={`field-input font-mono resize-none ${
-                                  isGlobalEditMode
-                                    ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   validationErrors?.[overlay.field]?.length
                                     ? 'bg-destructive/10 border-destructive'
                                     : isCurrentField
@@ -905,13 +914,22 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             {overlay.type === 'checkbox' && (
                               <Checkbox
                                 checked={!!formData[overlay.field as keyof FormData]}
-                                onCheckedChange={(checked) => !isGlobalEditMode && updateField(overlay.field, checked as boolean)}
-                                disabled={isGlobalEditMode}
+                                onCheckedChange={(checked) => {
+                                  if (!isGlobalEditMode) {
+                                    updateField(overlay.field, checked as boolean);
+                                    const fieldIndex = fieldNameToIndex[overlay.field];
+                                    if (fieldIndex !== undefined) {
+                                      setCurrentFieldIndex(fieldIndex);
+                                    }
+                                  }
+                                }}
+                                style={{
+                                  pointerEvents: 'auto',
+                                  cursor: isGlobalEditMode ? 'move' : 'pointer'
+                                }}
                                 className={`border-2 ${
-                                  isGlobalEditMode
-                                    ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
-                                  isCurrentField 
-                                    ? 'bg-primary/5 border-primary' 
+                                  isCurrentField
+                                    ? 'bg-primary/5 border-primary'
                                     : 'bg-background border-border'
                                 }`}
                               />
