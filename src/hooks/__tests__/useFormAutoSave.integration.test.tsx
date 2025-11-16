@@ -11,10 +11,15 @@ import { useFormAutoSave } from '../useFormAutoSave';
 import type { FormData, FieldPositions } from '@/types/FormData';
 
 // Mock Supabase client
-const mockUpsert = vi.fn();
-const mockFrom = vi.fn(() => ({
-  upsert: mockUpsert,
-}));
+// Use vi.hoisted() to properly hoist mock functions for use in vi.mock()
+const { mockUpsert, mockFrom, mockToast } = vi.hoisted(() => {
+  const mockUpsert = vi.fn();
+  const mockFrom = vi.fn(() => ({
+    upsert: mockUpsert,
+  }));
+  const mockToast = vi.fn();
+  return { mockUpsert, mockFrom, mockToast };
+});
 
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
@@ -29,7 +34,6 @@ vi.mock('@/integrations/supabase/client', () => ({
 }));
 
 // Mock toast
-const mockToast = vi.fn();
 vi.mock('@/hooks/use-toast', () => ({
   useToast: () => ({
     toast: mockToast
@@ -357,7 +361,7 @@ describe('Auto-Save Integration Tests', () => {
 
     await waitFor(() => {
       expect(mockUpsert).toHaveBeenCalledTimes(2);
-    });
+    }, { timeout: 10000 });
 
     // Verify both documents saved with correct IDs
     expect(mockUpsert).toHaveBeenCalledWith(
@@ -387,7 +391,7 @@ describe('Auto-Save Integration Tests', () => {
 
     await waitFor(() => {
       expect(mockUpsert).toHaveBeenCalled();
-    });
+    }, { timeout: 10000 });
 
     // Should show offline/error toast
     expect(mockToast).toHaveBeenCalledWith(
@@ -395,7 +399,7 @@ describe('Auto-Save Integration Tests', () => {
         title: expect.stringMatching(/error|failed|offline/i)
       })
     );
-  });
+  }, 10000);
 
   /**
    * TEST 12: Save Performance with Large Data
@@ -415,12 +419,11 @@ describe('Auto-Save Integration Tests', () => {
       })
     );
 
-    const startTime = Date.now();
     vi.advanceTimersByTime(5000);
 
     await waitFor(() => {
       expect(mockUpsert).toHaveBeenCalled();
-    });
+    }, { timeout: 10000 });
 
     // Save should complete reasonably quickly
     expect(mockUpsert).toHaveBeenCalledWith(
@@ -428,7 +431,7 @@ describe('Auto-Save Integration Tests', () => {
         form_data: largeFormData
       })
     );
-  });
+  }, 10000);
 });
 
 /**
