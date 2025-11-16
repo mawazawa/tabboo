@@ -794,8 +794,8 @@ const Index = () => {
             id="viewer-panel"
             order={1}
             defaultSize={showFieldsPanel || showVaultPanel ? 70 : 100}
-            minSize={showFieldsPanel || showVaultPanel ? 40 : 60}
-            maxSize={showFieldsPanel || showVaultPanel ? undefined : 100}
+            minSize={showFieldsPanel || showVaultPanel ? 30 : 60}
+            maxSize={showFieldsPanel || showVaultPanel ? 80 : 100}
           >
             <ResizablePanelGroup direction="horizontal" className="h-full">
               {/* Resizable Thumbnail Sidebar */}
@@ -807,12 +807,12 @@ const Index = () => {
                 maxSize={40}
                 collapsible={true}
                 collapsedSize={0}
+                collapsed={!showThumbnails}
                 onResize={(size) => {
                   // Convert percentage to pixels (approximate)
                   const containerWidth = window.innerWidth * 0.75; // 75% of viewport
                   setThumbnailPanelWidth((size / 100) * containerWidth);
                 }}
-                className={showThumbnails ? "" : "hidden"}
               >
                 <Suspense fallback={<PanelSkeleton />}>
                   <PDFThumbnailSidebar 
@@ -833,8 +833,9 @@ const Index = () => {
               <ResizablePanel
                 id="pdf-panel"
                 order={2}
-                defaultSize={75}
-                minSize={50}
+                defaultSize={showThumbnails ? 75 : 100}
+                minSize={showThumbnails ? 50 : 60}
+                maxSize={showThumbnails ? undefined : 100}
               >
                 <div ref={pdfPanelRef} className="h-full w-full">
                   <Suspense fallback={<ViewerSkeleton />}>
@@ -864,11 +865,11 @@ const Index = () => {
             id="right-panel"
             order={2}
             defaultSize={30}
-            minSize={showFieldsPanel || showVaultPanel ? 20 : 0}
+            minSize={20}
             maxSize={60}
             collapsible={true}
             collapsedSize={0}
-            className={showFieldsPanel || showVaultPanel ? "" : "hidden"}
+            collapsed={!(showFieldsPanel || showVaultPanel)}
           >
             <div className="h-full w-full pl-3 flex flex-col overflow-hidden">
               <Suspense fallback={<PanelSkeleton />}>

@@ -496,7 +496,7 @@ export const FieldNavigationPanel = ({
                     <Package className="h-3 w-3" strokeWidth={1.5} />
                   </Badge>
                 </PopoverTrigger>
-                <PopoverContent className="w-[500px]" align="end">
+                <PopoverContent className="w-[min(500px,calc(100vw-2rem))] max-w-[calc(100vw-2rem)]" align="end" side="left">
                   <FieldGroupManager
                     selectedFields={selectedFields}
                     fieldPositions={fieldPositions}
@@ -517,7 +517,7 @@ export const FieldNavigationPanel = ({
           </div>
 
           <Sheet open={settingsSheetOpen} onOpenChange={onSettingsSheetChange}>
-            <SheetContent side="right" className="w-[400px] sm:w-[540px]">
+            <SheetContent side="right" className="w-[min(540px,calc(100vw-2rem))] max-w-[calc(100vw-2rem)]">
               <SheetHeader>
                 <SheetTitle>Form Settings</SheetTitle>
                 <SheetDescription>Manage templates and form configurations</SheetDescription>
@@ -648,7 +648,7 @@ export const FieldNavigationPanel = ({
                           <span className="text-xs">Adjust</span>
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-56 p-4" side="left" align="start">
+                      <PopoverContent className="w-[min(224px,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] p-4" side="left" align="start">
                         <h4 className="text-sm font-semibold mb-3">Position Adjustment</h4>
                         <div className="grid grid-cols-2 gap-2 mb-3">
                           <div>
