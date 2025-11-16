@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { offlineSyncManager } from '@/utils/offlineSync';
@@ -25,10 +25,10 @@ export const useFormAutoSave = ({
   debounceMs = 2000,
 }: AutoSaveOptions) => {
   const { toast } = useToast();
-  const hasUnsavedChanges = useRef(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
   const lastSaveRef = useRef<{ formData: FormData; fieldPositions: FieldPositions }>();
-  const isSavingRef = useRef(false);
 
   // Mark as having unsaved changes whenever data changes
   useEffect(() => {
@@ -38,17 +38,20 @@ export const useFormAutoSave = ({
         JSON.stringify(fieldPositions) !== JSON.stringify(lastSaveRef.current.fieldPositions);
 
       if (dataChanged) {
-        hasUnsavedChanges.current = true;
+        setHasUnsavedChanges(true);
       }
+    } else {
+      // First render - store initial data but don't mark as unsaved
+      lastSaveRef.current = { formData, fieldPositions };
     }
   }, [formData, fieldPositions]);
 
   const performSave = useCallback(async () => {
-    if (!documentId || !hasUnsavedChanges.current || isSavingRef.current) {
+    if (!documentId || !hasUnsavedChanges || isSaving) {
       return;
     }
 
-    isSavingRef.current = true;
+    setIsSaving(true);
 
     try {
       // Validate data before saving
@@ -62,7 +65,7 @@ export const useFormAutoSave = ({
           description: "Form data contains invalid values. Please check your inputs.",
           variant: "destructive",
         });
-        isSavingRef.current = false;
+        setIsSaving(false);
         return;
       }
 
@@ -73,7 +76,7 @@ export const useFormAutoSave = ({
           description: "Field positions are invalid. Please reset field positions.",
           variant: "destructive",
         });
-        isSavingRef.current = false;
+        setIsSaving(false);
         return;
       }
 
@@ -92,7 +95,7 @@ export const useFormAutoSave = ({
         });
 
         lastSaveRef.current = { formData: formDataValidation.data, fieldPositions: fieldPositionsValidation.data };
-        hasUnsavedChanges.current = false;
+        setHasUnsavedChanges(false);
 
         console.log('Saved offline - will sync when online');
         return;
@@ -111,7 +114,7 @@ export const useFormAutoSave = ({
 
       // Update last save reference
       lastSaveRef.current = { formData: formDataValidation.data, fieldPositions: fieldPositionsValidation.data };
-      hasUnsavedChanges.current = false;
+      setHasUnsavedChanges(false);
 
       console.log('Auto-save successful');
     } catch (error) {
@@ -131,7 +134,7 @@ export const useFormAutoSave = ({
         });
 
         lastSaveRef.current = { formData, fieldPositions };
-        hasUnsavedChanges.current = false;
+        setHasUnsavedChanges(false);
         return;
       }
 
@@ -143,18 +146,18 @@ export const useFormAutoSave = ({
 
       // Retry after 5 seconds
       setTimeout(() => {
-        isSavingRef.current = false;
+        setIsSaving(false);
         performSave();
       }, 5000);
       return;
     } finally {
-      isSavingRef.current = false;
+      setIsSaving(false);
     }
-  }, [documentId, formData, fieldPositions, toast]);
+  }, [documentId, formData, fieldPositions, toast, hasUnsavedChanges, isSaving]);
 
   // Debounced auto-save
   useEffect(() => {
-    if (!enabled || !hasUnsavedChanges.current) return;
+    if (!enabled || !hasUnsavedChanges) return;
 
     // Clear existing timeout
     if (saveTimeoutRef.current) {
@@ -171,17 +174,17 @@ export const useFormAutoSave = ({
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [formData, fieldPositions, enabled, debounceMs, performSave]);
+  }, [formData, fieldPositions, enabled, debounceMs, performSave, hasUnsavedChanges]);
 
   // Save on unmount if there are unsaved changes
   useEffect(() => {
     return () => {
-      if (hasUnsavedChanges.current && documentId) {
+      if (hasUnsavedChanges && documentId) {
         // Fire-and-forget save on unmount
         performSave();
       }
     };
-  }, [documentId, performSave]);
+  }, [documentId, performSave, hasUnsavedChanges]);
 
   // Manual save function
   const saveNow = useCallback(async () => {
@@ -201,7 +204,7 @@ export const useFormAutoSave = ({
 
   return {
     saveNow,
-    hasUnsavedChanges: hasUnsavedChanges.current,
-    isSaving: isSavingRef.current,
+    hasUnsavedChanges,
+    isSaving,
   };
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { offlineSyncManager } from '@/utils/offlineSync';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -8,6 +8,18 @@ export const useOfflineSync = () => {
   const [pendingCount, setPendingCount] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
   const { toast } = useToast();
+  const isSyncingRef = useRef(false);
+  const isOnlineRef = useRef(navigator.onLine);
+  const pendingCountRef = useRef(0);
+
+  // Keep refs in sync with state
+  useEffect(() => {
+    isOnlineRef.current = isOnline;
+  }, [isOnline]);
+
+  useEffect(() => {
+    pendingCountRef.current = pendingCount;
+  }, [pendingCount]);
 
   const updatePendingCount = useCallback(async () => {
     const count = await offlineSyncManager.getPendingCount();
@@ -15,11 +27,15 @@ export const useOfflineSync = () => {
   }, []);
 
   const syncNow = useCallback(async () => {
-    if (!isOnline || isSyncing) return;
+    // Check navigator.onLine directly to avoid race conditions with state updates
+    if (!navigator.onLine || isSyncingRef.current) return;
 
+    isSyncingRef.current = true;
     setIsSyncing(true);
 
     try {
+      const countBefore = await offlineSyncManager.getPendingCount();
+
       await offlineSyncManager.syncPendingUpdates(async (update) => {
         try {
           const { error } = await supabase
@@ -41,10 +57,10 @@ export const useOfflineSync = () => {
 
       await updatePendingCount();
 
-      if (pendingCount > 0) {
+      if (countBefore > 0) {
         toast({
           title: "Sync complete",
-          description: `${pendingCount} offline change${pendingCount > 1 ? 's' : ''} synced.`,
+          description: `${countBefore} offline change${countBefore > 1 ? 's' : ''} synced.`,
         });
       }
     } catch (error) {
@@ -55,9 +71,10 @@ export const useOfflineSync = () => {
         variant: "destructive",
       });
     } finally {
+      isSyncingRef.current = false;
       setIsSyncing(false);
     }
-  }, [isOnline, isSyncing, pendingCount, toast, updatePendingCount]);
+  }, [toast, updatePendingCount]);
 
   useEffect(() => {
     const handleOnline = () => {
@@ -86,9 +103,9 @@ export const useOfflineSync = () => {
     // Initial pending count
     updatePendingCount();
 
-    // Periodic sync check
+    // Periodic sync check - use refs to avoid re-creating interval
     const syncInterval = setInterval(() => {
-      if (isOnline && pendingCount > 0) {
+      if (isOnlineRef.current && pendingCountRef.current > 0) {
         syncNow();
       }
     }, 30000); // Every 30 seconds
@@ -98,7 +115,8 @@ export const useOfflineSync = () => {
       window.removeEventListener('offline', handleOffline);
       clearInterval(syncInterval);
     };
-  }, [isOnline, pendingCount, syncNow, toast, updatePendingCount]);
+    // Only run once on mount - refs keep values updated
+  }, [syncNow, toast, updatePendingCount]);
 
   return {
     isOnline,
