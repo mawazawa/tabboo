@@ -599,48 +599,28 @@ const Index = () => {
 
       {/* Main Content with Resizable Panels */}
       <main className="flex-1 flex flex-col container mx-auto px-4 py-6 overflow-hidden">
-        {/* Control Toolbar */}
-        <div className="flex items-center justify-between gap-3 mb-4 p-3 bg-card/80 backdrop-blur-sm rounded-lg border shadow-sm flex-shrink-0">
-          {/* Left Section */}
-          <div className="flex items-center gap-3">
-            {/* AI Assistant Toggle */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowAIPanel(!showAIPanel)}
-                  className={`gap-2 ${showAIPanel ? 'bg-primary/10 text-primary' : ''}`}
-                >
-                  <MessageSquare className="h-4 w-4" strokeWidth={1.5} />
-                  AI Chat
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Toggle AI Assistant panel for smart form filling help</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <div className="h-6 w-px bg-border" />
-
-            {/* Autofill All Fields Button */}
+        {/* Control Toolbar - Tightened & Organized */}
+        <div className="flex items-center justify-between gap-2 mb-3 px-3 py-2 bg-card/80 backdrop-blur-sm rounded-lg border shadow-sm flex-shrink-0">
+          {/* Left: Primary Actions */}
+          <div className="flex items-center gap-2">
+            {/* Autofill All Fields - Primary Action */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="default"
-                  size="default"
+                  size="sm"
                   onClick={handleAutofillAll}
                   disabled={isVaultLoading || !vaultData}
-                  className="gap-2"
+                  className="gap-1.5 h-9"
                 >
                   {isVaultLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5} />
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={1.5} />
                   ) : (
-                    <Sparkles className="h-4 w-4" strokeWidth={1.5} />
+                    <Sparkles className="h-3.5 w-3.5" strokeWidth={1.5} />
                   )}
-                  Autofill All Fields
+                  <span className="text-sm font-semibold">Autofill</span>
                   {vaultData && !isVaultLoading && (
-                    <span className="ml-1 px-2 py-0.5 text-xs bg-primary-foreground/20 rounded-full">
+                    <span className="ml-0.5 px-1.5 py-0.5 text-[10px] bg-primary-foreground/20 rounded-full font-semibold">
                       {getAutofillableFields(vaultData as PersonalVaultData).length}
                     </span>
                   )}
@@ -651,19 +631,39 @@ const Index = () => {
               </TooltipContent>
             </Tooltip>
 
-            <div className="h-6 w-px bg-border" />
+            <div className="h-5 w-px bg-border/60" />
 
-            {/* Thumbnail Collapse */}
+            {/* AI Assistant Toggle */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowAIPanel(!showAIPanel)}
+                  className={`gap-1.5 h-9 ${showAIPanel ? 'bg-primary/10 text-primary' : ''}`}
+                >
+                  <MessageSquare className="h-3.5 w-3.5" strokeWidth={1.5} />
+                  <span className="text-sm">AI</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Toggle AI Assistant panel for smart form filling help</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <div className="h-5 w-px bg-border/60" />
+
+            {/* Thumbnail Toggle */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowThumbnails(!showThumbnails)}
-                  className="gap-2"
+                  className="gap-1.5 h-9"
                 >
-                  <PanelLeftClose className={`h-4 w-4 transition-transform ${!showThumbnails ? 'rotate-180' : ''}`} strokeWidth={1.5} />
-                  {showThumbnails ? 'Hide' : 'Show'}
+                  <PanelLeftClose className={`h-3.5 w-3.5 transition-transform ${!showThumbnails ? 'rotate-180' : ''}`} strokeWidth={1.5} />
+                  <span className="text-sm">Pages</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -672,8 +672,8 @@ const Index = () => {
             </Tooltip>
           </div>
 
-          {/* Center Section - Zoom Controls */}
-          <div className="flex items-center gap-2 px-2">
+          {/* Center: Zoom Controls - Compact Group */}
+          <div className="flex items-center gap-1 bg-muted/30 rounded-md px-1 py-0.5">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -681,9 +681,9 @@ const Index = () => {
                   size="sm"
                   onClick={() => setPdfZoom(Math.max(0.5, pdfZoom - 0.1))}
                   disabled={pdfZoom <= 0.5}
-                  className="h-8 w-8 p-0"
+                  className="h-7 w-7 p-0"
                 >
-                  <span className="text-lg font-semibold">−</span>
+                  <span className="text-base font-semibold">−</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -696,15 +696,12 @@ const Index = () => {
                   variant={pdfZoom === 1 ? "default" : "ghost"}
                   size="sm"
                   onClick={() => {
-                    // Get PDF panel container from ref
                     if (pdfPanelRef.current) {
-                      // Use actual panel width minus padding (24px each side)
                       const viewportWidth = pdfPanelRef.current.clientWidth - 48;
-                      const targetWidth = 850; // Default PDF width
+                      const targetWidth = 850;
                       const calculatedZoom = Math.min(2, Math.max(0.5, viewportWidth / targetWidth));
                       setPdfZoom(calculatedZoom);
                     } else {
-                      // Fallback: Try to get element by ID as backup
                       const pdfPanel = document.getElementById('pdf-panel');
                       if (pdfPanel) {
                         const viewportWidth = pdfPanel.clientWidth - 48;
@@ -712,17 +709,14 @@ const Index = () => {
                         const calculatedZoom = Math.min(2, Math.max(0.5, viewportWidth / targetWidth));
                         setPdfZoom(calculatedZoom);
                       } else {
-                        // Last resort: set to 1:1
                         setPdfZoom(1);
                       }
                     }
                   }}
-                  className="flex items-center gap-1 px-3 min-w-[120px] justify-center transition-colors"
+                  className="flex items-center gap-1 px-2.5 min-w-[100px] justify-center h-7 text-xs font-semibold"
                 >
-                  <FileText className="h-3.5 w-3.5" strokeWidth={1.5} />
-                  <span className="text-sm font-medium">
-                    {pdfZoom === 1 ? 'Fit to Page' : `${Math.round(pdfZoom * 100)}%`}
-                  </span>
+                  <FileText className="h-3 w-3" strokeWidth={1.5} />
+                  {pdfZoom === 1 ? 'Fit' : `${Math.round(pdfZoom * 100)}%`}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -736,9 +730,9 @@ const Index = () => {
                   size="sm"
                   onClick={() => setPdfZoom(Math.min(2, pdfZoom + 0.1))}
                   disabled={pdfZoom >= 2}
-                  className="h-8 w-8 p-0"
+                  className="h-7 w-7 p-0"
                 >
-                  <span className="text-lg font-semibold">+</span>
+                  <span className="text-base font-semibold">+</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -747,19 +741,18 @@ const Index = () => {
             </Tooltip>
           </div>
 
-          {/* Right Section */}
-          <div className="flex items-center gap-2">
-            {/* Fields Panel Toggle */}
+          {/* Right: Panel Toggles - Compact */}
+          <div className="flex items-center gap-1">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowFieldsPanel(!showFieldsPanel)}
-                  className={`gap-2 ${showFieldsPanel && !showVaultPanel ? 'bg-primary/10 text-primary' : ''}`}
+                  className={`gap-1.5 h-9 ${showFieldsPanel && !showVaultPanel ? 'bg-primary/10 text-primary' : ''}`}
                 >
-                  <PanelRightClose className="h-4 w-4" strokeWidth={1.5} />
-                  Fields
+                  <PanelRightClose className="h-3.5 w-3.5" strokeWidth={1.5} />
+                  <span className="text-sm">Fields</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -767,19 +760,18 @@ const Index = () => {
               </TooltipContent>
             </Tooltip>
 
-            <div className="h-6 w-px bg-border" />
+            <div className="h-5 w-px bg-border/60" />
 
-            {/* Personal Data Vault Toggle */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowVaultPanel(!showVaultPanel)}
-                  className={`gap-2 ${showVaultPanel ? 'bg-primary/10 text-primary' : ''}`}
+                  className={`gap-1.5 h-9 ${showVaultPanel ? 'bg-primary/10 text-primary' : ''}`}
                 >
-                  <Shield className="h-4 w-4" strokeWidth={1.5} />
-                  Vault
+                  <Shield className="h-3.5 w-3.5" strokeWidth={1.5} />
+                  <span className="text-sm">Vault</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
