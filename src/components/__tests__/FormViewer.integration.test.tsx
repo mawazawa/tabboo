@@ -11,6 +11,7 @@ import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FormViewer } from '../FormViewer';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import type { FormData, FieldPosition } from '@/types/FormData';
 
 // Mock PDF.js worker
@@ -124,11 +125,20 @@ describe('FormViewer Integration Tests', () => {
     vi.clearAllTimers();
   });
 
+  // Helper to render FormViewer with required providers
+  const renderFormViewer = (props = defaultProps) => {
+    return render(
+      <TooltipProvider>
+        <FormViewer {...props} />
+      </TooltipProvider>
+    );
+  };
+
   /**
    * TEST 1: Component Renders Successfully
    */
   test('renders PDF document and fields', async () => {
-    render(<FormViewer {...defaultProps} />);
+    renderFormViewer();
 
     // Wait for PDF to load
     await waitFor(() => {
@@ -147,7 +157,7 @@ describe('FormViewer Integration Tests', () => {
    */
   test('user can type into text fields', async () => {
     const user = userEvent.setup();
-    render(<FormViewer {...defaultProps} />);
+    renderFormViewer();
 
     await waitFor(() => {
       const pdfDoc = document.querySelector('.react-pdf__Document');
@@ -172,7 +182,7 @@ describe('FormViewer Integration Tests', () => {
    */
   test('user can enable edit mode for a field', async () => {
     const user = userEvent.setup();
-    render(<FormViewer {...defaultProps} />);
+    renderFormViewer();
 
     await waitFor(() => {
       const pdfDoc = document.querySelector('.react-pdf__Document');
@@ -212,7 +222,7 @@ describe('FormViewer Integration Tests', () => {
    */
   test('dragging a field in edit mode updates its position', async () => {
     const user = userEvent.setup();
-    render(<FormViewer {...defaultProps} />);
+    renderFormViewer();
 
     await waitFor(() => {
       const pdfDoc = document.querySelector('.react-pdf__Document');
@@ -277,7 +287,7 @@ describe('FormViewer Integration Tests', () => {
       }
     };
 
-    render(<FormViewer {...propsWithErrors} />);
+    renderFormViewer(propsWithErrors);
 
     await waitFor(() => {
       const pdfDoc = document.querySelector('.react-pdf__Document');
@@ -302,7 +312,7 @@ describe('FormViewer Integration Tests', () => {
       highlightedField: 'partyName'
     };
 
-    render(<FormViewer {...propsWithHighlight} />);
+    renderFormViewer(propsWithHighlight);
 
     await waitFor(() => {
       const pdfDoc = document.querySelector('.react-pdf__Document');
@@ -335,7 +345,7 @@ describe('FormViewer Integration Tests', () => {
       zoom: 1.5
     };
 
-    render(<FormViewer {...propsWithZoom} />);
+    renderFormViewer(propsWithZoom);
 
     await waitFor(() => {
       const pdfDoc = document.querySelector('.react-pdf__Document');
@@ -351,7 +361,7 @@ describe('FormViewer Integration Tests', () => {
    */
   test('fields support keyboard navigation', async () => {
     const user = userEvent.setup();
-    render(<FormViewer {...defaultProps} />);
+    renderFormViewer();
 
     await waitFor(() => {
       const pdfDoc = document.querySelector('.react-pdf__Document');
@@ -386,7 +396,7 @@ describe('FormViewer Integration Tests', () => {
       }
     };
 
-    render(<FormViewer {...propsWithVault} />);
+    renderFormViewer(propsWithVault);
 
     await waitFor(() => {
       const pdfDoc = document.querySelector('.react-pdf__Document');
@@ -413,7 +423,7 @@ describe('FormViewer Integration Tests', () => {
       }
     };
 
-    render(<FormViewer {...propsWithOutOfBounds} />);
+    renderFormViewer(propsWithOutOfBounds);
 
     await waitFor(() => {
       const pdfDoc = document.querySelector('.react-pdf__Document');
