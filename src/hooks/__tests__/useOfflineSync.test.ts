@@ -191,29 +191,37 @@ describe('useOfflineSync', () => {
     it('should not sync when already syncing', async () => {
       const { result } = renderHook(() => useOfflineSync());
 
+      await waitFor(() => {
+        expect(result.current).not.toBeNull();
+      });
+
       // Mock a long-running sync
       (offlineSyncManager.syncPendingUpdates as ReturnType<typeof vi.fn>).mockImplementation(
         () => new Promise((resolve) => setTimeout(resolve, 100))
       );
 
-      // Start first sync
-      const firstSync = act(async () => {
-        await result.current.syncNow();
+      // Start first sync (don't await it)
+      act(() => {
+        result.current.syncNow();
       });
 
+      // Wait for isSyncing to become true
       await waitFor(() => {
         expect(result.current.isSyncing).toBe(true);
       });
 
-      // Try to start second sync
+      // Try to start second sync while first is still running
       await act(async () => {
         await result.current.syncNow();
       });
 
-      // syncPendingUpdates should only be called once
+      // syncPendingUpdates should only be called once (second call rejected)
       expect(offlineSyncManager.syncPendingUpdates).toHaveBeenCalledTimes(1);
 
-      await firstSync;
+      // Wait for first sync to complete
+      await waitFor(() => {
+        expect(result.current.isSyncing).toBe(false);
+      });
     });
   });
 
@@ -221,8 +229,9 @@ describe('useOfflineSync', () => {
     it('should sync when syncNow is called', async () => {
       const { result } = renderHook(() => useOfflineSync());
 
-      console.log('DEBUG: result.current:', result.current);
-      console.log('DEBUG: result.current type:', typeof result.current);
+      await waitFor(() => {
+        expect(result.current).not.toBeNull();
+      });
 
       await act(async () => {
         await result.current.syncNow();
@@ -263,6 +272,10 @@ describe('useOfflineSync', () => {
 
       const { result } = renderHook(() => useOfflineSync());
 
+      await waitFor(() => {
+        expect(result.current).not.toBeNull();
+      });
+
       expect(result.current.isSyncing).toBe(false);
 
       act(() => {
@@ -287,6 +300,10 @@ describe('useOfflineSync', () => {
   describe('pending count updates', () => {
     it('should allow manual pending count refresh', async () => {
       const { result } = renderHook(() => useOfflineSync());
+
+      await waitFor(() => {
+        expect(result.current).not.toBeNull();
+      });
 
       (offlineSyncManager.getPendingCount as ReturnType<typeof vi.fn>).mockResolvedValue(10);
 
@@ -331,6 +348,10 @@ describe('useOfflineSync', () => {
 
       const { result } = renderHook(() => useOfflineSync());
 
+      await waitFor(() => {
+        expect(result.current).not.toBeNull();
+      });
+
       // Should not throw
       await act(async () => {
         await expect(result.current.syncNow()).resolves.not.toThrow();
@@ -343,6 +364,10 @@ describe('useOfflineSync', () => {
       );
 
       const { result } = renderHook(() => useOfflineSync());
+
+      await waitFor(() => {
+        expect(result.current).not.toBeNull();
+      });
 
       await act(async () => {
         await result.current.syncNow();
@@ -373,6 +398,10 @@ describe('useOfflineSync', () => {
       );
 
       const { result } = renderHook(() => useOfflineSync());
+
+      await waitFor(() => {
+        expect(result.current).not.toBeNull();
+      });
 
       await act(async () => {
         await result.current.syncNow();
@@ -412,6 +441,10 @@ describe('useOfflineSync', () => {
 
       const { result } = renderHook(() => useOfflineSync());
 
+      await waitFor(() => {
+        expect(result.current).not.toBeNull();
+      });
+
       await act(async () => {
         await result.current.syncNow();
       });
@@ -441,6 +474,10 @@ describe('useOfflineSync', () => {
       );
 
       const { result } = renderHook(() => useOfflineSync());
+
+      await waitFor(() => {
+        expect(result.current).not.toBeNull();
+      });
 
       await act(async () => {
         await result.current.syncNow();

@@ -47,10 +47,11 @@ export type FormDataValidation = z.infer<typeof formDataSchema>;
 
 /**
  * Field position schema
+ * Allows free movement - no bounds constraints (fields can be positioned anywhere)
  */
 export const fieldPositionSchema = z.object({
-  top: z.number().min(0).max(100),
-  left: z.number().min(0).max(100),
+  top: z.number(), // No min/max - free movement
+  left: z.number(), // No min/max - free movement
 });
 
 /**

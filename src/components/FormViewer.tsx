@@ -213,27 +213,46 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
         const deltaX = moveEvent.clientX - dragStartPos.current.x;
         const deltaY = moveEvent.clientY - dragStartPos.current.y;
 
+        // Free movement - no bounds constraints
         let newLeft = dragStartPos.current.left + (deltaX / parentRect.width) * 100;
         let newTop = dragStartPos.current.top + (deltaY / parentRect.height) * 100;
 
-        newLeft = Math.max(0, Math.min(95, newLeft));
-        newTop = Math.max(0, Math.min(95, newTop));
-
-        // Smart snapping
-        const snapThreshold = 1.5;
+        // Optional: Smart snapping only when Shift key is held (for precision alignment)
+        const isSnappingEnabled = moveEvent.shiftKey;
         const guides: { x: number[]; y: number[] } = { x: [], y: [] };
 
-        Object.entries(fieldPositions).forEach(([f, pos]) => {
-          if (f === field) return;
-          if (Math.abs(newLeft - pos.left) < snapThreshold) {
-            newLeft = pos.left;
-            guides.x.push(pos.left);
-          }
-          if (Math.abs(newTop - pos.top) < snapThreshold) {
-            newTop = pos.top;
-            guides.y.push(pos.top);
-          }
-        });
+        if (isSnappingEnabled) {
+          const snapThreshold = 1.5;
+          let snappedLeft = newLeft;
+          let snappedTop = newTop;
+
+          Object.entries(fieldPositions).forEach(([f, pos]) => {
+            if (f === field) return;
+            if (Math.abs(newLeft - pos.left) < snapThreshold) {
+              snappedLeft = pos.left;
+              guides.x.push(pos.left);
+            }
+            if (Math.abs(newTop - pos.top) < snapThreshold) {
+              snappedTop = pos.top;
+              guides.y.push(pos.top);
+            }
+          });
+
+          newLeft = snappedLeft;
+          newTop = snappedTop;
+        } else {
+          // Show alignment guides visually but don't enforce snapping
+          const guideThreshold = 2.0;
+          Object.entries(fieldPositions).forEach(([f, pos]) => {
+            if (f === field) return;
+            if (Math.abs(newLeft - pos.left) < guideThreshold) {
+              guides.x.push(pos.left);
+            }
+            if (Math.abs(newTop - pos.top) < guideThreshold) {
+              guides.y.push(pos.top);
+            }
+          });
+        }
 
         const guidesChanged =
           guides.x.length !== lastGuidesRef.current.x.length ||
