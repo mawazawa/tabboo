@@ -871,11 +871,19 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 value={formData[overlay.field as keyof FormData] as string || ''}
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
-                                disabled={isGlobalEditMode}
+                                onFocus={() => {
+                                  // Select field when clicking into input
+                                  const fieldIndex = fieldNameToIndex[overlay.field];
+                                  if (fieldIndex !== undefined) {
+                                    setCurrentFieldIndex(fieldIndex);
+                                  }
+                                }}
+                                onPointerDown={(e) => {
+                                  // Prevent drag when clicking on input itself (allow typing)
+                                  e.stopPropagation();
+                                }}
                                 style={{ fontSize: `${fieldFontSize}pt`, height: `${fieldFontSize * 2}px` }}
                                 className={`field-input font-mono ${
-                                  isGlobalEditMode
-                                    ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   validationErrors?.[overlay.field]?.length
                                     ? 'bg-destructive/10 border-destructive'
                                     : isCurrentField
@@ -889,11 +897,19 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 value={formData[overlay.field as keyof FormData] as string || ''}
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
-                                disabled={isGlobalEditMode}
+                                onFocus={() => {
+                                  // Select field when clicking into textarea
+                                  const fieldIndex = fieldNameToIndex[overlay.field];
+                                  if (fieldIndex !== undefined) {
+                                    setCurrentFieldIndex(fieldIndex);
+                                  }
+                                }}
+                                onPointerDown={(e) => {
+                                  // Prevent drag when clicking on textarea itself (allow typing)
+                                  e.stopPropagation();
+                                }}
                                 style={{ fontSize: `${fieldFontSize}pt`, minHeight: `${fieldFontSize * 4}px` }}
                                 className={`field-input font-mono resize-none ${
-                                  isGlobalEditMode
-                                    ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   validationErrors?.[overlay.field]?.length
                                     ? 'bg-destructive/10 border-destructive'
                                     : isCurrentField
@@ -905,13 +921,21 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             {overlay.type === 'checkbox' && (
                               <Checkbox
                                 checked={!!formData[overlay.field as keyof FormData]}
-                                onCheckedChange={(checked) => !isGlobalEditMode && updateField(overlay.field, checked as boolean)}
-                                disabled={isGlobalEditMode}
+                                onCheckedChange={(checked) => {
+                                  updateField(overlay.field, checked as boolean);
+                                  // Select field when checking
+                                  const fieldIndex = fieldNameToIndex[overlay.field];
+                                  if (fieldIndex !== undefined) {
+                                    setCurrentFieldIndex(fieldIndex);
+                                  }
+                                }}
+                                onPointerDown={(e) => {
+                                  // Prevent drag when clicking on checkbox itself
+                                  e.stopPropagation();
+                                }}
                                 className={`border-2 ${
-                                  isGlobalEditMode
-                                    ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
-                                  isCurrentField 
-                                    ? 'bg-primary/5 border-primary' 
+                                  isCurrentField
+                                    ? 'bg-primary/5 border-primary'
                                     : 'bg-background border-border'
                                 }`}
                               />
