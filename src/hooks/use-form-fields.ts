@@ -85,7 +85,8 @@ export function useFormFields(formNumber: string) {
           )
         `)
         .eq('form_id', formData.id)
-        .order('page_number', { ascending: true });
+        .order('page_number', { ascending: true })
+        .limit(1000); // Fetch all fields (forms typically have < 100 fields)
 
       if (mappingsError) {
         console.error('Error fetching field mappings:', mappingsError);
