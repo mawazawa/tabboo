@@ -470,15 +470,15 @@ export const FieldNavigationPanel = ({
   }, [currentFieldIndex, showPositionControl, showSearch]);
 
   return (
-    <Card className="h-full border-hairline shadow-3point chamfered flex flex-col overflow-hidden">
+    <Card className="h-full w-full min-w-0 border-hairline shadow-3point chamfered flex flex-col overflow-hidden">
       {/* Compact Sticky Header */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-sm">
         <div className="p-3 space-y-2">
           <div className="flex items-center justify-between gap-2">
             <div className="flex-1 min-w-0">
-              <h2 className="font-semibold text-sm truncate">Field {currentFieldIndex + 1}/{FIELD_CONFIG.length}</h2>
+              <h2 className="font-semibold text-sm break-words">Field {currentFieldIndex + 1}/{FIELD_CONFIG.length}</h2>
               {searchQuery && (
-                <p className="text-xs text-muted-foreground truncate">{filteredFields.length} results</p>
+                <p className="text-xs text-muted-foreground break-words">{filteredFields.length} results</p>
               )}
             </div>
             <div className="flex items-center gap-1 shrink-0">
@@ -635,7 +635,7 @@ export const FieldNavigationPanel = ({
               {currentFieldIndex >= 0 && currentFieldIndex < FIELD_CONFIG.length && (
                 <div className="p-2 bg-muted/30 rounded-lg border space-y-1.5">
                   <div className="flex items-center justify-between gap-2">
-                    <h3 className="text-xs font-semibold truncate">
+                    <h3 className="text-xs font-semibold break-words min-w-0 flex-1">
                       {FIELD_CONFIG[currentFieldIndex]?.label}
                       {selectedFields.length > 0 && (
                         <span className="ml-1 text-[10px] text-muted-foreground">({selectedFields.length})</span>
@@ -886,7 +886,7 @@ export const FieldNavigationPanel = ({
                 
                 {/* Show vault data preview if available */}
                 {config.vaultField && personalInfo && personalInfo[config.vaultField as keyof typeof personalInfo] && (
-                  <div className="text-xs text-muted-foreground bg-muted/50 rounded px-2 py-1 font-mono truncate">
+                  <div className="text-xs text-muted-foreground bg-muted/50 rounded px-2 py-1 font-mono break-words min-w-0">
                     Saved: {personalInfo[config.vaultField as keyof typeof personalInfo]}
                   </div>
                 )}

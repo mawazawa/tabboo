@@ -62,7 +62,7 @@ export const FieldPresetsToolbar = ({
   };
 
   return (
-    <div className="flex items-center gap-2 px-2 py-1 bg-muted/50 rounded-lg">
+    <div className="flex items-center gap-2 px-2 py-1 bg-muted/50 rounded-lg overflow-x-auto min-w-0 flex-wrap">
         {/* Snap to Grid */}
         <Tooltip>
           <TooltipTrigger asChild>

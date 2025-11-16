@@ -865,13 +865,13 @@ const Index = () => {
             id="right-panel"
             order={2}
             defaultSize={30}
-            minSize={20}
+            minSize={25}
             maxSize={60}
             collapsible={true}
             collapsedSize={0}
             collapsed={!(showFieldsPanel || showVaultPanel)}
           >
-            <div className="h-full w-full pl-3 flex flex-col overflow-hidden">
+            <div className="h-full w-full min-w-0 pl-3 flex flex-col overflow-hidden">
               <Suspense fallback={<PanelSkeleton />}>
                 {showVaultPanel ? (
                   <PersonalDataVaultPanel userId={user?.id || ''} />
