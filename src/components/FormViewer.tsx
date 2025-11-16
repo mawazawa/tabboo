@@ -709,7 +709,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                               isCurrentField
                                 ? 'ring-2 ring-primary shadow-md bg-primary/5'
                                 : 'ring-1 ring-border/50 hover:ring-primary/50'
-                            } rounded-lg bg-background/80 backdrop-blur-sm p-1.5 transition-all duration-200`}
+                            } rounded-lg bg-background/80 backdrop-blur-sm p-1 text-xs transition-all duration-200`}
                             style={{
                               top: `${position.top}%`,
                               left: `${position.left}%`,
@@ -718,12 +718,11 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                               pointerEvents: 'auto',
                               // Smaller clickable area
                               margin: '-4px',
-                              // Make overlays smaller relative to page (85% of original size)
-                              transform: `scale(0.85)`,
-                              transformOrigin: 'top left',
+                              // REMOVED transform: scale() - it breaks click event coordinates
+                              // Instead using: smaller padding (p-1 instead of p-1.5) + text-xs class
                               // CRITICAL: Disable touch scrolling to enable dragging
                               touchAction: 'none',
-                              // GPU acceleration hint when dragging
+                              // GPU acceleration hint when dragging (only applies during actual drag transform)
                               willChange: isDragging === overlay.field ? 'transform' : 'auto',
                             }}
                             onClick={(e) => {
