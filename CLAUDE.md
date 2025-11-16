@@ -312,6 +312,15 @@ Validates:
 3. Update `fieldNameToIndex` mapping
 4. Add to navigation panel fields list
 
+### Adjusting Field Appearance
+1. **Font Size**: Use the Font controls in the toolbar (8pt-16pt, default 12pt)
+   - Small 'A' button: Decrease font size
+   - Center button: Shows current size, click to reset to 12pt
+   - Large 'A' button: Increase font size
+   - Field height automatically adjusts (2x font size for inputs, 4x for textareas)
+2. **Field Positioning**: Use Edit Mode (press 'E' key) to drag fields or use arrow keys
+3. **PDF Zoom**: Use zoom controls for overall document scaling
+
 ### Adding New Routes
 1. Create page component in `src/pages/`
 2. Add route in `App.tsx` ABOVE the `*` catch-all route
@@ -378,6 +387,7 @@ This project is managed through Lovable.dev:
 6. **Field Groups**: Organize related fields together
 7. **PDF Thumbnails**: Quick navigation between pages
 8. **Templates**: Save and reuse common form configurations
+9. **Adjustable Field Font Size**: Dynamic font sizing (8pt-16pt, default 12pt)
 
 ## Git Workflow
 
