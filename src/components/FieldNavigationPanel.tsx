@@ -188,6 +188,8 @@ export const FieldNavigationPanel = ({
   const { toast } = useToast();
   const positionInputRef = useRef<HTMLInputElement>(null);
   const [showPositionControl, setShowPositionControl] = useState(false);
+  const xInputRef = useRef<HTMLInputElement | null>(null);
+  const yInputRef = useRef<HTMLInputElement | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [showAISearch, setShowAISearch] = useState(false);
@@ -425,6 +427,49 @@ export const FieldNavigationPanel = ({
         (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA') &&
         activeElement.classList.contains('field-input'); // Only block if it's a form field input
       
+      // CRITICAL: If Position Adjustment popover is open, directly update X-Y input fields
+      if (showPositionControl && !isActivelyTyping && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        e.preventDefault();
+        const step = 0.1; // Small step for precise control
+        const currentX = parseFloat(xInputRef.current?.value || currentPosition.left.toFixed(1));
+        const currentY = parseFloat(yInputRef.current?.value || currentPosition.top.toFixed(1));
+        
+        let newX = currentX;
+        let newY = currentY;
+        let direction: 'up' | 'down' | 'left' | 'right' | null = null;
+        
+        switch (e.key) {
+          case 'ArrowUp':
+            newY = Math.max(0, currentY - step);
+            direction = 'up';
+            break;
+          case 'ArrowDown':
+            newY = Math.min(100, currentY + step);
+            direction = 'down';
+            break;
+          case 'ArrowLeft':
+            newX = Math.max(0, currentX - step);
+            direction = 'left';
+            break;
+          case 'ArrowRight':
+            newX = Math.min(100, currentX + step);
+            direction = 'right';
+            break;
+        }
+        
+        // Update position directly - React's controlled component pattern will update the input fields automatically
+        updateFieldPosition(currentFieldName, { left: newX, top: newY });
+        
+        // Visual feedback
+        if (direction) {
+          requestAnimationFrame(() => {
+            setPressedKey(direction);
+          });
+        }
+        return;
+      }
+      
+      // Fallback: Normal arrow key positioning when popover is closed
       if (!isActivelyTyping && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
         e.preventDefault();
         const direction = {
@@ -467,7 +512,7 @@ export const FieldNavigationPanel = ({
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [currentFieldIndex, showPositionControl, showSearch]);
+    }, [currentFieldIndex, showPositionControl, showSearch, currentFieldName, currentPosition, updateFieldPosition]);
 
   return (
     <Card className="h-full w-full min-w-0 border-hairline shadow-3point chamfered flex flex-col overflow-hidden">
@@ -654,28 +699,50 @@ export const FieldNavigationPanel = ({
                           <div>
                             <label className="text-[10px] text-muted-foreground">X %</label>
                             <Input
+                              ref={xInputRef}
                               type="number"
                               step="0.1"
                               value={currentPosition.left.toFixed(1)}
-                              onChange={(e) => updateFieldPosition(currentFieldName, { 
-                                ...currentPosition, 
-                                left: parseFloat(e.target.value) || 0 
-                              })}
+                              onChange={(e) => {
+                                const newX = parseFloat(e.target.value) || 0;
+                                updateFieldPosition(currentFieldName, { 
+                                  ...currentPosition, 
+                                  left: newX
+                                });
+                              }}
+                              onInput={(e) => {
+                                const newX = parseFloat((e.target as HTMLInputElement).value) || 0;
+                                updateFieldPosition(currentFieldName, { 
+                                  ...currentPosition, 
+                                  left: newX
+                                });
+                              }}
                               className="h-7 text-xs"
                             />
                           </div>
                           <div>
                             <label className="text-[10px] text-muted-foreground">Y %</label>
                             <Input
+                              ref={yInputRef}
                               type="number"
                               step="0.1"
                               value={currentPosition.top.toFixed(1)}
-                          onChange={(e) => updateFieldPosition(currentFieldName, { 
-                            ...currentPosition, 
-                            top: parseFloat(e.target.value) || 0 
-                          })}
-                          className="h-7 text-xs"
-                        />
+                              onChange={(e) => {
+                                const newY = parseFloat(e.target.value) || 0;
+                                updateFieldPosition(currentFieldName, { 
+                                  ...currentPosition, 
+                                  top: newY
+                                });
+                              }}
+                              onInput={(e) => {
+                                const newY = parseFloat((e.target as HTMLInputElement).value) || 0;
+                                updateFieldPosition(currentFieldName, { 
+                                  ...currentPosition, 
+                                  top: newY
+                                });
+                              }}
+                              className="h-7 text-xs"
+                            />
                       </div>
                     </div>
                     {/* Arrow key controls in intuitive cross/diamond pattern */}
