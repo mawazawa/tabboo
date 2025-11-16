@@ -794,9 +794,9 @@ const Index = () => {
           <ResizablePanel
             id="viewer-panel"
             order={1}
-            defaultSize={showFieldsPanel || showVaultPanel ? 70 : 100}
-            minSize={showFieldsPanel || showVaultPanel ? 30 : 60}
-            maxSize={showFieldsPanel || showVaultPanel ? 80 : 100}
+            defaultSize={70}
+            minSize={40}
+            maxSize={75}
           >
             <ResizablePanelGroup direction="horizontal" className="h-full">
               {/* Resizable Thumbnail Sidebar */}
