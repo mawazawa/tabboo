@@ -51,6 +51,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   const dragElementRef = useRef<HTMLElement | null>(null);
   const draggedPositionRef = useRef<{ top: number; left: number } | null>(null);
   const rafRef = useRef<number | null>(null);
+  const lastGuidesRef = useRef<{ x: number[]; y: number[] }>({ x: [], y: [] });
 
   // Convert database field mappings to field overlays (memoized for performance)
   const fieldOverlays = useMemo(() => {
@@ -212,23 +213,26 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
     if (!isDragging || !dragElementRef.current) return;
-    
+
     e.preventDefault();
-    
+
     // Cancel any pending animation frame
     if (rafRef.current !== null) {
       cancelAnimationFrame(rafRef.current);
     }
-    
+
     // Use requestAnimationFrame + CSS transform (no React state updates during drag!)
+    // Performance: This limits updates to 60fps max for buttery smooth dragging
     rafRef.current = requestAnimationFrame(() => {
+      const startTime = performance.now();
+
       const deltaX = e.clientX - dragStartPos.current.x;
       const deltaY = e.clientY - dragStartPos.current.y;
       const parentRect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-      
+
       let newLeft = dragStartPos.current.left + (deltaX / parentRect.width) * 100;
       let newTop = dragStartPos.current.top + (deltaY / parentRect.height) * 100;
-      
+
       // Constrain within bounds
       newLeft = Math.max(0, Math.min(95, newLeft));
       newTop = Math.max(0, Math.min(95, newTop));
@@ -236,32 +240,49 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
       // Smart snapping to other fields
       const snapThreshold = 1.5;
       const guides: { x: number[]; y: number[] } = { x: [], y: [] };
-      
+
       Object.entries(fieldPositions).forEach(([field, pos]) => {
         if (field === isDragging) return;
-        
+
         if (Math.abs(newLeft - pos.left) < snapThreshold) {
           newLeft = pos.left;
           guides.x.push(pos.left);
         }
-        
+
         if (Math.abs(newTop - pos.top) < snapThreshold) {
           newTop = pos.top;
           guides.y.push(pos.top);
         }
       });
-      
-      // Update alignment guides
-      setAlignmentGuides(guides);
-      
+
+      // Performance: Only update alignment guides state if they changed
+      // This avoids unnecessary re-renders during drag
+      const guidesChanged =
+        guides.x.length !== lastGuidesRef.current.x.length ||
+        guides.y.length !== lastGuidesRef.current.y.length ||
+        !guides.x.every((val, idx) => val === lastGuidesRef.current.x[idx]) ||
+        !guides.y.every((val, idx) => val === lastGuidesRef.current.y[idx]);
+
+      if (guidesChanged) {
+        lastGuidesRef.current = guides;
+        setAlignmentGuides(guides);
+      }
+
       // Store position in ref (not state!)
       draggedPositionRef.current = { top: newTop, left: newLeft };
-      
-      // Apply via CSS transform for smooth 60fps movement
+
+      // Apply via CSS transform for smooth 60fps movement (bypasses React)
       if (dragElementRef.current) {
         const deltaLeftPx = (newLeft - dragStartPos.current.left) * parentRect.width / 100;
         const deltaTopPx = (newTop - dragStartPos.current.top) * parentRect.height / 100;
         dragElementRef.current.style.transform = `translate(${deltaLeftPx}px, ${deltaTopPx}px)`;
+      }
+
+      // Performance monitoring: Warn if frame took longer than 16ms (60fps)
+      const endTime = performance.now();
+      const frameTime = endTime - startTime;
+      if (frameTime > 16) {
+        console.warn(`⚠️ Slow drag frame: ${frameTime.toFixed(2)}ms (target: <16ms for 60fps)`);
       }
     });
   }, [isDragging, fieldPositions]);
@@ -291,6 +312,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     dragElementRef.current = null;
     draggedPositionRef.current = null;
     setAlignmentGuides({ x: [], y: [] });
+    lastGuidesRef.current = { x: [], y: [] };
   }, [isDragging, updateFieldPosition]);
 
   const handlePDFClick = (e: React.MouseEvent) => {
@@ -346,6 +368,16 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
       updateField(field, value);
     }
   };
+
+  // RAF cleanup on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
+  }, []);
 
   // Keyboard shortcuts for field positioning
   useEffect(() => {
