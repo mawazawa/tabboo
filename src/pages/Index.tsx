@@ -306,26 +306,33 @@ const Index = () => {
   // Get current field positions for minimap indicators (supports multiple fields)
   const getCurrentFieldPositions = () => {
     const fieldConfigs = [
-      { field: 'partyName', top: 15.8, left: 5 },
-      { field: 'streetAddress', top: 19, left: 5 },
-      { field: 'city', top: 22.5, left: 5 },
-      { field: 'state', top: 22.5, left: 29.5 },
-      { field: 'zipCode', top: 22.5, left: 38 },
-      { field: 'telephoneNo', top: 25.8, left: 5 },
-      { field: 'faxNo', top: 25.8, left: 23 },
-      { field: 'email', top: 29.2, left: 5 },
-      { field: 'attorneyFor', top: 32.5, left: 5 },
-      { field: 'county', top: 15.8, left: 55 },
-      { field: 'petitioner', top: 22.5, left: 55 },
-      { field: 'respondent', top: 26.5, left: 55 },
-      { field: 'caseNumber', top: 32.5, left: 55 },
-      { field: 'noOrders', top: 43.5, left: 25.5 },
-      { field: 'agreeOrders', top: 46.5, left: 25.5 },
-      { field: 'consentCustody', top: 53, left: 25.5 },
-      { field: 'consentVisitation', top: 56, left: 25.5 },
-      { field: 'facts', top: 68, left: 5 },
-      { field: 'signatureDate', top: 90, left: 5 },
-      { field: 'signatureName', top: 90, left: 50 },
+      { field: 'partyName', top: 8, left: 5 },
+      { field: 'firmName', top: 10, left: 5 },
+      { field: 'streetAddress', top: 12, left: 5 },
+      { field: 'mailingAddress', top: 14, left: 5 },
+      { field: 'city', top: 16, left: 5 },
+      { field: 'state', top: 16, left: 26 },
+      { field: 'zipCode', top: 16, left: 34 },
+      { field: 'telephoneNo', top: 18, left: 5 },
+      { field: 'faxNo', top: 18, left: 23 },
+      { field: 'email', top: 20, left: 5 },
+      { field: 'attorneyFor', top: 22, left: 5 },
+      { field: 'stateBarNumber', top: 22, left: 36 },
+      { field: 'county', top: 8, left: 50 },
+      { field: 'petitioner', top: 20, left: 77 },
+      { field: 'respondent', top: 22, left: 77 },
+      { field: 'otherParentParty', top: 24, left: 77 },
+      { field: 'caseNumber', top: 27, left: 77 },
+      { field: 'restrainingOrderNone', top: 36, left: 5 },
+      { field: 'restrainingOrderActive', top: 38, left: 5 },
+      { field: 'childCustodyConsent', top: 42, left: 5 },
+      { field: 'visitationConsent', top: 44, left: 5 },
+      { field: 'childCustodyDoNotConsent', top: 46, left: 7 },
+      { field: 'visitationDoNotConsent', top: 46, left: 25 },
+      { field: 'facts', top: 54, left: 5 },
+      { field: 'signatureDate', top: 91, left: 5 },
+      { field: 'printName', top: 93, left: 5 },
+      { field: 'signatureName', top: 95, left: 5 },
     ];
 
     const positions: { top: number; left: number }[] = [];
@@ -686,17 +693,24 @@ const Index = () => {
                   variant={pdfZoom === 1 ? "default" : "ghost"}
                   size="sm"
                   onClick={() => {
-                    // Calculate zoom to fit PDF to viewport
-                    const viewportWidth = window.innerWidth - (showThumbnails ? thumbnailPanelWidth : 0) - (showFieldsPanel ? 400 : 0) - 100; // Account for panels and padding
-                    const targetWidth = 850; // Default PDF width
-                    const calculatedZoom = Math.min(2, Math.max(0.5, viewportWidth / targetWidth));
-                    setPdfZoom(calculatedZoom);
+                    // Get actual PDF container element
+                    const pdfPanel = document.getElementById('pdf-panel');
+                    if (pdfPanel) {
+                      // Use actual panel width minus padding
+                      const viewportWidth = pdfPanel.clientWidth - 48; // Account for padding
+                      const targetWidth = 850; // Default PDF width
+                      const calculatedZoom = Math.min(2, Math.max(0.5, viewportWidth / targetWidth));
+                      setPdfZoom(calculatedZoom);
+                    } else {
+                      // Fallback to 1:1 if element not found
+                      setPdfZoom(1);
+                    }
                   }}
                   className="flex items-center gap-1 px-3 min-w-[120px] justify-center transition-colors"
                 >
                   <FileText className="h-3.5 w-3.5" strokeWidth={1.5} />
                   <span className="text-sm font-medium">
-                    {pdfZoom === 1 ? 'Scale to Fit' : `${Math.round(pdfZoom * 100)}%`}
+                    {pdfZoom === 1 ? 'Fit to Page' : `${Math.round(pdfZoom * 100)}%`}
                   </span>
                 </Button>
               </TooltipTrigger>
@@ -766,11 +780,11 @@ const Index = () => {
 
         <ResizablePanelGroup direction="horizontal" className="flex-1 w-full">
           {/* Center: Form Viewer with PDF + Thumbnail Sidebar */}
-          <ResizablePanel 
+          <ResizablePanel
             id="viewer-panel"
             order={1}
-            defaultSize={75}
-            minSize={30}
+            defaultSize={70}
+            minSize={40}
           >
             <ResizablePanelGroup direction="horizontal" className="h-full">
               {/* Resizable Thumbnail Sidebar */}
