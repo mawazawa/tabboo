@@ -24,10 +24,14 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+    // Ensure React is deduplicated across all modules
+    dedupe: ['react', 'react-dom'],
   },
   optimizeDeps: {
     // Exclude pdfjs-dist from dependency pre-bundling for proper worker handling
     exclude: ['pdfjs-dist'],
+    // Ensure React is properly resolved for Radix UI components
+    include: ['react', 'react-dom', '@radix-ui/react-tooltip'],
   },
   build: {
     // Optimize chunk splitting to reduce network dependency chains
