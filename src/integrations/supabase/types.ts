@@ -14,36 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      _CategoryToRule: {
-        Row: {
-          A: string
-          B: string
-        }
-        Insert: {
-          A: string
-          B: string
-        }
-        Update: {
-          A?: string
-          B?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "_CategoryToRule_A_fkey"
-            columns: ["A"]
-            isOneToOne: false
-            referencedRelation: "Category"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "_CategoryToRule_B_fkey"
-            columns: ["B"]
-            isOneToOne: false
-            referencedRelation: "Rule"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       canonical_fields: {
         Row: {
           category: string
