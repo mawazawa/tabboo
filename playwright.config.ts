@@ -10,6 +10,12 @@ export default defineConfig({
   testDir: './src/__tests__',
   testMatch: ['**/*.e2e.test.ts', '**/smoke.test.ts', '**/workflows.test.ts'],
 
+  // Test timeout configuration
+  timeout: 30000, // 30s per test
+  expect: {
+    timeout: 5000, // 5s for assertions
+  },
+
   // Run tests in files in parallel
   fullyParallel: true,
 

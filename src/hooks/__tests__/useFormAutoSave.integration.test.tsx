@@ -68,7 +68,11 @@ describe('Auto-Save Integration Tests', () => {
    */
   test('triggers auto-save after 5 seconds of inactivity', async () => {
     renderHook(() =>
-      useFormAutoSave(mockFormData, mockFieldPositions, mockDocumentId)
+      useFormAutoSave({
+        documentId: mockDocumentId,
+        formData: mockFormData,
+        fieldPositions: mockFieldPositions,
+      })
     );
 
     // Fast-forward time by 5 seconds
@@ -94,7 +98,11 @@ describe('Auto-Save Integration Tests', () => {
    */
   test('debounces multiple rapid changes', async () => {
     const { rerender } = renderHook(
-      ({ formData }) => useFormAutoSave(formData, mockFieldPositions, mockDocumentId),
+      ({ formData }) => useFormAutoSave({
+        documentId: mockDocumentId,
+        formData,
+        fieldPositions: mockFieldPositions,
+      }),
       { initialProps: { formData: mockFormData } }
     );
 
@@ -134,7 +142,11 @@ describe('Auto-Save Integration Tests', () => {
    */
   test('shows success toast when save completes', async () => {
     renderHook(() =>
-      useFormAutoSave(mockFormData, mockFieldPositions, mockDocumentId)
+      useFormAutoSave({
+        documentId: mockDocumentId,
+        formData: mockFormData,
+        fieldPositions: mockFieldPositions,
+      })
     );
 
     vi.advanceTimersByTime(5000);
@@ -159,7 +171,11 @@ describe('Auto-Save Integration Tests', () => {
     });
 
     renderHook(() =>
-      useFormAutoSave(mockFormData, mockFieldPositions, mockDocumentId)
+      useFormAutoSave({
+        documentId: mockDocumentId,
+        formData: mockFormData,
+        fieldPositions: mockFieldPositions,
+      })
     );
 
     vi.advanceTimersByTime(5000);
@@ -184,7 +200,11 @@ describe('Auto-Save Integration Tests', () => {
       .mockResolvedValueOnce({ data: null, error: null });
 
     renderHook(() =>
-      useFormAutoSave(mockFormData, mockFieldPositions, mockDocumentId)
+      useFormAutoSave({
+        documentId: mockDocumentId,
+        formData: mockFormData,
+        fieldPositions: mockFieldPositions,
+      })
     );
 
     vi.advanceTimersByTime(5000);
@@ -208,7 +228,11 @@ describe('Auto-Save Integration Tests', () => {
    */
   test('does not save when data has not changed', async () => {
     const { rerender } = renderHook(
-      ({ formData }) => useFormAutoSave(formData, mockFieldPositions, mockDocumentId),
+      ({ formData }) => useFormAutoSave({
+        documentId: mockDocumentId,
+        formData,
+        fieldPositions: mockFieldPositions,
+      }),
       { initialProps: { formData: mockFormData } }
     );
 
@@ -256,7 +280,11 @@ describe('Auto-Save Integration Tests', () => {
    */
   test('warns user on page unload with unsaved changes', () => {
     renderHook(() =>
-      useFormAutoSave(mockFormData, mockFieldPositions, mockDocumentId)
+      useFormAutoSave({
+        documentId: mockDocumentId,
+        formData: mockFormData,
+        fieldPositions: mockFieldPositions,
+      })
     );
 
     // Simulate beforeunload event
@@ -275,7 +303,11 @@ describe('Auto-Save Integration Tests', () => {
    */
   test('saves when field positions change', async () => {
     const { rerender } = renderHook(
-      ({ positions }) => useFormAutoSave(mockFormData, positions, mockDocumentId),
+      ({ positions }) => useFormAutoSave({
+        documentId: mockDocumentId,
+        formData: mockFormData,
+        fieldPositions: positions,
+      }),
       { initialProps: { positions: mockFieldPositions } }
     );
 
@@ -306,11 +338,19 @@ describe('Auto-Save Integration Tests', () => {
     const doc2Id = 'doc-2';
 
     const { rerender: rerender1 } = renderHook(() =>
-      useFormAutoSave(mockFormData, mockFieldPositions, doc1Id)
+      useFormAutoSave({
+        documentId: doc1Id,
+        formData: mockFormData,
+        fieldPositions: mockFieldPositions,
+      })
     );
 
     const { rerender: rerender2 } = renderHook(() =>
-      useFormAutoSave(mockFormData, mockFieldPositions, doc2Id)
+      useFormAutoSave({
+        documentId: doc2Id,
+        formData: mockFormData,
+        fieldPositions: mockFieldPositions,
+      })
     );
 
     vi.advanceTimersByTime(5000);
@@ -336,7 +376,11 @@ describe('Auto-Save Integration Tests', () => {
     mockUpsert.mockRejectedValue(new Error('Failed to fetch'));
 
     renderHook(() =>
-      useFormAutoSave(mockFormData, mockFieldPositions, mockDocumentId)
+      useFormAutoSave({
+        documentId: mockDocumentId,
+        formData: mockFormData,
+        fieldPositions: mockFieldPositions,
+      })
     );
 
     vi.advanceTimersByTime(5000);
@@ -364,7 +408,11 @@ describe('Auto-Save Integration Tests', () => {
     }
 
     renderHook(() =>
-      useFormAutoSave(largeFormData, mockFieldPositions, mockDocumentId)
+      useFormAutoSave({
+        documentId: mockDocumentId,
+        formData: largeFormData,
+        fieldPositions: mockFieldPositions,
+      })
     );
 
     const startTime = Date.now();

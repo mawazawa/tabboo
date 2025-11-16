@@ -34,6 +34,13 @@ describe('AI Assistant Integration Tests', () => {
     caseNumber: 'FL12345678'
   };
 
+  const mockProps = {
+    formContext: mockFormData,
+    vaultData: null,
+    isVisible: true,
+    onToggleVisible: vi.fn(),
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -42,7 +49,7 @@ describe('AI Assistant Integration Tests', () => {
    * TEST 1: Component Renders
    */
   test('renders AI assistant with initial message', () => {
-    render(<DraggableAIAssistant formData={mockFormData} />);
+    render(<DraggableAIAssistant {...mockProps} />);
 
     // Verify assistant message is displayed
     expect(screen.getByText(/hello.*help you/i)).toBeInTheDocument();
@@ -53,7 +60,7 @@ describe('AI Assistant Integration Tests', () => {
    */
   test('user can send a message to AI', async () => {
     const user = userEvent.setup();
-    render(<DraggableAIAssistant formData={mockFormData} />);
+    render(<DraggableAIAssistant {...mockProps} />);
 
     // Find input field
     const input = screen.getByPlaceholderText(/ask|message|type/i);
@@ -89,7 +96,7 @@ describe('AI Assistant Integration Tests', () => {
       cancelStream: mockCancelStream,
     }) as any;
 
-    render(<DraggableAIAssistant formData={mockFormData} />);
+    render(<DraggableAIAssistant {...mockProps} />);
 
     // Look for loading indicator (spinner, "thinking", etc.)
     const loadingIndicator = screen.queryByText(/thinking|loading|generating/i) ||
@@ -112,7 +119,7 @@ describe('AI Assistant Integration Tests', () => {
       cancelStream: mockCancelStream,
     }) as any;
 
-    render(<DraggableAIAssistant formData={mockFormData} />);
+    render(<DraggableAIAssistant {...mockProps} />);
 
     // Look for error message
     const errorMessage = screen.queryByText(/error|failed|couldn't/i);
@@ -136,7 +143,7 @@ describe('AI Assistant Integration Tests', () => {
       cancelStream: mockCancelStream,
     }) as any;
 
-    render(<DraggableAIAssistant formData={mockFormData} />);
+    render(<DraggableAIAssistant {...mockProps} />);
 
     // Look for cancel/stop button
     const cancelButton = screen.queryByRole('button', { name: /cancel|stop/i });
@@ -169,7 +176,7 @@ describe('AI Assistant Integration Tests', () => {
       cancelStream: mockCancelStream,
     }) as any;
 
-    render(<DraggableAIAssistant formData={mockFormData} />);
+    render(<DraggableAIAssistant {...mockProps} />);
 
     // Verify all messages are displayed
     expect(screen.getByText(/what is fl-320/i)).toBeInTheDocument();
@@ -182,7 +189,7 @@ describe('AI Assistant Integration Tests', () => {
    */
   test('sends form context with messages', async () => {
     const user = userEvent.setup();
-    render(<DraggableAIAssistant formData={mockFormData} />);
+    render(<DraggableAIAssistant {...mockProps} />);
 
     // Type and send a message
     const input = screen.getByPlaceholderText(/ask|message|type/i);
@@ -209,7 +216,7 @@ describe('AI Assistant Integration Tests', () => {
    */
   test('prevents sending empty messages', async () => {
     const user = userEvent.setup();
-    render(<DraggableAIAssistant formData={mockFormData} />);
+    render(<DraggableAIAssistant {...mockProps} />);
 
     const input = screen.getByPlaceholderText(/ask|message|type/i);
 
@@ -230,7 +237,7 @@ describe('AI Assistant Integration Tests', () => {
    */
   test('AI assistant is draggable', async () => {
     const user = userEvent.setup();
-    render(<DraggableAIAssistant formData={mockFormData} />);
+    render(<DraggableAIAssistant {...mockProps} />);
 
     // Find the drag handle (usually the header/title bar)
     const dragHandle = screen.queryByRole('heading', { name: /ai assistant|assistant/i }) ||
@@ -258,7 +265,7 @@ describe('AI Assistant Integration Tests', () => {
    * TEST 10: Resize Functionality
    */
   test('AI assistant can be resized', async () => {
-    render(<DraggableAIAssistant formData={mockFormData} />);
+    render(<DraggableAIAssistant {...mockProps} />);
 
     // Look for resize handle
     const resizeHandle = document.querySelector('[class*="resize"]');
@@ -283,7 +290,7 @@ describe('AI Assistant Integration Tests', () => {
    */
   test('user can close or minimize assistant', async () => {
     const user = userEvent.setup();
-    render(<DraggableAIAssistant formData={mockFormData} />);
+    render(<DraggableAIAssistant {...mockProps} />);
 
     // Look for close or minimize button
     const closeButton = screen.queryByRole('button', { name: /close|minimize|hide/i }) ||
@@ -303,7 +310,7 @@ describe('AI Assistant Integration Tests', () => {
    */
   test('supports keyboard shortcuts', async () => {
     const user = userEvent.setup();
-    render(<DraggableAIAssistant formData={mockFormData} />);
+    render(<DraggableAIAssistant {...mockProps} />);
 
     const input = screen.getByPlaceholderText(/ask|message|type/i);
     await user.type(input, 'Test message');
