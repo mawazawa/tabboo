@@ -46,6 +46,8 @@ All environment variables are stored in `.env.web` (gitignored) with actual prod
 
 ## Package.json Configuration
 
+**Security Note**: All API keys in `package.json` use environment variable references (`${VAR}`) - never hardcoded values. All actual keys are stored in `.env.web` (gitignored).
+
 The `package.json` includes a `claudeCode` configuration section that enables:
 
 1. **Custom Environment Mode**: Full control over environment variables
