@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { useAdaptiveLayout } from '@/hooks/useAdaptiveLayout';
+import { useAdaptiveLayout } from '@/hooks/use-adaptive-layout';
 
 interface AdaptiveLayoutProps {
   /** Desktop layout (≥1280px) */
