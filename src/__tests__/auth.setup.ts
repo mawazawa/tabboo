@@ -62,7 +62,14 @@ setup('authenticate with Supabase', async ({ page }) => {
 
   console.log('[Auth Setup] App loaded successfully!');
 
-  // Save the authenticated state
+  // Disable tutorial for tests by setting localStorage flag
+  await page.evaluate(() => {
+    localStorage.setItem('tutorial-shown', 'true');
+  });
+
+  console.log('[Auth Setup] Tutorial disabled for tests');
+
+  // Save the authenticated state (includes localStorage)
   await page.context().storageState({ path: authFile });
 
   console.log(`[Auth Setup] Authentication state saved to ${authFile}`);
