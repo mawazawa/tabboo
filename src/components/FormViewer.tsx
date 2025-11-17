@@ -13,6 +13,7 @@ import { Settings, Move, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Spar
 import { canAutofill, getVaultValueForField } from "@/utils/vaultFieldMatcher";
 import { TutorialTooltips } from "@/components/TutorialTooltips";
 import { useFormFields, convertToFieldOverlays, generateFieldNameToIndex } from "@/hooks/use-form-fields";
+import { useLiveRegion } from "@/hooks/useLiveRegion";
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
@@ -35,6 +36,12 @@ interface Props {
 }
 
 export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, zoom = 1, highlightedField = null, validationErrors = {}, vaultData = null }: Props) => {
+  // Live region for screen reader announcements
+  const { announce, LiveRegionComponent } = useLiveRegion({
+    clearAfter: 2000, // Clear announcements after 2 seconds
+    debounce: 300, // Debounce rapid announcements (e.g., during dragging)
+  });
+
   // Fetch FL-320 form fields from database
   const { data: fieldMappings, isLoading: isLoadingFields, error: fieldsError } = useFormFields('FL-320');
 
@@ -197,7 +204,12 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   };
 
   const toggleGlobalEditMode = () => {
-    setIsGlobalEditMode(prev => !prev);
+    setIsGlobalEditMode(prev => {
+      const newMode = !prev;
+      // Announce mode change to screen readers
+      announce(newMode ? 'Edit mode activated. You can now drag fields to reposition them.' : 'Edit mode deactivated. Fields are now locked.');
+      return newMode;
+    });
   };
 
   const handleFieldClick = (field: string, e: React.MouseEvent) => {
@@ -301,15 +313,17 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     // COMMIT: Now update React state with final position
     if (draggedPositionRef.current && isDragging) {
       updateFieldPosition(isDragging, draggedPositionRef.current);
+      // Announce field repositioning to screen readers
+      announce(`Field ${isDragging} repositioned`);
     }
-    
+
     // Clean up
     setIsDragging(null);
     dragElementRef.current = null;
     draggedPositionRef.current = null;
     setAlignmentGuides({ x: [], y: [] });
     lastGuidesRef.current = { x: [], y: [] };
-  }, [isDragging, updateFieldPosition]);
+  }, [isDragging, updateFieldPosition, announce]);
 
   const handlePDFClick = (e: React.MouseEvent) => {
     // Clicking PDF background does nothing in edit mode
@@ -476,6 +490,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
 
   return (
     <div className="h-full w-full overflow-auto bg-muted/20">
+        {/* Live region for screen reader announcements */}
+        <LiveRegionComponent />
+
         <TutorialTooltips />
         
         {/* Global Edit Mode Toggle */}

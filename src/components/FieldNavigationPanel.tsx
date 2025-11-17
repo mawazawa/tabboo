@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { useLiveRegion } from "@/hooks/useLiveRegion";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ValidationRuleEditor } from "./ValidationRuleEditor";
 import { FieldPresetsToolbar } from "./FieldPresetsToolbar";
@@ -181,6 +182,11 @@ export const FieldNavigationPanel = ({
   onApplyTemplate,
   onApplyGroup,
 }: Props) => {
+  // Live region for field navigation announcements
+  const { announce, LiveRegionComponent } = useLiveRegion({
+    clearAfter: 1500, // Quick clear for rapid field navigation
+  });
+
   const fieldRefs = useRef<(HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | null)[]>([]);
   const scrollViewportRef = useRef<HTMLDivElement>(null);
   const activeFieldRef = useRef<HTMLDivElement>(null);
@@ -215,10 +221,18 @@ export const FieldNavigationPanel = ({
   });
 
   // Filter fields based on search query
-  const filteredFields = FIELD_CONFIG.filter(config => 
+  const filteredFields = FIELD_CONFIG.filter(config =>
     config.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
     config.field.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Announce current field to screen readers when it changes
+  useEffect(() => {
+    const currentField = FIELD_CONFIG[currentFieldIndex];
+    if (currentField) {
+      announce(`Field ${currentFieldIndex + 1} of ${FIELD_CONFIG.length}: ${currentField.label}`);
+    }
+  }, [currentFieldIndex, announce]);
 
   // Smooth scroll to active field within ScrollArea viewport only
   useEffect(() => {
@@ -471,6 +485,9 @@ export const FieldNavigationPanel = ({
 
   return (
     <Card className="h-full border-hairline shadow-3point chamfered flex flex-col overflow-hidden">
+      {/* Live region for field navigation announcements */}
+      <LiveRegionComponent />
+
       {/* Compact Sticky Header */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-sm">
         <div className="p-3 space-y-2">
