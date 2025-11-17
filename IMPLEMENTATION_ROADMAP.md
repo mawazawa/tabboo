@@ -162,7 +162,11 @@ private async getPDFPageCount(file: File | Blob): Promise<number> {
     return pdf.numPages;
   } catch (error) {
     console.warn('Could not get PDF page count:', error);
-    return 0; // Allow upload if page count check fails
+    // Fix: Return MAX_PAGES + 1 to fail validation instead of 0
+    // Returning 0 bypasses validation because "0 > 1000" is false
+    // This ensures malformed/unparseable PDFs are rejected
+    const MAX_PAGES = 1000;
+    return MAX_PAGES + 1; // Fail validation when page count cannot be determined
   }
 }
 ```

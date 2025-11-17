@@ -341,6 +341,17 @@ export class ExtractionCache {
 
     const allEntries = await this.db.getAll('extractions');
 
+    // Fix: Check if array is empty before calling Math.min/max
+    // Math.min/max on empty arrays return Infinity/-Infinity
+    if (allEntries.length === 0) {
+      return {
+        totalEntries: 0,
+        totalSizeBytes: 0,
+        oldestEntry: 0,
+        newestEntry: 0
+      };
+    }
+
     return {
       totalEntries: allEntries.length,
       totalSizeBytes: allEntries.reduce((sum, e) => sum + e.fileSize, 0),
@@ -1002,8 +1013,17 @@ export class RedisExtractionCache {
    * Get cached extraction (global, cross-user)
    */
   async get(fileHash: string): Promise<StructuredDocumentData | null> {
-    const cached = await this.redis.get<StructuredDocumentData>(`ocr:${fileHash}`);
-    return cached;
+    // Fix: Upstash Redis returns string, need to parse JSON
+    // set() stores data as JSON.stringify(), so get() must parse it
+    const cached = await this.redis.get<string>(`ocr:${fileHash}`);
+    if (!cached) return null;
+    
+    try {
+      return JSON.parse(cached) as StructuredDocumentData;
+    } catch (error) {
+      console.error('Failed to parse cached extraction:', error);
+      return null;
+    }
   }
 
   /**

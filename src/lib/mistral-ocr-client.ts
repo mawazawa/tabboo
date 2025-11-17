@@ -369,6 +369,30 @@ export class MistralOCREngine {
   }
 
   /**
+   * Get PDF page count using pdfjs-dist
+   * Returns MAX_PAGES + 1 on error to ensure validation fails for unparseable PDFs
+   */
+  private async getPDFPageCount(file: File | Blob): Promise<number> {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+
+      // Use pdfjs-dist (already in project)
+      const { getDocument } = await import('pdfjs-dist');
+      const pdf = await getDocument({ data: uint8Array }).promise;
+
+      return pdf.numPages;
+    } catch (error) {
+      console.warn('Could not get PDF page count:', error);
+      // Fix: Return MAX_PAGES + 1 to fail validation instead of 0
+      // Returning 0 bypasses validation because "0 > 1000" is false
+      // This ensures malformed/unparseable PDFs are rejected
+      const MAX_PAGES = 1000;
+      return MAX_PAGES + 1; // Fail validation when page count cannot be determined
+    }
+  }
+
+  /**
    * Create structuring prompt based on document type
    */
   private createStructuringPrompt(markdown: string, documentType: DocumentType): string {
