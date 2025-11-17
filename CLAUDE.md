@@ -113,6 +113,8 @@ src/
 │   ├── FieldGroupManager.tsx       # Group related fields
 │   ├── PDFThumbnailSidebar.tsx     # PDF page thumbnails
 │   ├── TemplateManager.tsx         # Form templates
+│   ├── TROWorkflowWizard.tsx       # TRO packet workflow orchestration ✨NEW
+│   ├── PacketProgressPanel.tsx     # Workflow progress visualization ✨NEW
 │   └── ui/                         # shadcn/ui components
 ├── pages/
 │   ├── Index.tsx                   # Main form editor (auth required)
@@ -126,15 +128,21 @@ src/
 │   ├── useFormAutoSave.ts          # Auto-save every 5 seconds
 │   ├── useOfflineSync.ts           # Offline data synchronization
 │   ├── useKeyboardShortcuts.ts     # Keyboard shortcuts
-│   └── usePrefetchOnHover.ts       # Prefetch optimization
+│   ├── usePrefetchOnHover.ts       # Prefetch optimization
+│   └── useTROWorkflow.ts           # TRO workflow state management ✨NEW
 ├── integrations/
 │   └── supabase/
 │       ├── client.ts               # Supabase client config
 │       └── types.ts                # Database types
+├── types/
+│   ├── FormData.ts                 # Form data interfaces
+│   └── WorkflowTypes.ts            # TRO workflow type definitions ✨NEW
 └── lib/
     ├── utils.ts                    # Utility functions (cn, etc.)
     ├── validations.ts              # Form validation logic
-    └── errorTracking.ts            # Sentry integration
+    ├── errorTracking.ts            # Sentry integration
+    ├── formDataMapper.ts           # Data mapping between forms ✨NEW
+    └── workflowValidator.ts        # Workflow & packet validation ✨NEW
 ```
 
 ### Key Architectural Patterns
@@ -172,6 +180,16 @@ src/
 - Uses `react-resizable-panels` for user-adjustable widths
 - Panel visibility toggles for mobile/focused work
 - AI Assistant can be dragged anywhere on screen
+
+**6. TRO Workflow Engine** (November 2025)
+- Multi-form workflow orchestration for complete TRO packets
+- State machine with 18 workflow states and 9 form types
+- Automatic data mapping between forms (DV-100 → CLETS-001, DV-105, FL-150)
+- Form dependency validation and packet completion tracking
+- Personal Data Vault integration for auto-fill across forms
+- Comprehensive validation with required fields and conditional rules
+- Progress visualization with estimated time remaining
+- Database tables: `tro_workflows` (workflow state), `legal_documents` (form data)
 
 ## Supabase Configuration
 
@@ -274,6 +292,326 @@ Validates:
    - User-friendly test for self-represented litigants
    - Real-world scenario testing
    - Non-technical language and guidance
+
+## TRO Workflow Engine (November 2025)
+
+### Overview
+
+The TRO (Temporary Restraining Order) Workflow Engine is a comprehensive multi-form orchestration system that guides users through completing California Judicial Council form packets for domestic violence restraining orders. It provides state management, data mapping, validation, and progress tracking across multiple interdependent forms.
+
+**Key Features**:
+- ✅ Multi-form workflow orchestration
+- ✅ State machine with 18 workflow states
+- ✅ Support for 9 different form types (DV-100, DV-105, CLETS-001, FL-150, etc.)
+- ✅ Automatic data mapping between forms
+- ✅ Form dependency validation
+- ✅ Progress tracking with time estimates
+- ✅ Personal Data Vault integration
+- ✅ Comprehensive validation rules
+
+### Supported Packet Types
+
+**1. Initiating TRO (With Children)**
+- Forms: DV-100, CLETS-001, DV-105, FL-150 (optional)
+- Use case: Filing for protection with child custody issues
+
+**2. Initiating TRO (Without Children)**
+- Forms: DV-100, CLETS-001, FL-150 (optional)
+- Use case: Filing for protection without children
+
+**3. Response to TRO**
+- Forms: DV-120, FL-150 (optional), FL-320 (optional)
+- Use case: Responding to a restraining order request
+
+### Architecture
+
+**Core Files**:
+- `src/types/WorkflowTypes.ts` - Complete type system (1000+ lines)
+- `src/hooks/useTROWorkflow.ts` - Workflow state management hook
+- `src/lib/formDataMapper.ts` - Data mapping between forms
+- `src/lib/workflowValidator.ts` - Form and packet validation
+- `src/components/TROWorkflowWizard.tsx` - Main UI orchestration
+- `src/components/PacketProgressPanel.tsx` - Progress visualization
+
+**Database Tables**:
+```sql
+-- Workflow state (one row per user's active workflow)
+tro_workflows {
+  id: uuid,
+  user_id: uuid,
+  packet_type: text,           -- 'initiating_with_children' | 'initiating_no_children' | 'response'
+  current_state: text,          -- Current workflow state (18 possible states)
+  form_statuses: jsonb,         -- { 'DV-100': 'complete', 'CLETS-001': 'in_progress', ... }
+  packet_config: jsonb,         -- { hasChildren: true, requestingSupport: false, ... }
+  form_data_refs: jsonb,        -- { 'DV-100': 'doc_uuid', 'CLETS-001': 'doc_uuid', ... }
+  metadata: jsonb,              -- Progress percentage, validation errors, etc.
+  created_at: timestamptz,
+  updated_at: timestamptz
+}
+
+-- Individual form data (one row per form)
+legal_documents {
+  id: uuid,
+  user_id: uuid,
+  title: text,
+  form_type: text,              -- 'DV-100', 'CLETS-001', etc.
+  workflow_id: uuid,            -- References tro_workflows
+  content: jsonb,               -- Actual form data
+  metadata: jsonb,              -- Field positions, validation rules, etc.
+  status: text,
+  created_at: timestamptz,
+  updated_at: timestamptz
+}
+```
+
+### Using the Workflow Engine
+
+**Example: Starting a New Workflow**
+```typescript
+import { useTROWorkflow } from '@/hooks/useTROWorkflow';
+import { PacketType } from '@/types/WorkflowTypes';
+
+function MyComponent({ userId }: { userId: string }) {
+  const {
+    workflow,
+    startWorkflow,
+    transitionToNextForm,
+    validateCurrentForm,
+    getPacketCompletionPercentage
+  } = useTROWorkflow(userId);
+
+  // Start a new workflow
+  const handleStart = async () => {
+    await startWorkflow(PacketType.INITIATING_WITH_CHILDREN, {
+      hasChildren: true,
+      requestingChildSupport: false,
+      requestingSpousalSupport: false,
+      needMoreSpace: false,
+      hasExistingCaseNumber: false
+    });
+  };
+
+  // Validate and move to next form
+  const handleNext = async () => {
+    const validation = await validateCurrentForm();
+    if (validation.valid) {
+      await transitionToNextForm();
+    } else {
+      // Show errors
+      console.error(validation.errors);
+    }
+  };
+
+  return (
+    <div>
+      <h1>Progress: {getPacketCompletionPercentage()}%</h1>
+      <button onClick={handleNext}>Next Form</button>
+    </div>
+  );
+}
+```
+
+**Example: Using the Wizard Component**
+```typescript
+import { TROWorkflowWizard } from '@/components/TROWorkflowWizard';
+
+function TROPacketPage({ userId }: { userId: string }) {
+  return (
+    <TROWorkflowWizard
+      userId={userId}
+      onComplete={() => {
+        // Packet complete, ready to file
+        console.log('Packet ready for filing!');
+      }}
+      onError={(error) => {
+        // Handle errors
+        console.error('Workflow error:', error);
+      }}
+    />
+  );
+}
+```
+
+### Form Data Mapping
+
+The workflow engine automatically maps data between forms to reduce redundant data entry:
+
+**DV-100 → CLETS-001**:
+- Protected person name, address, DOB, physical description
+- Restrained person name, address, DOB, physical description
+- Case number, county
+
+**DV-100 → DV-105**:
+- Petitioner/respondent names
+- Case number, county
+- Children information
+
+**DV-100 → FL-150**:
+- Party name, case number
+- Number of children for support calculations
+
+**Personal Data Vault → All Forms**:
+- Full name, address, contact information
+- Attorney information (if applicable)
+
+### Validation Rules
+
+**Form-Level Validation**:
+- Required fields check (e.g., DV-100 requires protected person name, restrained person name, abuse description)
+- Conditional requirements (e.g., FL-150 required if requesting support)
+- Field format validation (email, phone, ZIP code, dates, case numbers)
+- Data type validation (numbers, text, dates)
+
+**Packet-Level Validation**:
+- All required forms completed
+- Form dependencies met (e.g., CLETS-001 requires DV-100 to be complete)
+- Data consistency across forms (case numbers match, party names consistent)
+- No conflicting information
+
+**Example Validation Errors**:
+```typescript
+{
+  valid: false,
+  errors: [
+    {
+      field: 'protectedPersonName',
+      formType: 'DV-100',
+      message: 'Protected person name is required',
+      code: 'REQUIRED_FIELD_MISSING',
+      severity: 'error'
+    }
+  ],
+  warnings: [
+    {
+      field: 'abuseDescription',
+      formType: 'DV-100',
+      message: 'Abuse description is very brief. More details may strengthen your case.',
+      suggestion: 'Consider adding more specific details about dates, locations, and incidents'
+    }
+  ]
+}
+```
+
+### Workflow State Machine
+
+The engine uses a finite state machine with 18 states:
+
+```
+NOT_STARTED → PACKET_TYPE_SELECTION → DV100_IN_PROGRESS → DV100_COMPLETE
+  → CLETS_IN_PROGRESS → CLETS_COMPLETE → [DV105 if children] → [FL150 if support]
+  → REVIEW_IN_PROGRESS → READY_TO_FILE → FILED
+```
+
+**Valid Transitions**:
+- State transitions are validated before execution
+- Cannot skip required forms
+- Cannot move forward without completing current form
+- Can move backward to edit previous forms
+
+### Progress Tracking
+
+**Completion Percentage**:
+```typescript
+const completionPercentage = getPacketCompletionPercentage();
+// Returns 0-100 based on required forms completed
+```
+
+**Estimated Time Remaining**:
+```typescript
+const minutesRemaining = getEstimatedTimeRemaining();
+// Based on pre-defined time estimates per form type
+```
+
+**Form-Level Progress**:
+```typescript
+const formProgress = getFormCompletionPercentage('DV-100');
+// Returns 0-100 for individual form
+```
+
+### Integration Points
+
+**With Form Components** (To be implemented by Agent 1):
+```typescript
+// The workflow wizard will render form components based on current state
+const currentForm = getCurrentForm(); // Returns 'DV-100', 'CLETS-001', etc.
+
+// Render appropriate form component
+{currentForm === 'DV-100' && <DV100FormViewer data={formData} onChange={handleUpdate} />}
+{currentForm === 'CLETS-001' && <CLETS001FormViewer data={formData} onChange={handleUpdate} />}
+```
+
+**With Personal Data Vault**:
+```typescript
+// Auto-fill form from vault
+const result = await autofillFormFromVault('DV-100');
+// Returns: { fieldsAutofilled: 12, fields: {...}, source: 'vault' }
+```
+
+**With Auto-Save System**:
+```typescript
+// Each form save triggers workflow update
+await saveFormData('DV-100', formData);
+// Also updates form status to 'in_progress' or 'complete'
+```
+
+### Error Handling
+
+**Workflow Errors**:
+```typescript
+import { WorkflowError, WorkflowErrorCode } from '@/types/WorkflowTypes';
+
+try {
+  await transitionToNextForm();
+} catch (error) {
+  if (error instanceof WorkflowError) {
+    if (error.code === WorkflowErrorCode.VALIDATION_FAILED) {
+      // Show validation errors to user
+    } else if (error.recoverable) {
+      // Show error toast, stay on current form
+    } else {
+      // Critical error, show error boundary
+    }
+  }
+}
+```
+
+### Testing
+
+**Unit Tests** (To be implemented):
+- State transitions
+- Data mapping functions
+- Validation rules
+- Form dependency logic
+
+**Integration Tests** (To be implemented):
+- Complete workflow flow
+- Form-to-form data transfer
+- Error handling scenarios
+- Database persistence
+
+### Future Enhancements
+
+**Phase 2** (Planned):
+- Save and resume workflows
+- Packet templates
+- Court-specific variations
+- E-filing integration
+- Attorney review workflow
+
+**Phase 3** (Planned):
+- Multi-language support
+- Enhanced accessibility
+- Mobile app
+- Video tutorials
+- Live chat support
+
+### Related Documentation
+
+- `TRO_WORKFLOW_DESIGN.md` - Detailed workflow architecture
+- `SYSTEMATIC_FORM_IMPLEMENTATION_GUIDE.md` - Form implementation patterns
+- `PRE_LAUNCH_REALITY_CHECK.md` - Product requirements
+
+---
 
 **Test Data** (Standardized for consistency):
 ```json
