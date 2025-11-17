@@ -34,8 +34,8 @@ setup('authenticate with Supabase', async ({ page }) => {
 
   console.log('[Auth Setup] Starting authentication...');
 
-  // Navigate to auth page
-  await page.goto('http://localhost:8085/auth');
+  // Navigate to auth page (using relative URL to inherit baseURL from config)
+  await page.goto('/auth');
   await page.waitForLoadState('networkidle');
 
   console.log('[Auth Setup] Filling credentials...');
@@ -52,13 +52,15 @@ setup('authenticate with Supabase', async ({ page }) => {
   // Click sign in button
   await page.getByRole('button', { name: /sign in|login/i }).click();
 
-  // Wait for redirect to main page
-  await page.waitForURL('http://localhost:8085/', { timeout: 15000 });
+  // Wait for redirect to main page (using relative URL to inherit baseURL from config)
+  await page.waitForURL('/', { timeout: 15000 });
 
   console.log('[Auth Setup] Login successful, waiting for app to load...');
 
   // Wait for the PDF viewer to load as confirmation app is ready
-  await page.waitForSelector('.react-pdf__Document', { timeout: 15000 });
+  await page.waitForSelector('.react-pdf__Document canvas', { timeout: 20000, state: 'visible' });
+  // Also wait for form fields to be interactive
+  await page.waitForSelector('input[placeholder]', { timeout: 20000, state: 'visible' });
 
   console.log('[Auth Setup] App loaded successfully!');
 

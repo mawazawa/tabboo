@@ -37,6 +37,9 @@ test.describe('Complete User Workflows', () => {
     // Navigate to home page (already authenticated via stored session)
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+    // Wait for PDF and form fields to be ready
+    await page.waitForSelector('.react-pdf__Document', { timeout: 15000, state: 'visible' });
+    await page.waitForSelector('input[placeholder]', { timeout: 15000, state: 'visible' });
   });
 
   /**
