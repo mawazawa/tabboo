@@ -85,10 +85,7 @@
     "mcpServers": {
       "memory": {
         "command": "npx",
-        "args": [
-          "-y",
-          "@modelcontextprotocol/server-memory"
-        ],
+        "args": ["-y", "@modelcontextprotocol/server-memory"],
         "env": {
           "MEMORY_FILE_PATH": "/Users/mathieuwauters/Desktop/code/memory/canonical/knowledge-graph.db"
         },
@@ -96,42 +93,31 @@
       },
       "supabase": {
         "command": "npx",
-        "args": [
-          "-y",
-          "@supabase/mcp-server-supabase@latest"
-        ],
+        "args": ["-y", "@supabase/mcp-server-supabase@latest"],
         "env": {
-          "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN}"
+          "SUPABASE_ACCESS_TOKEN": "sbp_d117902556394d2d2085222e4f69546895aaea4f"
         },
         "enabled": true
       },
       "exa": {
         "command": "npx",
-        "args": [
-          "exa-mcp-server"
-        ],
+        "args": ["exa-mcp-server"],
         "env": {
-          "EXA_API_KEY": "${EXA_API_KEY}"
+          "EXA_API_KEY": "c3206133-e55a-4859-8510-c5884dbe900d"
         },
         "enabled": true
       },
       "perplexity": {
         "command": "npx",
-        "args": [
-          "-y",
-          "server-perplexity-ask"
-        ],
+        "args": ["-y", "server-perplexity-ask"],
         "env": {
-          "PERPLEXITY_API_KEY": "${PERPLEXITY_API_KEY}"
+          "PERPLEXITY_API_KEY": "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"
         },
         "enabled": true
       },
       "linear": {
         "command": "npx",
-        "args": [
-          "-y",
-          "@modelcontextprotocol/server-linear"
-        ],
+        "args": ["-y", "@modelcontextprotocol/server-linear"],
         "env": {
           "LINEAR_API_KEY": ""
         },
@@ -139,10 +125,7 @@
       },
       "neo4j": {
         "command": "npx",
-        "args": [
-          "-y",
-          "@modelcontextprotocol/server-neo4j"
-        ],
+        "args": ["-y", "@modelcontextprotocol/server-neo4j"],
         "env": {
           "NEO4J_URI": "",
           "NEO4J_USER": "",
@@ -152,10 +135,7 @@
       },
       "stripe": {
         "command": "npx",
-        "args": [
-          "-y",
-          "@modelcontextprotocol/server-stripe"
-        ],
+        "args": ["-y", "@modelcontextprotocol/server-stripe"],
         "env": {
           "STRIPE_API_KEY": ""
         },
@@ -163,10 +143,7 @@
       },
       "vercel": {
         "command": "npx",
-        "args": [
-          "-y",
-          "@modelcontextprotocol/server-vercel"
-        ],
+        "args": ["-y", "@modelcontextprotocol/server-vercel"],
         "env": {
           "VERCEL_API_TOKEN": ""
         },
@@ -174,8 +151,8 @@
       }
     },
     "environmentVariables": {
-      "VITE_SUPABASE_URL": "https://sbwgkocarqvonkdlitdx.supabase.co",
-      "VITE_SUPABASE_ANON_KEY": "${VITE_SUPABASE_ANON_KEY}",
+      "VITE_SUPABASE_URL": "${VITE_SUPABASE_URL}",
+      "VITE_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNid2drb2NhcnF2b25rZGxpdGR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0NjMyNTIsImV4cCI6MjA3NTAzOTI1Mn0.OelLtQvHVhiSjEcL3PxS5yfM-CRc3Ino_L7ykDG4Now",
       "GROQ_API_KEY": "",
       "MISTRAL_API_KEY": "",
       "VITE_MISTRAL_API_KEY": "",
