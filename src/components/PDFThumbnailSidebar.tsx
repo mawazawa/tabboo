@@ -47,14 +47,19 @@ export const PDFThumbnailSidebar = ({
   };
 
   return (
-    <div ref={containerRef} className="w-full border-r bg-card/50 backdrop-blur-sm flex flex-col h-full">
-      <div className="border-b p-4 flex items-center gap-2 bg-card/80">
-        <FileText className="h-5 w-5 text-primary" strokeWidth={1.5} />
+    <div ref={containerRef} className="w-full border-r bg-muted/30 backdrop-blur-sm flex flex-col h-full">
+      <div className="border-b p-4 flex items-center gap-2 bg-muted/50 backdrop-blur-md">
+        <FileText className="h-5 w-5 text-primary" strokeWidth={2} />
         <span className="font-semibold text-sm">Pages</span>
+        {numPages > 0 && (
+          <span className="ml-auto text-xs text-muted-foreground bg-background/50 px-2 py-0.5 rounded-full">
+            {numPages}
+          </span>
+        )}
       </div>
 
-      <ScrollArea className="flex-1">
-        <div className="p-4 space-y-3">
+      <ScrollArea className="flex-1 bg-muted/10">
+        <div className="p-4 space-y-4">
           {isLoading && (
             <div className="flex flex-col items-center gap-3 py-8">
               <Loader2 className="h-6 w-6 animate-spin text-primary" strokeWidth={1.5} />
@@ -75,10 +80,12 @@ export const PDFThumbnailSidebar = ({
                 <button
                   key={`thumb_${pageNum}`}
                   onClick={() => onPageClick?.(pageNum)}
-                  className={`relative mb-3 rounded-lg overflow-hidden transition-all spring-hover w-full ${
+                  aria-label={`Go to page ${pageNum}`}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`group relative mb-4 rounded-lg overflow-hidden transition-all duration-200 w-full hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                     isActive
-                      ? "ring-4 ring-primary shadow-3point scale-105"
-                      : "ring-2 ring-border hover:ring-primary/50 shadow-3point"
+                      ? "ring-4 ring-primary shadow-xl scale-[1.03]"
+                      : "ring-2 ring-border/50 hover:ring-primary/60 shadow-lg hover:shadow-xl bg-background"
                   }`}
                 >
                   <div className="relative w-full">
@@ -107,10 +114,10 @@ export const PDFThumbnailSidebar = ({
                     )}
                   </div>
                   <div
-                    className={`absolute bottom-0 left-0 right-0 py-1 text-center text-xs font-semibold ${
+                    className={`absolute bottom-0 left-0 right-0 py-1.5 text-center text-xs font-semibold transition-colors ${
                       isActive
                         ? "bg-primary text-primary-foreground"
-                        : "bg-background/90 text-muted-foreground"
+                        : "bg-background/95 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
                     }`}
                   >
                     Page {pageNum}
