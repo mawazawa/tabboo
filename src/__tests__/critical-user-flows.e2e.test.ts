@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { waitForApp } from './helpers/wait-for-app';
 
 /**
  * CRITICAL USER FLOWS - E2E Tests
@@ -16,11 +17,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Critical User Flow: Basic Form Interaction', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    // Wait for PDF and form to load - use specific selector for main PDF canvas
-    await page.waitForSelector('.react-pdf__Document canvas', { timeout: 15000, state: 'visible' });
-    // Also wait for at least one input field to be ready
-    await page.waitForSelector('input[placeholder]', { timeout: 15000, state: 'visible' });
-    await page.waitForLoadState('networkidle');
+    await waitForApp(page);
   });
 
   test('CRITICAL: User can click into a field and type immediately', async ({ page }) => {
@@ -166,11 +163,7 @@ test.describe('Critical User Flow: Basic Form Interaction', () => {
 test.describe('Real User Journey: Complete Form Filling', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    // Wait for PDF and form to load - use specific selector for main PDF canvas
-    await page.waitForSelector('.react-pdf__Document canvas', { timeout: 15000, state: 'visible' });
-    // Also wait for at least one input field to be ready
-    await page.waitForSelector('input[placeholder]', { timeout: 15000, state: 'visible' });
-    await page.waitForLoadState('networkidle');
+    await waitForApp(page);
   });
 
   test('User fills out a complete FL-320 form from start to finish', async ({ page }) => {
@@ -243,10 +236,7 @@ test.describe('Real User Journey: Complete Form Filling', () => {
 test.describe('Personal Data Vault Integration', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.waitForSelector('.react-pdf__Document canvas', { timeout: 15000, state: 'visible' });
-    // Also wait for at least one input field to be ready
-    await page.waitForSelector('input[placeholder]', { timeout: 15000, state: 'visible' });
-    await page.waitForLoadState('networkidle');
+    await waitForApp(page);
   });
 
   test('User can save their information to vault and reuse it', async ({ page }) => {
@@ -308,10 +298,7 @@ test.describe('Personal Data Vault Integration', () => {
 test.describe('Field Positioning and Dragging', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.waitForSelector('.react-pdf__Document canvas', { timeout: 15000, state: 'visible' });
-    // Also wait for at least one input field to be ready
-    await page.waitForSelector('input[placeholder]', { timeout: 15000, state: 'visible' });
-    await page.waitForLoadState('networkidle');
+    await waitForApp(page);
   });
 
   test('User can enter edit mode and drag fields', async ({ page }) => {
@@ -363,10 +350,7 @@ test.describe('Field Positioning and Dragging', () => {
 test.describe('Auto-save and Data Persistence', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.waitForSelector('.react-pdf__Document canvas', { timeout: 15000, state: 'visible' });
-    // Also wait for at least one input field to be ready
-    await page.waitForSelector('input[placeholder]', { timeout: 15000, state: 'visible' });
-    await page.waitForLoadState('networkidle');
+    await waitForApp(page);
   });
 
   test('User data is automatically saved and persists on reload', async ({ page }) => {
@@ -426,10 +410,7 @@ test.describe('Auto-save and Data Persistence', () => {
 test.describe('Accessibility and Keyboard Navigation', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.waitForSelector('.react-pdf__Document canvas', { timeout: 15000, state: 'visible' });
-    // Also wait for at least one input field to be ready
-    await page.waitForSelector('input[placeholder]', { timeout: 15000, state: 'visible' });
-    await page.waitForLoadState('networkidle');
+    await waitForApp(page);
   });
 
   test('User can navigate entire form using only keyboard', async ({ page }) => {
@@ -491,10 +472,7 @@ test.describe('Accessibility and Keyboard Navigation', () => {
 test.describe('Error Handling and Edge Cases', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.waitForSelector('.react-pdf__Document canvas', { timeout: 15000, state: 'visible' });
-    // Also wait for at least one input field to be ready
-    await page.waitForSelector('input[placeholder]', { timeout: 15000, state: 'visible' });
-    await page.waitForLoadState('networkidle');
+    await waitForApp(page);
   });
 
   test('User can recover if they click rapidly between fields', async ({ page }) => {

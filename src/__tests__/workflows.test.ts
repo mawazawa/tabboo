@@ -6,6 +6,7 @@
  */
 
 import { test, expect, Page } from '@playwright/test';
+import { waitForApp } from './helpers/wait-for-app';
 
 // Authentication is handled by auth.setup.ts and stored in playwright/.auth/user.json
 // All tests automatically use the authenticated session
@@ -34,12 +35,8 @@ async function fillStandardFormData(page: Page) {
 
 test.describe('Complete User Workflows', () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to home page (already authenticated via stored session)
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
-    // Wait for PDF and form fields to be ready
-    await page.waitForSelector('.react-pdf__Document', { timeout: 15000, state: 'visible' });
-    await page.waitForSelector('input[placeholder]', { timeout: 15000, state: 'visible' });
+    await waitForApp(page);
   });
 
   /**
