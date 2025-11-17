@@ -507,33 +507,6 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
         <LiveRegionComponent />
 
         <TutorialTooltips />
-        
-        {/* Global Edit Mode Toggle */}
-        <div className="fixed top-4 right-4 z-50">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="lg"
-                variant={isGlobalEditMode ? "default" : "secondary"}
-                className={`shadow-lg hover:scale-105 transition-transform ${!isGlobalEditMode ? 'animate-pulse ring-2 ring-primary/50' : ''}`}
-                onClick={toggleGlobalEditMode}
-              >
-                <Move className="h-5 w-5 mr-2" />
-                {isGlobalEditMode ? 'Lock Fields' : 'Edit Positions'}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="left" className="max-w-xs">
-              <div className="space-y-1">
-                <p className="font-semibold">{isGlobalEditMode ? 'Exit edit mode to fill form' : 'Click to enable dragging'}</p>
-                <p className="text-xs text-muted-foreground">
-                  {isGlobalEditMode
-                    ? 'Keyboard: Press E or Esc to exit'
-                    : 'Enable this to drag fields into position'}
-                </p>
-              </div>
-            </TooltipContent>
-          </Tooltip>
-        </div>
 
         {/* Edit Mode Active Banner */}
         {isGlobalEditMode && (
@@ -603,9 +576,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                 const pageOverlays = fieldOverlays.find(o => o.page === pageNum);
 
                 return (
-                  <div 
+                  <div
                     key={`page_${pageNum}`}
-                    className="relative mb-4 touch-none w-full"
+                    className={`relative mb-4 w-full ${isGlobalEditMode ? 'touch-none' : ''}`}
                     onPointerMove={handlePointerMove}
                     onPointerUp={handlePointerUp}
                     onPointerLeave={handlePointerUp}
@@ -673,7 +646,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             <div
                             key={idx}
                             data-field={overlay.field}
-                            className={`field-container group absolute select-none touch-none ${
+                            className={`field-container group absolute ${isGlobalEditMode ? 'select-none touch-none' : ''} ${
                               isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary shadow-lg scale-105' :
                               isGlobalEditMode ? 'cursor-move ring-2 ring-primary/70' : 'cursor-pointer'
                             } ${
