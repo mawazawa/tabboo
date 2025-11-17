@@ -38,56 +38,87 @@ vi.mock('react-pdf', () => ({
   }
 }));
 
-// Mock useFormFields hook to return test data
+// Mock useFormFields hook to return test data matching FormFieldMapping structure
 vi.mock('@/hooks/use-form-fields', () => ({
   useFormFields: () => ({
     data: [
       {
-        form_type: 'FL-320',
+        id: 'test-1',
+        form_id: 'test-form',
+        field_id: 'field-1',
+        form_field_name: 'partyName',
         page_number: 1,
-        field_name: 'partyName',
-        field_type: 'text',
-        top_position: 10,
-        left_position: 20,
-        width: 200,
-        height: 24,
-        field_label: 'Party Name',
-        tab_order: 1,
+        position_top: 10,
+        position_left: 20,
+        field_width: null,
+        field_height: null,
+        placeholder_text: 'Party Name',
+        help_text: null,
+        item_number: '1',
+        section_name: null,
+        is_required: false,
+        is_readonly: false,
+        default_value: null,
+        canonical_field: {
+          field_key: 'party_name',
+          field_label: 'Party Name',
+          field_type: 'input',
+          vault_field_name: null,
+          validation_pattern: null,
+          description: null,
+        },
       },
       {
-        form_type: 'FL-320',
+        id: 'test-2',
+        form_id: 'test-form',
+        field_id: 'field-2',
+        form_field_name: 'email',
         page_number: 1,
-        field_name: 'email',
-        field_type: 'text',
-        top_position: 15,
-        left_position: 20,
-        width: 200,
-        height: 24,
-        field_label: 'Email',
-        tab_order: 2,
+        position_top: 15,
+        position_left: 20,
+        field_width: null,
+        field_height: null,
+        placeholder_text: 'Email',
+        help_text: null,
+        item_number: '2',
+        section_name: null,
+        is_required: false,
+        is_readonly: false,
+        default_value: null,
+        canonical_field: {
+          field_key: 'email',
+          field_label: 'Email',
+          field_type: 'input',
+          vault_field_name: null,
+          validation_pattern: null,
+          description: null,
+        },
       }
     ],
     isLoading: false,
     error: null,
   }),
   convertToFieldOverlays: (mappings: any[]) => {
-    return mappings.map((mapping) => ({
-      page: mapping.page_number,
-      fields: [{
-        field: mapping.field_name,
-        type: mapping.field_type,
-        top: String(mapping.top_position),
-        left: String(mapping.left_position),
-        width: mapping.width,
-        height: mapping.height,
-        label: mapping.field_label || mapping.field_name,
-        tabOrder: mapping.tab_order,
-      }]
-    }));
+    const pageMap = new Map<number, any[]>();
+    mappings.forEach((mapping) => {
+      if (mapping.position_top === null || mapping.position_left === null) return;
+      const overlay = {
+        type: mapping.canonical_field.field_type,
+        field: mapping.form_field_name,
+        top: mapping.position_top.toString(),
+        left: mapping.position_left.toString(),
+        width: mapping.field_width ? `${mapping.field_width}%` : undefined,
+        height: mapping.field_height ? `${mapping.field_height}%` : undefined,
+        placeholder: mapping.placeholder_text || mapping.canonical_field.field_label,
+      };
+      if (!pageMap.has(mapping.page_number)) pageMap.set(mapping.page_number, []);
+      pageMap.get(mapping.page_number)!.push(overlay);
+    });
+    return Array.from(pageMap.entries()).map(([page, fields]) => ({ page, fields }));
   },
   generateFieldNameToIndex: (mappings: any[]) => {
     return mappings.reduce((acc, mapping, index) => {
-      acc[mapping.field_name] = index;
+      acc[mapping.form_field_name] = index;
       return acc;
     }, {} as Record<string, number>);
   }

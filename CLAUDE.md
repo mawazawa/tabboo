@@ -8,6 +8,45 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Important**: This project was previously named "form-ai-forge" which was an accidental Loveable rename. The official name is now **SwiftFill**.
 
+## Supported Forms
+
+SwiftFill currently supports three California Judicial Council forms:
+
+### FL-320: Response to Request for Restraining Orders
+- **Status**: ✅ Fully Implemented
+- **Pages**: 4 pages
+- **Fields**: 64 fields
+- **Pattern**: Response form with consent/non-consent structure
+- **Database**: Complete field position mappings
+
+### DV-100: Request for Domestic Violence Restraining Order
+- **Status**: 🟡 Core Implementation Complete
+- **Pages**: 13 pages
+- **Items**: 34 numbered items
+- **Fields**: 837 fields (item1a_, item2b_, etc.)
+- **Pattern**: Request form with detailed abuse documentation
+- **Documentation**: Complete field guide (DV100_COMPLETE_FIELD_GUIDE.md)
+- **TypeScript**: DV100FormData interface (1,303 lines)
+- **Validation**: Comprehensive Zod schema (263 lines)
+- **PDF**: /public/dv100.pdf (Rev. January 1, 2025)
+- **Database**: ⚠️ Field position mappings needed
+
+### DV-105: Request for Child Custody and Visitation Orders
+- **Status**: 🟡 Core Implementation Complete
+- **Pages**: 6 pages
+- **Items**: 13 numbered items
+- **Fields**: 466 fields (item-based naming)
+- **Pattern**: Attachment form for custody and visitation
+- **Documentation**: Complete field guide (DV105_COMPLETE_FIELD_GUIDE.md)
+- **TypeScript**: DV105FormData interface (1,303 lines)
+- **Validation**: Comprehensive Zod schema (202 lines)
+- **PDF**: /public/dv105.pdf (Rev. January 1, 2024)
+- **Database**: ⚠️ Field position mappings needed
+
+**Multi-Form Architecture**: FormViewer component supports dynamic form loading via `formType` prop (`'FL-320' | 'DV-100' | 'DV-105'`). Forms are rendered from database field position mappings for maintainability.
+
+**See Also**: DV_FORMS_IMPLEMENTATION_STATUS.md for detailed implementation status and remaining work.
+
 ## Technology Stack
 
 - **Frontend**: React 18, TypeScript 5, Vite 5

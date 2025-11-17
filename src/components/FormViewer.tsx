@@ -22,6 +22,8 @@ import type { FormData, FieldOverlay, FieldPosition, ValidationErrors, PersonalV
 // Import centralized PDF.js configuration
 import '@/lib/pdfConfig';
 
+export type FormType = 'FL-320' | 'DV-100' | 'DV-105';
+
 interface Props {
   formData: FormData;
   updateField: (field: string, value: string | boolean) => void;
@@ -29,21 +31,32 @@ interface Props {
   setCurrentFieldIndex: (index: number) => void;
   fieldPositions: Record<string, FieldPosition>;
   updateFieldPosition: (field: string, position: FieldPosition) => void;
+  formType?: FormType;
   zoom?: number;
   highlightedField?: string | null;
   validationErrors?: ValidationErrors;
   vaultData?: PersonalVaultData | null;
 }
 
-export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, zoom = 1, highlightedField = null, validationErrors = {}, vaultData = null }: Props) => {
+// Helper function to get PDF path based on form type
+const getPdfPath = (formType: FormType): string => {
+  const pdfPaths: Record<FormType, string> = {
+    'FL-320': '/fl320.pdf',
+    'DV-100': '/dv100.pdf',
+    'DV-105': '/dv105.pdf',
+  };
+  return pdfPaths[formType];
+};
+
+export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, formType = 'FL-320', zoom = 1, highlightedField = null, validationErrors = {}, vaultData = null }: Props) => {
   // Live region for screen reader announcements
   const { announce, LiveRegionComponent } = useLiveRegion({
     clearAfter: 2000, // Clear announcements after 2 seconds
     debounce: 300, // Debounce rapid announcements (e.g., during dragging)
   });
 
-  // Fetch FL-320 form fields from database
-  const { data: fieldMappings, isLoading: isLoadingFields, error: fieldsError } = useFormFields('FL-320');
+  // Fetch form fields from database based on formType
+  const { data: fieldMappings, isLoading: isLoadingFields, error: fieldsError } = useFormFields(formType);
 
   const [numPages, setNumPages] = useState<number>(0);
   const [pageWidth, setPageWidth] = useState<number>(850);
@@ -445,7 +458,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
       <div className="h-full w-full flex items-center justify-center bg-muted/20">
         <div className="text-center space-y-4">
           <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-          <p className="text-muted-foreground">Loading FL-320 form fields from database...</p>
+          <p className="text-muted-foreground">Loading {formType} form fields from database...</p>
         </div>
       </div>
     );
@@ -460,7 +473,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
             <AlertTriangle className="h-12 w-12 mx-auto text-destructive" />
             <h3 className="font-semibold text-lg">Error Loading Form Fields</h3>
             <p className="text-sm text-muted-foreground">
-              Failed to load FL-320 form field definitions from the database.
+              Failed to load {formType} form field definitions from the database.
             </p>
             <p className="text-xs text-muted-foreground font-mono bg-muted p-2 rounded">
               {fieldsError.message}
@@ -480,7 +493,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
             <AlertCircle className="h-12 w-12 mx-auto text-warning" />
             <h3 className="font-semibold text-lg">No Form Fields Found</h3>
             <p className="text-sm text-muted-foreground">
-              No field mappings found for FL-320 in the database.
+              No field mappings found for {formType} in the database.
             </p>
           </div>
         </Card>
@@ -555,7 +568,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                   </div>
                   <div className="text-center space-y-2">
                     <h3 className="text-lg font-semibold">Loading PDF Form</h3>
-                    <p className="text-sm text-muted-foreground">Preparing your FL-320 form...</p>
+                    <p className="text-sm text-muted-foreground">Preparing your {formType} form...</p>
                   </div>
                   {loadProgress > 0 && loadProgress < 100 && (
                     <div className="w-full">
@@ -575,7 +588,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
           
           <div className="w-full" style={{ maxWidth: `${pageWidth * zoom}px` }}>
             <Document
-              file="/fl320.pdf"
+              file={getPdfPath(formType)}
               onLoadSuccess={onDocumentLoadSuccess}
               onLoadProgress={({ loaded, total }) => {
                 if (total > 0) {
@@ -659,14 +672,15 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                           return (
                             <div
                             key={idx}
+                            data-field={overlay.field}
                             className={`field-container group absolute select-none touch-none ${
-                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary shadow-lg scale-105' : 
+                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary shadow-lg scale-105' :
                               isGlobalEditMode ? 'cursor-move ring-2 ring-primary/70' : 'cursor-pointer'
                             } ${
                               highlightedField === overlay.field
                                 ? 'ring-2 ring-accent shadow-lg animate-pulse' :
-                              isCurrentField 
-                                ? 'ring-2 ring-primary shadow-md bg-primary/5' 
+                              isCurrentField
+                                ? 'ring-2 ring-primary shadow-md bg-primary/5'
                                 : 'ring-1 ring-border/50 hover:ring-primary/50'
                             } rounded-lg bg-background/80 backdrop-blur-sm p-2 transition-all duration-200`}
                             style={{
@@ -839,6 +853,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             
                             {overlay.type === 'input' && (
                               <Input
+                                data-field={overlay.field}
                                 value={formData[overlay.field as keyof FormData] as string || ''}
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
@@ -856,6 +871,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             )}
                             {overlay.type === 'textarea' && (
                               <Textarea
+                                data-field={overlay.field}
                                 value={formData[overlay.field as keyof FormData] as string || ''}
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
@@ -873,6 +889,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             )}
                             {overlay.type === 'checkbox' && (
                               <Checkbox
+                                data-field={overlay.field}
                                 checked={!!formData[overlay.field as keyof FormData]}
                                 onCheckedChange={(checked) => !isGlobalEditMode && updateField(overlay.field, checked as boolean)}
                                 disabled={isGlobalEditMode}
