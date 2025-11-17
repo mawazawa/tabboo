@@ -12,6 +12,7 @@ import { test as setup } from '@playwright/test';
 import * as dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { waitForApp } from './helpers/wait-for-app';
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -57,10 +58,8 @@ setup('authenticate with Supabase', async ({ page }) => {
 
   console.log('[Auth Setup] Login successful, waiting for app to load...');
 
-  // Wait for the PDF viewer to load as confirmation app is ready
-  await page.waitForSelector('.react-pdf__Document canvas', { timeout: 20000, state: 'visible' });
-  // Also wait for form fields to be interactive
-  await page.waitForSelector('input[placeholder]', { timeout: 20000, state: 'visible' });
+  // Wait for app to be fully loaded and interactive using November 2025 best practices
+  await waitForApp(page);
 
   console.log('[Auth Setup] App loaded successfully!');
 
