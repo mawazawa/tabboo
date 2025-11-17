@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { useLiveRegion } from "@/hooks/useLiveRegion";
+import { useLiveRegion } from "@/hooks/use-live-region";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ValidationRuleEditor } from "./ValidationRuleEditor";
 import { FieldPresetsToolbar } from "./FieldPresetsToolbar";

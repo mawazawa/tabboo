@@ -13,7 +13,7 @@ import { Settings, Move, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Spar
 import { canAutofill, getVaultValueForField } from "@/utils/vaultFieldMatcher";
 import { TutorialTooltips } from "@/components/TutorialTooltips";
 import { useFormFields, convertToFieldOverlays, generateFieldNameToIndex } from "@/hooks/use-form-fields";
-import { useLiveRegion } from "@/hooks/useLiveRegion";
+import { useLiveRegion } from "@/hooks/use-live-region";
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
