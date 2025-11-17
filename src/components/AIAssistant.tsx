@@ -250,8 +250,10 @@ export const AIAssistant = ({ formContext, vaultData }: AIAssistantProps) => {
                 disabled={isLoading || !input.trim()}
                 size="icon"
                 className="rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity shadow-soft h-10 w-10"
+                aria-label="Send message to AI assistant"
               >
                 <Send className="w-4 h-4" />
+                <span className="sr-only">Send message to AI assistant</span>
               </Button>
               <Button
                 onClick={() => {
@@ -262,8 +264,10 @@ export const AIAssistant = ({ formContext, vaultData }: AIAssistantProps) => {
                 variant="ghost"
                 size="icon"
                 className="rounded-xl h-10 w-10"
+                aria-label="Cancel message input"
               >
                 ✕
+                <span className="sr-only">Cancel message input</span>
               </Button>
             </div>
           ) : (

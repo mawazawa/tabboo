@@ -7,24 +7,8 @@
 
 import { test, expect, Page } from '@playwright/test';
 
-// Helper: Login
-async function loginUser(page: Page) {
-  await page.goto('/auth');
-  await page.waitForLoadState('networkidle');
-
-  const currentUrl = page.url();
-  if (currentUrl.includes('/auth')) {
-    const emailInput = page.getByPlaceholder(/email/i);
-    const passwordInput = page.getByPlaceholder(/password/i);
-
-    if (await emailInput.isVisible({ timeout: 1000 }).catch(() => false)) {
-      await emailInput.fill('test@example.com');
-      await passwordInput.fill('testpassword123');
-      await page.getByRole('button', { name: /sign in|login/i }).click();
-      await page.waitForURL('/', { timeout: 10000 });
-    }
-  }
-}
+// Authentication is handled by auth.setup.ts and stored in playwright/.auth/user.json
+// All tests automatically use the authenticated session
 
 // Helper: Fill standard test data
 async function fillStandardFormData(page: Page) {
@@ -50,8 +34,12 @@ async function fillStandardFormData(page: Page) {
 
 test.describe('Complete User Workflows', () => {
   test.beforeEach(async ({ page }) => {
-    await loginUser(page);
+    // Navigate to home page (already authenticated via stored session)
+    await page.goto('/');
     await page.waitForLoadState('networkidle');
+    // Wait for PDF and form fields to be ready
+    await page.waitForSelector('.react-pdf__Document', { timeout: 15000, state: 'visible' });
+    await page.waitForSelector('input[placeholder]', { timeout: 15000, state: 'visible' });
   });
 
   /**

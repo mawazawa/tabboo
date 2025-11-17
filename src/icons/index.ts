@@ -41,6 +41,7 @@ export {
   Copy,
   Dot,
   Download,
+  Eye,
   FileJson,
   FileText,
   Grid3x3,

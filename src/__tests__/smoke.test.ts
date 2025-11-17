@@ -7,37 +7,19 @@
  * Priority: These tests should catch showstopper bugs like drag-and-drop failures.
  */
 
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
-// Helper function to login (reusable across tests)
-async function loginUser(page: Page) {
-  await page.goto('/auth');
-
-  // Wait for auth page to load
-  await page.waitForLoadState('networkidle');
-
-  // Check if already logged in by looking for redirect
-  const currentUrl = page.url();
-  if (currentUrl.includes('/auth')) {
-    // Need to login - use test credentials
-    // NOTE: You may need to adjust this based on your actual auth flow
-    const emailInput = page.getByPlaceholder(/email/i);
-    const passwordInput = page.getByPlaceholder(/password/i);
-
-    if (await emailInput.isVisible({ timeout: 1000 }).catch(() => false)) {
-      await emailInput.fill('test@example.com');
-      await passwordInput.fill('testpassword123');
-      await page.getByRole('button', { name: /sign in|login/i }).click();
-      await page.waitForURL('/', { timeout: 10000 });
-    }
-  }
-}
+// Authentication is handled by auth.setup.ts and stored in playwright/.auth/user.json
+// All tests automatically use the authenticated session
 
 test.describe('Critical Product Features (Smoke Tests)', () => {
   test.beforeEach(async ({ page }) => {
-    // Login before each test
-    await loginUser(page);
+    // Navigate to home page (already authenticated via stored session)
+    await page.goto('/');
     await page.waitForLoadState('networkidle');
+    // Wait for PDF and form fields to be ready
+    await page.waitForSelector('.react-pdf__Document', { timeout: 15000, state: 'visible' });
+    await page.waitForSelector('input[placeholder]', { timeout: 15000, state: 'visible' });
   });
 
   /**
