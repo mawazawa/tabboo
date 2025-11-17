@@ -99,9 +99,11 @@ export const DraggableAIAssistant = ({ formContext, vaultData, isVisible, onTogg
           variant="ghost"
           size="icon"
           className="w-full h-full rounded-2xl hover:bg-primary/20"
+          aria-label="Expand AI Assistant"
           onClick={() => setIsMinimized(false)}
         >
           <MessageSquare className="h-6 w-6 text-primary animate-pulse" strokeWidth={0.5} />
+          <span className="sr-only">Expand AI Assistant</span>
         </Button>
       ) : (
         <div className="flex flex-col h-full" onClick={(e) => e.stopPropagation()}>
@@ -120,23 +122,27 @@ export const DraggableAIAssistant = ({ formContext, vaultData, isVisible, onTogg
                 variant="ghost"
                 size="icon"
                 className="h-7 w-7"
+                aria-label="Minimize AI Assistant"
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsMinimized(true);
                 }}
               >
                 <Minimize2 className="h-3.5 w-3.5" strokeWidth={0.5} />
+                <span className="sr-only">Minimize</span>
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 className="h-7 w-7"
+                aria-label="Close AI Assistant"
                 onClick={(e) => {
                   e.stopPropagation();
                   onToggleVisible();
                 }}
               >
                 <Maximize2 className="h-3.5 w-3.5" strokeWidth={0.5} />
+                <span className="sr-only">Close</span>
               </Button>
             </div>
           </div>

@@ -716,48 +716,56 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                       variant="secondary"
                                       className="h-6 w-6"
                                       disabled={!canMoveUp}
+                                      aria-label="Move field up"
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         adjustPosition('up', overlay.field);
                                       }}
                                     >
                                       <ChevronUp className="h-3 w-3" />
+                                      <span className="sr-only">Move field up</span>
                                     </Button>
                                     <Button
                                       size="icon"
                                       variant="secondary"
                                       className="h-6 w-6"
                                       disabled={!canMoveDown}
+                                      aria-label="Move field down"
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         adjustPosition('down', overlay.field);
                                       }}
                                     >
                                       <ChevronDown className="h-3 w-3" />
+                                      <span className="sr-only">Move field down</span>
                                     </Button>
                                     <Button
                                       size="icon"
                                       variant="secondary"
                                       className="h-6 w-6"
                                       disabled={!canMoveLeft}
+                                      aria-label="Move field left"
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         adjustPosition('left', overlay.field);
                                       }}
                                     >
                                       <ChevronLeft className="h-3 w-3" />
+                                      <span className="sr-only">Move field left</span>
                                     </Button>
                                     <Button
                                       size="icon"
                                       variant="secondary"
                                       className="h-6 w-6"
                                       disabled={!canMoveRight}
+                                      aria-label="Move field right"
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         adjustPosition('right', overlay.field);
                                       }}
                                     >
                                       <ChevronRight className="h-3 w-3" />
+                                      <span className="sr-only">Move field right</span>
                                     </Button>
                                   </div>
                                 )}
@@ -772,6 +780,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                         size="icon"
                                         variant="secondary"
                                         className="absolute -top-2 -right-10 h-7 w-7 rounded-full"
+                                        aria-label="Autofill field from vault"
                                         onClick={(e) => handleAutofillField(overlay.field, e)}
                                         onPointerDown={(e) => {
                                           e.preventDefault();
@@ -779,6 +788,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                         }}
                                       >
                                         <Sparkles className="h-4 w-4" />
+                                        <span className="sr-only">Autofill from vault</span>
                                       </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
@@ -792,6 +802,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                       size="icon"
                                       variant={isGlobalEditMode ? "default" : "secondary"}
                                       className="absolute -top-2 -right-2 h-7 w-7 rounded-full"
+                                      aria-label={isGlobalEditMode ? 'Exit edit mode' : 'Enter edit mode'}
                                       onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
@@ -799,6 +810,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                       }}
                                     >
                                       <Move className="h-4 w-4" />
+                                      <span className="sr-only">{isGlobalEditMode ? 'Exit edit mode' : 'Enter edit mode'}</span>
                                     </Button>
                                   </TooltipTrigger>
                                   <TooltipContent>
