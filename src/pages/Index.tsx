@@ -1,5 +1,10 @@
 import { lazy, Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AdaptiveLayout } from "@/components/layout/AdaptiveLayout";
+import { MobileBottomSheet } from "@/components/layout/MobileBottomSheet";
+import { useWindowSize } from "@/hooks/useAdaptiveLayout";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FocusTrap } from "@/components/ui/focus-trap";
 
 // Aggressive code splitting - lazy load all heavy components
 const FormViewer = lazy(() => import("@/components/FormViewer").then(m => ({ default: m.FormViewer })));
@@ -106,6 +111,8 @@ const Index = () => {
   const [settingsSheetOpen, setSettingsSheetOpen] = useState(false);
   const [vaultSheetOpen, setVaultSheetOpen] = useState(false);
   const { toast } = useToast();
+  const { height } = useWindowSize(); // For mobile bottom sheet snap points
+  const [mobileTab, setMobileTab] = useState<string>("fields"); // Mobile bottom sheet tab
   const hasUnsavedChanges = useRef(false);
   const pdfPanelRef = useRef<HTMLDivElement>(null);
 
@@ -788,7 +795,26 @@ const Index = () => {
           </div>
         </div>
 
-        <ResizablePanelGroup direction="horizontal" className="flex-1 w-full">
+        {/* Mobile PDF Viewer (full screen, no panels) */}
+        <div className="md:hidden flex-1 overflow-hidden">
+          <Suspense fallback={<ViewerSkeleton />}>
+            <FormViewer
+              formData={formData}
+              updateField={updateField}
+              currentFieldIndex={currentFieldIndex}
+              setCurrentFieldIndex={setCurrentFieldIndex}
+              fieldPositions={fieldPositions}
+              updateFieldPosition={updateFieldPosition}
+              zoom={pdfZoom}
+              highlightedField={highlightedField}
+              validationErrors={validationErrors}
+              vaultData={vaultData as PersonalVaultData}
+            />
+          </Suspense>
+        </div>
+
+        {/* Desktop Layout (hidden on mobile) */}
+        <ResizablePanelGroup direction="horizontal" className="hidden md:flex flex-1 w-full">
           {/* Center: Form Viewer with PDF + Thumbnail Sidebar */}
           <ResizablePanel
             id="viewer-panel"
@@ -904,34 +930,118 @@ const Index = () => {
           </ResizablePanel>
         </ResizablePanelGroup>
 
-        {/* Draggable AI Assistant */}
-        <Suspense fallback={null}>
-          <DraggableAIAssistant 
-            formContext={formData}
-            vaultData={vaultData}
-            isVisible={showAIPanel}
-            onToggleVisible={() => setShowAIPanel(!showAIPanel)}
-          />
-        </Suspense>
+        {/* Draggable AI Assistant (desktop only, on mobile it's in bottom sheet) */}
+        <div className="hidden md:block">
+          <Suspense fallback={null}>
+            <DraggableAIAssistant
+              formContext={formData}
+              vaultData={vaultData}
+              isVisible={showAIPanel}
+              onToggleVisible={() => setShowAIPanel(!showAIPanel)}
+            />
+          </Suspense>
+        </div>
 
         {/* Offline Indicator */}
         <OfflineIndicator />
+
+        {/* Mobile Bottom Sheet (visible only on mobile) */}
+        <div className="md:hidden">
+          <MobileBottomSheet
+            snapPoints={[80, Math.min(400, height * 0.5), height - 100]}
+            defaultSnapIndex={0}
+            showHandle={true}
+          >
+            <Tabs value={mobileTab} onValueChange={setMobileTab} className="h-full flex flex-col">
+              <TabsList className="w-full grid grid-cols-3 shrink-0">
+                <TabsTrigger value="fields" className="text-xs">
+                  Fields
+                </TabsTrigger>
+                <TabsTrigger value="ai" className="text-xs">
+                  AI Chat
+                </TabsTrigger>
+                <TabsTrigger value="vault" className="text-xs">
+                  Vault
+                </TabsTrigger>
+              </TabsList>
+
+              <div className="flex-1 overflow-hidden">
+                <TabsContent value="fields" className="h-full m-0 p-2">
+                  <Suspense fallback={<PanelSkeleton />}>
+                    <FieldNavigationPanel
+                      formData={formData}
+                      updateField={updateField}
+                      currentFieldIndex={currentFieldIndex}
+                      setCurrentFieldIndex={setCurrentFieldIndex}
+                      fieldPositions={fieldPositions}
+                      updateFieldPosition={updateFieldPosition}
+                      selectedFields={selectedFields}
+                      setSelectedFields={setSelectedFields}
+                      onSnapToGrid={handleSnapToGrid}
+                      onAlignHorizontal={handleAlignHorizontal}
+                      onAlignVertical={handleAlignVertical}
+                      onDistribute={handleDistribute}
+                      onCopyPositions={handleCopyPositions}
+                      onPastePositions={handlePastePositions}
+                      onTransformPositions={handleTransformPositions}
+                      hasCopiedPositions={!!copiedFieldPositions}
+                      onFieldHover={setHighlightedField}
+                      validationRules={validationRules}
+                      validationErrors={validationErrors}
+                      onSaveValidationRules={handleSaveValidationRules}
+                      settingsSheetOpen={settingsSheetOpen}
+                      onSettingsSheetChange={setSettingsSheetOpen}
+                      onApplyTemplate={handleApplyTemplate}
+                      onApplyGroup={handleApplyGroup}
+                    />
+                  </Suspense>
+                </TabsContent>
+
+                <TabsContent value="ai" className="h-full m-0 p-2">
+                  <Suspense fallback={<PanelSkeleton />}>
+                    <div className="h-full">
+                      {/* AI Assistant in mobile view */}
+                      <DraggableAIAssistant
+                        formContext={formData}
+                        vaultData={vaultData}
+                        isVisible={true}
+                        onToggleVisible={() => setMobileTab("fields")}
+                      />
+                    </div>
+                  </Suspense>
+                </TabsContent>
+
+                <TabsContent value="vault" className="h-full m-0 p-2">
+                  <Suspense fallback={<PanelSkeleton />}>
+                    {user?.id && <PersonalDataVaultPanel userId={user.id} />}
+                  </Suspense>
+                </TabsContent>
+              </div>
+            </Tabs>
+          </MobileBottomSheet>
+        </div>
       </main>
 
       {/* Personal Data Vault Sheet */}
       <Sheet open={vaultSheetOpen} onOpenChange={setVaultSheetOpen}>
         <SheetContent side="right" className="w-[400px] sm:w-[540px] overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle>Personal Data Vault</SheetTitle>
-            <SheetDescription>
-              Securely manage your personal information for auto-filling forms
-            </SheetDescription>
-          </SheetHeader>
-          <div className="mt-6">
-            <Suspense fallback={<PanelSkeleton />}>
-              {user?.id && <PersonalDataVaultPanel userId={user.id} />}
-            </Suspense>
-          </div>
+          <FocusTrap
+            active={vaultSheetOpen}
+            escapeToDeactivate={true}
+            onDeactivate={() => setVaultSheetOpen(false)}
+          >
+            <SheetHeader>
+              <SheetTitle>Personal Data Vault</SheetTitle>
+              <SheetDescription>
+                Securely manage your personal information for auto-filling forms
+              </SheetDescription>
+            </SheetHeader>
+            <div className="mt-6">
+              <Suspense fallback={<PanelSkeleton />}>
+                {user?.id && <PersonalDataVaultPanel userId={user.id} />}
+              </Suspense>
+            </div>
+          </FocusTrap>
         </SheetContent>
       </Sheet>
     </div>
