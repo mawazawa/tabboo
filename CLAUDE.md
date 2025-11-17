@@ -61,6 +61,68 @@ SwiftFill currently supports three California Judicial Council forms:
 - **Math Rendering**: KaTeX (react-katex)
 - **Testing**: Vitest, @testing-library/react
 - **PWA**: vite-plugin-pwa with workbox
+- **Document Intelligence**: Mistral OCR (mistral-ocr-latest + mistral-large-latest)
+- **Security**: AES-256-GCM encryption, Row Level Security (RLS), SHA-256 hashing
+
+## Secure Document Upload System
+
+**Status**: ✅ Production Ready (November 2025)
+
+SwiftFill implements enterprise-grade security for document uploads with defense-in-depth architecture:
+
+### Security Features
+
+- ✅ **User-Isolated Storage**: RLS-enforced storage buckets (`{user_id}/documents/`)
+- ✅ **File Validation**: MIME type + magic bytes verification (prevents file spoofing)
+- ✅ **Deduplication**: SHA-256 hashing prevents re-processing duplicate documents
+- ✅ **Rate Limiting**: 10 uploads per hour per user
+- ✅ **Field-Level Encryption**: AES-256-GCM for high-sensitivity PII (SSN, financials)
+- ✅ **Audit Logging**: Complete trail of all document operations (2-year retention)
+- ✅ **Background Processing**: Async extraction with Mistral OCR
+- ✅ **Compliance**: GDPR, CCPA, HIPAA-aligned practices
+
+### Architecture Components
+
+**Database Tables** (with RLS):
+- `canonical_data_vault` - User's personal data vault (JSONB)
+- `vault_document_extractions` - Document processing history
+- `extraction_queue` - Background job queue with retry logic
+- `audit_log` - Security audit trail
+
+**Storage Buckets**:
+- `personal-documents` - Private bucket with RLS policies
+
+**Edge Functions**:
+- `upload-document-secure` - Validates, hashes, and uploads documents
+- `process-extraction` - Background worker for Mistral OCR processing
+
+**Client Libraries**:
+- `src/lib/encryption.ts` - Field-level encryption (AES-256-GCM)
+- `src/lib/mistral-ocr-client.ts` - Mistral OCR integration
+
+### Deployment Checklist
+
+```bash
+# 1. Apply database migrations
+npx supabase db push
+
+# 2. Deploy edge functions
+npx supabase functions deploy upload-document-secure
+npx supabase functions deploy process-extraction
+
+# 3. Set environment variables
+npx supabase secrets set MISTRAL_API_KEY=your_key_here
+npx supabase secrets set VITE_ENCRYPTION_KEY=$(openssl rand -hex 32)
+
+# 4. Set up cron job for background processing
+# Run process-extraction every 30 seconds (see SECURE_DOCUMENT_UPLOAD_GUIDE.md)
+```
+
+### Documentation
+
+- **User Guide**: `SECURE_DOCUMENT_UPLOAD_GUIDE.md`
+- **Architecture**: `SECURE_STORAGE_ARCHITECTURE.md`
+- **Mistral OCR Details**: `DOCUMENT_INTELLIGENCE.md`
 
 ## Development Commands
 
