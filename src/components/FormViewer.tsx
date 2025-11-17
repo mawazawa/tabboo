@@ -405,13 +405,6 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
       const target = e.target as HTMLElement;
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
 
-      // Toggle edit mode with 'E' key
-      if (e.key === 'e' && !e.metaKey && !e.ctrlKey && !e.shiftKey) {
-        e.preventDefault();
-        setIsGlobalEditMode(prev => !prev);
-        return;
-      }
-
       // Move selected field with arrow keys (only in edit mode)
       if (isEditMode && currentFieldIndex >= 0) {
         const field = Object.keys(fieldNameToIndex).find(
@@ -845,13 +838,14 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 checked={!!formData[overlay.field as keyof FormData]}
                                 onCheckedChange={(checked) => !isEditMode && updateField(overlay.field, checked as boolean)}
                                 disabled={isEditMode}
-                                className={`border-2 ${
+                                className={`h-5 w-5 border-2 transition-all ${
                                   isEditMode
                                     ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   isCurrentField 
-                                    ? 'bg-primary/5 border-primary' 
-                                    : 'bg-background border-border'
+                                    ? 'bg-primary/10 border-primary shadow-md scale-110' 
+                                    : 'bg-background border-border hover:border-primary/50 hover:scale-105'
                                 }`}
+                                aria-label={overlay.placeholder || overlay.field}
                               />
                             )}
                           </div>
