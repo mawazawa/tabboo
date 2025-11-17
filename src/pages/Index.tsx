@@ -2,7 +2,7 @@ import { lazy, Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AdaptiveLayout } from "@/components/layout/AdaptiveLayout";
 import { MobileBottomSheet } from "@/components/layout/MobileBottomSheet";
-import { useWindowSize } from "@/hooks/use-adaptive-layout";
+import { useWindowSize } from "@/hooks/useAdaptiveLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FocusTrap } from "@/components/ui/focus-trap";
 
@@ -110,8 +110,6 @@ const Index = () => {
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const [settingsSheetOpen, setSettingsSheetOpen] = useState(false);
   const [vaultSheetOpen, setVaultSheetOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [fieldFontSize, setFieldFontSize] = useState(16); // Default 16px (prevents iOS Safari auto-zoom)
   const { toast } = useToast();
   const { height } = useWindowSize(); // For mobile bottom sheet snap points
   const [mobileTab, setMobileTab] = useState<string>("fields"); // Mobile bottom sheet tab
@@ -464,89 +462,6 @@ const Index = () => {
     loadData();
   }, [user, queryClient]);
 
-  // Smart defaults: Auto-zoom to fit and pre-select first empty field on load
-  useEffect(() => {
-    // Run after a short delay to ensure DOM is ready
-    const timer = setTimeout(() => {
-      // Auto-zoom to fit (calculates optimal zoom based on container width)
-      const targetWidth = 850; // Desired PDF width in pixels
-      const container = document.querySelector('.pdf-container');
-      if (container) {
-        const containerWidth = container.clientWidth;
-        const optimalZoom = Math.min(Math.max(containerWidth / targetWidth, 0.5), 2.0);
-        setPdfZoom(optimalZoom);
-      }
-
-      // Pre-select first empty field (if formData is loaded)
-      const fieldOrder = ['partyName', 'streetAddress', 'city', 'state', 'zipCode', 'telephoneNo', 'email'];
-      for (const fieldName of fieldOrder) {
-        const value = formData[fieldName as keyof typeof formData];
-        if (!value || (typeof value === 'string' && value.trim() === '')) {
-          // Find the index of this field
-          const fieldIndex = fieldOrder.indexOf(fieldName);
-          if (fieldIndex >= 0) {
-            setCurrentFieldIndex(fieldIndex);
-            setHighlightedField(fieldName);
-            break;
-          }
-        }
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, []); // Run only once on mount
-
-  // Zoom keyboard shortcuts (Cmd/Ctrl +/-/0)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-      const modKey = isMac ? e.metaKey : e.ctrlKey;
-
-      // Ignore shortcuts when typing in inputs
-      const target = e.target as HTMLElement;
-      if (['INPUT', 'TEXTAREA'].includes(target.tagName)) return;
-
-      // Cmd/Ctrl + Plus/Equals: Zoom in
-      if (modKey && (e.key === '+' || e.key === '=')) {
-        e.preventDefault();
-        setPdfZoom(prev => {
-          const newZoom = Math.min(prev + 0.1, 2.0);
-          toast({
-            title: "Zoomed In",
-            description: `${Math.round(newZoom * 100)}%`,
-          });
-          return newZoom;
-        });
-      }
-
-      // Cmd/Ctrl + Minus: Zoom out
-      if (modKey && e.key === '-') {
-        e.preventDefault();
-        setPdfZoom(prev => {
-          const newZoom = Math.max(prev - 0.1, 0.5);
-          toast({
-            title: "Zoomed Out",
-            description: `${Math.round(newZoom * 100)}%`,
-          });
-          return newZoom;
-        });
-      }
-
-      // Cmd/Ctrl + 0: Reset zoom to 100%
-      if (modKey && e.key === '0') {
-        e.preventDefault();
-        setPdfZoom(1.0);
-        toast({
-          title: "Zoom Reset",
-          description: "100%",
-        });
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [toast]);
-
   // Autosave every 5 seconds
   useEffect(() => {
     if (!user) return;
@@ -690,28 +605,48 @@ const Index = () => {
 
       {/* Main Content with Resizable Panels */}
       <main className="flex-1 flex flex-col container mx-auto px-4 py-6 overflow-hidden">
-        {/* Control Toolbar - Tightened & Organized */}
-        <div className="flex items-center justify-between gap-2 mb-3 px-3 py-2 bg-card/80 backdrop-blur-sm rounded-lg border shadow-sm flex-shrink-0">
-          {/* Left: Primary Actions */}
+        {/* Control Toolbar */}
+        <div className="flex items-center justify-between gap-2 mb-4 p-3 bg-card/80 backdrop-blur-sm rounded-lg border shadow-sm flex-shrink-0">
+          {/* Left Section */}
           <div className="flex items-center gap-2">
-            {/* Autofill All Fields - Primary Action */}
+            {/* AI Assistant Toggle */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowAIPanel(!showAIPanel)}
+                  className={`gap-2 ${showAIPanel ? 'bg-primary/10 text-primary' : ''}`}
+                >
+                  <MessageSquare className="h-4 w-4" strokeWidth={1.5} />
+                  AI Chat
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Toggle AI Assistant panel for smart form filling help</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <div className="h-6 w-px bg-border" />
+
+            {/* Autofill All Fields Button */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="default"
-                  size="sm"
+                  size="default"
                   onClick={handleAutofillAll}
                   disabled={isVaultLoading || !vaultData}
-                  className="gap-1.5 h-9"
+                  className="gap-2"
                 >
                   {isVaultLoading ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={1.5} />
+                    <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5} />
                   ) : (
-                    <Sparkles className="h-3.5 w-3.5" strokeWidth={1.5} />
+                    <Sparkles className="h-4 w-4" strokeWidth={1.5} />
                   )}
-                  <span className="text-sm font-semibold">Autofill</span>
+                  Autofill All Fields
                   {vaultData && !isVaultLoading && (
-                    <span className="ml-0.5 px-1.5 py-0.5 text-[10px] bg-primary-foreground/20 rounded-full font-semibold">
+                    <span className="ml-1 px-2 py-0.5 text-xs bg-primary-foreground/20 rounded-full">
                       {getAutofillableFields(vaultData as PersonalVaultData).length}
                     </span>
                   )}
@@ -722,39 +657,19 @@ const Index = () => {
               </TooltipContent>
             </Tooltip>
 
-            <div className="h-5 w-px bg-border/60" />
+            <div className="h-6 w-px bg-border" />
 
-            {/* AI Assistant Toggle */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowAIPanel(!showAIPanel)}
-                  className={`gap-1.5 h-9 ${showAIPanel ? 'bg-primary/10 text-primary' : ''}`}
-                >
-                  <MessageSquare className="h-3.5 w-3.5" strokeWidth={1.5} />
-                  <span className="text-sm">AI</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Toggle AI Assistant panel for smart form filling help</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <div className="h-5 w-px bg-border/60" />
-
-            {/* Thumbnail Toggle */}
+            {/* Thumbnail Collapse */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowThumbnails(!showThumbnails)}
-                  className="gap-1.5 h-9"
+                  className="gap-2"
                 >
-                  <PanelLeftClose className={`h-3.5 w-3.5 transition-transform ${!showThumbnails ? 'rotate-180' : ''}`} strokeWidth={1.5} />
-                  <span className="text-sm">Pages</span>
+                  <PanelLeftClose className={`h-4 w-4 transition-transform ${!showThumbnails ? 'rotate-180' : ''}`} strokeWidth={1.5} />
+                  {showThumbnails ? 'Hide' : 'Show'}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -763,142 +678,94 @@ const Index = () => {
             </Tooltip>
           </div>
 
-          {/* Center: View Controls - Compact Group */}
-          <div className="flex items-center gap-3">
-            {/* PDF Zoom Controls */}
-            <div className="flex items-center gap-1 bg-muted/30 rounded-md px-1 py-0.5">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setPdfZoom(Math.max(0.5, pdfZoom - 0.1))}
-                    disabled={pdfZoom <= 0.5}
-                    className="h-7 w-7 p-0"
-                  >
-                    <span className="text-base font-semibold">−</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Zoom out (minimum 50%)</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant={pdfZoom === 1 ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => {
-                      if (pdfPanelRef.current) {
-                        const viewportWidth = pdfPanelRef.current.clientWidth - 48;
+          {/* Center Section - Zoom Controls */}
+          <div className="flex items-center gap-1 px-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setPdfZoom(Math.max(0.5, pdfZoom - 0.1))}
+                  disabled={pdfZoom <= 0.5}
+                  className="h-8 w-8 p-0"
+                >
+                  <span className="text-lg font-semibold">−</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Zoom out (minimum 50%)</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={pdfZoom === 1 ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => {
+                    // Get PDF panel container from ref
+                    if (pdfPanelRef.current) {
+                      // Use actual panel width minus padding (24px each side)
+                      const viewportWidth = pdfPanelRef.current.clientWidth - 48;
+                      const targetWidth = 850; // Default PDF width
+                      const calculatedZoom = Math.min(2, Math.max(0.5, viewportWidth / targetWidth));
+                      setPdfZoom(calculatedZoom);
+                    } else {
+                      // Fallback: Try to get element by ID as backup
+                      const pdfPanel = document.getElementById('pdf-panel');
+                      if (pdfPanel) {
+                        const viewportWidth = pdfPanel.clientWidth - 48;
                         const targetWidth = 850;
                         const calculatedZoom = Math.min(2, Math.max(0.5, viewportWidth / targetWidth));
                         setPdfZoom(calculatedZoom);
                       } else {
-                        const pdfPanel = document.getElementById('pdf-panel');
-                        if (pdfPanel) {
-                          const viewportWidth = pdfPanel.clientWidth - 48;
-                          const targetWidth = 850;
-                          const calculatedZoom = Math.min(2, Math.max(0.5, viewportWidth / targetWidth));
-                          setPdfZoom(calculatedZoom);
-                        } else {
-                          setPdfZoom(1);
-                        }
+                        // Last resort: set to 1:1
+                        setPdfZoom(1);
                       }
-                    }}
-                    className="flex items-center gap-1 px-2.5 min-w-[100px] justify-center h-7 text-xs font-semibold"
-                  >
-                    <FileText className="h-3 w-3" strokeWidth={1.5} />
-                    {pdfZoom === 1 ? 'Fit' : `${Math.round(pdfZoom * 100)}%`}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Scale PDF to fit viewport perfectly</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setPdfZoom(Math.min(2, pdfZoom + 0.1))}
-                    disabled={pdfZoom >= 2}
-                    className="h-7 w-7 p-0"
-                  >
-                    <span className="text-base font-semibold">+</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Zoom in (maximum 200%)</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-
-            {/* Field Font Size Controls */}
-            <div className="flex items-center gap-1 bg-muted/30 rounded-md px-1 py-0.5">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setFieldFontSize(Math.max(16, fieldFontSize - 1))}
-                    disabled={fieldFontSize <= 16}
-                    className="h-7 w-7 p-0"
-                  >
-                    <span className="text-sm">A</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Decrease field font size (minimum 16px - iOS requirement)</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant={fieldFontSize === 16 ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setFieldFontSize(16)}
-                    className="flex items-center gap-1 px-2.5 min-w-[70px] justify-center h-7 text-xs font-semibold"
-                  >
-                    <span className="text-xs">Font</span>
-                    <span className="font-mono">{fieldFontSize}px</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Reset to default 16px font size (prevents iOS zoom)</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setFieldFontSize(Math.min(20, fieldFontSize + 1))}
-                    disabled={fieldFontSize >= 20}
-                    className="h-7 w-7 p-0"
-                  >
-                    <span className="text-base font-semibold">A</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Increase field font size (maximum 20px)</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
+                    }
+                  }}
+                  className="flex items-center gap-1 px-3 min-w-[120px] justify-center transition-colors"
+                >
+                  <FileText className="h-3.5 w-3.5" strokeWidth={1.5} />
+                  <span className="text-sm font-medium">
+                    {pdfZoom === 1 ? 'Fit to Page' : `${Math.round(pdfZoom * 100)}%`}
+                  </span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Scale PDF to fit viewport perfectly</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setPdfZoom(Math.min(2, pdfZoom + 0.1))}
+                  disabled={pdfZoom >= 2}
+                  className="h-8 w-8 p-0"
+                >
+                  <span className="text-lg font-semibold">+</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Zoom in (maximum 200%)</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
 
-          {/* Right: Panel Toggles - Compact */}
-          <div className="flex items-center gap-1">
+          {/* Right Section */}
+          <div className="flex items-center gap-2">
+            {/* Fields Panel Toggle */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowFieldsPanel(!showFieldsPanel)}
-                  className={`gap-1.5 h-9 ${showFieldsPanel && !showVaultPanel ? 'bg-primary/10 text-primary' : ''}`}
+                  className={`gap-2 ${showFieldsPanel && !showVaultPanel ? 'bg-primary/10 text-primary' : ''}`}
                 >
-                  <PanelRightClose className="h-3.5 w-3.5" strokeWidth={1.5} />
-                  <span className="text-sm">Fields</span>
+                  <PanelRightClose className="h-4 w-4" strokeWidth={1.5} />
+                  Fields
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -906,18 +773,19 @@ const Index = () => {
               </TooltipContent>
             </Tooltip>
 
-            <div className="h-5 w-px bg-border/60" />
+            <div className="h-6 w-px bg-border" />
 
+            {/* Personal Data Vault Toggle */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowVaultPanel(!showVaultPanel)}
-                  className={`gap-1.5 h-9 ${showVaultPanel ? 'bg-primary/10 text-primary' : ''}`}
+                  className={`gap-2 ${showVaultPanel ? 'bg-primary/10 text-primary' : ''}`}
                 >
-                  <Shield className="h-3.5 w-3.5" strokeWidth={1.5} />
-                  <span className="text-sm">Vault</span>
+                  <Shield className="h-4 w-4" strokeWidth={1.5} />
+                  Vault
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -953,7 +821,6 @@ const Index = () => {
             order={1}
             defaultSize={70}
             minSize={40}
-            maxSize={75}
           >
             <ResizablePanelGroup direction="horizontal" className="h-full">
               {/* Resizable Thumbnail Sidebar */}
@@ -965,12 +832,12 @@ const Index = () => {
                 maxSize={40}
                 collapsible={true}
                 collapsedSize={0}
-                collapsed={!showThumbnails}
                 onResize={(size) => {
                   // Convert percentage to pixels (approximate)
                   const containerWidth = window.innerWidth * 0.75; // 75% of viewport
                   setThumbnailPanelWidth((size / 100) * containerWidth);
                 }}
+                className={showThumbnails ? "" : "hidden"}
               >
                 <Suspense fallback={<PanelSkeleton />}>
                   <PDFThumbnailSidebar 
@@ -991,9 +858,8 @@ const Index = () => {
               <ResizablePanel
                 id="pdf-panel"
                 order={2}
-                defaultSize={showThumbnails ? 75 : 100}
-                minSize={showThumbnails ? 50 : 60}
-                maxSize={showThumbnails ? undefined : 100}
+                defaultSize={75}
+                minSize={50}
               >
                 <div ref={pdfPanelRef} className="h-full w-full">
                   <Suspense fallback={<ViewerSkeleton />}>
@@ -1008,9 +874,6 @@ const Index = () => {
                       highlightedField={highlightedField}
                       validationErrors={validationErrors}
                       vaultData={vaultData as PersonalVaultData}
-                      isEditMode={isEditMode}
-                      onToggleEditMode={() => setIsEditMode(!isEditMode)}
-                      fieldFontSize={fieldFontSize}
                     />
                   </Suspense>
                 </div>
@@ -1018,23 +881,25 @@ const Index = () => {
             </ResizablePanelGroup>
           </ResizablePanel>
 
-          {/* Right: Field Navigation Panel OR Vault Panel (ALWAYS VISIBLE) */}
+          {/* Right: Field Navigation Panel OR Vault Panel (collapsible) */}
           <ResizableHandleMulti withHandle className="hover:bg-primary/30 transition-colors" />
           <ResizablePanel
             id="right-panel"
             order={2}
             defaultSize={30}
             minSize={25}
-            maxSize={60}
-            collapsible={false}
+            maxSize={50}
+            collapsible={true}
+            collapsedSize={0}
+            className={showFieldsPanel || showVaultPanel ? "" : "hidden"}
           >
-            <div className="h-full w-full min-w-0 px-3 flex flex-col overflow-hidden">
+            <div className="h-full pl-3">
               <Suspense fallback={<PanelSkeleton />}>
                 {showVaultPanel ? (
                   <PersonalDataVaultPanel userId={user?.id || ''} />
                 ) : (
-                  <FieldNavigationPanel
-                    formData={formData}
+                  <FieldNavigationPanel 
+                    formData={formData} 
                     updateField={updateField}
                     currentFieldIndex={currentFieldIndex}
                     setCurrentFieldIndex={setCurrentFieldIndex}
@@ -1058,8 +923,6 @@ const Index = () => {
                     onSettingsSheetChange={setSettingsSheetOpen}
                     onApplyTemplate={handleApplyTemplate}
                     onApplyGroup={handleApplyGroup}
-                    isEditMode={isEditMode}
-                    onToggleEditMode={() => setIsEditMode(!isEditMode)}
                   />
                 )}
               </Suspense>

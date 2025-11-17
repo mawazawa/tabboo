@@ -1,0 +1,995 @@
+# Page snapshot
+
+```yaml
+- generic:
+  - generic:
+    - list
+    - generic:
+      - banner:
+        - generic:
+          - generic:
+            - generic:
+              - generic:
+                - img
+              - generic:
+                - heading [level=1]: SwiftFill Pro
+                - paragraph: AI-Powered Legal Form Assistant
+            - generic:
+              - navigation:
+                - generic:
+                  - list:
+                    - listitem:
+                      - button:
+                        - text: Tools
+                        - img
+              - button:
+                - img
+                - text: Logout
+      - main:
+        - generic:
+          - generic:
+            - button:
+              - img
+              - generic: Autofill
+              - generic: "9"
+            - button:
+              - img
+              - generic: AI
+            - button:
+              - img
+              - generic: Pages
+          - generic:
+            - generic:
+              - button:
+                - generic: −
+              - button:
+                - img
+                - text: Fit
+              - button:
+                - generic: +
+            - generic:
+              - button [disabled]:
+                - generic: A
+              - button:
+                - generic: Font
+                - generic: 16px
+              - button:
+                - generic: A
+          - generic:
+            - button:
+              - img
+              - generic: Fields
+            - button:
+              - img
+              - generic: Vault
+        - generic:
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - img
+                    - generic: Pages
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - button:
+                              - generic: Page 1
+                            - button:
+                              - generic: Page 2
+              - separator:
+                - generic:
+                  - generic:
+                    - img
+                    - img
+                  - generic:
+                    - img
+                    - img
+                  - generic:
+                    - img
+                    - img
+              - generic:
+                - generic:
+                  - generic:
+                    - status
+                    - generic:
+                      - button:
+                        - img
+                        - text: Edit Positions
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: "2. CHILD CUSTODY I consent to the order requested for child custody (legal and physical custody). a. b. I do not consent to the order requested for child custody I consent to the order requested for visitation (parenting time). visitation (parenting time) but I consent to the following order: c. d. b. I consent to the order requested. I consent to guideline support. I do not consent to the order requested but I consent to the following order: c. a. I have completed and filed a current Income and Expense Declaration ( form FL-150 ) or, if eligible, a current Financial Statement (Simplified) ( form FL-155 ) to support my responsive declaration. 3. CHILD SUPPORT I consent to the order requested. I do not consent to the order requested I have completed and filed a current Income and Expense Declaration ( form FL-150 ) to support my responsive declaration. but I consent to the following order: b. c. a. Page 1 of 2 Form Adopted for Mandatory Use Judicial Council of California FL-320 [Rev. July 1, 2016] RESPONSIVE DECLARATION TO REQUEST FOR ORDER FL-320 PETITIONER: RESPONDENT: OTHER PARENT/PARTY: FOR COURT USE ONLY CASE NUMBER: RESPONSIVE DECLARATION TO REQUEST FOR ORDER HEARING DATE: TIME: DEPARTMENT OR ROOM: SUPERIOR COURT OF CALIFORNIA, COUNTY OF BRANCH NAME: CITY AND ZIP CODE: STREET ADDRESS: MAILING ADDRESS: PARTY WITHOUT ATTORNEY OR ATTORNEY STATE: ZIP CODE: CITY: STREET ADDRESS: FIRM NAME: NAME: TELEPHONE NO.: FAX NO.: E-MAIL ADDRESS: ATTORNEY FOR ( name ): STATE BAR NUMBER: 4. SPOUSAL OR DOMESTIC PARTNER SUPPORT Read Information Sheet: Responsive Declaration to Request for Order (form FL-320-INFO ) for more information about this form. VISITATION (PARENTING TIME) 1. No domestic violence restraining/protective orders are now in effect between the parties in this case. I agree that one or more domestic violence restraining/ protective orders are now in effect between the parties in this case. a. b. RESTRAINING ORDER INFORMATION Code of Civil Procedure, § 1005 Cal. Rules of Court, rule 5.92 www.courts.ca.gov"
+                            - generic:
+                              - generic [ref=e1] [cursor=pointer]:
+                                - generic [ref=e3]: I have filed Income and Expense Declaration (FL-150)
+                                - checkbox [ref=e4]
+                              - checkbox [ref=e6] [cursor=pointer]
+                              - checkbox [ref=e8] [cursor=pointer]
+                              - checkbox [ref=e10] [cursor=pointer]
+                              - checkbox [ref=e12] [cursor=pointer]
+                              - checkbox [ref=e14] [cursor=pointer]
+                              - textbox [ref=e16]:
+                                - /placeholder: Alternative orders for child support
+                              - textbox [ref=e18]:
+                                - /placeholder: Alternative orders for spousal support
+                              - textbox [ref=e20]:
+                                - /placeholder: State Bar Number
+                              - textbox [ref=e22]:
+                                - /placeholder: Attorney or Party Name
+                              - textbox [ref=e24]:
+                                - /placeholder: Firm Name
+                              - textbox [ref=e26]:
+                                - /placeholder: Street Address
+                              - textbox [ref=e28]:
+                                - /placeholder: City
+                              - textbox [ref=e30]:
+                                - /placeholder: State
+                              - textbox [ref=e32]:
+                                - /placeholder: ZIP Code
+                              - textbox [ref=e34]:
+                                - /placeholder: Telephone Number
+                              - textbox [ref=e36]:
+                                - /placeholder: Fax Number
+                              - textbox [ref=e38]:
+                                - /placeholder: Email Address
+                              - textbox [ref=e40]:
+                                - /placeholder: Attorney For
+                              - textbox [ref=e42]:
+                                - /placeholder: County
+                              - textbox [ref=e44]:
+                                - /placeholder: Court Street Address
+                              - textbox [ref=e46]:
+                                - /placeholder: Court Mailing Address
+                              - textbox [ref=e48]:
+                                - /placeholder: Court City and ZIP
+                              - textbox [ref=e50]:
+                                - /placeholder: Branch Name
+                              - textbox [ref=e52]:
+                                - /placeholder: Petitioner
+                              - textbox [ref=e54]:
+                                - /placeholder: Respondent
+                              - textbox [ref=e56]:
+                                - /placeholder: Other Parent/Party
+                              - textbox [ref=e58]:
+                                - /placeholder: Case Number
+                              - textbox [ref=e60]:
+                                - /placeholder: Hearing Date
+                              - textbox [ref=e62]:
+                                - /placeholder: Hearing Time
+                              - textbox [ref=e64]:
+                                - /placeholder: Department or Room
+                              - checkbox [ref=e66] [cursor=pointer]
+                              - checkbox [ref=e68] [cursor=pointer]
+                              - checkbox [ref=e70] [cursor=pointer]
+                              - checkbox [ref=e72] [cursor=pointer]
+                              - checkbox [ref=e74] [cursor=pointer]
+                              - checkbox [ref=e76] [cursor=pointer]
+                              - checkbox [ref=e78] [cursor=pointer]
+                              - textbox [ref=e80]:
+                                - /placeholder: Alternative orders for child custody/visitation
+                          - generic:
+                            - generic:
+                              - generic: "c. I consent to the order requested. I do not consent to the order requested d. but I consent to the following order: I have completed and filed a current Income and Expense Declaration ( form FL-150 ) to support my responsive declaration. I have completed and filed with this form a Supporting Declaration for Attorney's Fees and Costs Attachment ( form FL-158 ) or a declaration that addresses the factors covered in that form. b. a. a. I consent to the order requested. I do not consent to the order requested b. but I consent to the following order: 5. PROPERTY CONTROL a. I consent to the order requested. I do not consent to the order requested b. but I consent to the following order: 7. DOMESTIC VIOLENCE ORDER a. I consent to the order requested. I do not consent to the order requested b. but I consent to the following order: 8. OTHER ORDERS REQUESTED CASE NUMBER: I declare under penalty of perjury under the laws of the State of California that the information provided in this form and all attachments is true and correct. FL-320 [Rev. July 1, 2016] Page 2 of 2 RESPONSIVE DECLARATION TO REQUEST FOR ORDER u (SIGNATURE OF DECLARANT) (TYPE OR PRINT NAME) Date: ATTORNEY'S FEES AND COSTS 6. a. I consent to the order requested. I do not consent to the order requested b. but I consent to the following order: 9. TIME FOR SERVICE / TIME UNTIL HEARING 10. FACTS TO SUPPORT my responsive declaration are listed below. The facts that I write and attach to this form cannot be longer than 10 pages, unless the court gives me permission. Attachment 10. FL-320 PETITIONER: RESPONDENT: OTHER PARENT/PARTY:"
+                            - generic:
+                              - checkbox [ref=e82] [cursor=pointer]
+                              - checkbox [ref=e84] [cursor=pointer]
+                              - textbox [ref=e86]:
+                                - /placeholder: Alternative orders for property control
+                              - checkbox [ref=e88] [cursor=pointer]
+                              - checkbox [ref=e90] [cursor=pointer]
+                              - checkbox [ref=e92] [cursor=pointer]
+                              - checkbox [ref=e94] [cursor=pointer]
+                              - textbox [ref=e96]:
+                                - /placeholder: Alternative orders for attorney fees
+                              - checkbox [ref=e98] [cursor=pointer]
+                              - checkbox [ref=e100] [cursor=pointer]
+                              - textbox [ref=e102]:
+                                - /placeholder: Alternative orders for domestic violence
+                              - checkbox [ref=e104] [cursor=pointer]
+                              - checkbox [ref=e106] [cursor=pointer]
+                              - textbox [ref=e108]:
+                                - /placeholder: Alternative other orders
+                              - checkbox [ref=e110] [cursor=pointer]
+                              - checkbox [ref=e112] [cursor=pointer]
+                              - textbox [ref=e114]:
+                                - /placeholder: Alternative orders for time for service
+                              - textbox [ref=e116]:
+                                - /placeholder: Facts to support my request
+                              - checkbox [ref=e118] [cursor=pointer]
+                              - textbox [ref=e120]:
+                                - /placeholder: Type or Print Name
+                              - textbox [ref=e122]:
+                                - /placeholder: Signature
+                              - checkbox [ref=e124] [cursor=pointer]
+                              - textbox [ref=e126]:
+                                - /placeholder: Date of Signature
+          - separator:
+            - generic:
+              - generic:
+                - img
+                - img
+              - generic:
+                - img
+                - img
+              - generic:
+                - img
+                - img
+          - generic:
+            - generic:
+              - generic:
+                - status
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - heading [level=2]: Field 1/64
+                      - generic:
+                        - generic:
+                          - img
+                        - generic:
+                          - img
+                        - generic:
+                          - img
+                    - generic:
+                      - button [disabled]:
+                        - img
+                        - generic: Prev
+                      - button:
+                        - generic: Next
+                        - img
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - button:
+                                - img
+                              - button [disabled]:
+                                - img
+                              - button [disabled]:
+                                - img
+                              - button [disabled]:
+                                - img
+                              - button [disabled]:
+                                - img
+                              - button [disabled]:
+                                - img
+                              - button [disabled]:
+                                - img
+                              - button [disabled]:
+                                - img
+                              - button [disabled]:
+                                - img
+                              - button [disabled]:
+                                - img
+                              - button [disabled]:
+                                - img
+                              - button [disabled]:
+                                - img
+                            - generic:
+                              - button: Select All
+                              - button [disabled]: Clear (0)
+                            - generic:
+                              - generic:
+                                - heading [level=3]: Name
+                                - button:
+                                  - img
+                                  - generic: Adjust
+                              - textbox:
+                                - /placeholder: Full name
+                              - generic: "Position: X 0.0% • Y 15.8%"
+                          - generic:
+                            - generic:
+                              - generic: 1. Name
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                                - button:
+                                  - img
+                                - generic: Active
+                            - generic: "Saved: Mathieu Wauters"
+                            - textbox:
+                              - /placeholder: Full name
+                          - generic:
+                            - generic:
+                              - generic: 2. Firm Name
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: Law firm name
+                          - generic:
+                            - generic:
+                              - generic: 3. Street Address
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                                - button:
+                                  - img
+                            - generic: "Saved: 4056 Davana Rd"
+                            - textbox:
+                              - /placeholder: Street address
+                          - generic:
+                            - generic:
+                              - generic: 4. Mailing Address
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: P.O. Box or mailing address
+                          - generic:
+                            - generic:
+                              - generic: 5. City
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                                - button:
+                                  - img
+                            - generic: "Saved: Sherman Oaks"
+                            - textbox:
+                              - /placeholder: City
+                          - generic:
+                            - generic:
+                              - generic: 6. State
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                                - button:
+                                  - img
+                            - generic: "Saved: CA"
+                            - textbox:
+                              - /placeholder: CA
+                          - generic:
+                            - generic:
+                              - generic: 7. ZIP Code
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                                - button:
+                                  - img
+                            - generic: "Saved: 91423"
+                            - textbox:
+                              - /placeholder: ZIP code
+                          - generic:
+                            - generic:
+                              - generic: 8. Telephone
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                                - button:
+                                  - img
+                            - generic: "Saved: 3475743963"
+                            - textbox:
+                              - /placeholder: Phone number
+                          - generic:
+                            - generic:
+                              - generic: 9. Fax
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: Fax number
+                          - generic:
+                            - generic:
+                              - generic: 10. Email
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                                - button:
+                                  - img
+                            - generic: "Saved: mathieuwauters@gmail.com"
+                            - textbox:
+                              - /placeholder: Email address
+                          - generic:
+                            - generic:
+                              - generic: 11. Attorney For
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                                - button:
+                                  - img
+                            - generic: "Saved: Thomas J. Rotert"
+                            - textbox:
+                              - /placeholder: Self-Represented or attorney name
+                          - generic:
+                            - generic:
+                              - generic: 12. State Bar Number
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: State bar number
+                          - generic:
+                            - generic:
+                              - generic: 13. County
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: County
+                          - generic:
+                            - generic:
+                              - generic: 14. Court Street Address
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: Court street address
+                          - generic:
+                            - generic:
+                              - generic: 15. Court Mailing Address
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: Court mailing address
+                          - generic:
+                            - generic:
+                              - generic: 16. Court City and ZIP
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: City and ZIP code
+                          - generic:
+                            - generic:
+                              - generic: 17. Branch Name
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: Court branch name
+                          - generic:
+                            - generic:
+                              - generic: 18. Petitioner
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: Petitioner name
+                          - generic:
+                            - generic:
+                              - generic: 19. Respondent
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: Respondent name
+                          - generic:
+                            - generic:
+                              - generic: 20. Other Parent/Party
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: Third party name
+                          - generic:
+                            - generic:
+                              - generic: 21. Case Number
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: Case number
+                          - generic:
+                            - generic:
+                              - generic: 22. Hearing Date
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: MM/DD/YYYY
+                          - generic:
+                            - generic:
+                              - generic: 23. Hearing Time
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: HH:MM AM/PM
+                          - generic:
+                            - generic:
+                              - generic: 24. Department
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: Department
+                          - generic:
+                            - generic:
+                              - generic: 25. Room
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: Room number
+                          - generic:
+                            - generic:
+                              - generic: 26. No restraining orders
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: No restraining orders
+                          - generic:
+                            - generic:
+                              - generic: 27. Restraining orders active
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Restraining orders active
+                          - generic:
+                            - generic:
+                              - generic: 28. Consent to child custody
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Consent to child custody
+                          - generic:
+                            - generic:
+                              - generic: 29. Consent to visitation
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Consent to visitation
+                          - generic:
+                            - generic:
+                              - generic: 30. Do not consent to custody
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Do not consent to custody
+                          - generic:
+                            - generic:
+                              - generic: 31. Do not consent to visitation
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Do not consent to visitation
+                          - generic:
+                            - generic:
+                              - generic: 32. Alternative custody order
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: Describe alternative order
+                          - generic:
+                            - generic:
+                              - generic: 33. Filed FL-150 (child support)
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Filed FL-150 (child support)
+                          - generic:
+                            - generic:
+                              - generic: 34. Consent to child support
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Consent to child support
+                          - generic:
+                            - generic:
+                              - generic: 35. Consent to guideline support
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Consent to guideline support
+                          - generic:
+                            - generic:
+                              - generic: 36. Do not consent to child support
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Do not consent to child support
+                          - generic:
+                            - generic:
+                              - generic: 37. Alternative child support order
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: Describe alternative order
+                          - generic:
+                            - generic:
+                              - generic: 38. Filed FL-150 (spousal support)
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Filed FL-150 (spousal support)
+                          - generic:
+                            - generic:
+                              - generic: 39. Consent to spousal support
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Consent to spousal support
+                          - generic:
+                            - generic:
+                              - generic: 40. Do not consent to spousal support
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Do not consent to spousal support
+                          - generic:
+                            - generic:
+                              - generic: 41. Alternative spousal support order
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: Describe alternative order
+                          - generic:
+                            - generic:
+                              - generic: 42. Consent to property control
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Consent to property control
+                          - generic:
+                            - generic:
+                              - generic: 43. Do not consent to property control
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Do not consent to property control
+                          - generic:
+                            - generic:
+                              - generic: 44. Alternative property order
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: Describe alternative order
+                          - generic:
+                            - generic:
+                              - generic: 45. Filed FL-150 (attorney fees)
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Filed FL-150 (attorney fees)
+                          - generic:
+                            - generic:
+                              - generic: 46. Filed FL-158
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Filed FL-158
+                          - generic:
+                            - generic:
+                              - generic: 47. Consent to attorney fees
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Consent to attorney fees
+                          - generic:
+                            - generic:
+                              - generic: 48. Do not consent to attorney fees
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Do not consent to attorney fees
+                          - generic:
+                            - generic:
+                              - generic: 49. Alternative fees order
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: Describe alternative order
+                          - generic:
+                            - generic:
+                              - generic: 50. Consent to DV order
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Consent to DV order
+                          - generic:
+                            - generic:
+                              - generic: 51. Do not consent to DV order
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Do not consent to DV order
+                          - generic:
+                            - generic:
+                              - generic: 52. Alternative DV order
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: Describe alternative order
+                          - generic:
+                            - generic:
+                              - generic: 53. Consent to other orders
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Consent to other orders
+                          - generic:
+                            - generic:
+                              - generic: 54. Do not consent to other orders
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Do not consent to other orders
+                          - generic:
+                            - generic:
+                              - generic: 55. Other orders description
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: Specify other orders
+                          - generic:
+                            - generic:
+                              - generic: 56. Consent to service time
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Consent to service time
+                          - generic:
+                            - generic:
+                              - generic: 57. Do not consent to service time
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Do not consent to service time
+                          - generic:
+                            - generic:
+                              - generic: 58. Alternative service time
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: Describe alternative
+                          - generic:
+                            - generic:
+                              - generic: 59. Facts to Support
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: Enter facts (max 10 pages)
+                          - generic:
+                            - generic:
+                              - generic: 60. Attachment 10 included
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Attachment 10 included
+                          - generic:
+                            - generic:
+                              - generic: 61. Declaration under penalty of perjury
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - generic:
+                              - checkbox
+                              - generic: Declaration under penalty of perjury
+                          - generic:
+                            - generic:
+                              - generic: 62. Date
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                            - textbox:
+                              - /placeholder: MM/DD/YYYY
+                          - generic:
+                            - generic:
+                              - generic: 63. Type or Print Name
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                                - button:
+                                  - img
+                            - generic: "Saved: Mathieu Wauters"
+                            - textbox:
+                              - /placeholder: Print your name
+                          - generic:
+                            - generic:
+                              - generic: 64. Signature of Declarant
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Validation Rules
+                                - button:
+                                  - img
+                            - generic: "Saved: Mathieu Wauters"
+                            - textbox:
+                              - /placeholder: Sign your name
+  - dialog [ref=e128]:
+    - generic [ref=e129]:
+      - generic [ref=e131]:
+        - img [ref=e132]
+        - combobox [expanded] [ref=e135]
+      - listbox "Suggestions" [ref=e136]:
+        - generic [ref=e137]:
+          - generic [ref=e138]: Navigation
+          - group "Navigation" [ref=e139]:
+            - option "Form Filler (FL-320)" [selected] [ref=e140]:
+              - img [ref=e141]
+              - generic [ref=e144]: Form Filler (FL-320)
+            - option "Distribution Calculator" [ref=e145]:
+              - img [ref=e146]
+              - generic [ref=e148]: Distribution Calculator
+          - separator [ref=e149]
+          - generic [ref=e150]: View
+          - group "View" [ref=e151]:
+            - option "Toggle AI Chat" [ref=e152]:
+              - img [ref=e153]
+              - generic [ref=e155]: Toggle AI Chat
+            - option "Toggle Fields Panel" [ref=e156]:
+              - img [ref=e157]
+              - generic [ref=e160]: Toggle Fields Panel
+            - option "Toggle Personal Data Vault" [ref=e161]:
+              - img [ref=e162]
+              - generic [ref=e164]: Toggle Personal Data Vault
+            - option "Toggle Thumbnails" [ref=e165]:
+              - img [ref=e166]
+              - generic [ref=e169]: Toggle Thumbnails
+          - separator [ref=e170]
+          - generic [ref=e171]: Data
+          - group "Data" [ref=e172]:
+            - option "Personal Data Vault" [ref=e173]:
+              - img [ref=e174]
+              - generic [ref=e176]: Personal Data Vault
+            - option "Autofill All Fields" [ref=e177]:
+              - img [ref=e178]
+              - generic [ref=e180]: Autofill All Fields
+          - separator [ref=e181]
+          - generic [ref=e182]: Settings
+          - group "Settings" [ref=e183]:
+            - option "Open Settings" [ref=e184]:
+              - img [ref=e185]
+              - generic [ref=e188]: Open Settings
+          - separator [ref=e189]
+          - generic [ref=e190]: Account
+          - group "Account" [ref=e191]:
+            - option "Logout" [ref=e192]:
+              - img [ref=e193]
+              - generic [ref=e196]: Logout
+    - button "Close" [ref=e197] [cursor=pointer]:
+      - img [ref=e198]
+      - generic [ref=e201]: Close
+  - dialog [ref=e202]:
+    - heading "Position Adjustment" [level=4] [ref=e203]
+    - generic [ref=e204]:
+      - generic [ref=e205]:
+        - text: X %
+        - spinbutton [ref=e206]: "0.0"
+      - generic [ref=e207]:
+        - text: Y %
+        - spinbutton [active] [ref=e208]: "15.8"
+    - generic [ref=e209]:
+      - button "Move field UP (↑)" [ref=e211] [cursor=pointer]:
+        - img
+      - button "Move field LEFT (←)" [ref=e213] [cursor=pointer]:
+        - img
+      - button "Move field RIGHT (→)" [ref=e216] [cursor=pointer]:
+        - img
+      - button "Move field DOWN (↓)" [ref=e218] [cursor=pointer]:
+        - img
+    - paragraph [ref=e220]: Use arrow keys or buttons to fine-tune position
+```
