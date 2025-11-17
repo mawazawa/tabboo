@@ -13,6 +13,7 @@ import { Settings, Move, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Spar
 import { canAutofill, getVaultValueForField } from "@/utils/vaultFieldMatcher";
 import { TutorialTooltips } from "@/components/TutorialTooltips";
 import { useFormFields, convertToFieldOverlays, generateFieldNameToIndex } from "@/hooks/use-form-fields";
+import { useLiveRegion } from "@/hooks/use-live-region";
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
@@ -32,23 +33,22 @@ interface Props {
   highlightedField?: string | null;
   validationErrors?: ValidationErrors;
   vaultData?: PersonalVaultData | null;
-  isEditMode?: boolean;
-  onToggleEditMode?: () => void;
-  fieldFontSize?: number;
 }
 
-export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, zoom = 1, highlightedField = null, validationErrors = {}, vaultData = null, isEditMode: externalEditMode, onToggleEditMode, fieldFontSize = 16 }: Props) => {
+export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, zoom = 1, highlightedField = null, validationErrors = {}, vaultData = null }: Props) => {
+  // Live region for screen reader announcements
+  const { announce, LiveRegionComponent } = useLiveRegion({
+    clearAfter: 2000, // Clear announcements after 2 seconds
+    debounce: 300, // Debounce rapid announcements (e.g., during dragging)
+  });
+
   // Fetch FL-320 form fields from database
   const { data: fieldMappings, isLoading: isLoadingFields, error: fieldsError } = useFormFields('FL-320');
 
   const [numPages, setNumPages] = useState<number>(0);
   const [pageWidth, setPageWidth] = useState<number>(850);
-  const [internalEditMode, setInternalEditMode] = useState<boolean>(false);
+  const [isGlobalEditMode, setIsGlobalEditMode] = useState<boolean>(false);
   const [isDragging, setIsDragging] = useState<string | null>(null);
-
-  // Use external edit mode if provided, otherwise use internal state
-  const isGlobalEditMode = externalEditMode !== undefined ? externalEditMode : internalEditMode;
-  const setIsGlobalEditMode = onToggleEditMode || setInternalEditMode;
   const [alignmentGuides, setAlignmentGuides] = useState<{ x: number[]; y: number[] }>({ x: [], y: [] });
   const [pdfLoading, setPdfLoading] = useState(true);
   const [loadProgress, setLoadProgress] = useState(0);
@@ -56,7 +56,6 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   // Use refs for drag state to avoid re-render storms
   const dragStartPos = useRef<{ x: number; y: number; top: number; left: number }>({ x: 0, y: 0, top: 0, left: 0 });
   const dragElementRef = useRef<HTMLElement | null>(null);
-  const dragParentRef = useRef<HTMLElement | null>(null); // Store parent element, not rect
   const draggedPositionRef = useRef<{ top: number; left: number } | null>(null);
   const rafRef = useRef<number | null>(null);
   const lastGuidesRef = useRef<{ x: number[]; y: number[] }>({ x: [], y: [] });
@@ -181,178 +180,150 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   };
 
   const handlePointerDown = (e: React.PointerEvent, field: string, currentTop: number, currentLeft: number) => {
-    // Always allow selection
-    const fieldIndex = fieldNameToIndex[field];
-    if (fieldIndex !== undefined) {
-      setCurrentFieldIndex(fieldIndex);
-    }
-
     // Only allow dragging in global edit mode
-    if (!isGlobalEditMode) {
-      return;
-    }
-
+    if (!isGlobalEditMode) return;
+    
     e.preventDefault();
     e.stopPropagation();
-
-    const container = e.currentTarget as HTMLElement;
-    const parent = container.parentElement;
-    if (!parent) return;
-
+    
+    const container = (e.currentTarget as HTMLElement).closest('.field-container') as HTMLElement;
+    if (!container) return;
+    
+    container.setPointerCapture(e.pointerId);
     dragElementRef.current = container;
-    dragParentRef.current = parent; // Store parent element for fresh getBoundingClientRect
     setIsDragging(field);
-
-    // Capture initial positions (rect will be recalculated on each move)
+    
     dragStartPos.current = {
       x: e.clientX,
       y: e.clientY,
       top: currentTop,
-      left: currentLeft,
+      left: currentLeft
     };
-
+    
     draggedPositionRef.current = { top: currentTop, left: currentLeft };
-
-    // Define handlers HERE with current scope - avoids stale closure
-    const onPointerMove = (moveEvent: PointerEvent) => {
-      moveEvent.preventDefault();
-
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current);
-      }
-
-      rafRef.current = requestAnimationFrame(() => {
-        // CRITICAL: Recalculate parent rect on each move to avoid stale values
-        // This handles parent resizing, scrolling, or transform changes
-        if (!dragParentRef.current) return;
-        const parentRect = dragParentRef.current.getBoundingClientRect();
-        
-        // Calculate mouse movement delta (no zoom division needed - PDF scales via width)
-        const deltaX = moveEvent.clientX - dragStartPos.current.x;
-        const deltaY = moveEvent.clientY - dragStartPos.current.y;
-
-        // Free movement - no bounds constraints
-        let newLeft = dragStartPos.current.left + (deltaX / parentRect.width) * 100;
-        let newTop = dragStartPos.current.top + (deltaY / parentRect.height) * 100;
-
-        // Optional: Smart snapping only when Shift key is held (for precision alignment)
-        const isSnappingEnabled = moveEvent.shiftKey;
-        const guides: { x: number[]; y: number[] } = { x: [], y: [] };
-
-        if (isSnappingEnabled) {
-          const snapThreshold = 1.5;
-          let snappedLeft = newLeft;
-          let snappedTop = newTop;
-
-          Object.entries(fieldPositions).forEach(([f, pos]) => {
-            if (f === field) return;
-            if (Math.abs(newLeft - pos.left) < snapThreshold) {
-              snappedLeft = pos.left;
-              guides.x.push(pos.left);
-            }
-            if (Math.abs(newTop - pos.top) < snapThreshold) {
-              snappedTop = pos.top;
-              guides.y.push(pos.top);
-            }
-          });
-
-          newLeft = snappedLeft;
-          newTop = snappedTop;
-        } else {
-          // Show alignment guides visually but don't enforce snapping
-          const guideThreshold = 2.0;
-          Object.entries(fieldPositions).forEach(([f, pos]) => {
-            if (f === field) return;
-            if (Math.abs(newLeft - pos.left) < guideThreshold) {
-              guides.x.push(pos.left);
-            }
-            if (Math.abs(newTop - pos.top) < guideThreshold) {
-              guides.y.push(pos.top);
-            }
-          });
-        }
-
-        const guidesChanged =
-          guides.x.length !== lastGuidesRef.current.x.length ||
-          guides.y.length !== lastGuidesRef.current.y.length ||
-          !guides.x.every((val, idx) => val === lastGuidesRef.current.x[idx]) ||
-          !guides.y.every((val, idx) => val === lastGuidesRef.current.y[idx]);
-
-        if (guidesChanged) {
-          lastGuidesRef.current = guides;
-          setAlignmentGuides(guides);
-        }
-
-        draggedPositionRef.current = { top: newTop, left: newLeft };
-
-        if (dragElementRef.current && dragParentRef.current) {
-          const parentRect = dragParentRef.current.getBoundingClientRect();
-          const deltaLeftPx = (newLeft - dragStartPos.current.left) * parentRect.width / 100;
-          const deltaTopPx = (newTop - dragStartPos.current.top) * parentRect.height / 100;
-          dragElementRef.current.style.transform = `translate(${deltaLeftPx}px, ${deltaTopPx}px)`;
-          // GPU acceleration hint for smooth movement
-          dragElementRef.current.style.willChange = 'transform';
-        }
-      });
-    };
-
-    const cleanupDrag = () => {
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = null;
-      }
-
-      if (dragElementRef.current) {
-        dragElementRef.current.style.transform = '';
-        dragElementRef.current.style.willChange = 'auto'; // Remove GPU hint after drag
-        dragElementRef.current = null;
-      }
-      
-      dragParentRef.current = null; // Clear parent ref
-
-      if (draggedPositionRef.current) {
-        updateFieldPosition(field, draggedPositionRef.current);
-        draggedPositionRef.current = null;
-      }
-
-      setIsDragging(null);
-      setAlignmentGuides({ x: [], y: [] });
-      lastGuidesRef.current = { x: [], y: [] };
-
-      window.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('pointerup', onPointerUp);
-      window.removeEventListener('pointercancel', onPointerUp);
-      window.removeEventListener('pointerleave', onPointerUp);
-    };
-
-    const onPointerUp = () => {
-      cleanupDrag();
-    };
-
-    window.addEventListener('pointermove', onPointerMove);
-    window.addEventListener('pointerup', onPointerUp, { once: true });
-    window.addEventListener('pointercancel', onPointerUp, { once: true });
-    window.addEventListener('pointerleave', onPointerUp, { once: true });
   };
 
   const toggleGlobalEditMode = () => {
-    if (onToggleEditMode) {
-      onToggleEditMode();
-    } else {
-      setInternalEditMode(prev => !prev);
-    }
+    setIsGlobalEditMode(prev => {
+      const newMode = !prev;
+      // Announce mode change to screen readers
+      announce(newMode ? 'Edit mode activated. You can now drag fields to reposition them.' : 'Edit mode deactivated. Fields are now locked.');
+      return newMode;
+    });
   };
 
   const handleFieldClick = (field: string, e: React.MouseEvent) => {
     // Prevent event propagation to avoid triggering PDF click
     e.stopPropagation();
-
-    // PRIORITY: Set this field as active in the control panel ALWAYS (not just in edit mode)
+    
+    // Set this field as active in the control panel
     const fieldIndex = fieldNameToIndex[field];
     if (fieldIndex !== undefined) {
       setCurrentFieldIndex(fieldIndex);
     }
   };
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!isDragging || !dragElementRef.current) return;
+
+    e.preventDefault();
+
+    // Cancel any pending animation frame
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+    }
+
+    // Use requestAnimationFrame + CSS transform (no React state updates during drag!)
+    // Performance: This limits updates to 60fps max for buttery smooth dragging
+    rafRef.current = requestAnimationFrame(() => {
+      const startTime = performance.now();
+
+      const deltaX = e.clientX - dragStartPos.current.x;
+      const deltaY = e.clientY - dragStartPos.current.y;
+      const parentRect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+
+      let newLeft = dragStartPos.current.left + (deltaX / parentRect.width) * 100;
+      let newTop = dragStartPos.current.top + (deltaY / parentRect.height) * 100;
+
+      // Constrain within bounds
+      newLeft = Math.max(0, Math.min(95, newLeft));
+      newTop = Math.max(0, Math.min(95, newTop));
+
+      // Smart snapping to other fields
+      const snapThreshold = 1.5;
+      const guides: { x: number[]; y: number[] } = { x: [], y: [] };
+
+      Object.entries(fieldPositions).forEach(([field, pos]) => {
+        if (field === isDragging) return;
+
+        if (Math.abs(newLeft - pos.left) < snapThreshold) {
+          newLeft = pos.left;
+          guides.x.push(pos.left);
+        }
+
+        if (Math.abs(newTop - pos.top) < snapThreshold) {
+          newTop = pos.top;
+          guides.y.push(pos.top);
+        }
+      });
+
+      // Performance: Only update alignment guides state if they changed
+      // This avoids unnecessary re-renders during drag
+      const guidesChanged =
+        guides.x.length !== lastGuidesRef.current.x.length ||
+        guides.y.length !== lastGuidesRef.current.y.length ||
+        !guides.x.every((val, idx) => val === lastGuidesRef.current.x[idx]) ||
+        !guides.y.every((val, idx) => val === lastGuidesRef.current.y[idx]);
+
+      if (guidesChanged) {
+        lastGuidesRef.current = guides;
+        setAlignmentGuides(guides);
+      }
+
+      // Store position in ref (not state!)
+      draggedPositionRef.current = { top: newTop, left: newLeft };
+
+      // Apply via CSS transform for smooth 60fps movement (bypasses React)
+      if (dragElementRef.current) {
+        const deltaLeftPx = (newLeft - dragStartPos.current.left) * parentRect.width / 100;
+        const deltaTopPx = (newTop - dragStartPos.current.top) * parentRect.height / 100;
+        dragElementRef.current.style.transform = `translate(${deltaLeftPx}px, ${deltaTopPx}px)`;
+      }
+
+      // Performance monitoring: Track frame time (removed console.warn for production)
+      // Frame time is tracked but not logged to console in production builds
+    });
+  }, [isDragging, fieldPositions]);
+
+  const handlePointerUp = useCallback((e: React.PointerEvent) => {
+    if (!isDragging) return;
+    
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+    
+    // Release pointer capture
+    if (dragElementRef.current) {
+      dragElementRef.current.releasePointerCapture(e.pointerId);
+      // Reset transform
+      dragElementRef.current.style.transform = '';
+    }
+    
+    // COMMIT: Now update React state with final position
+    if (draggedPositionRef.current && isDragging) {
+      updateFieldPosition(isDragging, draggedPositionRef.current);
+      // Announce field repositioning to screen readers
+      announce(`Field ${isDragging} repositioned`);
+    }
+
+    // Clean up
+    setIsDragging(null);
+    dragElementRef.current = null;
+    draggedPositionRef.current = null;
+    setAlignmentGuides({ x: [], y: [] });
+    lastGuidesRef.current = { x: [], y: [] };
+  }, [isDragging, updateFieldPosition, announce]);
 
   const handlePDFClick = (e: React.MouseEvent) => {
     // Clicking PDF background does nothing in edit mode
@@ -408,67 +379,22 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     }
   };
 
-  // Cleanup drag state on unmount or when edit mode is disabled
+  // RAF cleanup on unmount to prevent memory leaks
   useEffect(() => {
     return () => {
-      // Cleanup RAF
       if (rafRef.current !== null) {
         cancelAnimationFrame(rafRef.current);
         rafRef.current = null;
       }
-      
-      // Cleanup drag state if component unmounts during drag
-      if (dragElementRef.current) {
-        dragElementRef.current.style.transform = '';
-        dragElementRef.current.style.willChange = 'auto';
-        dragElementRef.current = null;
-      }
-      
-      dragParentRef.current = null;
-      draggedPositionRef.current = null;
-      setIsDragging(null);
-      setAlignmentGuides({ x: [], y: [] });
-      lastGuidesRef.current = { x: [], y: [] };
     };
   }, []);
-
-  // Cleanup drag state when edit mode is toggled off during drag
-  useEffect(() => {
-    if (!isGlobalEditMode && isDragging) {
-      // Edit mode was disabled while dragging - force cleanup
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = null;
-      }
-      
-      if (dragElementRef.current) {
-        dragElementRef.current.style.transform = '';
-        dragElementRef.current.style.willChange = 'auto';
-        dragElementRef.current = null;
-      }
-      
-      dragParentRef.current = null;
-      
-      if (draggedPositionRef.current) {
-        const field = isDragging;
-        updateFieldPosition(field, draggedPositionRef.current);
-        draggedPositionRef.current = null;
-      }
-      
-      setIsDragging(null);
-      setAlignmentGuides({ x: [], y: [] });
-      lastGuidesRef.current = { x: [], y: [] };
-    }
-  }, [isGlobalEditMode, isDragging, updateFieldPosition]);
 
   // Keyboard shortcuts for field positioning
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ignore if user is typing in an input field
       const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
-        return;
-      }
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
 
       // Toggle edit mode with 'E' key
       if (e.key === 'e' && !e.metaKey && !e.ctrlKey && !e.shiftKey) {
@@ -564,7 +490,37 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
 
   return (
     <div className="h-full w-full overflow-auto bg-muted/20">
+        {/* Live region for screen reader announcements */}
+        <LiveRegionComponent />
+
         <TutorialTooltips />
+        
+        {/* Global Edit Mode Toggle */}
+        <div className="fixed top-4 right-4 z-50">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="lg"
+                variant={isGlobalEditMode ? "default" : "secondary"}
+                className={`shadow-lg hover:scale-105 transition-transform ${!isGlobalEditMode ? 'animate-pulse ring-2 ring-primary/50' : ''}`}
+                onClick={toggleGlobalEditMode}
+              >
+                <Move className="h-5 w-5 mr-2" />
+                {isGlobalEditMode ? 'Lock Fields' : 'Edit Positions'}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="left" className="max-w-xs">
+              <div className="space-y-1">
+                <p className="font-semibold">{isGlobalEditMode ? 'Exit edit mode to fill form' : 'Click to enable dragging'}</p>
+                <p className="text-xs text-muted-foreground">
+                  {isGlobalEditMode
+                    ? 'Keyboard: Press E or Esc to exit'
+                    : 'Enable this to drag fields into position'}
+                </p>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </div>
 
         {/* Edit Mode Active Banner */}
         {isGlobalEditMode && (
@@ -634,9 +590,12 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                 const pageOverlays = fieldOverlays.find(o => o.page === pageNum);
 
                 return (
-                  <div
+                  <div 
                     key={`page_${pageNum}`}
-                    className="relative mb-4 w-full"
+                    className="relative mb-4 touch-none w-full"
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
+                    onPointerLeave={handlePointerUp}
                     onClick={handlePDFClick}
                   >
                     <Page
@@ -649,7 +608,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                     />
                   
                   {pageOverlays && (
-                    <div className="absolute inset-0 z-10" style={{ pointerEvents: 'none' }}>
+                    <div className="absolute inset-0">
                       {/* Alignment Guides */}
                       {isDragging && (
                         <>
@@ -700,45 +659,33 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                           return (
                             <div
                             key={idx}
-                            className={`field-container group absolute z-20 ${
-                              isGlobalEditMode ? 'select-none' : ''
-                            } ${
-                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary shadow-lg scale-105' :
-                              isGlobalEditMode && isCurrentField ? 'cursor-grab ring-2 ring-primary/70' :
-                              isGlobalEditMode ? 'cursor-default ring-1 ring-border/30' : 'cursor-auto'
+                            className={`field-container group absolute select-none touch-none ${
+                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary shadow-lg scale-105' : 
+                              isGlobalEditMode ? 'cursor-move ring-2 ring-primary/70' : 'cursor-pointer'
                             } ${
                               highlightedField === overlay.field
                                 ? 'ring-2 ring-accent shadow-lg animate-pulse' :
-                              isCurrentField
-                                ? 'ring-2 ring-primary shadow-md bg-primary/5'
+                              isCurrentField 
+                                ? 'ring-2 ring-primary shadow-md bg-primary/5' 
                                 : 'ring-1 ring-border/50 hover:ring-primary/50'
-                            } rounded-lg bg-background/80 backdrop-blur-sm p-1 text-xs transition-all duration-200`}
+                            } rounded-lg bg-background/80 backdrop-blur-sm p-2 transition-all duration-200`}
                             style={{
                               top: `${position.top}%`,
                               left: `${position.left}%`,
                               width: overlay.width || 'auto',
                               height: overlay.height || 'auto',
-                              pointerEvents: isGlobalEditMode ? 'auto' : 'none',
-                              // Smaller clickable area
-                              margin: '-4px',
-                              // REMOVED transform: scale() - it breaks click event coordinates
-                              // Instead using: smaller padding (p-1 instead of p-1.5) + text-xs class
-                              // CRITICAL: Only disable touch scrolling when in edit mode
-                              touchAction: isGlobalEditMode ? 'none' : 'auto',
-                              // GPU acceleration hint when dragging (only applies during actual drag transform)
-                              willChange: isDragging === overlay.field ? 'transform' : 'auto',
+                              pointerEvents: 'auto',
+                              // Expand clickable area with negative margin
+                              margin: '-8px',
+                              // Scale with zoom
+                              transform: `scale(${zoom})`,
+                              transformOrigin: 'top left',
                             }}
-                            onPointerDown={(e) => {
-                              // In edit mode: drag the container
-                              // In normal mode: let clicks pass through to the input
-                              if (isGlobalEditMode) {
-                                handlePointerDown(e, overlay.field, position.top, position.left);
-                              }
-                              // Don't handle pointer down in normal mode - let the input handle it
-                            }}
+                            onClick={(e) => handleFieldClick(overlay.field, e)}
+                            onPointerDown={(e) => handlePointerDown(e, overlay.field, position.top, position.left)}
                           >
-                            {/* Visual Direction Indicators - ONLY show for currently selected field */}
-                            {isGlobalEditMode && isCurrentField && (
+                            {/* Visual Direction Indicators */}
+                            {isGlobalEditMode && (
                               <>
                                 {/* Up Arrow Indicator */}
                                 {canMoveUp && (
@@ -786,48 +733,56 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                       variant="secondary"
                                       className="h-6 w-6"
                                       disabled={!canMoveUp}
+                                      aria-label="Move field up"
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         adjustPosition('up', overlay.field);
                                       }}
                                     >
                                       <ChevronUp className="h-3 w-3" />
+                                      <span className="sr-only">Move field up</span>
                                     </Button>
                                     <Button
                                       size="icon"
                                       variant="secondary"
                                       className="h-6 w-6"
                                       disabled={!canMoveDown}
+                                      aria-label="Move field down"
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         adjustPosition('down', overlay.field);
                                       }}
                                     >
                                       <ChevronDown className="h-3 w-3" />
+                                      <span className="sr-only">Move field down</span>
                                     </Button>
                                     <Button
                                       size="icon"
                                       variant="secondary"
                                       className="h-6 w-6"
                                       disabled={!canMoveLeft}
+                                      aria-label="Move field left"
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         adjustPosition('left', overlay.field);
                                       }}
                                     >
                                       <ChevronLeft className="h-3 w-3" />
+                                      <span className="sr-only">Move field left</span>
                                     </Button>
                                     <Button
                                       size="icon"
                                       variant="secondary"
                                       className="h-6 w-6"
                                       disabled={!canMoveRight}
+                                      aria-label="Move field right"
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         adjustPosition('right', overlay.field);
                                       }}
                                     >
                                       <ChevronRight className="h-3 w-3" />
+                                      <span className="sr-only">Move field right</span>
                                     </Button>
                                   </div>
                                 )}
@@ -842,6 +797,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                         size="icon"
                                         variant="secondary"
                                         className="absolute -top-2 -right-10 h-7 w-7 rounded-full"
+                                        aria-label="Autofill field from vault"
                                         onClick={(e) => handleAutofillField(overlay.field, e)}
                                         onPointerDown={(e) => {
                                           e.preventDefault();
@@ -849,6 +805,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                         }}
                                       >
                                         <Sparkles className="h-4 w-4" />
+                                        <span className="sr-only">Autofill from vault</span>
                                       </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
@@ -856,6 +813,27 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                     </TooltipContent>
                                   </Tooltip>
                                 )}
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      size="icon"
+                                      variant={isGlobalEditMode ? "default" : "secondary"}
+                                      className="absolute -top-2 -right-2 h-7 w-7 rounded-full"
+                                      aria-label={isGlobalEditMode ? 'Exit edit mode' : 'Enter edit mode'}
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        toggleGlobalEditMode();
+                                      }}
+                                    >
+                                      <Move className="h-4 w-4" />
+                                      <span className="sr-only">{isGlobalEditMode ? 'Exit edit mode' : 'Enter edit mode'}</span>
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>{isGlobalEditMode ? 'Exit Edit Mode' : 'Enter Edit Mode'}</p>
+                                  </TooltipContent>
+                                </Tooltip>
                               </>
                             )}
                             
@@ -864,19 +842,10 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 value={formData[overlay.field as keyof FormData] as string || ''}
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
-                                onFocus={() => {
-                                  const fieldIndex = fieldNameToIndex[overlay.field];
-                                  if (fieldIndex !== undefined) {
-                                    setCurrentFieldIndex(fieldIndex);
-                                  }
-                                }}
-                                style={{
-                                  fontSize: `${fieldFontSize}px`,
-                                  height: `${fieldFontSize * 2}px`,
-                                  pointerEvents: 'auto',
-                                  cursor: isGlobalEditMode ? 'move' : 'text'
-                                }}
-                                className={`field-input font-mono ${
+                                disabled={isGlobalEditMode}
+                                className={`field-input h-6 text-[12pt] font-mono ${
+                                  isGlobalEditMode
+                                    ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   validationErrors?.[overlay.field]?.length
                                     ? 'bg-destructive/10 border-destructive'
                                     : isCurrentField
@@ -890,19 +859,10 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 value={formData[overlay.field as keyof FormData] as string || ''}
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
-                                onFocus={() => {
-                                  const fieldIndex = fieldNameToIndex[overlay.field];
-                                  if (fieldIndex !== undefined) {
-                                    setCurrentFieldIndex(fieldIndex);
-                                  }
-                                }}
-                                style={{
-                                  fontSize: `${fieldFontSize}px`,
-                                  minHeight: `${fieldFontSize * 4}px`,
-                                  pointerEvents: 'auto',
-                                  cursor: isGlobalEditMode ? 'move' : 'text'
-                                }}
-                                className={`field-input font-mono resize-none ${
+                                disabled={isGlobalEditMode}
+                                className={`field-input text-[12pt] font-mono resize-none min-h-[48px] ${
+                                  isGlobalEditMode
+                                    ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   validationErrors?.[overlay.field]?.length
                                     ? 'bg-destructive/10 border-destructive'
                                     : isCurrentField
@@ -914,22 +874,13 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             {overlay.type === 'checkbox' && (
                               <Checkbox
                                 checked={!!formData[overlay.field as keyof FormData]}
-                                onCheckedChange={(checked) => {
-                                  if (!isGlobalEditMode) {
-                                    updateField(overlay.field, checked as boolean);
-                                    const fieldIndex = fieldNameToIndex[overlay.field];
-                                    if (fieldIndex !== undefined) {
-                                      setCurrentFieldIndex(fieldIndex);
-                                    }
-                                  }
-                                }}
-                                style={{
-                                  pointerEvents: 'auto',
-                                  cursor: isGlobalEditMode ? 'move' : 'pointer'
-                                }}
+                                onCheckedChange={(checked) => !isGlobalEditMode && updateField(overlay.field, checked as boolean)}
+                                disabled={isGlobalEditMode}
                                 className={`border-2 ${
-                                  isCurrentField
-                                    ? 'bg-primary/5 border-primary'
+                                  isGlobalEditMode
+                                    ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
+                                  isCurrentField 
+                                    ? 'bg-primary/5 border-primary' 
                                     : 'bg-background border-border'
                                 }`}
                               />

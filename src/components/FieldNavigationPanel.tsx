@@ -6,12 +6,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Copy, Move, Search, X, AlertCircle, Settings, Package, Keyboard } from "@/icons";
-import { useEffect, useRef, useState, useMemo } from "react";
+import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Copy, Move, Search, X, AlertCircle, Settings, Package } from "@/icons";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { useLiveRegion } from "@/hooks/use-live-region";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ValidationRuleEditor } from "./ValidationRuleEditor";
 import { FieldPresetsToolbar } from "./FieldPresetsToolbar";
@@ -26,7 +26,6 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import type { FormData, FieldConfig, FieldPosition, ValidationRules, ValidationErrors } from "@/types/FormData";
-import { useFormFields, generateFieldNameToIndex } from "@/hooks/use-form-fields";
 
 interface Template {
   name: string;
@@ -59,8 +58,6 @@ interface Props {
   onSettingsSheetChange: (open: boolean) => void;
   onApplyTemplate: (template: Template) => void;
   onApplyGroup: (groupPositions: Record<string, FieldPosition>) => void;
-  isEditMode?: boolean;
-  onToggleEditMode?: () => void;
 }
 
 const FIELD_CONFIG: FieldConfig[] = [
@@ -159,12 +156,12 @@ const FIELD_CONFIG: FieldConfig[] = [
   { field: 'signatureName', label: 'Signature of Declarant', type: 'input', placeholder: 'Sign your name', vaultField: 'full_name' },
 ];
 
-export const FieldNavigationPanel = ({
-  formData,
-  updateField,
-  currentFieldIndex,
-  setCurrentFieldIndex,
-  fieldPositions,
+export const FieldNavigationPanel = ({ 
+  formData, 
+  updateField, 
+  currentFieldIndex, 
+  setCurrentFieldIndex, 
+  fieldPositions, 
   updateFieldPosition,
   selectedFields,
   setSelectedFields,
@@ -184,9 +181,12 @@ export const FieldNavigationPanel = ({
   onSettingsSheetChange,
   onApplyTemplate,
   onApplyGroup,
-  isEditMode = false,
-  onToggleEditMode,
 }: Props) => {
+  // Live region for field navigation announcements
+  const { announce, LiveRegionComponent } = useLiveRegion({
+    clearAfter: 1500, // Quick clear for rapid field navigation
+  });
+
   const fieldRefs = useRef<(HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | null)[]>([]);
   const scrollViewportRef = useRef<HTMLDivElement>(null);
   const activeFieldRef = useRef<HTMLDivElement>(null);
@@ -194,8 +194,6 @@ export const FieldNavigationPanel = ({
   const { toast } = useToast();
   const positionInputRef = useRef<HTMLInputElement>(null);
   const [showPositionControl, setShowPositionControl] = useState(false);
-  const xInputRef = useRef<HTMLInputElement | null>(null);
-  const yInputRef = useRef<HTMLInputElement | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [showAISearch, setShowAISearch] = useState(false);
@@ -222,22 +220,19 @@ export const FieldNavigationPanel = ({
     },
   });
 
-  // Fetch field mappings from database to ensure consistent ordering with FormViewer
-  const { data: fieldMappings, isLoading: isLoadingFields } = useFormFields();
-
-  // Generate field name to index mapping from database (same as FormViewer)
-  const fieldNameToIndex: Record<string, number> = useMemo(() => {
-    if (!fieldMappings || fieldMappings.length === 0) {
-      return {};
-    }
-    return generateFieldNameToIndex(fieldMappings);
-  }, [fieldMappings]);
-
   // Filter fields based on search query
   const filteredFields = FIELD_CONFIG.filter(config =>
     config.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
     config.field.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Announce current field to screen readers when it changes
+  useEffect(() => {
+    const currentField = FIELD_CONFIG[currentFieldIndex];
+    if (currentField) {
+      announce(`Field ${currentFieldIndex + 1} of ${FIELD_CONFIG.length}: ${currentField.label}`);
+    }
+  }, [currentFieldIndex, announce]);
 
   // Smooth scroll to active field within ScrollArea viewport only
   useEffect(() => {
@@ -444,49 +439,6 @@ export const FieldNavigationPanel = ({
         (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA') &&
         activeElement.classList.contains('field-input'); // Only block if it's a form field input
       
-      // CRITICAL: If Position Adjustment popover is open, directly update X-Y input fields
-      if (showPositionControl && !isActivelyTyping && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-        e.preventDefault();
-        const step = 0.1; // Small step for precise control
-        const currentX = parseFloat(xInputRef.current?.value || currentPosition.left.toFixed(1));
-        const currentY = parseFloat(yInputRef.current?.value || currentPosition.top.toFixed(1));
-        
-        let newX = currentX;
-        let newY = currentY;
-        let direction: 'up' | 'down' | 'left' | 'right' | null = null;
-        
-        switch (e.key) {
-          case 'ArrowUp':
-            newY = Math.max(0, currentY - step);
-            direction = 'up';
-            break;
-          case 'ArrowDown':
-            newY = Math.min(100, currentY + step);
-            direction = 'down';
-            break;
-          case 'ArrowLeft':
-            newX = Math.max(0, currentX - step);
-            direction = 'left';
-            break;
-          case 'ArrowRight':
-            newX = Math.min(100, currentX + step);
-            direction = 'right';
-            break;
-        }
-        
-        // Update position directly - React's controlled component pattern will update the input fields automatically
-        updateFieldPosition(currentFieldName, { left: newX, top: newY });
-        
-        // Visual feedback
-        if (direction) {
-          requestAnimationFrame(() => {
-            setPressedKey(direction);
-          });
-        }
-        return;
-      }
-      
-      // Fallback: Normal arrow key positioning when popover is closed
       if (!isActivelyTyping && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
         e.preventDefault();
         const direction = {
@@ -529,18 +481,21 @@ export const FieldNavigationPanel = ({
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-    }, [currentFieldIndex, showPositionControl, showSearch, currentFieldName, currentPosition, updateFieldPosition]);
+  }, [currentFieldIndex, showPositionControl, showSearch]);
 
   return (
-    <Card className="h-full w-full min-w-0 border-hairline shadow-3point chamfered flex flex-col overflow-hidden">
+    <Card className="h-full border-hairline shadow-3point chamfered flex flex-col overflow-hidden">
+      {/* Live region for field navigation announcements */}
+      <LiveRegionComponent />
+
       {/* Compact Sticky Header */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-sm">
         <div className="p-3 space-y-2">
           <div className="flex items-center justify-between gap-2">
             <div className="flex-1 min-w-0">
-              <h2 className="font-semibold text-sm break-words">Field {currentFieldIndex + 1}/{FIELD_CONFIG.length}</h2>
+              <h2 className="font-semibold text-sm truncate">Field {currentFieldIndex + 1}/{FIELD_CONFIG.length}</h2>
               {searchQuery && (
-                <p className="text-xs text-muted-foreground break-words">{filteredFields.length} results</p>
+                <p className="text-xs text-muted-foreground truncate">{filteredFields.length} results</p>
               )}
             </div>
             <div className="flex items-center gap-1 shrink-0">
@@ -558,7 +513,7 @@ export const FieldNavigationPanel = ({
                     <Package className="h-3 w-3" strokeWidth={1.5} />
                   </Badge>
                 </PopoverTrigger>
-                <PopoverContent className="w-[min(500px,calc(100vw-2rem))] max-w-[calc(100vw-2rem)]" align="end" side="left">
+                <PopoverContent className="w-[500px]" align="end">
                   <FieldGroupManager
                     selectedFields={selectedFields}
                     fieldPositions={fieldPositions}
@@ -578,34 +533,8 @@ export const FieldNavigationPanel = ({
             </div>
           </div>
 
-          {/* Form Completion Progress */}
-          {(() => {
-            const filledFields = FIELD_CONFIG.filter(field => {
-              const value = formData[field.field];
-              if (field.type === 'checkbox') return value === true;
-              return typeof value === 'string' && value.trim() !== '';
-            }).length;
-            const totalFields = FIELD_CONFIG.length;
-            const percentage = Math.round((filledFields / totalFields) * 100);
-
-            return (
-              <div className="space-y-1.5 px-3 pb-3 border-b">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground font-medium">Form Progress</span>
-                  <span className="text-primary font-semibold">{filledFields}/{totalFields} ({percentage}%)</span>
-                </div>
-                <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-500 ease-out"
-                    style={{ width: `${percentage}%` }}
-                  />
-                </div>
-              </div>
-            );
-          })()}
-
           <Sheet open={settingsSheetOpen} onOpenChange={onSettingsSheetChange}>
-            <SheetContent side="right" className="w-[min(540px,calc(100vw-2rem))] max-w-[calc(100vw-2rem)]">
+            <SheetContent side="right" className="w-[400px] sm:w-[540px]">
               <SheetHeader>
                 <SheetTitle>Form Settings</SheetTitle>
                 <SheetDescription>Manage templates and form configurations</SheetDescription>
@@ -723,89 +652,47 @@ export const FieldNavigationPanel = ({
               {currentFieldIndex >= 0 && currentFieldIndex < FIELD_CONFIG.length && (
                 <div className="p-2 bg-muted/30 rounded-lg border space-y-1.5">
                   <div className="flex items-center justify-between gap-2">
-                    <h3 className="text-xs font-semibold break-words min-w-0 flex-1">
+                    <h3 className="text-xs font-semibold truncate">
                       {FIELD_CONFIG[currentFieldIndex]?.label}
                       {selectedFields.length > 0 && (
                         <span className="ml-1 text-[10px] text-muted-foreground">({selectedFields.length})</span>
                       )}
                     </h3>
-                    <div className="flex items-center gap-1">
-                      {/* Toggle Edit Mode Button (4 arrows) */}
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            size="sm"
-                            variant={isEditMode ? "default" : "outline"}
-                            className="h-7 px-2 gap-1"
-                            onClick={() => onToggleEditMode?.()}
-                          >
-                            <Move className="h-3 w-3" strokeWidth={1.5} />
-                            <span className="text-xs">{isEditMode ? 'Lock' : 'Move'}</span>
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>{isEditMode ? 'Exit edit mode' : 'Enable drag mode to reposition fields'}</p>
-                        </TooltipContent>
-                      </Tooltip>
-
-                      {/* Position Adjustment Popover */}
-                      <Popover open={showPositionControl} onOpenChange={setShowPositionControl}>
-                        <PopoverTrigger asChild>
-                          <Button size="sm" variant="outline" className="h-7 px-2 gap-1">
-                            <Keyboard className="h-3 w-3" strokeWidth={1.5} />
-                            <span className="text-xs">Adjust</span>
-                          </Button>
-                        </PopoverTrigger>
-                      <PopoverContent className="w-[min(224px,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] p-4" side="left" align="start">
+                    <Popover open={showPositionControl} onOpenChange={setShowPositionControl}>
+                      <PopoverTrigger asChild>
+                        <Button size="sm" variant="outline" className="h-7 px-2 gap-1">
+                          <Move className="h-3 w-3" strokeWidth={1.5} />
+                          <span className="text-xs">Adjust</span>
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-56 p-4" side="left" align="start">
                         <h4 className="text-sm font-semibold mb-3">Position Adjustment</h4>
                         <div className="grid grid-cols-2 gap-2 mb-3">
                           <div>
                             <label className="text-[10px] text-muted-foreground">X %</label>
                             <Input
-                              ref={xInputRef}
                               type="number"
                               step="0.1"
                               value={currentPosition.left.toFixed(1)}
-                              onChange={(e) => {
-                                const newX = parseFloat(e.target.value) || 0;
-                                updateFieldPosition(currentFieldName, { 
-                                  ...currentPosition, 
-                                  left: newX
-                                });
-                              }}
-                              onInput={(e) => {
-                                const newX = parseFloat((e.target as HTMLInputElement).value) || 0;
-                                updateFieldPosition(currentFieldName, { 
-                                  ...currentPosition, 
-                                  left: newX
-                                });
-                              }}
+                              onChange={(e) => updateFieldPosition(currentFieldName, { 
+                                ...currentPosition, 
+                                left: parseFloat(e.target.value) || 0 
+                              })}
                               className="h-7 text-xs"
                             />
                           </div>
                           <div>
                             <label className="text-[10px] text-muted-foreground">Y %</label>
                             <Input
-                              ref={yInputRef}
                               type="number"
                               step="0.1"
                               value={currentPosition.top.toFixed(1)}
-                              onChange={(e) => {
-                                const newY = parseFloat(e.target.value) || 0;
-                                updateFieldPosition(currentFieldName, { 
-                                  ...currentPosition, 
-                                  top: newY
-                                });
-                              }}
-                              onInput={(e) => {
-                                const newY = parseFloat((e.target as HTMLInputElement).value) || 0;
-                                updateFieldPosition(currentFieldName, { 
-                                  ...currentPosition, 
-                                  top: newY
-                                });
-                              }}
-                              className="h-7 text-xs"
-                            />
+                          onChange={(e) => updateFieldPosition(currentFieldName, { 
+                            ...currentPosition, 
+                            top: parseFloat(e.target.value) || 0 
+                          })}
+                          className="h-7 text-xs"
+                        />
                       </div>
                     </div>
                     {/* Arrow key controls in intuitive cross/diamond pattern */}
@@ -874,9 +761,8 @@ export const FieldNavigationPanel = ({
                   </PopoverContent>
                 </Popover>
               </div>
-            </div>
-
-            {/* Quick Edit Input */}
+              
+              {/* Quick Edit Input */}
               {FIELD_CONFIG[currentFieldIndex]?.type === 'input' && (
                 <Input
                   value={formData[currentFieldName] as string || ''}
@@ -923,13 +809,8 @@ export const FieldNavigationPanel = ({
             </div>
           ) : (
             filteredFields.map((config) => {
-              // Use database index for highlighting synchronization with FormViewer
-              const databaseIndex = fieldNameToIndex[config.field];
-              const isActive = databaseIndex !== undefined && databaseIndex === currentFieldIndex;
-
-              // Use UI index for field refs and display numbering
-              const uiIndex = FIELD_CONFIG.findIndex(f => f.field === config.field);
-
+              const originalIndex = FIELD_CONFIG.findIndex(f => f.field === config.field);
+              const isActive = originalIndex === currentFieldIndex;
               const isSelected = selectedFields.includes(config.field);
               const fieldErrors = validationErrors[config.field] || [];
               const hasErrors = fieldErrors.length > 0;
@@ -960,10 +841,8 @@ export const FieldNavigationPanel = ({
                           : [...prev, config.field]
                       );
                     } else {
-                      // Normal navigation - use database index for consistency with FormViewer
-                      if (databaseIndex !== undefined) {
-                        setCurrentFieldIndex(databaseIndex);
-                      }
+                      // Normal navigation
+                      setCurrentFieldIndex(originalIndex);
                     }
                   }}
                   onMouseEnter={() => onFieldHover?.(config.field)}
@@ -988,7 +867,7 @@ export const FieldNavigationPanel = ({
                         isActive ? 'text-primary' : isSelected ? 'text-blue-600' : hasErrors ? 'text-destructive' : 'text-muted-foreground'
                       }`}
                     >
-                      {uiIndex + 1}. {config.label}
+                      {originalIndex + 1}. {config.label}
                     </Label>
                     <div className="flex items-center gap-2">
                       {onSaveValidationRules && (
@@ -1024,7 +903,7 @@ export const FieldNavigationPanel = ({
                 
                 {/* Show vault data preview if available */}
                 {config.vaultField && personalInfo && personalInfo[config.vaultField as keyof typeof personalInfo] && (
-                  <div className="text-xs text-muted-foreground bg-muted/50 rounded px-2 py-1 font-mono break-words min-w-0">
+                  <div className="text-xs text-muted-foreground bg-muted/50 rounded px-2 py-1 font-mono truncate">
                     Saved: {personalInfo[config.vaultField as keyof typeof personalInfo]}
                   </div>
                 )}
@@ -1044,16 +923,13 @@ export const FieldNavigationPanel = ({
                   {config.type === 'input' && (
                     <Input
                       id={config.field}
-                      ref={el => fieldRefs.current[uiIndex] = el}
+                      ref={el => fieldRefs.current[originalIndex] = el}
                       value={formData[config.field] as string || ''}
                       onChange={(e) => updateField(config.field, e.target.value)}
-                      onKeyDown={(e) => handleKeyDown(e, uiIndex)}
+                      onKeyDown={(e) => handleKeyDown(e, originalIndex)}
                       onFocus={(e) => {
                         e.stopPropagation();
-                        // Use database index for global state synchronization
-                        if (databaseIndex !== undefined) {
-                          setCurrentFieldIndex(databaseIndex);
-                        }
+                        setCurrentFieldIndex(originalIndex);
                       }}
                       onClick={(e) => e.stopPropagation()}
                       placeholder={config.placeholder}
@@ -1065,16 +941,13 @@ export const FieldNavigationPanel = ({
                   {config.type === 'textarea' && (
                     <Textarea
                       id={config.field}
-                      ref={el => fieldRefs.current[uiIndex] = el as HTMLTextAreaElement}
+                      ref={el => fieldRefs.current[originalIndex] = el as HTMLTextAreaElement}
                       value={formData[config.field] as string || ''}
                       onChange={(e) => updateField(config.field, e.target.value)}
-                      onKeyDown={(e) => handleKeyDown(e, uiIndex)}
+                      onKeyDown={(e) => handleKeyDown(e, originalIndex)}
                       onFocus={(e) => {
                         e.stopPropagation();
-                        // Use database index for global state synchronization
-                        if (databaseIndex !== undefined) {
-                          setCurrentFieldIndex(databaseIndex);
-                        }
+                        setCurrentFieldIndex(originalIndex);
                       }}
                       onClick={(e) => e.stopPropagation()}
                       placeholder={config.placeholder}
@@ -1086,16 +959,11 @@ export const FieldNavigationPanel = ({
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id={config.field}
-                        ref={el => fieldRefs.current[uiIndex] = el as unknown as HTMLButtonElement}
+                        ref={el => fieldRefs.current[originalIndex] = el as unknown as HTMLButtonElement}
                         checked={!!formData[config.field]}
                         onCheckedChange={(checked) => updateField(config.field, checked as boolean)}
-                        onKeyDown={(e) => handleKeyDown(e, uiIndex)}
-                        onFocus={() => {
-                          // Use database index for global state synchronization
-                          if (databaseIndex !== undefined) {
-                            setCurrentFieldIndex(databaseIndex);
-                          }
-                        }}
+                        onKeyDown={(e) => handleKeyDown(e, originalIndex)}
+                        onFocus={() => setCurrentFieldIndex(originalIndex)}
                       />
                       <label 
                         htmlFor={config.field} 
