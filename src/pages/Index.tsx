@@ -106,7 +106,7 @@ const Index = () => {
   const [settingsSheetOpen, setSettingsSheetOpen] = useState(false);
   const [vaultSheetOpen, setVaultSheetOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [fieldFontSize, setFieldFontSize] = useState(12); // Default 12pt
+  const [fieldFontSize, setFieldFontSize] = useState(16); // Default 16px (prevents iOS Safari auto-zoom)
   const { toast } = useToast();
   const hasUnsavedChanges = useRef(false);
   const pdfPanelRef = useRef<HTMLDivElement>(null);
@@ -834,31 +834,31 @@ const Index = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setFieldFontSize(Math.max(8, fieldFontSize - 1))}
-                    disabled={fieldFontSize <= 8}
+                    onClick={() => setFieldFontSize(Math.max(16, fieldFontSize - 1))}
+                    disabled={fieldFontSize <= 16}
                     className="h-7 w-7 p-0"
                   >
                     <span className="text-sm">A</span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Decrease field font size (minimum 8pt)</p>
+                  <p>Decrease field font size (minimum 16px - iOS requirement)</p>
                 </TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    variant={fieldFontSize === 12 ? "default" : "ghost"}
+                    variant={fieldFontSize === 16 ? "default" : "ghost"}
                     size="sm"
-                    onClick={() => setFieldFontSize(12)}
+                    onClick={() => setFieldFontSize(16)}
                     className="flex items-center gap-1 px-2.5 min-w-[70px] justify-center h-7 text-xs font-semibold"
                   >
                     <span className="text-xs">Font</span>
-                    <span className="font-mono">{fieldFontSize}pt</span>
+                    <span className="font-mono">{fieldFontSize}px</span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Reset to default 12pt font size</p>
+                  <p>Reset to default 16px font size (prevents iOS zoom)</p>
                 </TooltipContent>
               </Tooltip>
               <Tooltip>
@@ -866,15 +866,15 @@ const Index = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setFieldFontSize(Math.min(16, fieldFontSize + 1))}
-                    disabled={fieldFontSize >= 16}
+                    onClick={() => setFieldFontSize(Math.min(20, fieldFontSize + 1))}
+                    disabled={fieldFontSize >= 20}
                     className="h-7 w-7 p-0"
                   >
                     <span className="text-base font-semibold">A</span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Increase field font size (maximum 16pt)</p>
+                  <p>Increase field font size (maximum 20px)</p>
                 </TooltipContent>
               </Tooltip>
             </div>

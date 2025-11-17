@@ -37,7 +37,7 @@ interface Props {
   fieldFontSize?: number;
 }
 
-export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, zoom = 1, highlightedField = null, validationErrors = {}, vaultData = null, isEditMode: externalEditMode, onToggleEditMode, fieldFontSize = 12 }: Props) => {
+export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, zoom = 1, highlightedField = null, validationErrors = {}, vaultData = null, isEditMode: externalEditMode, onToggleEditMode, fieldFontSize = 16 }: Props) => {
   // Fetch FL-320 form fields from database
   const { data: fieldMappings, isLoading: isLoadingFields, error: fieldsError } = useFormFields('FL-320');
 
@@ -871,7 +871,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                   }
                                 }}
                                 style={{
-                                  fontSize: `${fieldFontSize}pt`,
+                                  fontSize: `${fieldFontSize}px`,
                                   height: `${fieldFontSize * 2}px`,
                                   pointerEvents: 'auto',
                                   cursor: isGlobalEditMode ? 'move' : 'text'
@@ -897,7 +897,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                   }
                                 }}
                                 style={{
-                                  fontSize: `${fieldFontSize}pt`,
+                                  fontSize: `${fieldFontSize}px`,
                                   minHeight: `${fieldFontSize * 4}px`,
                                   pointerEvents: 'auto',
                                   cursor: isGlobalEditMode ? 'move' : 'text'
