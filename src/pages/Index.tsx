@@ -2,7 +2,7 @@ import { lazy, Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AdaptiveLayout } from "@/components/layout/AdaptiveLayout";
 import { MobileBottomSheet } from "@/components/layout/MobileBottomSheet";
-import { useWindowSize } from "@/hooks/useAdaptiveLayout";
+import { useWindowSize } from "@/hooks/use-adaptive-layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FocusTrap } from "@/components/ui/focus-trap";
 
