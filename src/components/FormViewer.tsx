@@ -33,9 +33,11 @@ interface Props {
   highlightedField?: string | null;
   validationErrors?: ValidationErrors;
   vaultData?: PersonalVaultData | null;
+  isEditMode: boolean;
+  onToggleEditMode: () => void;
 }
 
-export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, zoom = 1, highlightedField = null, validationErrors = {}, vaultData = null }: Props) => {
+export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, zoom = 1, highlightedField = null, validationErrors = {}, vaultData = null, isEditMode, onToggleEditMode }: Props) => {
   // Live region for screen reader announcements
   const { announce, LiveRegionComponent } = useLiveRegion({
     clearAfter: 2000, // Clear announcements after 2 seconds
@@ -47,7 +49,6 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
 
   const [numPages, setNumPages] = useState<number>(0);
   const [pageWidth, setPageWidth] = useState<number>(850);
-  const [isGlobalEditMode, setIsGlobalEditMode] = useState<boolean>(false);
   const [isDragging, setIsDragging] = useState<string | null>(null);
   const [alignmentGuides, setAlignmentGuides] = useState<{ x: number[]; y: number[] }>({ x: [], y: [] });
   const [pdfLoading, setPdfLoading] = useState(true);
@@ -181,7 +182,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
 
   const handlePointerDown = (e: React.PointerEvent, field: string, currentTop: number, currentLeft: number) => {
     // Only allow dragging in global edit mode
-    if (!isGlobalEditMode) return;
+    if (!isEditMode) return;
     
     e.preventDefault();
     e.stopPropagation();
@@ -204,12 +205,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   };
 
   const toggleGlobalEditMode = () => {
-    setIsGlobalEditMode(prev => {
-      const newMode = !prev;
-      // Announce mode change to screen readers
-      announce(newMode ? 'Edit mode activated. You can now drag fields to reposition them.' : 'Edit mode deactivated. Fields are now locked.');
-      return newMode;
-    });
+    // Announce mode change to screen readers BEFORE toggle (since we're reading current state)
+    announce(!isEditMode ? 'Edit mode activated. You can now drag fields to reposition them.' : 'Edit mode deactivated. Fields are now locked.');
+    onToggleEditMode();
   };
 
   const handleFieldClick = (field: string, e: React.MouseEvent) => {
@@ -399,19 +397,20 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
       // Toggle edit mode with 'E' key
       if (e.key === 'e' && !e.metaKey && !e.ctrlKey && !e.shiftKey) {
         e.preventDefault();
-        setIsGlobalEditMode(prev => !prev);
+        toggleGlobalEditMode();
         return;
       }
 
       // Exit edit mode with Escape
-      if (e.key === 'Escape' && isGlobalEditMode) {
+      if (e.key === 'Escape' && isEditMode) {
         e.preventDefault();
-        setIsGlobalEditMode(false);
+        onToggleEditMode(); // Exit edit mode
+        announce('Edit mode deactivated. Fields are now locked.');
         return;
       }
 
       // Move selected field with arrow keys (only in edit mode)
-      if (isGlobalEditMode && currentFieldIndex >= 0) {
+      if (isEditMode && currentFieldIndex >= 0) {
         const field = Object.keys(fieldNameToIndex).find(
           f => fieldNameToIndex[f] === currentFieldIndex
         );
@@ -437,7 +436,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isGlobalEditMode, currentFieldIndex, fieldNameToIndex, adjustPosition]);
+  }, [isEditMode, currentFieldIndex, fieldNameToIndex, adjustPosition]);
 
   // Show loading state while fetching field data from database
   if (isLoadingFields) {
@@ -501,19 +500,19 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
             <TooltipTrigger asChild>
               <Button
                 size="lg"
-                variant={isGlobalEditMode ? "default" : "secondary"}
-                className={`shadow-lg hover:scale-105 transition-transform ${!isGlobalEditMode ? 'animate-pulse ring-2 ring-primary/50' : ''}`}
+                variant={isEditMode ? "default" : "secondary"}
+                className={`shadow-lg hover:scale-105 transition-transform ${!isEditMode ? 'animate-pulse ring-2 ring-primary/50' : ''}`}
                 onClick={toggleGlobalEditMode}
               >
                 <Move className="h-5 w-5 mr-2" />
-                {isGlobalEditMode ? 'Lock Fields' : 'Edit Positions'}
+                {isEditMode ? 'Lock Fields' : 'Edit Positions'}
               </Button>
             </TooltipTrigger>
             <TooltipContent side="left" className="max-w-xs">
               <div className="space-y-1">
-                <p className="font-semibold">{isGlobalEditMode ? 'Exit edit mode to fill form' : 'Click to enable dragging'}</p>
+                <p className="font-semibold">{isEditMode ? 'Exit edit mode to fill form' : 'Click to enable dragging'}</p>
                 <p className="text-xs text-muted-foreground">
-                  {isGlobalEditMode
+                  {isEditMode
                     ? 'Keyboard: Press E or Esc to exit'
                     : 'Enable this to drag fields into position'}
                 </p>
@@ -523,7 +522,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
         </div>
 
         {/* Edit Mode Active Banner */}
-        {isGlobalEditMode && (
+        {isEditMode && (
           <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 px-6 py-3 bg-amber-500/95 text-white rounded-lg shadow-lg backdrop-blur-sm animate-in slide-in-from-top border-2 border-amber-400">
             <div className="flex items-center gap-3">
               <div className="relative">
@@ -661,7 +660,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             key={idx}
                             className={`field-container group absolute select-none touch-none ${
                               isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary shadow-lg scale-105' : 
-                              isGlobalEditMode ? 'cursor-move ring-2 ring-primary/70' : 'cursor-pointer'
+                              isEditMode ? 'cursor-move ring-2 ring-primary/70' : 'cursor-pointer'
                             } ${
                               highlightedField === overlay.field
                                 ? 'ring-2 ring-accent shadow-lg animate-pulse' :
@@ -685,7 +684,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             onPointerDown={(e) => handlePointerDown(e, overlay.field, position.top, position.left)}
                           >
                             {/* Visual Direction Indicators */}
-                            {isGlobalEditMode && (
+                            {isEditMode && (
                               <>
                                 {/* Up Arrow Indicator */}
                                 {canMoveUp && (
@@ -726,7 +725,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                     <Sparkles className="inline h-3 w-3 ml-1 animate-pulse" />
                                   )}
                                 </div>
-                                {isGlobalEditMode && (
+                                {isEditMode && (
                                   <div className="flex gap-1">
                                     <Button
                                       size="icon"
@@ -817,9 +816,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                   <TooltipTrigger asChild>
                                     <Button
                                       size="icon"
-                                      variant={isGlobalEditMode ? "default" : "secondary"}
+                                      variant={isEditMode ? "default" : "secondary"}
                                       className="absolute -top-2 -right-2 h-7 w-7 rounded-full"
-                                      aria-label={isGlobalEditMode ? 'Exit edit mode' : 'Enter edit mode'}
+                                      aria-label={isEditMode ? 'Exit edit mode' : 'Enter edit mode'}
                                       onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
@@ -827,11 +826,11 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                       }}
                                     >
                                       <Move className="h-4 w-4" />
-                                      <span className="sr-only">{isGlobalEditMode ? 'Exit edit mode' : 'Enter edit mode'}</span>
+                                      <span className="sr-only">{isEditMode ? 'Exit edit mode' : 'Enter edit mode'}</span>
                                     </Button>
                                   </TooltipTrigger>
                                   <TooltipContent>
-                                    <p>{isGlobalEditMode ? 'Exit Edit Mode' : 'Enter Edit Mode'}</p>
+                                    <p>{isEditMode ? 'Exit Edit Mode' : 'Enter Edit Mode'}</p>
                                   </TooltipContent>
                                 </Tooltip>
                               </>
@@ -842,9 +841,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 value={formData[overlay.field as keyof FormData] as string || ''}
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
-                                disabled={isGlobalEditMode}
+                                disabled={isEditMode}
                                 className={`field-input h-6 text-[12pt] font-mono ${
-                                  isGlobalEditMode
+                                  isEditMode
                                     ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   validationErrors?.[overlay.field]?.length
                                     ? 'bg-destructive/10 border-destructive'
@@ -859,9 +858,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 value={formData[overlay.field as keyof FormData] as string || ''}
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
-                                disabled={isGlobalEditMode}
+                                disabled={isEditMode}
                                 className={`field-input text-[12pt] font-mono resize-none min-h-[48px] ${
-                                  isGlobalEditMode
+                                  isEditMode
                                     ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   validationErrors?.[overlay.field]?.length
                                     ? 'bg-destructive/10 border-destructive'
@@ -874,10 +873,10 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             {overlay.type === 'checkbox' && (
                               <Checkbox
                                 checked={!!formData[overlay.field as keyof FormData]}
-                                onCheckedChange={(checked) => !isGlobalEditMode && updateField(overlay.field, checked as boolean)}
-                                disabled={isGlobalEditMode}
+                                onCheckedChange={(checked) => !isEditMode && updateField(overlay.field, checked as boolean)}
+                                disabled={isEditMode}
                                 className={`border-2 ${
-                                  isGlobalEditMode
+                                  isEditMode
                                     ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   isCurrentField 
                                     ? 'bg-primary/5 border-primary' 
