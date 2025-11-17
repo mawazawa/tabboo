@@ -40,9 +40,9 @@ setup('authenticate with Supabase', async ({ page }) => {
 
   console.log('[Auth Setup] Filling credentials...');
 
-  // Fill in the auth form
-  const emailInput = page.getByPlaceholder(/email/i);
-  const passwordInput = page.getByPlaceholder(/password/i);
+  // Fill in the auth form using getByLabel (fields have labels, not placeholders)
+  const emailInput = page.getByLabel(/email/i);
+  const passwordInput = page.getByLabel(/password/i);
 
   await emailInput.fill(email);
   await passwordInput.fill(password);
