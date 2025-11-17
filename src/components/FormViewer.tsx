@@ -812,27 +812,6 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                     </TooltipContent>
                                   </Tooltip>
                                 )}
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Button
-                                      size="icon"
-                                      variant={isEditMode ? "default" : "secondary"}
-                                      className="absolute -top-2 -right-2 h-7 w-7 rounded-full"
-                                      aria-label={isEditMode ? 'Exit edit mode' : 'Enter edit mode'}
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        toggleGlobalEditMode();
-                                      }}
-                                    >
-                                      <Move className="h-4 w-4" />
-                                      <span className="sr-only">{isEditMode ? 'Exit edit mode' : 'Enter edit mode'}</span>
-                                    </Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>{isEditMode ? 'Exit Edit Mode' : 'Enter Edit Mode'}</p>
-                                  </TooltipContent>
-                                </Tooltip>
                               </>
                             )}
                             
