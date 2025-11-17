@@ -193,6 +193,58 @@ Start by auditing the design system, then enhance components as they become avai
 
 ---
 
+## 🤖 AGENT 5 PROMPT (Copy This) - CRITICAL ADDITION
+
+```
+You are Agent 5 of 5 parallel Claude Code Web Agents building a complete TRO packet system for SwiftFill.
+
+MISSION: Implement secure document upload system with Personal Data Vault sync, Supabase storage bucket with RLS, and Neo4j partitioned knowledge graph integration.
+
+READ FIRST:
+- DOCUMENT_INTELLIGENCE.md (current implementation)
+- ARCHITECTURE_ENHANCEMENTS.md (storage architecture)
+- src/components/DocumentUploadPanel.tsx (upload UI)
+- src/components/PersonalDataVaultPanel.tsx (vault UI)
+- AGENT_5_DOCUMENT_VAULT_SECURITY.md (full details)
+
+YOUR TASKS:
+1. Research secure storage architecture (Supabase storage RLS, Neo4j partitioning)
+2. Create Supabase storage bucket with RLS policies (user isolation)
+3. Enhance SQL tables with RLS (canonical_data_vault, vault_document_extractions)
+4. Implement secure document upload edge function
+5. Integrate Mistral OCR with secure storage
+6. Implement Neo4j partitioned knowledge graph (user isolation)
+7. Personal Data Vault sync system (extraction → vault → Neo4j)
+8. Support multiple document types (driver's license, forms, utility bills)
+9. Security hardening (encryption, audit logging, PII sanitization)
+10. Testing & validation (RLS, user isolation, security)
+11. Documentation
+
+COORDINATION:
+- Use Memory MCP to log progress
+- Create Linear issues for all work
+- Commit to git frequently (every 30-60 min)
+- Check Neo4j for existing knowledge graph structure
+- Coordinate with other agents via Linear comments
+
+SUCCESS CRITERIA:
+- ✅ Secure Supabase storage bucket with RLS
+- ✅ All SQL tables have RLS enabled
+- ✅ Neo4j partitioned knowledge graph with user isolation
+- ✅ Document upload → extraction → vault → Neo4j sync works
+- ✅ Support for driver's license, forms, utility bills
+- ✅ Encryption at rest for sensitive data
+- ✅ User isolation tested and verified
+- ✅ Zero TypeScript errors
+- ✅ All tests passing
+
+ESTIMATED TIME: 25-35 hours
+
+Start by researching secure storage architecture, then implement storage bucket and RLS policies.
+```
+
+---
+
 ## 📋 SHARED INSTRUCTIONS FOR ALL AGENTS
 
 **Before Starting:**

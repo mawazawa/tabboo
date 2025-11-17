@@ -316,6 +316,133 @@ You are one of 4 parallel Claude Code Web Agents working to transform **SwiftFil
 
 ---
 
+## 🤖 AGENT 5: Secure Document Upload & Personal Data Vault Integration
+
+**Your Mission**: Implement secure document upload system with Personal Data Vault sync, Supabase storage bucket with RLS, and Neo4j partitioned knowledge graph integration.
+
+**Context**:
+- Read `DOCUMENT_INTELLIGENCE.md` for current implementation
+- Study `src/components/DocumentUploadPanel.tsx` and `PersonalDataVaultPanel.tsx`
+- Review `ARCHITECTURE_ENHANCEMENTS.md` for storage architecture
+- Current system has basic upload but needs security hardening and Neo4j integration
+
+**Your Tasks** (in order):
+
+1. **Research Secure Storage Architecture** (2-3 hours)
+   - Use Exa MCP to research:
+     - Supabase storage bucket RLS policies for user isolation
+     - Secure document upload patterns (encryption, access control)
+     - Neo4j partitioned knowledge graph for multi-tenant data
+     - Best practices for PII storage (GDPR, CCPA, HIPAA considerations)
+   - Create `SECURE_STORAGE_ARCHITECTURE.md` documenting architecture
+   - Log research to Memory MCP and create Linear issues
+
+2. **Create Supabase Storage Bucket with RLS** (2-3 hours)
+   - Create migration for storage bucket: `personal-documents`
+   - Implement RLS policies:
+     - Users can only upload to their own folder (`${user_id}/documents/`)
+     - Users can only read their own files
+     - Users can only delete their own files
+   - Test policies with different users
+   - Document in `SECURE_STORAGE_ARCHITECTURE.md`
+
+3. **Enhance SQL Tables with RLS** (2-3 hours)
+   - Review existing tables: `canonical_data_vault`, `vault_document_extractions`
+   - Ensure RLS is enabled on all tables
+   - Add/update RLS policies for user isolation
+   - Test policies prevent cross-user access
+   - Create migration file
+
+4. **Implement Secure Document Upload Edge Function** (3-4 hours)
+   - Create `supabase/functions/upload-document-secure/index.ts`
+   - Validate file type, size, signature
+   - Upload to Supabase storage with secure path structure
+   - Implement rate limiting (10 uploads/hour/user)
+   - Return secure signed URLs
+
+5. **Integrate Mistral OCR with Secure Storage** (2-3 hours)
+   - Update `src/lib/mistral-ocr-client.ts` to use secure upload
+   - Handle signed URLs for document access
+   - Implement retry logic and progress tracking
+   - Update `src/components/DocumentUploadPanel.tsx`
+
+6. **Implement Neo4j Partitioned Knowledge Graph** (4-5 hours)
+   - Design partition strategy (user-based isolation)
+   - Create `src/lib/neo4j-vault-sync.ts`:
+     - Sync extracted data from Supabase to Neo4j
+     - Create nodes: Document, Person, Address, Case
+     - Create relationships: EXTRACTED_FROM, CONTAINS, REFERENCES
+     - Implement user isolation (partition by user_id)
+   - Test user isolation (user A cannot see user B's data)
+
+7. **Personal Data Vault Sync System** (3-4 hours)
+   - Create `src/lib/vault-sync.ts`:
+     - Sync extracted data to `canonical_data_vault` table
+     - Merge data intelligently (handle conflicts)
+     - Track provenance (source document, confidence, timestamp)
+   - Update `src/components/PersonalDataVaultPanel.tsx`:
+     - Show data sources and confidence scores
+     - Allow user verification/override
+     - Display merge conflicts and resolution UI
+
+8. **Support Multiple Document Types** (2-3 hours)
+   - Enhance document type detection:
+     - Driver's license (front/back)
+     - Passport
+     - Court forms (DV-100, FL-320, etc.)
+     - Utility bills, pay stubs, tax returns
+   - Create document type handlers in `src/lib/document-handlers/`
+   - Test with real documents
+
+9. **Security Hardening** (2-3 hours)
+   - Implement encryption at rest for sensitive fields
+   - Add audit logging (all uploads, vault access, Neo4j queries)
+   - Implement data retention policies
+   - Add PII sanitization
+   - Test security (cross-user access should fail)
+
+10. **Testing & Validation** (3-4 hours)
+    - Write integration tests for secure upload, RLS, user isolation
+    - Write E2E tests for complete flow
+    - Performance testing (concurrent uploads, large files)
+    - Security testing (RLS policies, storage access)
+    - Run `npm run test:all` - all tests must pass
+
+11. **Documentation** (2 hours)
+    - Create `SECURE_DOCUMENT_UPLOAD_GUIDE.md`
+    - Update `DOCUMENT_INTELLIGENCE.md`
+    - Update `CLAUDE.md`
+    - Log completion to Memory MCP and Linear
+
+**Success Criteria**:
+- ✅ Secure Supabase storage bucket with RLS policies
+- ✅ All SQL tables have RLS enabled and tested
+- ✅ Document upload uses secure edge function
+- ✅ Personal Data Vault syncs from document extraction
+- ✅ Neo4j partitioned knowledge graph with user isolation
+- ✅ Support for driver's license, forms, utility bills
+- ✅ Encryption at rest for sensitive data
+- ✅ User isolation tested and verified
+- ✅ Zero TypeScript errors
+- ✅ All tests passing
+
+**Files You'll Create/Modify**:
+- `SECURE_STORAGE_ARCHITECTURE.md` (new)
+- `SECURE_DOCUMENT_UPLOAD_GUIDE.md` (new)
+- `supabase/migrations/[timestamp]_secure_document_storage.sql` (new)
+- `supabase/migrations/[timestamp]_vault_rls_policies.sql` (new)
+- `supabase/functions/upload-document-secure/index.ts` (new)
+- `src/lib/neo4j-vault-sync.ts` (new)
+- `src/lib/vault-sync.ts` (new)
+- `src/lib/document-handlers/*.ts` (new)
+- Enhance existing components
+
+**Dependencies**: Can work independently, will integrate with Agents 1-4's work
+
+**Estimated Time**: 25-35 hours
+
+---
+
 ## 🤖 AGENT 4: UX/UI Polish & Production Readiness
 
 **Your Mission**: Transform the UI/UX into world-class quality and ensure production readiness for the complete TRO packet system.
