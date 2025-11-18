@@ -400,15 +400,19 @@ describe('FormViewer Integration Tests', () => {
     renderFormViewer(propsWithFontSize);
 
     await waitFor(() => {
-      expect(document.querySelector('[data-field="partyName"]')).toBeTruthy();
+      // Query the Input element inside the container (Input also has data-field attribute)
+      const input = document.querySelector('[data-field="partyName"] input') as HTMLInputElement | null;
+      expect(input).toBeTruthy();
     });
 
-    const field = document.querySelector('[data-field="partyName"]') as HTMLElement | null;
-    expect(field).toBeTruthy();
-    if (!field) {
-      throw new Error('Expected partyName field to render');
+    // Query the Input element directly (it has data-field attribute and is the actual input)
+    const input = document.querySelector('[data-field="partyName"] input') as HTMLInputElement | null;
+    expect(input).toBeTruthy();
+    if (!input) {
+      throw new Error('Expected partyName input field to render');
     }
-    expect(field.style.fontSize).toBe('14pt');
+    // Verify fontSize is applied to the Input element (not the container)
+    expect(input.style.fontSize).toBe('14pt');
   });
 
   /**
