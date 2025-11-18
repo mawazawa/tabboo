@@ -43,8 +43,8 @@ export async function fillPDFFields(options: FillOptions): Promise<Uint8Array> {
   // 4. Draw text for each field in formData
   let fieldsDrawn = 0;
   for (const [fieldKey, value] of Object.entries(options.formData)) {
-    // Skip empty values
-    if (!value || value === '') continue;
+    // Skip empty values (but allow numeric zero)
+    if (value === null || value === undefined || value === '') continue;
 
     // Find position data for this field
     const position = fieldPositions.find(p => p.form_field_name === fieldKey);
