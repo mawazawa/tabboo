@@ -372,10 +372,10 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
    * @param field - Field name to adjust
    * @param customStep - Optional custom step size (default: 0.5%)
    */
-  const adjustPosition = (direction: 'up' | 'down' | 'left' | 'right', field: string, customStep?: number) => {
+  const adjustPosition = useCallback((direction: 'up' | 'down' | 'left' | 'right', field: string, customStep?: number) => {
     const position = fieldPositions[field] || {
-      top: parseFloat(fieldOverlays[0].fields.find(f => f.field === field)?.top || '0'),
-      left: parseFloat(fieldOverlays[0].fields.find(f => f.field === field)?.left || '0')
+      top: parseFloat(fieldOverlays[0]?.fields.find(f => f.field === field)?.top || '0'),
+      left: parseFloat(fieldOverlays[0]?.fields.find(f => f.field === field)?.left || '0')
     };
     const step = customStep ?? 0.5; // Fine-tuned for precise control, allow override
     const newPosition = { ...position };
@@ -400,7 +400,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     }
 
     updateFieldPosition(field, newPosition);
-  };
+  }, [fieldPositions, fieldOverlays, updateFieldPosition]);
 
   const handleAutofillField = (field: string, e: React.MouseEvent) => {
     e.stopPropagation();
