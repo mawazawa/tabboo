@@ -197,7 +197,7 @@ export const storage = {
           localStorage.setItem(testKey + size, testValue);
           size += 1024;
         } catch {
-          // Clean up test data
+          // Clean up test data when quota is reached
           for (let i = 0; i < size; i += 1024) {
             localStorage.removeItem(testKey + i);
           }
@@ -205,6 +205,10 @@ export const storage = {
         }
       }
 
+      // Clean up test data if loop completes (reached max test size)
+      for (let i = 0; i < size; i += 1024) {
+        localStorage.removeItem(testKey + i);
+      }
       return size;
     } catch {
       return 0;
