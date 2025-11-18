@@ -95,38 +95,6 @@ const Index = () => {
     toggleAIPanel, toggleFieldsPanel, toggleVaultPanel, toggleThumbnails
   } = panelState;
 
-  // Keyboard shortcut: 'E' key to toggle edit mode
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore if user is typing in an input field
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
-
-      // Toggle edit mode with 'E' key
-      if (e.key === 'e' || e.key === 'E') {
-        e.preventDefault();
-        setIsEditMode(prev => !prev);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []); // toast is a stable function, doesn't need to be in dependencies
-
-  // Toast notification when edit mode changes
-  useEffect(() => {
-    // Skip on initial mount
-    if (isEditMode === false && !user) return;
-    
-    toast({
-      title: isEditMode ? 'Edit Mode Enabled' : 'Edit Mode Disabled',
-      description: isEditMode
-        ? 'You can now reposition fields by dragging them or using arrow keys'
-        : 'You can now fill form fields',
-      duration: 2000,
-    });
-  }, [isEditMode]); // toast is a stable function, doesn't need to be in dependencies
-
   // Document persistence hook - handles auth, data loading, and autosave
   const { user, loading, documentId, handleLogout } = useDocumentPersistence({
     formData,
@@ -182,6 +150,8 @@ const Index = () => {
   } = useUIControls({
     pdfPanelRef,
     vaultData: typedVaultData,
+    user,
+    toast,
   });
 
   // Field operations custom hook - handles all field manipulation (13 handlers)

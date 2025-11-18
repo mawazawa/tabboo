@@ -1,9 +1,12 @@
-import { useState, useCallback, RefObject } from 'react';
+import { useState, useCallback, useEffect, RefObject } from 'react';
 import type { PersonalVaultData } from '@/utils/vaultFieldMatcher';
+import type { User } from '@supabase/supabase-js';
 
 interface UseUIControlsProps {
   pdfPanelRef: RefObject<HTMLDivElement>;
   vaultData: PersonalVaultData | null;
+  user: User | null;
+  toast: (options: { title: string; description: string; duration?: number }) => void;
 }
 
 interface UseUIControlsReturn {
@@ -26,11 +29,45 @@ interface UseUIControlsReturn {
 export function useUIControls({
   pdfPanelRef,
   vaultData,
+  user,
+  toast,
 }: UseUIControlsProps): UseUIControlsReturn {
   const [pdfZoom, setPdfZoom] = useState(1);
   const [fieldFontSize, setFieldFontSize] = useState(12); // Default 12pt (PDF form standard)
   const [isEditMode, setIsEditMode] = useState(false);
   const [thumbnailPanelWidth, setThumbnailPanelWidth] = useState(200);
+
+  // Keyboard shortcut: 'E' key to toggle edit mode
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is typing in an input field
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+
+      // Toggle edit mode with 'E' key
+      if (e.key === 'e' || e.key === 'E') {
+        e.preventDefault();
+        setIsEditMode(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []); // toast is a stable function, doesn't need to be in dependencies
+
+  // Toast notification when edit mode changes
+  useEffect(() => {
+    // Skip on initial mount
+    if (isEditMode === false && !user) return;
+
+    toast({
+      title: isEditMode ? 'Edit Mode Enabled' : 'Edit Mode Disabled',
+      description: isEditMode
+        ? 'You can now reposition fields by dragging them or using arrow keys'
+        : 'You can now fill form fields',
+      duration: 2000,
+    });
+  }, [isEditMode, user, toast]);
 
   const handleZoomOut = useCallback(() => {
     setPdfZoom((prev) => Math.max(0.5, prev - 0.1));
