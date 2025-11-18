@@ -404,6 +404,8 @@ export const FieldNavigationPanel = ({
 
   // Handle keyboard shortcuts with optimized performance
   useEffect(() => {
+    console.log('[KEYBOARD LISTENER]', 'Arrow key listener ATTACHED. Current field index:', currentFieldIndex);
+    
     const handleKeyDown = (e: KeyboardEvent) => {
       // DEBUG: Log ALL arrow key presses
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {

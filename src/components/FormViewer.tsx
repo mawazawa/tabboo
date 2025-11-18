@@ -86,9 +86,12 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   const fieldNameToIndex: Record<string, number> = useMemo(() => {
     if (!fieldMappings || fieldMappings.length === 0) {
       // Fallback to empty mapping while loading
+      console.warn('[FIELD MAPPING]', 'No field mappings loaded yet!');
       return {};
     }
-    return generateFieldNameToIndex(fieldMappings);
+    const mapping = generateFieldNameToIndex(fieldMappings);
+    console.log('[FIELD MAPPING]', 'Generated mapping with', Object.keys(mapping).length, 'fields:', Object.keys(mapping).slice(0, 10));
+    return mapping;
   }, [fieldMappings]);
 
   // Legacy field name to index mapping (kept for reference, will be removed once database is fully integrated)
