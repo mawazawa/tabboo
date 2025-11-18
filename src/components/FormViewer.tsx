@@ -812,11 +812,6 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 data-field={overlay.field}
                                 value={formData[overlay.field as keyof FormData] as string || ''}
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
-                                onFocus={() => console.log(`✅ FOCUS: ${overlay.field}`)}
-                                onClick={(e) => {
-                                  console.log(`✅ CLICK: ${overlay.field}`, e.target);
-                                  e.stopPropagation();
-                                }}
                                 placeholder={overlay.placeholder}
                                 disabled={isEditMode}
                                 className={`field-input h-6 text-[12pt] font-mono ${
