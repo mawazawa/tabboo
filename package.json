@@ -60,6 +60,7 @@
     "cmdk": "^1.1.1",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.6.0",
+    "idb-keyval": "^6.2.2",
     "input-otp": "^1.4.2",
     "katex": "^0.16.25",
     "lucide-react": "^0.462.0",
@@ -85,7 +86,10 @@
     "mcpServers": {
       "memory": {
         "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-memory"],
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-memory"
+        ],
         "env": {
           "MEMORY_FILE_PATH": "/Users/mathieuwauters/Desktop/code/memory/canonical/knowledge-graph.db"
         },
@@ -93,7 +97,10 @@
       },
       "supabase": {
         "command": "npx",
-        "args": ["-y", "@supabase/mcp-server-supabase@latest"],
+        "args": [
+          "-y",
+          "@supabase/mcp-server-supabase@latest"
+        ],
         "env": {
           "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN}"
         },
@@ -101,7 +108,9 @@
       },
       "exa": {
         "command": "npx",
-        "args": ["exa-mcp-server"],
+        "args": [
+          "exa-mcp-server"
+        ],
         "env": {
           "EXA_API_KEY": "${EXA_API_KEY}"
         },
@@ -109,7 +118,10 @@
       },
       "perplexity": {
         "command": "npx",
-        "args": ["-y", "server-perplexity-ask"],
+        "args": [
+          "-y",
+          "server-perplexity-ask"
+        ],
         "env": {
           "PERPLEXITY_API_KEY": "${PERPLEXITY_API_KEY}"
         },
@@ -117,7 +129,10 @@
       },
       "linear": {
         "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-linear"],
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-linear"
+        ],
         "env": {
           "LINEAR_API_KEY": ""
         },
@@ -125,7 +140,10 @@
       },
       "neo4j": {
         "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-neo4j"],
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-neo4j"
+        ],
         "env": {
           "NEO4J_URI": "",
           "NEO4J_USER": "",
@@ -135,7 +153,10 @@
       },
       "stripe": {
         "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-stripe"],
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-stripe"
+        ],
         "env": {
           "STRIPE_API_KEY": ""
         },
@@ -143,7 +164,10 @@
       },
       "vercel": {
         "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-vercel"],
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-vercel"
+        ],
         "env": {
           "VERCEL_API_TOKEN": ""
         },

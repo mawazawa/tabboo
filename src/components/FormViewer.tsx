@@ -14,6 +14,7 @@ import { AlignmentGuides } from "@/components/pdf/AlignmentGuides";
 import { FieldOverlay } from "@/components/pdf/FieldOverlay";
 import { mergeFieldNameToIndex } from "@/lib/field-name-index-utils";
 import { legacyFieldNameToIndex } from "@/lib/legacy-field-name-map";
+import { pdfCache } from "@/utils/pdf-cache";
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
@@ -65,6 +66,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   const [pdfLoading, setPdfLoading] = useState(true);
   const [loadProgress, setLoadProgress] = useState(0);
   const [currentPDFPage, setCurrentPDFPage] = useState<number>(1);
+  const [cachedPdfUrl, setCachedPdfUrl] = useState<string | null>(null);
 
 // Convert database field mappings to field overlays (memoized for performance)
 const fieldOverlays = useMemo(() => {
@@ -142,6 +144,54 @@ const fieldNameToIndex: Record<string, number> = useMemo(() => {
   useEffect(() => {
     announce(isEditMode ? 'Edit mode activated. You can now drag fields to reposition them.' : 'Edit mode deactivated. Fields are now locked.');
   }, [isEditMode, announce]);
+
+  // Load PDF through cache (Phase 3: IndexedDB optimization)
+  useEffect(() => {
+    let isMounted = true;
+    let blobUrl: string | null = null;
+
+    const loadPdf = async () => {
+      try {
+        const pdfPath = getPdfPath(formType);
+        const fullUrl = window.location.origin + pdfPath;
+
+        // Load PDF through triple-layer cache
+        const blob = await pdfCache.get(fullUrl);
+
+        if (isMounted) {
+          blobUrl = URL.createObjectURL(blob);
+          setCachedPdfUrl(blobUrl);
+
+          // Log cache statistics in dev mode
+          if (import.meta.env.DEV) {
+            const stats = pdfCache.getStats();
+            console.log('[PDF Cache Stats]', {
+              cacheHitRate: `${stats.cacheHitRate.toFixed(1)}%`,
+              memoryHits: stats.memoryHits,
+              indexedDBHits: stats.indexedDBHits,
+              networkFetches: stats.networkFetches,
+            });
+          }
+        }
+      } catch (error) {
+        console.error('[PDF Cache] Failed to load PDF:', error);
+        if (isMounted) {
+          // Fallback to direct path if cache fails
+          setCachedPdfUrl(getPdfPath(formType));
+        }
+      }
+    };
+
+    loadPdf();
+
+    return () => {
+      isMounted = false;
+      // Clean up blob URL to prevent memory leaks
+      if (blobUrl) {
+        URL.revokeObjectURL(blobUrl);
+      }
+    };
+  }, [formType]);
 
   const handleFieldClick = useCallback((field: string, e: React.MouseEvent) => {
     // Check if clicking on form element OR any parent up to the container
@@ -338,7 +388,7 @@ const fieldNameToIndex: Record<string, number> = useMemo(() => {
           
           <div className="w-full" style={{ maxWidth: `${pageWidth * zoom}px` }}>
             <Document
-              file={getPdfPath(formType)}
+              file={cachedPdfUrl || getPdfPath(formType)}
               onLoadSuccess={onDocumentLoadSuccess}
               onLoadProgress={({ loaded, total }) => {
                 if (total > 0) {
