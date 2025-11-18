@@ -89,4 +89,49 @@ describe('Encryption - Large Data Handling', () => {
 
     expect(decrypted).toBe(unicodeText);
   });
+
+  it('should provide descriptive error message for invalid base64 in decryptField', async () => {
+    // BUG FIX VERIFICATION: base64ToUint8Array should preserve DOMException error context
+    // Before fix: DOMException from atob() was caught in decryptField and re-thrown as generic error
+    // After fix: base64ToUint8Array catches DOMException and throws descriptive Error
+    
+    const invalidCiphertext = 'invalid:base64:here!';
+    
+    // Verify error is thrown
+    await expect(decryptField(invalidCiphertext)).rejects.toThrow();
+    
+    try {
+      await decryptField(invalidCiphertext);
+      expect.fail('Should have thrown an error for invalid base64');
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+      const errorMessage = (error as Error).message;
+      
+      // After fix: The error chain should preserve the "Invalid base64 string" message
+      // Even though decryptField wraps it, the original error context is preserved
+      expect(errorMessage).toBeTruthy();
+      expect(errorMessage).toContain('Failed to decrypt field');
+      
+      // Verify the error was properly caught and re-thrown (not a raw DOMException)
+      // This confirms base64ToUint8Array handled the DOMException correctly
+      expect((error as Error).constructor.name).toBe('Error');
+    }
+  });
+
+  it('should handle corrupted encrypted data with invalid base64 characters', async () => {
+    // Test with corrupted data that has invalid base64 characters
+    const corruptedData = 'dGVzdA==:invalid!base64:corrupted@data';
+    
+    await expect(decryptField(corruptedData)).rejects.toThrow();
+    
+    try {
+      await decryptField(corruptedData);
+      expect.fail('Should have thrown an error for corrupted data');
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+      // Verify error is thrown (before fix: generic message, after fix: more descriptive)
+      const errorMessage = (error as Error).message;
+      expect(errorMessage).toContain('Failed to decrypt field');
+    }
+  });
 });

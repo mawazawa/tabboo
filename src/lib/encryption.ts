@@ -94,15 +94,23 @@ function uint8ArrayToBase64(bytes: Uint8Array): string {
 
 /**
  * Convert base64 string to Uint8Array (safe for large data)
+ * @throws Error if base64 string is invalid or corrupted
  */
 function base64ToUint8Array(base64: string): Uint8Array {
-  const binary = atob(base64);
-  const len = binary.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binary.charCodeAt(i);
+  try {
+    const binary = atob(base64);
+    const len = binary.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+  } catch (error) {
+    if (error instanceof DOMException) {
+      throw new Error(`Invalid base64 string: ${error.message}`);
+    }
+    throw error;
   }
-  return bytes;
 }
 
 // ============================================================================

@@ -152,8 +152,10 @@ describe('FormViewer Integration Tests', () => {
     vi.clearAllMocks();
   });
 
-  afterEach(() => {
-    vi.clearAllTimers();
+  afterEach(async () => {
+    // Wait for any pending timers to complete before cleanup
+    await new Promise(resolve => setTimeout(resolve, 200));
+    vi.clearAllMocks();
   });
 
   // Helper to render FormViewer with required providers

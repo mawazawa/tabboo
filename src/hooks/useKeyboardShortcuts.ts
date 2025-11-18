@@ -25,8 +25,8 @@ export const useKeyboardShortcuts = (shortcuts: KeyboardShortcut[], enabled = tr
       target.tagName === 'TEXTAREA' ||
       target.contentEditable === 'true'
     ) {
-      // Allow Ctrl+S even in inputs
-      if (!(event.ctrlKey && event.key === 's')) {
+      // Allow Ctrl+S (Windows/Linux) or Cmd+S (macOS) even in inputs
+      if (!((event.ctrlKey || event.metaKey) && event.key === 's')) {
         return;
       }
     }
