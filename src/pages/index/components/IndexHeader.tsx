@@ -33,11 +33,11 @@ export const IndexHeader = ({
   lastSaved,
   saveError,
 }: IndexHeaderProps) => (
-  <header className="border-b border-border/40 bg-card/85 backdrop-blur-xl z-50 shadow-[0_1px_2px_hsl(220_13%_13%/0.05),inset_0_1px_0_hsl(0_0%_100%/0.4)] flex-shrink-0 transition-all duration-300">
+  <header className="border-b border-border/40 bg-card/85 backdrop-blur-xl z-50 shadow-[0_1px_2px_hsl(220_13%_13%/0.05),inset_0_1px_0_hsl(0_0%_100%/0.4)] flex-shrink-0 spring-smooth">
     <div className="container mx-auto px-6 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-[inset_0_1px_0_hsl(0_0%_100%/0.3)] transition-all duration-300 hover:bg-primary/15">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-[inset_0_1px_0_hsl(0_0%_100%/0.3)] spring-smooth hover:bg-primary/15">
             <FileText className="w-5 h-5 text-primary" strokeWidth={1.5} />
           </div>
           <div>

@@ -81,8 +81,8 @@ export const DraggableAIAssistant = ({ formContext, vaultData, isVisible, onTogg
       ref={containerRef}
       className={cn(
         "fixed z-50 touch-none liquid-glass",
-        // Smooth transitions with spring easing
-        "transition-all duration-300 ease-out",
+        // Smooth transitions with spring easing (Apple HIG)
+        "spring-smooth",
         // Premium drag states with enhanced depth
         isDragging
           ? "cursor-grabbing scale-[1.03] shadow-[0_16px_64px_hsl(220_13%_13%/0.20),0_32px_128px_hsl(220_13%_13%/0.15),inset_0_2px_0_hsl(0_0%_100%/0.7)]"
@@ -101,7 +101,7 @@ export const DraggableAIAssistant = ({ formContext, vaultData, isVisible, onTogg
         <Button
           variant="ghost"
           size="icon"
-          className="w-full h-full rounded-2xl hover:bg-primary/20 hover:scale-105 transition-all duration-300 shadow-[inset_0_1px_0_hsl(0_0%_100%/0.5)] active:scale-95"
+          className="w-full h-full rounded-2xl hover:bg-primary/20 hover:scale-105 spring-snappy shadow-[inset_0_1px_0_hsl(0_0%_100%/0.5)] active:scale-95"
           aria-label="Expand AI Assistant"
           onClick={() => setIsMinimized(false)}
         >
@@ -112,7 +112,7 @@ export const DraggableAIAssistant = ({ formContext, vaultData, isVisible, onTogg
         <div className="flex flex-col h-full" onClick={(e) => e.stopPropagation()}>
           {/* Draggable Header with Premium Liquid Glass */}
           <div
-            className="flex items-center justify-between p-3 border-b border-white/20 bg-background/30 backdrop-blur-xl rounded-t-2xl cursor-grab active:cursor-grabbing relative z-10 transition-all duration-300 hover:bg-background/35 shadow-[inset_0_1px_0_hsl(0_0%_100%/0.4),0_1px_2px_hsl(220_13%_13%/0.05)]"
+            className="flex items-center justify-between p-3 border-b border-white/20 bg-background/30 backdrop-blur-xl rounded-t-2xl cursor-grab active:cursor-grabbing relative z-10 spring-snappy hover:bg-background/35 shadow-[inset_0_1px_0_hsl(0_0%_100%/0.4),0_1px_2px_hsl(220_13%_13%/0.05)]"
             onPointerDown={handlePointerDown}
           >
             <div className="flex items-center gap-2">

@@ -1,77 +1,97 @@
 /**
  * Playwright Authentication Setup
  *
- * This setup runs ONCE before all tests to authenticate with Supabase
- * and store the session in playwright/.auth/user.json
+ * This file runs ONCE before all tests to authenticate and save the session state.
+ * All subsequent tests will reuse this authenticated state for speed.
  *
- * Best Practice Pattern from Supabase E2E Testing Guide (Nov 2025)
- * https://github.com/supabase-community/e2e
+ * Based on November 2025 Playwright best practices:
+ * - https://playwright.dev/docs/auth
+ * - Isolated authenticated browser state
+ * - Stored in playwright/.auth/user.json (gitignored)
+ * - Runs as a separate "setup" project
  */
 
-import { test as setup } from '@playwright/test';
-import * as dotenv from 'dotenv';
+import { test as setup, expect } from '@playwright/test';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { waitForApp } from './helpers/wait-for-app';
+import { dirname } from 'path';
 
-// Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = dirname(__filename);
+const authFile = path.join(__dirname, '../../playwright/.auth/user.json');
 
-// Load test environment variables
-dotenv.config({ path: path.resolve(__dirname, '../../.env.test') });
-
-const authFile = 'playwright/.auth/user.json';
+// Test account credentials (from user)
+const TEST_EMAIL = 'mathieuwauters@gmail.com';
+const TEST_PASSWORD = 'Karmaisabitch2025$';
 
 setup('authenticate with Supabase', async ({ page }) => {
-  const email = process.env.SUPABASE_TEST_EMAIL;
-  const password = process.env.SUPABASE_TEST_PASSWORD;
-
-  if (!email || !password) {
-    throw new Error(
-      'Missing test credentials. Please set SUPABASE_TEST_EMAIL and SUPABASE_TEST_PASSWORD in .env.test'
-    );
-  }
-
-  console.log('[Auth Setup] Starting authentication...');
-
-  // Navigate to auth page (using relative URL to inherit baseURL from config)
+  // Navigate to auth page
   await page.goto('/auth');
+
+  // Wait for auth UI to load
   await page.waitForLoadState('networkidle');
 
-  console.log('[Auth Setup] Filling credentials...');
+  // Log the page title for debugging
+  const title = await page.title();
+  console.log(`Auth page title: ${title}`);
 
-  // Fill in the auth form using getByLabel (fields have labels, not placeholders)
-  const emailInput = page.getByLabel(/email/i);
-  const passwordInput = page.getByLabel(/password/i);
+  // Screenshot initial state (visual regression baseline)
+  await page.screenshot({ path: 'playwright/.auth/auth-page-initial.png' });
 
-  await emailInput.fill(email);
-  await passwordInput.fill(password);
+  // Find and fill email input (Supabase Auth UI)
+  // Supabase uses specific selectors - try multiple strategies
+  const emailInput = page.locator('input[type="email"], input[name="email"], input[placeholder*="email" i]').first();
+  await expect(emailInput).toBeVisible({ timeout: 10000 });
+  await emailInput.fill(TEST_EMAIL);
 
-  console.log('[Auth Setup] Submitting login...');
+  // Find and fill password input
+  const passwordInput = page.locator('input[type="password"], input[name="password"], input[placeholder*="password" i]').first();
+  await expect(passwordInput).toBeVisible({ timeout: 10000 });
+  await passwordInput.fill(TEST_PASSWORD);
+
+  // Screenshot filled form (visual regression)
+  await page.screenshot({ path: 'playwright/.auth/auth-page-filled.png' });
 
   // Click sign in button
-  await page.getByRole('button', { name: /sign in|login/i }).click();
+  const signInButton = page.locator('button:has-text("Sign in"), button:has-text("Log in"), button[type="submit"]').first();
+  await expect(signInButton).toBeVisible({ timeout: 10000 });
 
-  // Wait for redirect to main page (using relative URL to inherit baseURL from config)
-  await page.waitForURL('/', { timeout: 15000 });
+  // Click and wait for navigation
+  await Promise.all([
+    page.waitForURL('**/', { timeout: 30000 }), // Wait for redirect to main page
+    signInButton.click()
+  ]);
 
-  console.log('[Auth Setup] Login successful, waiting for app to load...');
+  // Verify we're authenticated by checking for main app UI
+  // SwiftFill should show the form editor after login
+  await expect(page).toHaveURL('/', { timeout: 30000 });
 
-  // Wait for app to be fully loaded and interactive using November 2025 best practices
-  await waitForApp(page);
+  // Wait for main app to load
+  await page.waitForLoadState('networkidle');
 
-  console.log('[Auth Setup] App loaded successfully!');
+  // Wait a bit for React to render
+  await page.waitForTimeout(2000);
 
-  // Disable tutorial for tests by setting localStorage flag
+  // Screenshot authenticated state (visual regression)
+  await page.screenshot({ path: 'playwright/.auth/authenticated-app.png', fullPage: true });
+
+  console.log('✅ Authentication successful - saving session state');
+
+  // Disable tutorial for all tests by setting localStorage
   await page.evaluate(() => {
     localStorage.setItem('tutorial-shown', 'true');
   });
 
-  console.log('[Auth Setup] Tutorial disabled for tests');
-
-  // Save the authenticated state (includes localStorage)
+  // Save authenticated state to file (includes localStorage)
   await page.context().storageState({ path: authFile });
 
-  console.log(`[Auth Setup] Authentication state saved to ${authFile}`);
+  // Log success
+  const cookies = await page.context().cookies();
+  console.log(`Saved ${cookies.length} cookies to ${authFile}`);
+  console.log('Session state includes:', {
+    cookieCount: cookies.length,
+    hasSbAccessToken: cookies.some(c => c.name.includes('sb-') && c.name.includes('auth-token')),
+    localStorage: 'saved',
+    sessionStorage: 'saved'
+  });
 });

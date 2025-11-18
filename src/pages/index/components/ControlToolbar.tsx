@@ -76,7 +76,7 @@ export const ControlToolbar = ({
             variant={showThumbnails ? "default" : "ghost"}
             size="sm"
             onClick={onToggleThumbnails}
-            className="gap-2 transition-all hover:scale-105"
+            className="gap-2 spring-snappy hover:scale-105"
             aria-label={showThumbnails ? "Hide page thumbnails" : "Show page thumbnails"}
           >
             <PanelLeftClose className={cn("h-4 w-4 transition-transform", !showThumbnails && "rotate-180")} strokeWidth={1.5} />
@@ -97,7 +97,7 @@ export const ControlToolbar = ({
             variant={showAIPanel ? "default" : "outline"}
             size="default"
             onClick={onToggleAI}
-            className="gap-2 font-semibold relative group hover:scale-105 transition-all"
+            className="gap-2 font-semibold relative group hover:scale-105 spring-snappy"
             aria-label="Toggle AI Chat Assistant"
           >
             <MessageSquare className="h-4 w-4" strokeWidth={2} />
@@ -121,7 +121,7 @@ export const ControlToolbar = ({
             size="lg"
             onClick={onAutofillAll}
             disabled={isVaultLoading || !hasVaultData}
-            className="gap-2 bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/95 hover:via-primary/85 hover:to-primary/75 shadow-lg hover:shadow-xl transition-all duration-200 font-semibold relative overflow-hidden group hover:scale-105"
+            className="gap-2 bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/95 hover:via-primary/85 hover:to-primary/75 shadow-lg hover:shadow-xl spring-snappy font-semibold relative overflow-hidden group hover:scale-105"
             aria-label="Autofill all compatible fields from vault"
           >
             {isVaultLoading ? <Loader2 className="h-5 w-5 animate-spin" strokeWidth={2} /> : <Sparkles className="h-5 w-5 group-hover:animate-pulse" strokeWidth={2} />}
@@ -172,7 +172,7 @@ export const ControlToolbar = ({
             variant={pdfZoom === 1 ? "default" : "ghost"}
             size="sm"
             onClick={onFitToPage}
-            className="flex items-center gap-1 px-3 min-w-[120px] justify-center transition-colors"
+            className="flex items-center gap-1 px-3 min-w-[120px] justify-center spring-snappy"
           >
             <FileText className="h-3.5 w-3.5" strokeWidth={1.5} />
             <span className="text-sm font-medium">{pdfZoom === 1 ? "Fit to Page" : `${Math.round(pdfZoom * 100)}%`}</span>
@@ -254,7 +254,7 @@ export const ControlToolbar = ({
             variant={showVaultPanel ? "default" : "ghost"}
             size="sm"
             onClick={onToggleVault}
-            className="gap-2 transition-all hover:scale-105"
+            className="gap-2 spring-snappy hover:scale-105"
             aria-label={showVaultPanel ? "Hide Personal Data Vault" : "Show Personal Data Vault"}
           >
             <Shield className="h-4 w-4" strokeWidth={1.5} />
@@ -276,7 +276,7 @@ export const ControlToolbar = ({
             variant={showFieldsPanel && !showVaultPanel ? "default" : "ghost"}
             size="sm"
             onClick={onToggleFields}
-            className="gap-2 transition-all hover:scale-105"
+            className="gap-2 spring-snappy hover:scale-105"
             aria-label={showFieldsPanel ? "Hide Fields panel" : "Show Fields panel"}
           >
             <span className="font-medium">Fields</span>
