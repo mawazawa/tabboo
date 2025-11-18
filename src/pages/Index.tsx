@@ -103,6 +103,7 @@ const Index = () => {
   const [pdfZoom, setPdfZoom] = useState(1);
   const [showThumbnails, setShowThumbnails] = useState(true);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [fieldFontSize, setFieldFontSize] = useState(12); // Default 12pt (PDF form standard)
   const [thumbnailPanelWidth, setThumbnailPanelWidth] = useState(200);
   const [fieldSearchQuery, setFieldSearchQuery] = useState("");
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
@@ -128,7 +129,11 @@ const Index = () => {
       // Toggle edit mode with 'E' key
       if (e.key === 'e' || e.key === 'E') {
         e.preventDefault();
-        setIsEditMode(prev => !prev);
+        setIsEditMode(prev => {
+          const newMode = !prev;
+          console.log('🔄 Edit Mode toggled via keyboard:', prev, '→', newMode);
+          return newMode;
+        });
       }
     };
 
@@ -799,6 +804,58 @@ const Index = () => {
               </TooltipTrigger>
               <TooltipContent>
                 <p>Zoom in (maximum 200%)</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+
+          {/* Field Font Size Controls */}
+          <div className="flex items-center gap-1 bg-muted/30 rounded-md px-1 py-0.5">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setFieldFontSize(Math.max(8, fieldFontSize - 1))}
+                  disabled={fieldFontSize <= 8}
+                  className="h-7 w-7 p-0"
+                >
+                  <span className="text-sm">A</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Decrease field font size (minimum 8pt)</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={fieldFontSize === 12 ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setFieldFontSize(12)}
+                  className="flex items-center gap-1 px-2.5 min-w-[70px] justify-center h-7 text-xs font-semibold"
+                >
+                  <span className="text-xs">Font</span>
+                  <span className="font-mono">{fieldFontSize}pt</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Reset to default 12pt font size</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setFieldFontSize(Math.min(16, fieldFontSize + 1))}
+                  disabled={fieldFontSize >= 16}
+                  className="h-7 w-7 p-0"
+                >
+                  <span className="text-base font-semibold">A</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Increase field font size (maximum 16pt)</p>
               </TooltipContent>
             </Tooltip>
           </div>
