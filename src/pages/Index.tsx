@@ -223,7 +223,7 @@ const Index = () => {
         saveError={saveError}
       />
 
-      <main className="flex-1 flex flex-col container mx-auto px-4 py-6 overflow-hidden">
+      <main className="flex-1 flex flex-col container mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 overflow-hidden">
         <ControlToolbar
           showThumbnails={showThumbnails}
           onToggleThumbnails={toggleThumbnails}

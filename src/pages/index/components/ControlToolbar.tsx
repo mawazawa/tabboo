@@ -68,8 +68,8 @@ export const ControlToolbar = ({
   formData,
   caseNumber,
 }: ControlToolbarProps) => (
-  <div className="flex items-center justify-between gap-2 mb-4 p-3 bg-card/80 backdrop-blur-sm rounded-lg border shadow-sm flex-shrink-0">
-    <div className="flex items-center gap-2">
+  <div className="flex items-center justify-between gap-3 mb-6 p-4 bg-card/85 backdrop-blur-xl rounded-xl border border-border/40 shadow-[0_2px_8px_hsl(220_13%_13%/0.04),inset_0_1px_0_hsl(0_0%_100%/0.4)] flex-shrink-0 transition-all duration-300">
+    <div className="flex items-center gap-3">
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
