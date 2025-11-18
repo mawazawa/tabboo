@@ -615,9 +615,7 @@ const Index = () => {
         onLogout={handleLogout}
       />
 
-      {/* Main Content with Resizable Panels */}
       <main className="flex-1 flex flex-col container mx-auto px-4 py-6 overflow-hidden">
-        {/* Control Toolbar */}
         <ControlToolbar
           showThumbnails={showThumbnails}
           onToggleThumbnails={() => setShowThumbnails(!showThumbnails)}
@@ -638,19 +636,17 @@ const Index = () => {
           showFieldsPanel={showFieldsPanel}
           onToggleFields={() => setShowFieldsPanel(!showFieldsPanel)}
           fieldFontSize={fieldFontSize}
-          onDecreaseFontSize={() => setFieldFontSize(Math.max(8, fieldFontSize - 1))}
-          onIncreaseFontSize={() => setFieldFontSize(Math.min(16, fieldFontSize + 1))}
+          onDecreaseFontSize={() => setFieldFontSize((size) => Math.max(8, size - 1))}
+          onIncreaseFontSize={() => setFieldFontSize((size) => Math.min(16, size + 1))}
           onResetFontSize={() => setFieldFontSize(12)}
         />
 
-        {/* Mobile PDF Viewer (full screen, no panels) */}
         <MobileFormViewerSection
-          FormViewer={FormViewer}
+          FormViewerComponent={FormViewer}
           sharedFormViewerProps={sharedFormViewerProps}
           fallback={<ViewerSkeleton />}
         />
 
-        {/* Desktop Layout (hidden on mobile) */}
         <DesktopWorkspace
           FormViewerComponent={FormViewer}
           FieldNavigationPanelComponent={FieldNavigationPanel}
@@ -662,10 +658,7 @@ const Index = () => {
           pdfPanelRef={pdfPanelRef}
           showThumbnails={showThumbnails}
           thumbnailPanelWidth={thumbnailPanelWidth}
-          onThumbnailResize={(size) => {
-            const containerWidth = window.innerWidth * 0.75;
-            setThumbnailPanelWidth((size / 100) * containerWidth);
-          }}
+          onThumbnailResize={handleThumbnailResize}
           currentPDFPage={currentPDFPage}
           onPageClick={setCurrentPDFPage}
           getCurrentFieldPositions={getCurrentFieldPositions}
@@ -692,7 +685,6 @@ const Index = () => {
           onApplyGroup={handleApplyGroup}
         />
 
-        {/* Draggable AI Assistant (desktop only, on mobile it's in bottom sheet) */}
         <div className="hidden md:block">
           <Suspense fallback={null}>
             <DraggableAIAssistant
@@ -704,16 +696,10 @@ const Index = () => {
           </Suspense>
         </div>
 
-        {/* Offline Indicator */}
         <OfflineIndicator />
 
-        {/* Mobile Bottom Sheet (visible only on mobile) */}
         <div className="md:hidden">
-          <MobileBottomSheet
-            snapPoints={[80, Math.min(400, height * 0.5), height - 100]}
-            defaultSnapIndex={0}
-            showHandle={true}
-          >
+          <MobileBottomSheet snapPoints={[80, Math.min(400, height * 0.5), height - 100]} defaultSnapIndex={0} showHandle>
             <Tabs value={mobileTab} onValueChange={setMobileTab} className="h-full flex flex-col">
               <TabsList className="w-full grid grid-cols-3 shrink-0">
                 <TabsTrigger value="fields" className="text-xs">
@@ -762,11 +748,10 @@ const Index = () => {
                 <TabsContent value="ai" className="h-full m-0 p-2">
                   <Suspense fallback={<PanelSkeleton />}>
                     <div className="h-full">
-                      {/* AI Assistant in mobile view */}
                       <DraggableAIAssistant
                         formContext={formData}
                         vaultData={vaultData}
-                        isVisible={true}
+                        isVisible
                         onToggleVisible={() => setMobileTab("fields")}
                       />
                     </div>
