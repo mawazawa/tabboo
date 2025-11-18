@@ -39,6 +39,25 @@ All colors MUST be HSL.
     --ring: 215 85% 50%;
 
     --radius: 0.75rem;
+
+    /* Semantic Color Tokens (Radix-inspired) */
+    --color-bg-base: var(--background);
+    --color-bg-subtle: 220 25% 99%;
+    --color-bg-muted: var(--muted);
+    --color-bg-emphasis: var(--accent);
+
+    --color-text-primary: var(--foreground);
+    --color-text-secondary: var(--muted-foreground);
+    --color-text-tertiary: 220 10% 50%;
+    --color-text-link: var(--primary);
+    --color-text-on-emphasis: var(--primary-foreground);
+
+    --color-border-default: var(--border);
+    --color-border-muted: 220 15% 92%;
+    --color-border-emphasis: var(--primary);
+
+    --color-surface-overlay: 0 0% 100%;
+    --color-surface-inset: 220 25% 98%;
     
     /* Premium Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(215 85% 50%), hsl(215 85% 60%));
@@ -133,6 +152,40 @@ All colors MUST be HSL.
     /* Mobile touch targets */
     --touch-target-min: 44px;
 
+    /* 8px Spacing System (Vertical Rhythm) */
+    --space-0: 0px;
+    --space-1: 4px;    /* 0.5x base */
+    --space-2: 8px;    /* 1x base */
+    --space-3: 12px;   /* 1.5x base */
+    --space-4: 16px;   /* 2x base */
+    --space-5: 20px;   /* 2.5x base */
+    --space-6: 24px;   /* 3x base */
+    --space-8: 32px;   /* 4x base */
+    --space-10: 40px;  /* 5x base */
+    --space-12: 48px;  /* 6x base */
+    --space-16: 64px;  /* 8x base */
+    --space-20: 80px;  /* 10x base */
+    --space-24: 96px;  /* 12x base */
+    --space-32: 128px; /* 16x base */
+    --space-40: 160px; /* 20x base */
+    --space-48: 192px; /* 24x base */
+    --space-56: 224px; /* 28x base */
+    --space-64: 256px; /* 32x base */
+
+    /* Spring Animation Physics (Apple HIG-inspired) */
+    --spring-smooth: cubic-bezier(0.16, 1, 0.3, 1);      /* Gentle spring */
+    --spring-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Playful bounce */
+    --spring-snappy: cubic-bezier(0.4, 0, 0.2, 1);       /* Quick response */
+    --spring-duration-short: 200ms;
+    --spring-duration-medium: 350ms;
+    --spring-duration-long: 500ms;
+
+    /* WCAG 2.2 Focus States */
+    --focus-ring-width: 2px;
+    --focus-ring-offset: 2px;
+    --focus-ring-color: var(--ring);
+    --focus-ring-style: solid;
+
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -144,35 +197,67 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 220 18% 8%;
+    /* Material Design 3 Dark Mode Base (Elevation 0) */
+    --background: 220 18% 7%; /* #121212 equivalent in HSL */
     --foreground: 220 15% 95%;
 
-    --card: 220 18% 11%;
+    /* Elevation System: Surfaces get lighter as they elevate (MD3 principle) */
+    --card: 220 18% 11%; /* Elevation 1: +5% overlay */
     --card-foreground: 220 15% 95%;
 
-    --popover: 220 18% 11%;
+    --popover: 220 18% 13%; /* Elevation 2: +8% overlay */
     --popover-foreground: 220 15% 95%;
 
     --primary: 215 85% 55%;
     --primary-foreground: 0 0% 100%;
-    
+
     --primary-glow: 215 85% 65%;
 
-    --secondary: 220 15% 18%;
+    /* Elevation 1 surface for secondary elements */
+    --secondary: 220 18% 12%;
     --secondary-foreground: 220 15% 95%;
 
-    --muted: 220 15% 16%;
+    --muted: 220 18% 10%;
     --muted-foreground: 220 10% 70%;
 
+    /* Elevation 2 for accent interactions */
     --accent: 215 80% 60%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 20%;
-    --input: 220 15% 20%;
+    /* Subtle borders on dark surfaces */
+    --border: 220 15% 18%;
+    --input: 220 15% 18%;
     --ring: 215 85% 55%;
+
+    /* Elevation overlays (Material Design 3 system) */
+    --elevation-0: 220 18% 7%;   /* Base: #121212 */
+    --elevation-1: 220 18% 11%;  /* +5% white overlay */
+    --elevation-2: 220 18% 13%;  /* +8% white overlay */
+    --elevation-3: 220 18% 15%;  /* +11% white overlay */
+    --elevation-4: 220 18% 17%;  /* +12% white overlay */
+    --elevation-5: 220 18% 19%;  /* +14% white overlay */
+
+    /* Semantic Color Tokens (Dark Mode) */
+    --color-bg-base: var(--background);
+    --color-bg-subtle: 220 18% 9%;
+    --color-bg-muted: var(--muted);
+    --color-bg-emphasis: var(--accent);
+
+    --color-text-primary: var(--foreground);
+    --color-text-secondary: var(--muted-foreground);
+    --color-text-tertiary: 220 10% 60%;
+    --color-text-link: var(--primary);
+    --color-text-on-emphasis: var(--primary-foreground);
+
+    --color-border-default: var(--border);
+    --color-border-muted: 220 15% 15%;
+    --color-border-emphasis: var(--primary);
+
+    --color-surface-overlay: 220 18% 11%;
+    --color-surface-inset: 220 18% 6%;
     
     --gradient-chamfer: linear-gradient(145deg, hsl(220 18% 16%), hsl(220 18% 11%));
     --shadow-3point: 
@@ -635,6 +720,54 @@ All colors MUST be HSL.
       min-height: var(--touch-target-min);
       min-width: var(--touch-target-min);
     }
+  }
+
+  /* Material Design 3 Elevation Utilities (Dark Mode) */
+  .elevation-0 { background-color: hsl(var(--elevation-0)); }
+  .elevation-1 { background-color: hsl(var(--elevation-1)); }
+  .elevation-2 { background-color: hsl(var(--elevation-2)); }
+  .elevation-3 { background-color: hsl(var(--elevation-3)); }
+  .elevation-4 { background-color: hsl(var(--elevation-4)); }
+  .elevation-5 { background-color: hsl(var(--elevation-5)); }
+
+  /* Spring Animation Utilities (Apple HIG) */
+  .spring-smooth {
+    transition-timing-function: var(--spring-smooth);
+    transition-duration: var(--spring-duration-medium);
+  }
+
+  .spring-bounce {
+    transition-timing-function: var(--spring-bounce);
+    transition-duration: var(--spring-duration-medium);
+  }
+
+  .spring-snappy {
+    transition-timing-function: var(--spring-snappy);
+    transition-duration: var(--spring-duration-short);
+  }
+
+  /* WCAG 2.2 Focus States (2.4.7 AA + 2.4.11 AA) */
+  .focus-wcag {
+    outline: none;
+  }
+
+  .focus-wcag:focus-visible {
+    outline: var(--focus-ring-width) var(--focus-ring-style) hsl(var(--focus-ring-color));
+    outline-offset: var(--focus-ring-offset);
+    transition: outline-offset 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Enhanced focus with 3:1 contrast minimum (WCAG 2.4.11) */
+  .focus-wcag-enhanced:focus-visible {
+    outline: 3px solid hsl(var(--focus-ring-color));
+    outline-offset: 3px;
+    box-shadow: 0 0 0 4px hsl(var(--focus-ring-color) / 0.2);
+  }
+
+  /* Focus Not Obscured - ensure focus stays visible (WCAG 2.2) */
+  .focus-not-obscured:focus-visible {
+    position: relative;
+    z-index: 9999;
   }
 
   /* Premium Typography Utilities (2025) */
