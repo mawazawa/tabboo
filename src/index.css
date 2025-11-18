@@ -411,23 +411,107 @@ All colors MUST be HSL.
     box-shadow: var(--shadow-diffused-hover), var(--shadow-inset-dark);
   }
   
-  /* Smooth micro-interactions */
+  /* Premium Micro-Interactions (2025) */
+
+  /* Standard interactive element */
   .interactive {
     transition: var(--transition-fast);
   }
-  
+
   .interactive:hover {
     transform: scale(var(--scale-hover));
   }
-  
+
   .interactive:active {
     transform: scale(var(--scale-active));
   }
-  
+
   .interactive:focus-visible {
     transform: scale(var(--scale-focus));
     outline: 2px solid hsl(var(--ring));
     outline-offset: 2px;
+  }
+
+  /* Hover lift effect (Apple-style) */
+  .hover-lift {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 4px 12px hsl(220 13% 13% / 0.08),
+      0 8px 24px hsl(220 13% 13% / 0.06),
+      0 16px 48px hsl(220 13% 13% / 0.04);
+  }
+
+  .hover-lift:active {
+    transform: translateY(0);
+    box-shadow:
+      0 1px 2px hsl(220 13% 13% / 0.05);
+  }
+
+  /* Smooth color transition */
+  .smooth-color {
+    transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Focus ring with smooth animation */
+  .focus-ring-smooth {
+    outline: none;
+    position: relative;
+  }
+
+  .focus-ring-smooth:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    transition: outline-offset 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .focus-ring-smooth:focus-visible:hover {
+    outline-offset: 3px;
+  }
+
+  /* Scale on press */
+  .press-scale {
+    transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .press-scale:active {
+    transform: scale(0.96);
+  }
+
+  /* Icon hover animation */
+  .icon-hover {
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .icon-hover:hover svg {
+    transform: scale(1.1);
+  }
+
+  /* Shimmer effect for loading states */
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--muted-foreground) / 0.1) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite linear;
   }
   
   /* Dark blue pill button - pleasant 3D effect */
