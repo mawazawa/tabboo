@@ -499,20 +499,35 @@ export const FieldNavigationPanel = ({
               )}
             </div>
             <div className="flex items-center gap-1 shrink-0">
-              <Badge
-                variant="secondary"
-                className="cursor-pointer hover:bg-secondary/80 transition-colors px-1.5 py-0.5"
-                onClick={() => setShowAISearch(!showAISearch)}
-              >
-                <Search className="h-3 w-3" strokeWidth={1.5} />
-              </Badge>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge
+                    variant="secondary"
+                    className="cursor-pointer hover:bg-secondary/80 transition-colors px-1.5 py-0.5"
+                    onClick={() => setShowAISearch(!showAISearch)}
+                    aria-label="Search fields"
+                  >
+                    <Search className="h-3 w-3" strokeWidth={1.5} />
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>Search Fields</p>
+                </TooltipContent>
+              </Tooltip>
               
               <Popover>
-                <PopoverTrigger asChild>
-                  <Badge variant="secondary" className="cursor-pointer hover:bg-secondary/80 transition-colors px-1.5 py-0.5">
-                    <Package className="h-3 w-3" strokeWidth={1.5} />
-                  </Badge>
-                </PopoverTrigger>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <PopoverTrigger asChild>
+                      <Badge variant="secondary" className="cursor-pointer hover:bg-secondary/80 transition-colors px-1.5 py-0.5" aria-label="Field groups">
+                        <Package className="h-3 w-3" strokeWidth={1.5} />
+                      </Badge>
+                    </PopoverTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    <p>Field Groups</p>
+                  </TooltipContent>
+                </Tooltip>
                 <PopoverContent className="w-[500px]" align="end">
                   <FieldGroupManager
                     selectedFields={selectedFields}
@@ -523,13 +538,21 @@ export const FieldNavigationPanel = ({
                 </PopoverContent>
               </Popover>
 
-              <Badge
-                variant="secondary"
-                className="cursor-pointer hover:bg-secondary/80 transition-colors px-1.5 py-0.5"
-                onClick={() => onSettingsSheetChange(true)}
-              >
-                <Settings className="h-3 w-3" strokeWidth={1.5} />
-              </Badge>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge
+                    variant="secondary"
+                    className="cursor-pointer hover:bg-secondary/80 transition-colors px-1.5 py-0.5"
+                    onClick={() => onSettingsSheetChange(true)}
+                    aria-label="Form settings"
+                  >
+                    <Settings className="h-3 w-3" strokeWidth={1.5} />
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>Form Settings</p>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
 

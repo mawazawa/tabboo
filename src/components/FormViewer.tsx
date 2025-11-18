@@ -193,8 +193,8 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   };
 
   const handlePointerDown = (e: React.PointerEvent, field: string, currentTop: number, currentLeft: number) => {
-    // Only allow dragging in global edit mode
-    if (!isGlobalEditMode) return;
+    // Only allow dragging in edit mode
+    if (!isEditMode) return;
     
     e.preventDefault();
     e.stopPropagation();

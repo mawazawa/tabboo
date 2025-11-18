@@ -850,6 +850,7 @@ const Index = () => {
               highlightedField={highlightedField}
               validationErrors={validationErrors}
               vaultData={vaultData as PersonalVaultData}
+              isEditMode={isEditMode}
             />
           </Suspense>
         </div>
