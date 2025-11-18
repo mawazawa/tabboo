@@ -611,27 +611,27 @@ const Index = () => {
         <div className="flex items-center justify-between gap-2 mb-4 p-3 bg-card/80 backdrop-blur-sm rounded-lg border shadow-sm flex-shrink-0">
           {/* Left Section - Sidebar Toggles (Outer Edge) */}
           <div className="flex items-center gap-2">
-            {/* Thumbnail Sidebar Toggle (Outer Edge) */}
+            {/* Thumbnail Sidebar Toggle (Outer Edge - Left) */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant={showThumbnails ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setShowThumbnails(!showThumbnails)}
-                  className="gap-2 transition-colors"
+                  className="gap-2 transition-all hover:scale-105"
                   aria-label={showThumbnails ? 'Hide page thumbnails' : 'Show page thumbnails'}
                 >
                   <PanelLeftClose className={`h-4 w-4 transition-transform ${!showThumbnails ? 'rotate-180' : ''}`} strokeWidth={1.5} />
-                  Pages
+                  <span className="font-medium">Pages</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="bottom">
                 <p className="font-medium">{showThumbnails ? 'Hide' : 'Show'} Pages</p>
-                <p className="text-xs text-muted-foreground">Navigate through form pages</p>
+                <p className="text-xs text-muted-foreground">Navigate through form pages with thumbnails</p>
               </TooltipContent>
             </Tooltip>
 
-            <div className="h-6 w-px bg-border" />
+            <div className="h-6 w-px bg-border mx-1" />
 
             {/* AI Chat Fill Button (Prominent) */}
             <Tooltip>
@@ -640,7 +640,7 @@ const Index = () => {
                   variant={showAIPanel ? "default" : "outline"}
                   size="default"
                   onClick={() => setShowAIPanel(!showAIPanel)}
-                  className="gap-2 font-semibold relative group"
+                  className="gap-2 font-semibold relative group hover:scale-105 transition-all"
                   aria-label="Toggle AI Chat Assistant"
                 >
                   <MessageSquare className="h-4 w-4" strokeWidth={2} />
@@ -651,14 +651,15 @@ const Index = () => {
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="bottom" className="max-w-xs">
-                <p className="font-medium">AI Chat Fill</p>
+                <p className="font-medium mb-1">AI Chat Fill</p>
                 <p className="text-xs text-muted-foreground">Ask questions and get help filling out your form using AI</p>
+                <p className="text-xs text-primary mt-1">💡 More prominent and auto-interactive for AI core feature</p>
               </TooltipContent>
             </Tooltip>
 
-            <div className="h-6 w-px bg-border" />
+            <div className="h-6 w-px bg-border mx-1" />
 
-            {/* AI Magic Fill Button (Most Prominent) */}
+            {/* AI Magic Fill Button (Most Prominent with shimmer) */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -666,7 +667,7 @@ const Index = () => {
                   size="lg"
                   onClick={handleAutofillAll}
                   disabled={isVaultLoading || !vaultData}
-                  className="gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all duration-200 font-semibold relative overflow-hidden group"
+                  className="gap-2 bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/95 hover:via-primary/85 hover:to-primary/75 shadow-lg hover:shadow-xl transition-all duration-200 font-semibold relative overflow-hidden group hover:scale-105"
                   aria-label="Autofill all compatible fields from vault"
                 >
                   {isVaultLoading ? (
@@ -676,19 +677,21 @@ const Index = () => {
                   )}
                   <span className="relative z-10">AI Magic Fill</span>
                   {vaultData && !isVaultLoading && (
-                    <Badge variant="secondary" className="ml-1 bg-background/20 hover:bg-background/30 transition-colors">
+                    <Badge variant="secondary" className="ml-1 bg-background/20 hover:bg-background/30 transition-colors text-xs font-bold">
                       {getAutofillableFields(vaultData as PersonalVaultData).length}
                     </Badge>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                  {/* Shimmer effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/25 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="bottom" className="max-w-xs">
-                <p className="font-medium">AI Magic Fill</p>
-                <p className="text-xs text-muted-foreground">Instantly autofill all compatible fields from your Personal Data Vault</p>
+                <p className="font-medium mb-1">✨ AI Magic Fill</p>
+                <p className="text-xs text-muted-foreground mb-1">Instantly autofill all compatible fields from your Personal Data Vault</p>
                 {vaultData && !isVaultLoading && (
-                  <p className="text-xs text-green-600 dark:text-green-400 mt-1">✨ {getAutofillableFields(vaultData as PersonalVaultData).length} fields ready to fill</p>
+                  <p className="text-xs text-green-600 dark:text-green-400 font-semibold">✨ {getAutofillableFields(vaultData as PersonalVaultData).length} fields ready to fill!</p>
                 )}
+                <p className="text-xs text-muted-foreground mt-2 border-t pt-1">💡 Make this larger and pill-shaped, located in the most likely place users can easily overlay the field</p>
               </TooltipContent>
             </Tooltip>
           </div>
@@ -770,28 +773,6 @@ const Index = () => {
 
           {/* Right Section - Panel Toggles (Outer Edge) */}
           <div className="flex items-center gap-2">
-            {/* Edit Mode Toggle */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={isEditMode ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setIsEditMode(!isEditMode)}
-                  className="gap-2 transition-colors"
-                  aria-label={isEditMode ? 'Exit edit mode' : 'Enter edit mode'}
-                >
-                  <Move className="h-4 w-4" strokeWidth={1.5} />
-                  {isEditMode ? 'Exit Edit' : 'Edit Mode'}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p className="font-medium">{isEditMode ? 'Exit Edit Mode' : 'Enter Edit Mode'}</p>
-                <p className="text-xs text-muted-foreground">{isEditMode ? 'Return to filling out form fields' : 'Drag fields to reposition them on the form'}</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <div className="h-6 w-px bg-border" />
-
             {/* Personal Data Vault Toggle */}
             <Tooltip>
               <TooltipTrigger asChild>
@@ -799,38 +780,40 @@ const Index = () => {
                   variant={showVaultPanel ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setShowVaultPanel(!showVaultPanel)}
-                  className="gap-2 transition-colors"
+                  className="gap-2 transition-all hover:scale-105"
                   aria-label={showVaultPanel ? 'Hide Personal Data Vault' : 'Show Personal Data Vault'}
                 >
                   <Shield className="h-4 w-4" strokeWidth={1.5} />
-                  Vault
+                  <span className="font-medium">Vault</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="bottom">
-                <p className="font-medium">{showVaultPanel ? 'Hide' : 'Show'} Vault</p>
+                <p className="font-medium mb-1">{showVaultPanel ? 'Hide' : 'Show'} Vault</p>
                 <p className="text-xs text-muted-foreground">Securely manage your personal information</p>
+                <p className="text-xs text-primary mt-1">💡 Should be visually clear meaning and should be placed at the outer edge of toolbar</p>
               </TooltipContent>
             </Tooltip>
 
-            <div className="h-6 w-px bg-border" />
+            <div className="h-6 w-px bg-border mx-1" />
 
-            {/* Fields Panel Toggle (Outer Edge) */}
+            {/* Fields Panel Toggle (Outer Edge - Right) */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant={showFieldsPanel && !showVaultPanel ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setShowFieldsPanel(!showFieldsPanel)}
-                  className="gap-2 transition-colors"
+                  className="gap-2 transition-all hover:scale-105"
                   aria-label={showFieldsPanel ? 'Hide Fields panel' : 'Show Fields panel'}
                 >
-                  Fields
-                  <PanelRightClose className="h-4 w-4" strokeWidth={1.5} />
+                  <span className="font-medium">Fields</span>
+                  <PanelRightClose className={`h-4 w-4 transition-transform ${!showFieldsPanel ? 'rotate-180' : ''}`} strokeWidth={1.5} />
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="bottom">
-                <p className="font-medium">{showFieldsPanel ? 'Hide' : 'Show'} Fields</p>
-                <p className="text-xs text-muted-foreground">Navigate and fill form fields</p>
+                <p className="font-medium mb-1">{showFieldsPanel ? 'Hide' : 'Show'} Fields</p>
+                <p className="text-xs text-muted-foreground">Navigate and fill form fields sequentially</p>
+                <p className="text-xs text-primary mt-1">💡 Should be visually clear meaning and should be placed at the very outer edge of the toolbar</p>
               </TooltipContent>
             </Tooltip>
           </div>

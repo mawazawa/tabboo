@@ -52,13 +52,13 @@ export const PDFThumbnailSidebar = ({
         <FileText className="h-5 w-5 text-primary" strokeWidth={2} />
         <span className="font-semibold text-sm">Pages</span>
         {numPages > 0 && (
-          <span className="ml-auto text-xs text-muted-foreground bg-background/50 px-2 py-0.5 rounded-full">
+          <span className="ml-auto text-xs font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20">
             {numPages}
           </span>
         )}
       </div>
 
-      <ScrollArea className="flex-1 bg-muted/10">
+      <ScrollArea className="flex-1 bg-muted/10 hover:bg-muted/15 transition-colors">
         <div className="p-4 space-y-4">
           {isLoading && (
             <div className="flex flex-col items-center gap-3 py-8">
@@ -82,10 +82,10 @@ export const PDFThumbnailSidebar = ({
                   onClick={() => onPageClick?.(pageNum)}
                   aria-label={`Go to page ${pageNum}`}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`group relative mb-4 rounded-lg overflow-hidden transition-all duration-200 w-full hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
+                  className={`group relative mb-4 rounded-lg overflow-hidden transition-all duration-200 w-full hover:scale-105 active:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                     isActive
-                      ? "ring-4 ring-primary shadow-xl scale-[1.03]"
-                      : "ring-2 ring-border/50 hover:ring-primary/60 shadow-lg hover:shadow-xl bg-background"
+                      ? "ring-4 ring-primary shadow-xl scale-[1.03] bg-primary/5"
+                      : "ring-2 ring-border/50 hover:ring-primary/70 hover:ring-4 shadow-lg hover:shadow-2xl bg-background hover:bg-primary/5"
                   }`}
                 >
                   <div className="relative w-full">

@@ -827,12 +827,12 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 checked={!!formData[overlay.field as keyof FormData]}
                                 onCheckedChange={(checked) => !isEditMode && updateField(overlay.field, checked as boolean)}
                                 disabled={isEditMode}
-                                className={`h-5 w-5 border-2 transition-all ${
+                                className={`h-5 w-5 border-2 transition-all duration-200 ${
                                   isEditMode
                                     ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   isCurrentField 
-                                    ? 'bg-primary/10 border-primary shadow-md scale-110' 
-                                    : 'bg-background border-border hover:border-primary/50 hover:scale-105'
+                                    ? 'bg-primary/10 border-primary shadow-lg ring-2 ring-primary/20 scale-110' 
+                                    : 'bg-background border-border hover:border-primary/70 hover:bg-primary/5 hover:scale-110 hover:shadow-md active:scale-105 cursor-pointer'
                                 }`}
                                 aria-label={overlay.placeholder || overlay.field}
                               />

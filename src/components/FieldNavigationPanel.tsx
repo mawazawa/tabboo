@@ -504,7 +504,7 @@ export const FieldNavigationPanel = ({
                 <TooltipTrigger asChild>
                   <Badge
                     variant="secondary"
-                    className="cursor-pointer hover:bg-secondary/80 transition-colors px-1.5 py-0.5"
+                    className="cursor-pointer hover:bg-secondary/80 transition-all hover:scale-110 px-1.5 py-0.5"
                     onClick={() => setShowAISearch(!showAISearch)}
                     aria-label="Search fields"
                   >
@@ -512,7 +512,8 @@ export const FieldNavigationPanel = ({
                   </Badge>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p>Search Fields</p>
+                  <p className="font-medium">Search Fields</p>
+                  <p className="text-xs text-muted-foreground">Find specific form fields</p>
                 </TooltipContent>
               </Tooltip>
               
@@ -520,13 +521,14 @@ export const FieldNavigationPanel = ({
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <PopoverTrigger asChild>
-                      <Badge variant="secondary" className="cursor-pointer hover:bg-secondary/80 transition-colors px-1.5 py-0.5" aria-label="Field groups">
+                      <Badge variant="secondary" className="cursor-pointer hover:bg-secondary/80 transition-all hover:scale-110 px-1.5 py-0.5" aria-label="Field groups">
                         <Package className="h-3 w-3" strokeWidth={1.5} />
                       </Badge>
                     </PopoverTrigger>
                   </TooltipTrigger>
                   <TooltipContent side="bottom">
-                    <p>Field Groups</p>
+                    <p className="font-medium">Field Groups</p>
+                    <p className="text-xs text-muted-foreground">Organize related fields</p>
                   </TooltipContent>
                 </Tooltip>
                 <PopoverContent className="w-[500px]" align="end">
@@ -543,7 +545,7 @@ export const FieldNavigationPanel = ({
                 <TooltipTrigger asChild>
                   <Badge
                     variant="secondary"
-                    className="cursor-pointer hover:bg-secondary/80 transition-colors px-1.5 py-0.5"
+                    className="cursor-pointer hover:bg-secondary/80 transition-all hover:scale-110 px-1.5 py-0.5"
                     onClick={() => onSettingsSheetChange(true)}
                     aria-label="Form settings"
                   >
@@ -551,7 +553,36 @@ export const FieldNavigationPanel = ({
                   </Badge>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p>Form Settings</p>
+                  <p className="font-medium">Form Settings</p>
+                  <p className="text-xs text-muted-foreground">Manage templates</p>
+                </TooltipContent>
+              </Tooltip>
+
+              {/* Clear Form Fields Button */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge
+                    variant="destructive"
+                    className="cursor-pointer hover:bg-destructive/90 transition-all hover:scale-110 px-1.5 py-0.5"
+                    onClick={() => {
+                      if (confirm('Are you sure you want to clear all form fields? This action cannot be undone.')) {
+                        FIELD_CONFIG.forEach(config => updateField(config.field, config.type === 'checkbox' ? false : ''));
+                        toast({ 
+                          title: "Form cleared", 
+                          description: "All form fields have been reset",
+                          variant: "default"
+                        });
+                      }
+                    }}
+                    aria-label="Clear all form fields"
+                  >
+                    <Trash2 className="h-3 w-3" strokeWidth={1.5} />
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-xs">
+                  <p className="font-medium mb-1">Clear Form Fields</p>
+                  <p className="text-xs text-muted-foreground">⚠️ Delete all form data (cannot be undone)</p>
+                  <p className="text-xs text-destructive mt-1">💡 Not a power button, should be a smaller chip icon and should never overlap with a brief tooltip summary</p>
                 </TooltipContent>
               </Tooltip>
             </div>
