@@ -514,11 +514,19 @@ export const FieldNavigationPanel = ({
 
     window.addEventListener('keydown', handleKeyDown, { passive: false });
     window.addEventListener('keyup', handleKeyUp, { passive: true });
+    
+    console.log('[KEYBOARD LISTENER]', 'Event listeners attached. Dependencies:', {
+      currentFieldIndex,
+      showPositionControl,
+      showSearch
+    });
+    
     return () => {
+      console.log('[KEYBOARD LISTENER]', 'Event listeners REMOVED');
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [currentFieldIndex, showPositionControl, showSearch]);
+  }, [currentFieldIndex, showPositionControl, showSearch, updateFieldPosition]);
 
   return (
     <Card className="h-full border-hairline shadow-3point chamfered flex flex-col overflow-hidden">
