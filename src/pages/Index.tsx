@@ -128,23 +128,27 @@ const Index = () => {
       // Toggle edit mode with 'E' key
       if (e.key === 'e' || e.key === 'E') {
         e.preventDefault();
-        setIsEditMode(prev => {
-          const newMode = !prev;
-          toast({
-            title: newMode ? 'Edit Mode Enabled' : 'Edit Mode Disabled',
-            description: newMode
-              ? 'You can now reposition fields by dragging them or using arrow keys'
-              : 'You can now fill form fields',
-            duration: 2000,
-          });
-          return newMode;
-        });
+        setIsEditMode(prev => !prev);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [toast]);
+
+  // Toast notification when edit mode changes
+  useEffect(() => {
+    // Skip on initial mount
+    if (isEditMode === false && !user) return;
+    
+    toast({
+      title: isEditMode ? 'Edit Mode Enabled' : 'Edit Mode Disabled',
+      description: isEditMode
+        ? 'You can now reposition fields by dragging them or using arrow keys'
+        : 'You can now fill form fields',
+      duration: 2000,
+    });
+  }, [isEditMode, toast]);
 
   // Fetch vault data for AI Assistant context
   const { data: vaultData, isLoading: isVaultLoading } = useQuery({
@@ -806,16 +810,7 @@ const Index = () => {
                 <Button
                   variant={isEditMode ? "default" : "ghost"}
                   size="sm"
-                  onClick={() => {
-                    setIsEditMode(!isEditMode);
-                    toast({
-                      title: isEditMode ? 'Edit Mode Disabled' : 'Edit Mode Enabled',
-                      description: isEditMode
-                        ? 'You can now fill form fields'
-                        : 'You can now reposition fields by dragging them',
-                      duration: 2000,
-                    });
-                  }}
+                  onClick={() => setIsEditMode(prev => !prev)}
                   className={`gap-2 ${isEditMode ? '' : 'hover:bg-primary/10'}`}
                 >
                   <Move className="h-4 w-4" strokeWidth={1.5} />
