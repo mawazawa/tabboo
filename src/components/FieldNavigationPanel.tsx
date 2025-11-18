@@ -402,21 +402,12 @@ export const FieldNavigationPanel = ({
   // Track pressed arrow keys for visual feedback
   const [pressedKey, setPressedKey] = useState<'up' | 'down' | 'left' | 'right' | null>(null);
 
+  // Handle keyboard shortcuts - memoized adjustPosition to avoid re-renders
+  const adjustPositionCallback = useCallback(adjustPosition, [fieldPositions, updateFieldPosition]);
+  
   // Handle keyboard shortcuts with optimized performance
   useEffect(() => {
-    console.log('[KEYBOARD LISTENER]', 'Arrow key listener ATTACHED. Current field index:', currentFieldIndex);
-    
     const handleKeyDown = (e: KeyboardEvent) => {
-      // DEBUG: Log ALL arrow key presses
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-        console.log('[DEBUG]', 'Arrow key pressed:', e.key, {
-          currentFieldIndex,
-          currentField: FIELD_CONFIG[currentFieldIndex]?.field,
-          activeElement: document.activeElement?.tagName,
-          altKey: e.altKey
-        });
-      }
-      
       const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
       const modKey = isMac ? e.metaKey : e.ctrlKey;
       
@@ -452,28 +443,18 @@ export const FieldNavigationPanel = ({
       const activeElement = document.activeElement as HTMLElement;
       const isActivelyTyping = activeElement && 
         (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA') &&
-        activeElement.classList.contains('field-input'); // Only block if it's a form field input
+        activeElement.classList.contains('field-input');
       
       const isArrowKey = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key);
-      const shouldMoveField = isArrowKey && (e.altKey || !isActivelyTyping); // Alt+Arrow OR not typing
-      
-      console.log('[DEBUG]', 'Arrow key check:', {
-        isArrowKey,
-        altKey: e.altKey,
-        isActivelyTyping,
-        shouldMoveField,
-        activeElementTag: activeElement?.tagName,
-        hasFieldInputClass: activeElement?.classList.contains('field-input')
-      });
+      const shouldMoveField = isArrowKey && (e.altKey || !isActivelyTyping);
       
       if (shouldMoveField) {
         e.preventDefault();
         
-        // CRITICAL: If no field is selected, select the first one
+        // If no field is selected, select the first one
         if (currentFieldIndex === -1 || !FIELD_CONFIG[currentFieldIndex]) {
           setCurrentFieldIndex(0);
-          console.log('[ARROW KEY]', 'No field selected, auto-selecting first field');
-          return; // Wait for next keypress after selection
+          return;
         }
         
         const direction = {
@@ -483,13 +464,12 @@ export const FieldNavigationPanel = ({
           'ArrowRight': 'right'
         }[e.key] as 'up' | 'down' | 'left' | 'right';
         
-        console.log('[ARROW KEY]', `Moving ${FIELD_CONFIG[currentFieldIndex]?.field} ${direction}`);
-        
-        // Immediate visual feedback with requestAnimationFrame for optimal performance
+        // Visual feedback
         requestAnimationFrame(() => {
           setPressedKey(direction);
         });
-        adjustPosition(direction);
+        
+        adjustPositionCallback(direction);
       }
 
       // Escape to close controls
@@ -515,18 +495,11 @@ export const FieldNavigationPanel = ({
     window.addEventListener('keydown', handleKeyDown, { passive: false });
     window.addEventListener('keyup', handleKeyUp, { passive: true });
     
-    console.log('[KEYBOARD LISTENER]', 'Event listeners attached. Dependencies:', {
-      currentFieldIndex,
-      showPositionControl,
-      showSearch
-    });
-    
     return () => {
-      console.log('[KEYBOARD LISTENER]', 'Event listeners REMOVED');
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [currentFieldIndex, showPositionControl, showSearch, updateFieldPosition]);
+  }, [currentFieldIndex, showPositionControl, showSearch, adjustPositionCallback]);
 
   return (
     <Card className="h-full border-hairline shadow-3point chamfered flex flex-col overflow-hidden">

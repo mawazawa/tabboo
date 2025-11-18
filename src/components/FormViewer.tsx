@@ -85,13 +85,9 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   // Generate field name to index mapping from database (memoized for performance)
   const fieldNameToIndex: Record<string, number> = useMemo(() => {
     if (!fieldMappings || fieldMappings.length === 0) {
-      // Fallback to empty mapping while loading
-      console.warn('[FIELD MAPPING]', 'No field mappings loaded yet!');
       return {};
     }
-    const mapping = generateFieldNameToIndex(fieldMappings);
-    console.log('[FIELD MAPPING]', 'Generated mapping with', Object.keys(mapping).length, 'fields:', Object.keys(mapping).slice(0, 10));
-    return mapping;
+    return generateFieldNameToIndex(fieldMappings);
   }, [fieldMappings]);
 
   // Legacy field name to index mapping (kept for reference, will be removed once database is fully integrated)
@@ -252,12 +248,8 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     
     // Set this field as active in the control panel
     const fieldIndex = fieldNameToIndex[field];
-    console.log('[FIELD CLICK]', 'Field clicked:', field, 'Index:', fieldIndex, 'Map:', fieldNameToIndex);
     if (fieldIndex !== undefined) {
       setCurrentFieldIndex(fieldIndex);
-      console.log('[FIELD CLICK]', 'Set currentFieldIndex to:', fieldIndex);
-    } else {
-      console.error('[FIELD CLICK]', 'ERROR: Field not found in fieldNameToIndex!', field);
     }
   };
 
