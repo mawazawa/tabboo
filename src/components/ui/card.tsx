@@ -35,7 +35,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     <div
       ref={ref}
       className={cn(
-        "rounded-lg border bg-card text-card-foreground transition-all duration-300",
+        "rounded-lg border bg-card text-card-foreground spring-smooth",
         liquidGlass
           ? "liquid-glass rounded-2xl" // Ultimate premium: Apple Liquid Glass aesthetic
           : refined

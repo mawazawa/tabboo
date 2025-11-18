@@ -146,7 +146,7 @@ export const MobileBottomSheet = ({
       className={cn(
         'fixed inset-x-0 bottom-0 z-40',
         'bg-card border-t rounded-t-xl shadow-lg',
-        'transition-transform duration-300 ease-out',
+        'spring-smooth',
         isDragging && 'transition-none', // Disable transition while dragging
         className
       )}
