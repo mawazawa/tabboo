@@ -74,25 +74,23 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   const rafRef = useRef<number | null>(null);
   const lastGuidesRef = useRef<{ x: number[]; y: number[] }>({ x: [], y: [] });
 
-  // Convert database field mappings to field overlays (memoized for performance)
-  const fieldOverlays = useMemo(() => {
-    if (!fieldMappings || fieldMappings.length === 0) {
-      // Fallback to empty array while loading or if no data
-      return [];
-    }
-    return convertToFieldOverlays(fieldMappings);
-  }, [fieldMappings]);
+// Convert database field mappings to field overlays (memoized for performance)
+const fieldOverlays = useMemo(() => {
+  if (!fieldMappings || fieldMappings.length === 0) {
+    // Fallback to empty array while loading or if no data
+    return [];
+  }
+  return convertToFieldOverlays(fieldMappings);
+}, [fieldMappings]);
 
-  // Generate field name to index mapping from database (memoized for performance)
-  const fieldNameToIndex: Record<string, number> = useMemo(() => {
-    if (!fieldMappings || fieldMappings.length === 0) {
-      return {};
-    }
-    return generateFieldNameToIndex(fieldMappings);
-  }, [fieldMappings]);
+// Generate resilient field name to index mapping to keep keyboard navigation working
+const fieldNameToIndex: Record<string, number> = useMemo(() => {
+  const dbFieldNames = fieldMappings?.map(mapping => mapping.form_field_name) ?? [];
+  return buildFieldNameToIndex(dbFieldNames);
+}, [fieldMappings]);
 
-  // Legacy field name to index mapping (kept for reference, will be removed once database is fully integrated)
-  const legacyFieldNameToIndex: Record<string, number> = {
+// Legacy field name to index mapping (kept for reference, will be removed once database is fully integrated)
+const legacyFieldNameToIndex: Record<string, number> = {
     // Header - Party/Attorney Information (0-12)
     partyName: 0,
     firmName: 1,
@@ -249,12 +247,8 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     
     // Set this field as active in the control panel
     const fieldIndex = fieldNameToIndex[field];
-    console.log('🖱️ Field clicked:', { field, fieldIndex, isFormElement });
     if (fieldIndex !== undefined) {
       setCurrentFieldIndex(fieldIndex);
-      console.log('✅ Set currentFieldIndex to:', fieldIndex);
-    } else {
-      console.warn('⚠️ Field not found in fieldNameToIndex:', field);
     }
   };
 
@@ -377,16 +371,12 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
    * @param customStep - Optional custom step size (default: 0.5%)
    */
   const adjustPosition = useCallback((direction: 'up' | 'down' | 'left' | 'right', field: string, customStep?: number) => {
-    console.log('📐 adjustPosition called:', { direction, field, customStep });
-
     const position = fieldPositions[field] || {
       top: parseFloat(fieldOverlays[0]?.fields.find(f => f.field === field)?.top || '0'),
       left: parseFloat(fieldOverlays[0]?.fields.find(f => f.field === field)?.left || '0')
     };
     const step = customStep ?? 0.5; // Fine-tuned for precise control, allow override
     const newPosition = { ...position };
-
-    console.log('📐 Current position:', position);
 
     switch (direction) {
       case 'up':
@@ -407,7 +397,6 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
         break;
     }
 
-    console.log('📐 New position:', newPosition);
     updateFieldPosition(field, newPosition);
   }, [fieldPositions, fieldOverlays, updateFieldPosition]);
 
@@ -890,4 +879,24 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
       </div>
     </div>
   );
+};
+
+export const buildFieldNameToIndex = (dbFieldNames?: string[] | null): Record<string, number> => {
+  const merged: Record<string, number> = { ...legacyFieldNameToIndex };
+
+  if (!dbFieldNames || dbFieldNames.length === 0) {
+    return merged;
+  }
+
+  const legacyIndexes = Object.values(merged);
+  let nextIndex = legacyIndexes.length > 0 ? Math.max(...legacyIndexes) + 1 : 0;
+
+  dbFieldNames.forEach((fieldName) => {
+    if (!(fieldName in merged)) {
+      merged[fieldName] = nextIndex;
+      nextIndex += 1;
+    }
+  });
+
+  return merged;
 };

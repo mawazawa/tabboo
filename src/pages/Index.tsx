@@ -129,11 +129,7 @@ const Index = () => {
       // Toggle edit mode with 'E' key
       if (e.key === 'e' || e.key === 'E') {
         e.preventDefault();
-        setIsEditMode(prev => {
-          const newMode = !prev;
-          console.log('🔄 Edit Mode toggled via keyboard:', prev, '→', newMode);
-          return newMode;
-        });
+        setIsEditMode(prev => !prev);
       }
     };
 
