@@ -14,6 +14,7 @@ export default defineConfig({
       '**/dist/**',
       '**/*.e2e.test.ts',
       '**/*.e2e.test.tsx',
+      '**/src/__tests__/**', // Exclude Playwright E2E tests directory
     ],
     coverage: {
       provider: 'v8',
