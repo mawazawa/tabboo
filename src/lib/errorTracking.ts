@@ -158,8 +158,10 @@ class ErrorTracker {
     //   });
     // }
 
-    // For now, just log that we would send it
-    console.log('[MONITORING]', 'Would send to monitoring service:', logData);
+    // For now, just log in development
+    if (import.meta.env.DEV) {
+      console.log('[MONITORING]', 'Would send to monitoring service:', logData);
+    }
   }
 
   /**

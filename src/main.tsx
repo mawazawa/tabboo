@@ -10,7 +10,9 @@ if ('serviceWorker' in navigator) {
       navigator.serviceWorker
         .register('/sw.js')
         .then((registration) => {
-          console.log('Service Worker registered:', registration.scope);
+          if (import.meta.env.DEV) {
+            console.log('[SW]', 'Service Worker registered:', registration.scope);
+          }
           
           // Check for updates periodically
           setInterval(() => {
@@ -28,7 +30,9 @@ if ('serviceWorker' in navigator) {
         const registrations = await navigator.serviceWorker.getRegistrations();
         for (const registration of registrations) {
           await registration.unregister();
-          console.log('Service Worker unregistered for development');
+          if (import.meta.env.DEV) {
+            console.log('[SW]', 'Service Worker unregistered for development');
+          }
         }
       } catch (error) {
         console.error('Failed to unregister service worker:', error);
