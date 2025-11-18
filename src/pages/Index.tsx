@@ -118,6 +118,34 @@ const Index = () => {
   const hasUnsavedChanges = useRef(false);
   const pdfPanelRef = useRef<HTMLDivElement>(null);
 
+  // Keyboard shortcut: 'E' key to toggle edit mode
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is typing in an input field
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+
+      // Toggle edit mode with 'E' key
+      if (e.key === 'e' || e.key === 'E') {
+        e.preventDefault();
+        setIsEditMode(prev => {
+          const newMode = !prev;
+          toast({
+            title: newMode ? 'Edit Mode Enabled' : 'Edit Mode Disabled',
+            description: newMode
+              ? 'You can now reposition fields by dragging them or using arrow keys'
+              : 'You can now fill form fields',
+            duration: 2000,
+          });
+          return newMode;
+        });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [toast]);
+
   // Fetch vault data for AI Assistant context
   const { data: vaultData, isLoading: isVaultLoading } = useQuery({
     queryKey: ['vault-data', user?.id],
