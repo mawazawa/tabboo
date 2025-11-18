@@ -222,10 +222,27 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   }, [isEditMode, announce]);
 
   const handleFieldClick = (field: string, e: React.MouseEvent) => {
-    // Only stop propagation if clicking the container, not form elements
+    // Check if clicking on form element OR any parent up to the container
     const target = e.target as HTMLElement;
-    const isFormElement = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.getAttribute('role') === 'checkbox';
+    let element: HTMLElement | null = target;
+    let isFormElement = false;
     
+    // Check target and all parents up to the container
+    while (element && !element.classList.contains('field-container')) {
+      if (
+        element.tagName === 'INPUT' || 
+        element.tagName === 'TEXTAREA' || 
+        element.tagName === 'BUTTON' ||
+        element.getAttribute('role') === 'checkbox' ||
+        element.classList.contains('field-input')
+      ) {
+        isFormElement = true;
+        break;
+      }
+      element = element.parentElement;
+    }
+    
+    // Only stop propagation if clicking container background, NOT form elements
     if (!isFormElement) {
       e.stopPropagation();
     }
@@ -574,14 +591,14 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                     <Page
                       pageNumber={pageNum}
                       width={pageWidth * zoom}
-                      renderTextLayer={true}
+                      renderTextLayer={false}
                       renderAnnotationLayer={false}
                       className="w-full"
                       loading=""
                     />
                   
                   {pageOverlays && (
-                    <div className="absolute inset-0">
+                    <div className="absolute inset-0 z-10">
                       {/* Alignment Guides */}
                       {isDragging && (
                         <>
@@ -633,7 +650,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                             <div
                             key={idx}
                             data-field={overlay.field}
-                            className={`field-container group absolute ${isEditMode ? 'select-none touch-none' : ''} ${
+                            className={`field-container group absolute z-20 ${isEditMode ? 'select-none touch-none' : ''} ${
                               isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary shadow-lg scale-105' :
                               isEditMode ? 'cursor-move ring-2 ring-primary/70' : 'cursor-pointer'
                             } ${

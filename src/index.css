@@ -237,4 +237,15 @@ All colors MUST be HSL.
     clip: auto;
     white-space: normal;
   }
+
+  /* 🔥 CRITICAL FIX: Allow clicks to pass through PDF text layer to form fields */
+  .react-pdf__Page__textContent {
+    pointer-events: none !important;
+    user-select: none !important;
+  }
+
+  /* Ensure PDF annotation layer also doesn't block clicks */
+  .react-pdf__Page__annotations {
+    pointer-events: none !important;
+  }
 }
