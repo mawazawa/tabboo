@@ -939,6 +939,7 @@ const Index = () => {
               fieldPositions={fieldPositions}
               updateFieldPosition={updateFieldPosition}
               zoom={pdfZoom}
+              fieldFontSize={fieldFontSize}
               highlightedField={highlightedField}
               validationErrors={validationErrors}
               vaultData={vaultData as PersonalVaultData}
@@ -1005,9 +1006,11 @@ const Index = () => {
                       fieldPositions={fieldPositions}
                       updateFieldPosition={updateFieldPosition}
                       zoom={pdfZoom}
+                      fieldFontSize={fieldFontSize}
                       highlightedField={highlightedField}
                       validationErrors={validationErrors}
                       vaultData={vaultData as PersonalVaultData}
+                      isEditMode={isEditMode}
                     />
                   </Suspense>
                 </div>

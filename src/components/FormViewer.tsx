@@ -33,6 +33,7 @@ interface Props {
   updateFieldPosition: (field: string, position: FieldPosition) => void;
   formType?: FormType;
   zoom?: number;
+  fieldFontSize?: number;
   highlightedField?: string | null;
   validationErrors?: ValidationErrors;
   vaultData?: PersonalVaultData | null;
@@ -49,7 +50,7 @@ const getPdfPath = (formType: FormType): string => {
   return pdfPaths[formType];
 };
 
-export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, formType = 'FL-320', zoom = 1, highlightedField = null, validationErrors = {}, vaultData = null, isEditMode = false }: Props) => {
+export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, formType = 'FL-320', zoom = 1, fieldFontSize = 12, highlightedField = null, validationErrors = {}, vaultData = null, isEditMode = false }: Props) => {
   // Live region for screen reader announcements
   const { announce, LiveRegionComponent } = useLiveRegion({
     clearAfter: 2000, // Clear announcements after 2 seconds
@@ -431,53 +432,34 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   // Keyboard shortcuts for field positioning
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore if user is typing in an input field
       const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+      const isArrowKey = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key);
 
-      // DEBUG: Log arrow key presses
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-        console.log('🔍 Arrow key pressed:', {
-          key: e.key,
-          isEditMode,
-          currentFieldIndex,
-          fieldNameToIndexKeys: Object.keys(fieldNameToIndex),
-          fieldNameToIndexSize: Object.keys(fieldNameToIndex).length
-        });
-      }
-
-      // Move selected field with arrow keys (only in edit mode)
-      if (isEditMode && currentFieldIndex >= 0) {
+      // In Edit Mode with selected field: arrow keys move the field, even if input is focused
+      if (isEditMode && currentFieldIndex >= 0 && isArrowKey) {
         const field = Object.keys(fieldNameToIndex).find(
           f => fieldNameToIndex[f] === currentFieldIndex
         );
-        console.log('🔍 Field lookup:', { currentFieldIndex, foundField: field });
 
-        if (!field) {
-          console.warn('⚠️ No field found for index:', currentFieldIndex);
-          return;
-        }
+        if (!field) return;
 
+        e.preventDefault(); // Prevent default arrow key behavior in input
         const step = e.shiftKey ? 5 : 0.5; // Shift key for faster movement
 
         if (e.key === 'ArrowUp') {
-          e.preventDefault();
-          console.log('⬆️ Moving field up:', field, 'step:', step);
           adjustPosition('up', field, step);
         } else if (e.key === 'ArrowDown') {
-          e.preventDefault();
-          console.log('⬇️ Moving field down:', field, 'step:', step);
           adjustPosition('down', field, step);
         } else if (e.key === 'ArrowLeft') {
-          e.preventDefault();
-          console.log('⬅️ Moving field left:', field, 'step:', step);
           adjustPosition('left', field, step);
         } else if (e.key === 'ArrowRight') {
-          e.preventDefault();
-          console.log('➡️ Moving field right:', field, 'step:', step);
           adjustPosition('right', field, step);
         }
+        return; // Exit early - we handled the arrow key
       }
+
+      // In Fill Mode: ignore arrow keys if user is typing in an input field
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -842,7 +824,11 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
                                 disabled={isEditMode}
-                                className={`field-input h-6 text-[12pt] font-mono ${
+                                style={{ 
+                                  fontSize: `${fieldFontSize}pt`,
+                                  height: `${fieldFontSize * 2}px`
+                                }}
+                                className={`field-input font-mono ${
                                   isEditMode
                                     ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   validationErrors?.[overlay.field]?.length
@@ -860,7 +846,11 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                 onChange={(e) => updateField(overlay.field, e.target.value)}
                                 placeholder={overlay.placeholder}
                                 disabled={isEditMode}
-                                className={`field-input text-[12pt] font-mono resize-none min-h-[48px] ${
+                                style={{ 
+                                  fontSize: `${fieldFontSize}pt`,
+                                  minHeight: `${fieldFontSize * 4}px`
+                                }}
+                                className={`field-input font-mono resize-none ${
                                   isEditMode
                                     ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
                                   validationErrors?.[overlay.field]?.length
