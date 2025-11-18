@@ -39,6 +39,7 @@ export function ExportPDFButton({
       const pdfBytes = await fillPDFFields({
         formData,
         pdfPath: pdfPaths[formType],
+        formNumber: formType, // 'FL-320', 'DV-100', etc.
         fontSize: 12,
       });
 
