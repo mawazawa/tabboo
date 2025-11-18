@@ -314,6 +314,12 @@ function FieldOverlayComponent({
  * - isCurrentField, isDragging, highlightedField (visual state)
  * - formData[field] (field value changes)
  * - validationErrors[field] (validation state changes)
+ * - vaultData (for autofill functionality)
+ *
+ * Note: Callback functions (updateField, adjustPosition, handleFieldClick,
+ * handleAutofillField, onPointerDown) are expected to be stable (wrapped in
+ * useCallback) in the parent component. If they change, the component will
+ * re-render to avoid stale closures.
  *
  * This prevents re-rendering non-dragged fields when one field is being dragged,
  * providing 10-15% performance improvement during drag operations.
@@ -351,6 +357,41 @@ export const FieldOverlay = memo(FieldOverlayComponent, (prevProps, nextProps) =
   // Autofill state
   if (prevProps.canAutofillField !== nextProps.canAutofillField) return false;
   if (prevProps.hasValue !== nextProps.hasValue) return false;
+
+  // Vault data (shallow comparison - used by handleAutofillField callback)
+  // If vaultData reference changes, component should re-render to get fresh closure
+  if (prevProps.vaultData !== nextProps.vaultData) {
+    // Deep comparison for vaultData object contents
+    // If both are null/undefined, they're equal
+    if (!prevProps.vaultData && !nextProps.vaultData) {
+      // Both null/undefined, continue
+    } else if (!prevProps.vaultData || !nextProps.vaultData) {
+      // One is null, other is not - different
+      return false;
+    } else {
+      // Both are objects - shallow compare keys
+      const prevKeys = Object.keys(prevProps.vaultData);
+      const nextKeys = Object.keys(nextProps.vaultData);
+      if (prevKeys.length !== nextKeys.length) return false;
+      // Check if any values changed (shallow comparison)
+      for (const key of prevKeys) {
+        if (prevProps.vaultData[key as keyof typeof prevProps.vaultData] !== 
+            nextProps.vaultData[key as keyof typeof nextProps.vaultData]) {
+          return false;
+        }
+      }
+    }
+  }
+
+  // Callback functions: We rely on parent component to use useCallback for stability
+  // If callbacks change reference, we should re-render to avoid stale closures
+  // However, checking function references defeats memoization purpose, so we trust
+  // that parent components wrap callbacks in useCallback with stable dependencies
+  if (prevProps.updateField !== nextProps.updateField) return false;
+  if (prevProps.adjustPosition !== nextProps.adjustPosition) return false;
+  if (prevProps.handleFieldClick !== nextProps.handleFieldClick) return false;
+  if (prevProps.handleAutofillField !== nextProps.handleAutofillField) return false;
+  if (prevProps.onPointerDown !== nextProps.onPointerDown) return false;
 
   // All checks passed - props are equal, skip re-render
   return true;

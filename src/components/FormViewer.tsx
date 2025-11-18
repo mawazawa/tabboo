@@ -141,7 +141,7 @@ const fieldNameToIndex: Record<string, number> = useMemo(() => {
     announce(isEditMode ? 'Edit mode activated. You can now drag fields to reposition them.' : 'Edit mode deactivated. Fields are now locked.');
   }, [isEditMode, announce]);
 
-  const handleFieldClick = (field: string, e: React.MouseEvent) => {
+  const handleFieldClick = useCallback((field: string, e: React.MouseEvent) => {
     // Check if clicking on form element OR any parent up to the container
     const target = e.target as HTMLElement;
     let element: HTMLElement | null = target;
@@ -172,20 +172,20 @@ const fieldNameToIndex: Record<string, number> = useMemo(() => {
     if (fieldIndex !== undefined) {
       setCurrentFieldIndex(fieldIndex);
     }
-  };
+  }, [fieldNameToIndex, setCurrentFieldIndex]);
 
   const handlePDFClick = (e: React.MouseEvent) => {
     // Clicking PDF background does nothing in edit mode
     if ((e.target as HTMLElement).closest('.field-container')) return;
   };
 
-  const handleAutofillField = (field: string, e: React.MouseEvent) => {
+  const handleAutofillField = useCallback((field: string, e: React.MouseEvent) => {
     e.stopPropagation();
     const value = getVaultValueForField(field, vaultData);
     if (value) {
       updateField(field, value);
     }
-  };
+  }, [vaultData, updateField]);
 
   // Show loading state while fetching field data from database
   if (isLoadingFields) {
