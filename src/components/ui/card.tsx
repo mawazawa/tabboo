@@ -1,15 +1,22 @@
 /**
- * Card Component with Refined Styling Option
- * 
- * Enhanced with reference image aesthetic:
- * - Soft diffused shadows for depth
- * - Glassmorphic background with backdrop blur
- * - Subtle inset shadows/highlights for embossed look
+ * Card Component with Premium 2025 Styling Options
+ *
+ * Enhanced with multiple aesthetic levels:
+ * - Default: Clean card with subtle shadow
+ * - Refined: Glassmorphic background with soft diffused shadows (2025 premium)
+ * - Liquid Glass: Apple-inspired advanced glassmorphism with 24px blur (ultimate premium)
+ *
+ * Features:
+ * - Multi-layer depth through shadows and refraction
+ * - Backdrop blur for frosted glass effect
+ * - Inset highlights for embossed appearance
  * - Smooth transitions on hover
- * 
+ * - Responsive to user interactions
+ *
  * Usage:
- * - Default: Standard card styling
- * - Add "card-refined" class for enhanced aesthetic
+ * <Card /> - Standard card
+ * <Card refined /> - Premium glassmorphic card
+ * <Card liquidGlass /> - Ultimate Apple Liquid Glass aesthetic
  */
 
 import * as React from "react";
@@ -19,17 +26,21 @@ import { cn } from "@/lib/utils";
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Use refined styling (glassmorphic, soft shadows, embossed effect) */
   refined?: boolean;
+  /** Use Apple Liquid Glass styling (advanced glassmorphism with 24px blur - ultimate premium) */
+  liquidGlass?: boolean;
 }
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, refined, ...props }, ref) => (
+  ({ className, refined, liquidGlass, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
-        "rounded-lg border bg-card text-card-foreground",
-        refined
-          ? "card-refined" // Uses refined styling from CSS
-          : "shadow-sm", // Default shadow
+        "rounded-lg border bg-card text-card-foreground transition-all duration-300",
+        liquidGlass
+          ? "liquid-glass rounded-2xl" // Ultimate premium: Apple Liquid Glass aesthetic
+          : refined
+            ? "card-refined" // Premium: Refined glassmorphism
+            : "shadow-sm", // Default: Standard shadow
         className
       )}
       {...props}
