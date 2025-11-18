@@ -434,13 +434,18 @@ export const FieldNavigationPanel = ({
         return;
       }
 
-      // Arrow keys for positioning - work when a field is selected, unless actively typing
+      // Arrow keys for positioning:
+      // - Alt/Option + Arrow keys: ALWAYS move field position (even when typing)
+      // - Arrow keys alone: Only work when NOT focused on input (prevents conflict with text cursor)
       const activeElement = document.activeElement as HTMLElement;
       const isActivelyTyping = activeElement && 
         (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA') &&
         activeElement.classList.contains('field-input'); // Only block if it's a form field input
       
-      if (!isActivelyTyping && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+      const isArrowKey = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key);
+      const shouldMoveField = isArrowKey && (e.altKey || !isActivelyTyping); // Alt+Arrow OR not typing
+      
+      if (shouldMoveField) {
         e.preventDefault();
         const direction = {
           'ArrowUp': 'up',

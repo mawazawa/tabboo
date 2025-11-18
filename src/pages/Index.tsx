@@ -771,6 +771,35 @@ const Index = () => {
             </Tooltip>
           </div>
 
+          {/* Edit Mode Toggle */}
+          <div className="flex items-center gap-2 border-l border-border/50 pl-4">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={isEditMode ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => {
+                    setIsEditMode(!isEditMode);
+                    toast({
+                      title: isEditMode ? 'Edit Mode Disabled' : 'Edit Mode Enabled',
+                      description: isEditMode
+                        ? 'You can now fill form fields'
+                        : 'You can now reposition fields by dragging them',
+                      duration: 2000,
+                    });
+                  }}
+                  className={`gap-2 ${isEditMode ? '' : 'hover:bg-primary/10'}`}
+                >
+                  <Move className="h-4 w-4" strokeWidth={1.5} />
+                  {isEditMode ? 'Exit Edit' : 'Edit Mode'}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{isEditMode ? 'Exit edit mode to fill form fields (E)' : 'Enable edit mode to reposition fields (E)'}</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+
           {/* Right Section - Panel Toggles (Outer Edge) */}
           <div className="flex items-center gap-2">
             {/* Personal Data Vault Toggle */}
