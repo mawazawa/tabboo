@@ -918,7 +918,7 @@ const Index = () => {
             collapsedSize={0}
             className={showFieldsPanel || showVaultPanel ? "" : "hidden"}
           >
-            <div className="h-full pl-3">
+            <div className="h-full w-full flex flex-col overflow-hidden pl-3">
               <Suspense fallback={<PanelSkeleton />}>
                 {showVaultPanel ? (
                   <PersonalDataVaultPanel userId={user?.id || ''} />
