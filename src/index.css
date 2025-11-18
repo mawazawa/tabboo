@@ -553,6 +553,52 @@ All colors MUST be HSL.
     }
   }
 
+  /* Premium Typography Utilities (2025) */
+  .text-display {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    font-weight: 700;
+  }
+
+  .text-headline {
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+    font-weight: 600;
+  }
+
+  .text-title {
+    font-size: clamp(1.125rem, 2vw, 1.5rem);
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+    font-weight: 600;
+  }
+
+  .text-body {
+    font-size: 1rem;
+    line-height: 1.5;
+    letter-spacing: 0em;
+    font-weight: 400;
+  }
+
+  .text-caption {
+    font-size: 0.875rem;
+    line-height: 1.4;
+    letter-spacing: 0em;
+    font-weight: 400;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .text-label {
+    font-size: 0.75rem;
+    line-height: 1.3;
+    letter-spacing: 0.025em;
+    font-weight: 500;
+    text-transform: uppercase;
+    color: hsl(var(--muted-foreground));
+  }
+
   /* Screen reader only content (accessibility) */
   .sr-only {
     position: absolute;
