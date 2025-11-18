@@ -10,7 +10,7 @@ import type {
   ValidationRules,
 } from "@/types/FormData";
 import type { FormTemplate } from "@/utils/templateManager";
-import { PDFThumbnailSidebar } from "@/components/PDFThumbnailSidebar";
+import type { ThumbnailSidebarProps } from "@/components/PDFThumbnailSidebar";
 
 interface SharedFormViewerProps {
   formData: FormData;
@@ -58,10 +58,19 @@ interface PersonalVaultPanelProps {
   userId: string;
 }
 
+interface ThumbnailSidebarInjectedProps {
+  currentPage?: number;
+  onPageClick?: (pageNumber: number) => void;
+  currentFieldPositions?: { top: number; left: number }[];
+  showFieldIndicator?: boolean;
+  panelWidth?: number;
+}
+
 interface DesktopWorkspaceProps {
   FormViewerComponent: ComponentType<SharedFormViewerProps>;
   FieldNavigationPanelComponent: ComponentType<FieldNavigationPanelInjectedProps>;
   PersonalDataVaultPanelComponent: ComponentType<PersonalVaultPanelProps>;
+  ThumbnailSidebarComponent: ComponentType<ThumbnailSidebarInjectedProps>;
   sharedFormViewerProps: SharedFormViewerProps;
   viewerFallback: ReactNode;
   panelFallback: ReactNode;
@@ -99,6 +108,7 @@ export const DesktopWorkspace = ({
   FormViewerComponent,
   FieldNavigationPanelComponent,
   PersonalDataVaultPanelComponent,
+  ThumbnailSidebarComponent,
   sharedFormViewerProps,
   viewerFallback,
   panelFallback,
@@ -146,7 +156,7 @@ export const DesktopWorkspace = ({
           className={showThumbnails ? "" : "hidden"}
         >
           <Suspense fallback={panelFallback}>
-            <PDFThumbnailSidebar
+            <ThumbnailSidebarComponent
               currentPage={currentPDFPage}
               onPageClick={onPageClick}
               currentFieldPositions={getCurrentFieldPositions()}

@@ -543,6 +543,46 @@ const Index = () => {
     isEditMode,
   };
 
+  const handleZoomOut = useCallback(() => {
+    setPdfZoom((prev) => Math.max(0.5, prev - 0.1));
+  }, []);
+
+  const handleZoomIn = useCallback(() => {
+    setPdfZoom((prev) => Math.min(2, prev + 0.1));
+  }, []);
+
+  const handleFitToPage = useCallback(() => {
+    const updateZoom = (width: number) => {
+      const targetWidth = 850;
+      const calculatedZoom = Math.min(2, Math.max(0.5, width / targetWidth));
+      setPdfZoom(calculatedZoom);
+    };
+
+    if (pdfPanelRef.current) {
+      updateZoom(pdfPanelRef.current.clientWidth - 48);
+      return;
+    }
+
+    const pdfPanel = document.getElementById("pdf-panel");
+    if (pdfPanel) {
+      updateZoom(pdfPanel.clientWidth - 48);
+      return;
+    }
+
+    setPdfZoom(1);
+  }, []);
+
+  const handleEditToggle = useCallback(() => {
+    setIsEditMode((prev) => !prev);
+  }, []);
+
+  const hasVaultData = Boolean(typedVaultData);
+
+  const handleThumbnailResize = useCallback((size: number) => {
+    const containerWidth = window.innerWidth * 0.75;
+    setThumbnailPanelWidth((size / 100) * containerWidth);
+  }, []);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -567,478 +607,90 @@ const Index = () => {
         />
       </Suspense>
       
-      {/* Header */}
-      <header className="border-b-2 bg-card/80 backdrop-blur-sm z-50 shadow-medium flex-shrink-0">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-glow">
-                <FileText className="w-6 h-6 text-primary-foreground" strokeWidth={1.5} />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  SwiftFill Pro
-                </h1>
-                <p className="text-sm text-muted-foreground">AI-Powered Legal Form Assistant</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <NavigationMenu>
-                <NavigationMenuList>
-                  <NavigationMenuItem>
-                    <NavigationMenuTrigger>Tools</NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                      <div className="grid gap-3 p-4 w-[400px]">
-                        <NavigationMenuLink asChild>
-                          <button
-                            onClick={() => navigate("/distribution-calculator")}
-                            onMouseEnter={preloadDistributionCalculator}
-                            onMouseLeave={cancelDistributionCalculator}
-                            className="flex items-start gap-3 p-3 rounded-lg hover:bg-accent transition-colors text-left"
-                          >
-                            <Calculator className="h-5 w-5 mt-0.5 text-primary" strokeWidth={1.5} />
-                            <div>
-                              <div className="font-medium mb-1">Distribution Calculator</div>
-                              <p className="text-sm text-muted-foreground">
-                                Calculate property division, validate Watts charges, and detect errors
-                              </p>
-                            </div>
-                          </button>
-                        </NavigationMenuLink>
-                        <NavigationMenuLink asChild>
-                          <button
-                            onClick={() => navigate("/")}
-                            className="flex items-start gap-3 p-3 rounded-lg hover:bg-accent transition-colors text-left"
-                          >
-                            <FileText className="h-5 w-5 mt-0.5 text-primary" strokeWidth={1.5} />
-                            <div>
-                              <div className="font-medium mb-1">Form Filler (FL-320)</div>
-                              <p className="text-sm text-muted-foreground">
-                                Fill out legal forms with AI assistance
-                              </p>
-                            </div>
-                          </button>
-                        </NavigationMenuLink>
-                      </div>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-                </NavigationMenuList>
-              </NavigationMenu>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="outline" size="sm" onClick={handleLogout} className="gap-2 shadow-3point chamfered spring-hover">
-                    <LogOut className="h-4 w-4" strokeWidth={1.5} />
-                    Logout
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Sign out of your account</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-          </div>
-        </div>
-      </header>
+      <IndexHeader
+        onNavigateDistribution={() => navigate("/distribution-calculator")}
+        onNavigateHome={() => navigate("/")}
+        onPreloadDistribution={preloadDistributionCalculator}
+        onCancelDistribution={cancelDistributionCalculator}
+        onLogout={handleLogout}
+      />
 
       {/* Main Content with Resizable Panels */}
       <main className="flex-1 flex flex-col container mx-auto px-4 py-6 overflow-hidden">
         {/* Control Toolbar */}
-        <div className="flex items-center justify-between gap-2 mb-4 p-3 bg-card/80 backdrop-blur-sm rounded-lg border shadow-sm flex-shrink-0">
-          {/* Left Section - Sidebar Toggles (Outer Edge) */}
-          <div className="flex items-center gap-2">
-            {/* Thumbnail Sidebar Toggle (Outer Edge - Left) */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={showThumbnails ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setShowThumbnails(!showThumbnails)}
-                  className="gap-2 transition-all hover:scale-105"
-                  aria-label={showThumbnails ? 'Hide page thumbnails' : 'Show page thumbnails'}
-                >
-                  <PanelLeftClose className={`h-4 w-4 transition-transform ${!showThumbnails ? 'rotate-180' : ''}`} strokeWidth={1.5} />
-                  <span className="font-medium">Pages</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p className="font-medium">{showThumbnails ? 'Hide' : 'Show'} Pages</p>
-                <p className="text-xs text-muted-foreground">Navigate through form pages with thumbnails</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <div className="h-6 w-px bg-border mx-1" />
-
-            {/* AI Chat Fill Button (Prominent) */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={showAIPanel ? "default" : "outline"}
-                  size="default"
-                  onClick={() => setShowAIPanel(!showAIPanel)}
-                  className="gap-2 font-semibold relative group hover:scale-105 transition-all"
-                  aria-label="Toggle AI Chat Assistant"
-                >
-                  <MessageSquare className="h-4 w-4" strokeWidth={2} />
-                  <span>AI Chat Fill</span>
-                  {showAIPanel && (
-                    <span className="absolute -top-1 -right-1 h-2 w-2 bg-green-500 rounded-full animate-pulse" />
-                  )}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" className="max-w-xs">
-                <p className="font-medium mb-1">AI Chat Fill</p>
-                <p className="text-xs text-muted-foreground">Ask questions and get help filling out your form using AI</p>
-                <p className="text-xs text-primary mt-1">💡 More prominent and auto-interactive for AI core feature</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <div className="h-6 w-px bg-border mx-1" />
-
-            {/* AI Magic Fill Button (Most Prominent with shimmer) */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="default"
-                  size="lg"
-                  onClick={handleAutofillAll}
-                  disabled={isVaultLoading || !typedVaultData}
-                  className="gap-2 bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/95 hover:via-primary/85 hover:to-primary/75 shadow-lg hover:shadow-xl transition-all duration-200 font-semibold relative overflow-hidden group hover:scale-105"
-                  aria-label="Autofill all compatible fields from vault"
-                >
-                  {isVaultLoading ? (
-                    <Loader2 className="h-5 w-5 animate-spin" strokeWidth={2} />
-                  ) : (
-                    <Sparkles className="h-5 w-5 group-hover:animate-pulse" strokeWidth={2} />
-                  )}
-                  <span className="relative z-10">AI Magic Fill</span>
-                  {typedVaultData && !isVaultLoading && (
-                    <Badge variant="secondary" className="ml-1 bg-background/20 hover:bg-background/30 transition-colors text-xs font-bold">
-                      {autofillableCount}
-                    </Badge>
-                  )}
-                  {/* Shimmer effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/25 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" className="max-w-xs">
-                <p className="font-medium mb-1">✨ AI Magic Fill</p>
-                <p className="text-xs text-muted-foreground mb-1">Instantly autofill all compatible fields from your Personal Data Vault</p>
-                {typedVaultData && !isVaultLoading && (
-                  <p className="text-xs text-green-600 dark:text-green-400 font-semibold">✨ {autofillableCount} fields ready to fill!</p>
-                )}
-                <p className="text-xs text-muted-foreground mt-2 border-t pt-1">💡 Make this larger and pill-shaped, located in the most likely place users can easily overlay the field</p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-
-          {/* Center Section - Zoom Controls */}
-          <div className="flex items-center gap-1 px-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setPdfZoom(Math.max(0.5, pdfZoom - 0.1))}
-                  disabled={pdfZoom <= 0.5}
-                  className="h-8 w-8 p-0"
-                >
-                  <span className="text-lg font-semibold">−</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Zoom out (minimum 50%)</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={pdfZoom === 1 ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => {
-                    // Get PDF panel container from ref
-                    if (pdfPanelRef.current) {
-                      // Use actual panel width minus padding (24px each side)
-                      const viewportWidth = pdfPanelRef.current.clientWidth - 48;
-                      const targetWidth = 850; // Default PDF width
-                      const calculatedZoom = Math.min(2, Math.max(0.5, viewportWidth / targetWidth));
-                      setPdfZoom(calculatedZoom);
-                    } else {
-                      // Fallback: Try to get element by ID as backup
-                      const pdfPanel = document.getElementById('pdf-panel');
-                      if (pdfPanel) {
-                        const viewportWidth = pdfPanel.clientWidth - 48;
-                        const targetWidth = 850;
-                        const calculatedZoom = Math.min(2, Math.max(0.5, viewportWidth / targetWidth));
-                        setPdfZoom(calculatedZoom);
-                      } else {
-                        // Last resort: set to 1:1
-                        setPdfZoom(1);
-                      }
-                    }
-                  }}
-                  className="flex items-center gap-1 px-3 min-w-[120px] justify-center transition-colors"
-                >
-                  <FileText className="h-3.5 w-3.5" strokeWidth={1.5} />
-                  <span className="text-sm font-medium">
-                    {pdfZoom === 1 ? 'Fit to Page' : `${Math.round(pdfZoom * 100)}%`}
-                  </span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Scale PDF to fit viewport perfectly</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setPdfZoom(Math.min(2, pdfZoom + 0.1))}
-                  disabled={pdfZoom >= 2}
-                  className="h-8 w-8 p-0"
-                >
-                  <span className="text-lg font-semibold">+</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Zoom in (maximum 200%)</p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-
-          {/* Field Font Size Controls */}
-          <div className="flex items-center gap-1 bg-muted/30 rounded-md px-1 py-0.5">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setFieldFontSize(Math.max(8, fieldFontSize - 1))}
-                  disabled={fieldFontSize <= 8}
-                  className="h-7 w-7 p-0"
-                >
-                  <span className="text-sm">A</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Decrease field font size (minimum 8pt)</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={fieldFontSize === 12 ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setFieldFontSize(12)}
-                  className="flex items-center gap-1 px-2.5 min-w-[70px] justify-center h-7 text-xs font-semibold"
-                >
-                  <span className="text-xs">Font</span>
-                  <span className="font-mono">{fieldFontSize}pt</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Reset to default 12pt font size</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setFieldFontSize(Math.min(16, fieldFontSize + 1))}
-                  disabled={fieldFontSize >= 16}
-                  className="h-7 w-7 p-0"
-                >
-                  <span className="text-base font-semibold">A</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Increase field font size (maximum 16pt)</p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-
-          {/* Edit Mode Toggle */}
-          <div className="flex items-center gap-2 border-l border-border/50 pl-4">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={isEditMode ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setIsEditMode(prev => !prev)}
-                  className={`gap-2 ${isEditMode ? '' : 'hover:bg-primary/10'}`}
-                >
-                  <Move className="h-4 w-4" strokeWidth={1.5} />
-                  {isEditMode ? 'Exit Edit' : 'Edit Mode'}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{isEditMode ? 'Exit edit mode to fill form fields (E)' : 'Enable edit mode to reposition fields (E)'}</p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-
-          {/* Right Section - Panel Toggles (Outer Edge) */}
-          <div className="flex items-center gap-2">
-            {/* Personal Data Vault Toggle */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={showVaultPanel ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setShowVaultPanel(!showVaultPanel)}
-                  className="gap-2 transition-all hover:scale-105"
-                  aria-label={showVaultPanel ? 'Hide Personal Data Vault' : 'Show Personal Data Vault'}
-                >
-                  <Shield className="h-4 w-4" strokeWidth={1.5} />
-                  <span className="font-medium">Vault</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p className="font-medium mb-1">{showVaultPanel ? 'Hide' : 'Show'} Vault</p>
-                <p className="text-xs text-muted-foreground">Securely manage your personal information</p>
-                <p className="text-xs text-primary mt-1">💡 Should be visually clear meaning and should be placed at the outer edge of toolbar</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <div className="h-6 w-px bg-border mx-1" />
-
-            {/* Fields Panel Toggle (Outer Edge - Right) */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={showFieldsPanel && !showVaultPanel ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setShowFieldsPanel(!showFieldsPanel)}
-                  className="gap-2 transition-all hover:scale-105"
-                  aria-label={showFieldsPanel ? 'Hide Fields panel' : 'Show Fields panel'}
-                >
-                  <span className="font-medium">Fields</span>
-                  <PanelRightClose className={`h-4 w-4 transition-transform ${!showFieldsPanel ? 'rotate-180' : ''}`} strokeWidth={1.5} />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p className="font-medium mb-1">{showFieldsPanel ? 'Hide' : 'Show'} Fields</p>
-                <p className="text-xs text-muted-foreground">Navigate and fill form fields sequentially</p>
-                <p className="text-xs text-primary mt-1">💡 Should be visually clear meaning and should be placed at the very outer edge of the toolbar</p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-        </div>
+        <ControlToolbar
+          showThumbnails={showThumbnails}
+          onToggleThumbnails={() => setShowThumbnails(!showThumbnails)}
+          showAIPanel={showAIPanel}
+          onToggleAI={() => setShowAIPanel(!showAIPanel)}
+          onAutofillAll={handleAutofillAll}
+          isVaultLoading={isVaultLoading}
+          hasVaultData={hasVaultData}
+          autofillableCount={autofillableCount}
+          pdfZoom={pdfZoom}
+          onZoomOut={handleZoomOut}
+          onZoomIn={handleZoomIn}
+          onFitToPage={handleFitToPage}
+          isEditMode={isEditMode}
+          onToggleEditMode={handleEditToggle}
+          showVaultPanel={showVaultPanel}
+          onToggleVault={() => setShowVaultPanel(!showVaultPanel)}
+          showFieldsPanel={showFieldsPanel}
+          onToggleFields={() => setShowFieldsPanel(!showFieldsPanel)}
+          fieldFontSize={fieldFontSize}
+          onDecreaseFontSize={() => setFieldFontSize(Math.max(8, fieldFontSize - 1))}
+          onIncreaseFontSize={() => setFieldFontSize(Math.min(16, fieldFontSize + 1))}
+          onResetFontSize={() => setFieldFontSize(12)}
+        />
 
         {/* Mobile PDF Viewer (full screen, no panels) */}
-        <div className="md:hidden flex-1 overflow-hidden">
-          <Suspense fallback={<ViewerSkeleton />}>
-            <FormViewer {...sharedFormViewerProps} />
-          </Suspense>
-        </div>
+        <MobileFormViewerSection
+          FormViewer={FormViewer}
+          sharedFormViewerProps={sharedFormViewerProps}
+          fallback={<ViewerSkeleton />}
+        />
 
         {/* Desktop Layout (hidden on mobile) */}
-        <ResizablePanelGroup direction="horizontal" className="hidden md:flex flex-1 w-full">
-          {/* Center: Form Viewer with PDF + Thumbnail Sidebar */}
-          <ResizablePanel
-            id="viewer-panel"
-            order={1}
-            defaultSize={70}
-            minSize={40}
-          >
-            <ResizablePanelGroup direction="horizontal" className="h-full">
-              {/* Resizable Thumbnail Sidebar */}
-              <ResizablePanel 
-                id="thumbnail-panel"
-                order={1}
-                defaultSize={25}
-                minSize={15}
-                maxSize={40}
-                collapsible={true}
-                collapsedSize={0}
-                onResize={(size) => {
-                  // Convert percentage to pixels (approximate)
-                  const containerWidth = window.innerWidth * 0.75; // 75% of viewport
-                  setThumbnailPanelWidth((size / 100) * containerWidth);
-                }}
-                className={showThumbnails ? "" : "hidden"}
-              >
-                <Suspense fallback={<PanelSkeleton />}>
-                  <PDFThumbnailSidebar 
-                    currentPage={currentPDFPage}
-                    onPageClick={setCurrentPDFPage}
-                    currentFieldPositions={getCurrentFieldPositions()}
-                    showFieldIndicator={currentFieldIndex >= 0 || selectedFields.length > 0 || !!highlightedField}
-                    panelWidth={thumbnailPanelWidth}
-                  />
-                </Suspense>
-              </ResizablePanel>
-              
-              {showThumbnails && (
-                <ResizableHandleMulti withHandle className="hover:bg-primary/30 transition-colors" />
-              )}
-              
-              {/* PDF Viewer */}
-              <ResizablePanel
-                id="pdf-panel"
-                order={2}
-                defaultSize={75}
-                minSize={50}
-              >
-                <div ref={pdfPanelRef} className="h-full w-full">
-                  <Suspense fallback={<ViewerSkeleton />}>
-                    <FormViewer {...sharedFormViewerProps} />
-                  </Suspense>
-                </div>
-              </ResizablePanel>
-            </ResizablePanelGroup>
-          </ResizablePanel>
-
-          {/* Right: Field Navigation Panel OR Vault Panel (collapsible) */}
-          <ResizableHandleMulti withHandle className="hover:bg-primary/30 transition-colors" />
-          <ResizablePanel
-            id="right-panel"
-            order={2}
-            defaultSize={30}
-            minSize={25}
-            maxSize={50}
-            collapsible={true}
-            collapsedSize={0}
-            className={showFieldsPanel || showVaultPanel ? "" : "hidden"}
-          >
-            <div className="h-full w-full flex flex-col overflow-hidden pl-3">
-              <Suspense fallback={<PanelSkeleton />}>
-                {showVaultPanel ? (
-                  <PersonalDataVaultPanel userId={user?.id || ''} />
-                ) : (
-                  <FieldNavigationPanel 
-                    formData={formData} 
-                    updateField={updateField}
-                    currentFieldIndex={currentFieldIndex}
-                    setCurrentFieldIndex={setCurrentFieldIndex}
-                    fieldPositions={fieldPositions}
-                    updateFieldPosition={updateFieldPosition}
-                    selectedFields={selectedFields}
-                    setSelectedFields={setSelectedFields}
-                    onSnapToGrid={handleSnapToGrid}
-                    onAlignHorizontal={handleAlignHorizontal}
-                    onAlignVertical={handleAlignVertical}
-                    onDistribute={handleDistribute}
-                    onCopyPositions={handleCopyPositions}
-                    onPastePositions={handlePastePositions}
-                    onTransformPositions={handleTransformPositions}
-                    hasCopiedPositions={!!copiedFieldPositions}
-                    onFieldHover={setHighlightedField}
-                    validationRules={validationRules}
-                    validationErrors={validationErrors}
-                    onSaveValidationRules={handleSaveValidationRules}
-                    settingsSheetOpen={settingsSheetOpen}
-                    onSettingsSheetChange={setSettingsSheetOpen}
-                    onApplyTemplate={handleApplyTemplate}
-                    onApplyGroup={handleApplyGroup}
-                  />
-                )}
-              </Suspense>
-            </div>
-          </ResizablePanel>
-        </ResizablePanelGroup>
+        <DesktopWorkspace
+          FormViewerComponent={FormViewer}
+          FieldNavigationPanelComponent={FieldNavigationPanel}
+          PersonalDataVaultPanelComponent={PersonalDataVaultPanel}
+          ThumbnailSidebarComponent={PDFThumbnailSidebar}
+          sharedFormViewerProps={sharedFormViewerProps}
+          viewerFallback={<ViewerSkeleton />}
+          panelFallback={<PanelSkeleton />}
+          pdfPanelRef={pdfPanelRef}
+          showThumbnails={showThumbnails}
+          thumbnailPanelWidth={thumbnailPanelWidth}
+          onThumbnailResize={(size) => {
+            const containerWidth = window.innerWidth * 0.75;
+            setThumbnailPanelWidth((size / 100) * containerWidth);
+          }}
+          currentPDFPage={currentPDFPage}
+          onPageClick={setCurrentPDFPage}
+          getCurrentFieldPositions={getCurrentFieldPositions}
+          showFieldsPanel={showFieldsPanel}
+          showVaultPanel={showVaultPanel}
+          userId={user?.id}
+          selectedFields={selectedFields}
+          setSelectedFields={setSelectedFields}
+          handleSnapToGrid={handleSnapToGrid}
+          handleAlignHorizontal={handleAlignHorizontal}
+          handleAlignVertical={handleAlignVertical}
+          handleDistribute={handleDistribute}
+          handleCopyPositions={handleCopyPositions}
+          handlePastePositions={handlePastePositions}
+          handleTransformPositions={handleTransformPositions}
+          copiedFieldPositions={copiedFieldPositions}
+          setHighlightedField={setHighlightedField}
+          validationRules={validationRules}
+          validationErrors={validationErrors}
+          onSaveValidationRules={handleSaveValidationRules}
+          settingsSheetOpen={settingsSheetOpen}
+          onSettingsSheetChange={setSettingsSheetOpen}
+          onApplyTemplate={handleApplyTemplate}
+          onApplyGroup={handleApplyGroup}
+        />
 
         {/* Draggable AI Assistant (desktop only, on mobile it's in bottom sheet) */}
         <div className="hidden md:block">
