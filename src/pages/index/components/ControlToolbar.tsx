@@ -12,6 +12,8 @@ import {
   FileText,
 } from "@/icons";
 import { cn } from "@/lib/utils";
+import { ExportPDFButton } from "@/components/ExportPDFButton";
+import type { FormData } from "@/types/FormData";
 
 interface ControlToolbarProps {
   showThumbnails: boolean;
@@ -36,6 +38,8 @@ interface ControlToolbarProps {
   onDecreaseFontSize: () => void;
   onIncreaseFontSize: () => void;
   onResetFontSize: () => void;
+  formData: FormData;
+  caseNumber?: string;
 }
 
 export const ControlToolbar = ({
@@ -61,6 +65,8 @@ export const ControlToolbar = ({
   onDecreaseFontSize,
   onIncreaseFontSize,
   onResetFontSize,
+  formData,
+  caseNumber,
 }: ControlToolbarProps) => (
   <div className="flex items-center justify-between gap-2 mb-4 p-3 bg-card/80 backdrop-blur-sm rounded-lg border shadow-sm flex-shrink-0">
     <div className="flex items-center gap-2">
@@ -139,6 +145,14 @@ export const ControlToolbar = ({
           </p>
         </TooltipContent>
       </Tooltip>
+
+      <div className="h-6 w-px bg-border mx-1" />
+
+      <ExportPDFButton
+        formData={formData}
+        formType="FL-320"
+        caseNumber={caseNumber}
+      />
     </div>
 
     <div className="flex items-center gap-1 px-2">

@@ -247,6 +247,8 @@ const Index = () => {
           onDecreaseFontSize={handleDecreaseFontSize}
           onIncreaseFontSize={handleIncreaseFontSize}
           onResetFontSize={handleResetFontSize}
+          formData={formData}
+          caseNumber={formData.caseNumber}
         />
 
         <MobileFormViewerSection
