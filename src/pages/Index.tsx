@@ -3,6 +3,7 @@ import { AdaptiveLayout } from "@/components/layout/AdaptiveLayout";
 import { MobileBottomSheet } from "@/components/layout/MobileBottomSheet";
 import { useWindowSize } from "@/hooks/use-adaptive-layout";
 import { useFieldOperations } from "@/hooks/use-field-operations";
+import { useDocumentPersistence } from "@/hooks/use-document-persistence";
 import { getCurrentFieldPositions } from "@/utils/field-positions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FocusTrap } from "@/components/ui/focus-trap";
@@ -32,12 +33,10 @@ import {
 } from "@/utils/fieldPresets";
 import type { FormTemplate } from "@/utils/templateManager";
 import { autofillAllFromVault, getAutofillableFields, type PersonalVaultData } from "@/utils/vaultFieldMatcher";
-import { 
-  preloadDistributionCalculator, 
-  cancelDistributionCalculator,
-  preloadCriticalRoutes 
+import {
+  preloadDistributionCalculator,
+  cancelDistributionCalculator
 } from "@/utils/routePreloader";
-import { prefetchUserData } from "@/utils/dataPrefetcher";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { PanelSkeleton, ViewerSkeleton } from "./index/components/Skeletons";
 import { useNavigate } from "react-router-dom";
@@ -65,25 +64,14 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import type { FormData, User, ValidationRules, ValidationErrors, FieldPositions, ValidationRule } from "@/types/FormData";
-import type { Database } from "@/integrations/supabase/types";
-
-type LegalDocument = Database['public']['Tables']['legal_documents']['Row'];
-
-interface LegalDocumentMetadata {
-  fieldPositions?: FieldPositions;
-  validationRules?: ValidationRules;
-}
+import type { FormData, ValidationRules, ValidationErrors, FieldPositions, ValidationRule } from "@/types/FormData";
 
 const Index = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState<FormData>({});
   const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
   const [fieldPositions, setFieldPositions] = useState<FieldPositions>({});
-  const [documentId, setDocumentId] = useState<string | null>(null);
   const [showAIPanel, setShowAIPanel] = useState(false);
   const [showFieldsPanel, setShowFieldsPanel] = useState(true);
   const [showVaultPanel, setShowVaultPanel] = useState(false);
@@ -138,6 +126,18 @@ const Index = () => {
       duration: 2000,
     });
   }, [isEditMode]); // toast is a stable function, doesn't need to be in dependencies
+
+  // Document persistence hook - handles auth, data loading, and autosave
+  const { user, loading, documentId, handleLogout } = useDocumentPersistence({
+    formData,
+    fieldPositions,
+    validationRules,
+    hasUnsavedChanges,
+    setFormData,
+    setFieldPositions,
+    setValidationRules,
+    setVaultSheetOpen,
+  });
 
   // Fetch vault data for AI Assistant context
   const { data: vaultData, isLoading: isVaultLoading } = useQuery({
@@ -202,140 +202,6 @@ const Index = () => {
       highlightedField
     );
   }, [currentFieldIndex, fieldPositions, selectedFields, highlightedField]);
-
-  // Check authentication and prefetch data
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        setUser(session.user);
-        setLoading(false);
-        // Prefetch user data immediately for faster perceived performance
-        prefetchUserData(queryClient, session.user);
-        // Preload critical routes when idle
-        preloadCriticalRoutes();
-      } else {
-        navigate("/auth");
-      }
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        setUser(session.user);
-        setLoading(false);
-        // Prefetch user data on auth state change
-        prefetchUserData(queryClient, session.user);
-        // Preload critical routes when idle
-        preloadCriticalRoutes();
-      } else {
-        navigate("/auth");
-      }
-    });
-
-    // Listen for vault sheet open event from command palette
-    const handleOpenVaultSheet = () => {
-      setVaultSheetOpen(true);
-    };
-    window.addEventListener('open-vault-sheet', handleOpenVaultSheet);
-
-    return () => {
-      subscription.unsubscribe();
-      window.removeEventListener('open-vault-sheet', handleOpenVaultSheet);
-    };
-  }, [navigate, queryClient]);
-
-  // Load existing data when user is authenticated (use cached data if available)
-  useEffect(() => {
-    if (!user) return;
-
-    const loadData = async () => {
-      // Try to get cached data first
-      const cachedData = queryClient.getQueryData<LegalDocument>(['legal-document', user.id, 'FL-320 Form']);
-
-      if (cachedData) {
-        setDocumentId(cachedData.id);
-        setFormData((cachedData.content as FormData) || {});
-        const metadata = cachedData.metadata as LegalDocumentMetadata | null;
-        setFieldPositions(metadata?.fieldPositions || {});
-        setValidationRules(metadata?.validationRules || {});
-        return;
-      }
-
-      // If not cached, fetch from database
-      const { data, error } = await supabase
-        .from('legal_documents')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('title', 'FL-320 Form')
-        .maybeSingle();
-
-      if (data) {
-        setDocumentId(data.id);
-        setFormData((data.content as FormData) || {});
-        const metadata = data.metadata as LegalDocumentMetadata | null;
-        setFieldPositions(metadata?.fieldPositions || {});
-        setValidationRules(metadata?.validationRules || {});
-      } else if (!error) {
-        // Create new document
-        const { data: newDoc } = await supabase
-          .from('legal_documents')
-          .insert({
-            title: 'FL-320 Form',
-            content: {},
-            metadata: { fieldPositions: {}, validationRules: {} },
-            user_id: user.id
-          })
-          .select()
-          .maybeSingle();
-
-        if (newDoc) setDocumentId(newDoc.id);
-      }
-    };
-
-    loadData();
-  }, [user, queryClient]);
-
-  // Autosave every 5 seconds
-  useEffect(() => {
-    if (!user) return;
-
-    const saveData = async () => {
-      if (!documentId || !hasUnsavedChanges.current) return;
-
-      const { error } = await supabase
-        .from('legal_documents')
-        .update({
-          content: formData,
-          metadata: { fieldPositions, validationRules },
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', documentId);
-
-      if (!error) {
-        hasUnsavedChanges.current = false;
-      }
-    };
-
-    const interval = setInterval(saveData, 5000);
-    return () => clearInterval(interval);
-  }, [formData, fieldPositions, documentId, user]);
-
-  // Warn user before leaving with unsaved changes (prevents data loss)
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges.current) {
-        e.preventDefault();
-        e.returnValue = ''; // Modern browsers show generic "Leave site?" message
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, []);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/auth");
-  };
 
   const sharedFormViewerProps = {
     formData,
