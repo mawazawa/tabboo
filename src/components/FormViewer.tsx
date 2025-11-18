@@ -782,17 +782,6 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                                     </TooltipContent>
                                   </Tooltip>
                                 )}
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Button
-                                      size="icon"
-                                      variant="secondary"
-                                      className="absolute -top-2 -right-2 h-7 w-7 rounded-full"
-                                      aria-label="Edit mode controlled by toolbar"
-                                      disabled={true}
-                                      style={{ display: 'none' }}
-                                    >
-                                      <Move className="h-4 w-4" />
                               </>
                             )}
                             
