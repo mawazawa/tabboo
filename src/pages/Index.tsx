@@ -1,10 +1,13 @@
 import { lazy, Suspense } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { AdaptiveLayout } from "@/components/layout/AdaptiveLayout";
 import { MobileBottomSheet } from "@/components/layout/MobileBottomSheet";
 import { useWindowSize } from "@/hooks/use-adaptive-layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FocusTrap } from "@/components/ui/focus-trap";
+import { IndexHeader } from "./index/components/IndexHeader";
+import { ControlToolbar } from "./index/components/ControlToolbar";
+import { MobileFormViewerSection } from "./index/components/MobileFormViewerSection";
+import { DesktopWorkspace } from "./index/components/DesktopWorkspace";
 
 // Aggressive code splitting - lazy load all heavy components
 const FormViewer = lazy(() => import("@/components/FormViewer").then(m => ({ default: m.FormViewer })));
@@ -34,24 +37,7 @@ import {
 } from "@/utils/routePreloader";
 import { prefetchUserData } from "@/utils/dataPrefetcher";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-
-// Loading fallbacks for code-split components
-const PanelSkeleton = () => (
-  <div className="w-full h-full p-4 space-y-4">
-    <Skeleton className="h-12 w-full" />
-    <Skeleton className="h-24 w-full" />
-    <Skeleton className="h-24 w-full" />
-  </div>
-);
-
-const ViewerSkeleton = () => (
-  <div className="w-full h-full flex items-center justify-center">
-    <div className="space-y-4 text-center">
-      <Skeleton className="h-96 w-full max-w-2xl mx-auto" />
-      <Skeleton className="h-4 w-48 mx-auto" />
-    </div>
-  </div>
-);
+import { PanelSkeleton, ViewerSkeleton } from "./index/components/Skeletons";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
