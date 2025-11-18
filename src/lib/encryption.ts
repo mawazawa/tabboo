@@ -76,6 +76,36 @@ async function getEncryptionKey(): Promise<CryptoKey> {
 }
 
 // ============================================================================
+// Helper Functions for Binary ↔ Base64 Conversion
+// ============================================================================
+
+/**
+ * Convert Uint8Array to base64 string (safe for large arrays)
+ * Avoids "Maximum call stack size exceeded" from String.fromCharCode(...array)
+ */
+function uint8ArrayToBase64(bytes: Uint8Array): string {
+  let binary = '';
+  const len = bytes.length;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+/**
+ * Convert base64 string to Uint8Array (safe for large data)
+ */
+function base64ToUint8Array(base64: string): Uint8Array {
+  const binary = atob(base64);
+  const len = binary.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
+// ============================================================================
 // Encryption Functions
 // ============================================================================
 
@@ -119,10 +149,10 @@ export async function encryptField(plaintext: string): Promise<string> {
     const actualCiphertext = ciphertext.slice(0, authTagStart);
     const authTag = ciphertext.slice(authTagStart);
 
-    // Convert to base64 for storage
-    const ivBase64 = btoa(String.fromCharCode(...iv));
-    const authTagBase64 = btoa(String.fromCharCode(...authTag));
-    const ciphertextBase64 = btoa(String.fromCharCode(...actualCiphertext));
+    // Convert to base64 for storage (using safe helper functions)
+    const ivBase64 = uint8ArrayToBase64(iv);
+    const authTagBase64 = uint8ArrayToBase64(authTag);
+    const ciphertextBase64 = uint8ArrayToBase64(actualCiphertext);
 
     // Format: "iv:authTag:ciphertext"
     return `${ivBase64}:${authTagBase64}:${ciphertextBase64}`;
@@ -149,10 +179,10 @@ export async function decryptField(ciphertext: string): Promise<string> {
       throw new Error('Invalid encrypted field format');
     }
 
-    // Convert from base64
-    const iv = Uint8Array.from(atob(ivBase64), c => c.charCodeAt(0));
-    const authTag = Uint8Array.from(atob(authTagBase64), c => c.charCodeAt(0));
-    const actualCiphertext = Uint8Array.from(atob(ciphertextBase64), c => c.charCodeAt(0));
+    // Convert from base64 (using safe helper functions)
+    const iv = base64ToUint8Array(ivBase64);
+    const authTag = base64ToUint8Array(authTagBase64);
+    const actualCiphertext = base64ToUint8Array(ciphertextBase64);
 
     // Combine ciphertext and auth tag (GCM expects them together)
     const combined = new Uint8Array(actualCiphertext.length + authTag.length);
