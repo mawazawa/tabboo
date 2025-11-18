@@ -249,8 +249,12 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     
     // Set this field as active in the control panel
     const fieldIndex = fieldNameToIndex[field];
+    console.log('[FIELD CLICK]', 'Field clicked:', field, 'Index:', fieldIndex, 'Map:', fieldNameToIndex);
     if (fieldIndex !== undefined) {
       setCurrentFieldIndex(fieldIndex);
+      console.log('[FIELD CLICK]', 'Set currentFieldIndex to:', fieldIndex);
+    } else {
+      console.error('[FIELD CLICK]', 'ERROR: Field not found in fieldNameToIndex!', field);
     }
   };
 
