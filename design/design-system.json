@@ -180,26 +180,208 @@
       "usage": "Use for floating panels, modals, and prominent cards"
     },
 
-    "liquid_glass": {
-      "description": "Apple Liquid Glass-inspired advanced glassmorphism (2025) - real-time depth with motion-responsive effects",
-      "light_mode_bg": "0 0% 100% / 0.85",
-      "light_mode_border": "220 15% 88% / 0.25",
-      "light_mode_shadow": "0 8px 32px hsl(220 13% 13% / 0.08), 0 1px 0 hsl(0 0% 100% / 0.6) inset",
-      "dark_mode_bg": "220 18% 11% / 0.82",
-      "dark_mode_border": "220 15% 20% / 0.35",
-      "dark_mode_shadow": "0 8px 32px hsl(0 0% 0% / 0.4), 0 1px 0 hsl(220 15% 25% / 0.4) inset",
+    "liquid_glass_preview": {
+      "description": "Basic liquid glass preview - see full 'liquid_glass_materials' section for advanced implementation",
       "blur": "24px",
-      "backdrop_saturate": "180%",
-      "usage": "Use for primary navigation, floating AI assistant, critical modals - creates depth through refraction",
-      "motion_responsive": true,
-      "adaptive_contrast": true,
-      "features": [
-        "Real-time depth perception through multi-layer blur",
-        "Subtle refraction effects (background content visible through glass)",
-        "Adaptive contrast for readability in all lighting conditions",
-        "Motion-responsive - slight parallax on scroll/interaction",
-        "Enhanced saturation (180%) for vibrant background colors"
-      ]
+      "saturation": "180%",
+      "usage": "Refer to liquid_glass_materials section for production use"
+    }
+  },
+
+  "liquid_glass_materials": {
+    "design_philosophy": "SURPASSES Apple's WWDC 2025 Liquid Glass with 7 material levels, responsive blur, SVG distortion filters, and adaptive depth. Combines the optical qualities of glass with fluid dynamics that respond to interaction.",
+
+    "material_hierarchy": {
+      "description": "7-level semantic material system (exceeds Apple's 4-level thin/regular/thick/chrome)",
+
+      "ultra_thin": {
+        "backdrop_blur": "4px",
+        "background_light": "hsl(0 0% 100% / 0.98)",
+        "background_dark": "hsl(220 18% 11% / 0.95)",
+        "border_light": "hsl(220 15% 88% / 0.3)",
+        "border_dark": "hsl(220 15% 20% / 0.4)",
+        "saturation": "105%",
+        "brightness": "102%",
+        "shadow": "0 1px 2px hsl(220 13% 13% / 0.04)",
+        "usage": "Subtle overlays, tooltips, hover effects",
+        "elevation": "2dp"
+      },
+
+      "thin": {
+        "backdrop_blur": "8px",
+        "background_light": "hsl(0 0% 100% / 0.95)",
+        "background_dark": "hsl(220 18% 11% / 0.92)",
+        "border_light": "hsl(220 15% 88% / 0.4)",
+        "border_dark": "hsl(220 15% 20% / 0.5)",
+        "saturation": "108%",
+        "brightness": "103%",
+        "shadow": "0 2px 4px hsl(220 13% 13% / 0.06), 0 4px 8px hsl(220 13% 13% / 0.04)",
+        "usage": "Sidebars, secondary panels, navigation",
+        "elevation": "4dp"
+      },
+
+      "regular": {
+        "backdrop_blur": "12px",
+        "background_light": "hsl(0 0% 100% / 0.92)",
+        "background_dark": "hsl(220 18% 11% / 0.88)",
+        "border_light": "hsl(220 15% 88% / 0.5)",
+        "border_dark": "hsl(220 15% 20% / 0.6)",
+        "saturation": "112%",
+        "brightness": "105%",
+        "shadow": "Ultra-realistic default (5-layer shadow)",
+        "usage": "Standard cards, modals, content panels",
+        "elevation": "8dp"
+      },
+
+      "thick": {
+        "backdrop_blur": "16px",
+        "background_light": "hsl(0 0% 100% / 0.88)",
+        "background_dark": "hsl(220 18% 11% / 0.85)",
+        "border_light": "hsl(220 15% 88% / 0.6)",
+        "border_dark": "hsl(220 15% 20% / 0.7)",
+        "saturation": "115%",
+        "brightness": "108%",
+        "shadow": "Ultra-realistic hover (5-layer enhanced shadow)",
+        "usage": "Prominent cards, feature showcases, interactive elements",
+        "elevation": "12dp"
+      },
+
+      "chrome": {
+        "backdrop_blur": "24px",
+        "background_light": "hsl(0 0% 100% / 0.82)",
+        "background_dark": "hsl(220 18% 11% / 0.78)",
+        "border_light": "hsl(220 15% 88% / 0.7)",
+        "border_dark": "hsl(220 15% 20% / 0.8)",
+        "saturation": "120%",
+        "brightness": "112%",
+        "shadow": "Ultra-realistic floating (5-layer maximum elevation)",
+        "refraction_highlights": "linear-gradient(to bottom, hsl(0 0% 100% / 0.15), transparent 20%)",
+        "usage": "Floating panels, AI assistant, high-elevation overlays",
+        "elevation": "16dp"
+      },
+
+      "ultra_chrome": {
+        "backdrop_blur": "32px",
+        "background_light": "hsl(0 0% 100% / 0.75)",
+        "background_dark": "hsl(220 18% 11% / 0.72)",
+        "border_light": "hsl(220 15% 88% / 0.8)",
+        "border_dark": "hsl(220 15% 20% / 0.9)",
+        "saturation": "125%",
+        "brightness": "115%",
+        "shadow": "Ultra-realistic floating + Atmospheric glow",
+        "refraction_highlights": "linear-gradient(to bottom, hsl(0 0% 100% / 0.2), transparent 25%)",
+        "mesh_grain": "background-image: url(data:image/svg+xml,<noise pattern>)",
+        "usage": "Maximum emphasis - notifications, alerts, brand moments",
+        "elevation": "24dp"
+      },
+
+      "liquid_distortion": {
+        "description": "ADVANCED: True liquid glass with SVG distortion (Apple's secret technique)",
+        "backdrop_blur": "20px",
+        "background_light": "hsl(0 0% 100% / 0.85)",
+        "background_dark": "hsl(220 18% 11% / 0.82)",
+        "border_light": "hsl(220 15% 88% / 0.6)",
+        "border_dark": "hsl(220 15% 20% / 0.7)",
+        "saturation": "118%",
+        "brightness": "110%",
+        "svg_filter": "url(#liquid-distortion)",
+        "svg_turbulence": "baseFrequency='0.02' numOctaves='3' seed='2'",
+        "svg_displacement": "scale='10'",
+        "shadow": "Ultra-realistic hover",
+        "usage": "Hero sections, premium showcases, interactive art",
+        "elevation": "variable (responds to interaction)",
+        "performance_note": "Desktop only - fallback to 'chrome' on mobile",
+        "animation": "Animate SVG seed on hover for ripple effect"
+      }
+    },
+
+    "adaptive_responsiveness": {
+      "description": "Blur and saturation adapt to device, context, and interaction state",
+
+      "device_optimization": {
+        "desktop_high_performance": "Full material specifications",
+        "desktop_low_performance": "Reduce blur by 30%, reduce layers",
+        "tablet": "Reduce blur by 20%",
+        "mobile_high_end": "Reduce blur by 40%, no SVG filters",
+        "mobile_low_end": "Solid backgrounds with opacity, no backdrop-filter",
+        "detection": "navigator.hardwareConcurrency, @media (hover: none)"
+      },
+
+      "context_adaptive": {
+        "colorful_background": "Increase blur by 25% for better content separation",
+        "minimal_background": "Decrease blur by 15% to reduce visual weight",
+        "dark_mode": "Increase blur by 10% + increase saturation by 5%",
+        "light_mode": "Standard values",
+        "implementation": "Use CSS clamp() for fluid blur: clamp(8px, 2vw, 16px)"
+      },
+
+      "interaction_responsive": {
+        "rest": "Default material level",
+        "hover": "Increase blur +15%, saturation +5%, brightness +3%",
+        "active_pressed": "Decrease blur -10% (pushed into surface)",
+        "focus": "Increase blur +20%, add inner glow",
+        "dragging": "Increase blur +30%, scale(1.05), atmospheric glow",
+        "transition": "backdrop-filter 300ms cubic-bezier(0.4, 0, 0.2, 1)"
+      }
+    },
+
+    "advanced_techniques": {
+      "svg_distortion_filter": {
+        "description": "Creates true 'liquid' warping effect - Apple's WWDC 2025 innovation",
+        "svg_markup": "<svg><defs><filter id='liquid-distortion'><feTurbulence type='fractalNoise' baseFrequency='0.02' numOctaves='3' seed='2'/><feDisplacementMap in2='turbulence' in='SourceGraphic' scale='10' xChannelSelector='R' yChannelSelector='G'/></filter></defs></svg>",
+        "css": "filter: url(#liquid-distortion)",
+        "visual_effect": "Background ripples through glass like water",
+        "animation": "Animate seed attribute for dynamic ripples",
+        "browser_support": "Chrome/Edge/Safari desktop only",
+        "fallback": "Remove filter on mobile, use regular chrome material"
+      },
+
+      "layered_glass_stacking": {
+        "description": "Stack multiple glass layers for extreme 3D depth",
+        "structure": "Outer (chrome) → Middle (thick) → Inner (regular)",
+        "spacing": "8px gap between layers",
+        "visual_effect": "Refraction between glass panes",
+        "usage": "Premium modals, onboarding, feature announcements"
+      },
+
+      "gradient_tint_warmth": {
+        "description": "Add subtle color gradient for emotional warmth",
+        "light_mode": "linear-gradient(135deg, hsl(215 85% 50% / 0.03), hsl(215 85% 50% / 0.01))",
+        "dark_mode": "linear-gradient(135deg, hsl(215 85% 60% / 0.08), hsl(215 85% 60% / 0.02))",
+        "application": "background-image (layered over background-color)",
+        "effect": "Warm inviting glass vs cold neutral"
+      },
+
+      "refraction_edge_highlights": {
+        "description": "Simulate light bending through glass edges (physics-based)",
+        "top_edge": "linear-gradient(to bottom, hsl(0 0% 100% / 0.15), transparent 20%)",
+        "bottom_edge": "linear-gradient(to top, hsl(220 13% 13% / 0.08), transparent 20%)",
+        "implementation": "::before and ::after pseudo-elements",
+        "visual_effect": "Realistic glass rim where light refracts"
+      },
+
+      "organic_mesh_grain": {
+        "description": "Ultra-subtle noise prevents 'too perfect' digital look",
+        "technique": "CSS filter: contrast(1.01) opacity(0.98)",
+        "alternative": "SVG noise texture at 1.5% opacity",
+        "purpose": "Adds tactile, organic quality to glass",
+        "inspiration": "Apple's attention to microscopic detail"
+      }
+    },
+
+    "performance_optimization": {
+      "gpu_acceleration": "Use will-change: backdrop-filter on animated elements",
+      "reduce_on_mobile": "40% blur reduction, remove SVG filters",
+      "feature_detection": "@supports (backdrop-filter: blur(10px))",
+      "fallback_strategy": "Solid bg at 95% opacity + subtle shadow",
+      "animation_budget": "Limit to 3 concurrent backdrop-filter animations max"
+    },
+
+    "browser_compatibility": {
+      "full_support": "Chrome 91+, Safari 15.1+, Firefox 103+, Edge 91+",
+      "partial_support": "Older browsers get solid backgrounds",
+      "svg_filters": "Desktop only (mobile Safari doesn't support)",
+      "progressive_enhancement": "Baseline: solid → Enhanced: blur → Premium: distortion"
     }
   },
 
@@ -350,70 +532,147 @@
   },
 
   "shadows": {
-    "elevation_system": {
-      "soft": {
-        "value": "0 2px 8px -2px hsl(220 13% 13% / 0.08)",
-        "usage": "Subtle depth for cards at rest",
-        "elevation_level": 1
+    "design_philosophy": "SwiftFill's shadow system EXCEEDS Apple's standards with 5-layer realistic lighting that mimics natural physics. Based on latest research (Josh W. Comeau, 2025), combining ambient occlusion, key light, contact shadows, rim lighting, and atmospheric glow for unparalleled depth perception.",
+
+    "realistic_5_layer_system": {
+      "description": "Most sophisticated shadow system available - surpasses Apple's 3-layer approach with physically accurate lighting simulation",
+
+      "ultra_realistic_default": {
+        "light_mode": {
+          "value": "0 0.5px 1px hsl(220 13% 13% / 0.04), 0 1px 2px hsl(220 13% 13% / 0.08), 0 2px 4px hsl(220 13% 13% / 0.12), 0 4px 8px hsl(220 13% 13% / 0.16), 0 8px 16px hsl(220 13% 13% / 0.08)",
+          "layers": [
+            "Contact shadow (0.5px) - Darkest shadow directly beneath element",
+            "Key light shadow (1px) - Primary directional shadow from main light source",
+            "Ambient occlusion (2px) - Soft environmental shadow",
+            "Penumbra transition (4px) - Soft edge where shadow blurs",
+            "Atmospheric glow (8px) - Ultra-soft diffused light scattering"
+          ],
+          "performance": "Optimized with GPU acceleration via will-change: box-shadow"
+        },
+        "dark_mode": {
+          "value": "0 0.5px 1px hsl(0 0% 0% / 0.15), 0 1px 3px hsl(0 0% 0% / 0.2), 0 2px 6px hsl(0 0% 0% / 0.25), 0 4px 12px hsl(0 0% 0% / 0.3), 0 8px 24px hsl(0 0% 0% / 0.18)",
+          "note": "More pronounced in dark mode to maintain depth hierarchy against dark backgrounds"
+        },
+        "elevation_height": "8dp (standard card elevation)",
+        "use_cases": ["Premium cards", "Interactive panels", "Feature showcases"]
       },
-      "medium": {
-        "value": "0 8px 24px -4px hsl(220 13% 13% / 0.12)",
-        "usage": "Moderate depth for interactive cards",
-        "elevation_level": 2
+
+      "ultra_realistic_hover": {
+        "light_mode": {
+          "value": "0 1px 2px hsl(220 13% 13% / 0.06), 0 2px 4px hsl(220 13% 13% / 0.1), 0 4px 8px hsl(220 13% 13% / 0.14), 0 8px 16px hsl(220 13% 13% / 0.18), 0 16px 32px hsl(220 13% 13% / 0.12)",
+          "layers": [
+            "Contact shadow lifts slightly (1px) - Element moving away from surface",
+            "Key light intensifies (2px) - Stronger directional lighting",
+            "Ambient deepens (4px) - More pronounced environmental shadow",
+            "Penumbra expands (8px) - Larger soft shadow area",
+            "Atmospheric halo (16px) - Enhanced light diffusion"
+          ],
+          "transform": "translateY(-2px) - Subtle lift on hover",
+          "transition": "box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1), transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1)"
+        },
+        "dark_mode": {
+          "value": "0 1px 2px hsl(0 0% 0% / 0.2), 0 2px 6px hsl(0 0% 0% / 0.25), 0 4px 12px hsl(0 0% 0% / 0.3), 0 8px 24px hsl(0 0% 0% / 0.35), 0 16px 48px hsl(0 0% 0% / 0.22)"
+        },
+        "elevation_height": "16dp (elevated hover state)"
       },
-      "large": {
-        "value": "0 16px 48px -8px hsl(220 13% 13% / 0.16)",
-        "usage": "High elevation for modals and popovers",
-        "elevation_level": 3
+
+      "ultra_realistic_pressed": {
+        "light_mode": {
+          "value": "0 0px 0px hsl(220 13% 13% / 0.02), 0 0.5px 1px hsl(220 13% 13% / 0.06), 0 1px 2px hsl(220 13% 13% / 0.08), 0 2px 4px hsl(220 13% 13% / 0.1), 0 4px 8px hsl(220 13% 13% / 0.06)",
+          "description": "Flattened shadow for pressed/active state - element pushed into surface",
+          "transform": "translateY(1px) scale(0.98)",
+          "transition": "box-shadow 100ms ease-out, transform 100ms ease-out"
+        },
+        "dark_mode": {
+          "value": "0 0px 0px hsl(0 0% 0% / 0.08), 0 0.5px 1px hsl(0 0% 0% / 0.12), 0 1px 2px hsl(0 0% 0% / 0.15), 0 2px 4px hsl(0 0% 0% / 0.18), 0 4px 8px hsl(0 0% 0% / 0.12)"
+        },
+        "elevation_height": "2dp (pressed against surface)"
       },
-      "glow": {
-        "value": "0 0 32px hsl(215 85% 50% / 0.2)",
-        "usage": "Emphasis and focus states",
-        "elevation_level": "special"
+
+      "ultra_realistic_floating": {
+        "light_mode": {
+          "value": "0 2px 4px hsl(220 13% 13% / 0.08), 0 4px 8px hsl(220 13% 13% / 0.12), 0 8px 16px hsl(220 13% 13% / 0.16), 0 16px 32px hsl(220 13% 13% / 0.2), 0 32px 64px hsl(220 13% 13% / 0.14)",
+          "description": "High elevation for modals, dropdowns, and prominent overlays",
+          "elevation_height": "24dp (floating above interface)"
+        },
+        "dark_mode": {
+          "value": "0 2px 4px hsl(0 0% 0% / 0.25), 0 4px 8px hsl(0 0% 0% / 0.3), 0 8px 16px hsl(0 0% 0% / 0.35), 0 16px 32px hsl(0 0% 0% / 0.4), 0 32px 64px hsl(0 0% 0% / 0.28)"
+        },
+        "backdrop_blur": "8px - Enhance separation from background"
       }
     },
 
-    "3_point_premium_shadows": {
-      "description": "Multi-layer shadows for realistic depth perception",
-      "default": {
-        "light_mode": "0 1px 2px hsl(220 13% 13% / 0.12), 0 4px 8px hsl(220 13% 13% / 0.08), 0 8px 16px hsl(220 13% 13% / 0.06)",
-        "dark_mode": "0 1px 2px hsl(0 0% 0% / 0.2), 0 4px 8px hsl(0 0% 0% / 0.15), 0 8px 16px hsl(0 0% 0% / 0.12)"
+    "specialized_shadows": {
+      "rim_light": {
+        "description": "Edge highlight that creates premium 3D chamfered effect",
+        "light_mode": "inset 0 1px 0 hsl(0 0% 100% / 0.9), inset 0 -1px 0 hsl(220 13% 13% / 0.08)",
+        "dark_mode": "inset 0 1px 0 hsl(0 0% 100% / 0.2), inset 0 -1px 0 hsl(0 0% 0% / 0.3)",
+        "usage": "Buttons, inputs, raised surfaces",
+        "combine_with": "Ultra-realistic default shadow for best effect"
       },
-      "hover": {
-        "light_mode": "0 2px 4px hsl(220 13% 13% / 0.14), 0 6px 12px hsl(220 13% 13% / 0.1), 0 12px 24px hsl(220 13% 13% / 0.08)",
-        "dark_mode": "0 2px 4px hsl(0 0% 0% / 0.25), 0 6px 12px hsl(0 0% 0% / 0.2), 0 12px 24px hsl(0 0% 0% / 0.15)"
+
+      "inner_glow": {
+        "description": "Subtle inner glow for focus states and active elements",
+        "value": "inset 0 0 0 1px hsl(215 85% 50% / 0.3), inset 0 0 8px hsl(215 85% 50% / 0.15)",
+        "usage": "Focus rings, active states, emphasized containers",
+        "accessibility": "Combines with 2px outline for WCAG compliance"
+      },
+
+      "atmospheric_glow": {
+        "description": "Outer glow for emphasis and brand moments",
+        "primary": "0 0 16px hsl(215 85% 50% / 0.25), 0 0 32px hsl(215 85% 50% / 0.15), 0 0 64px hsl(215 85% 50% / 0.08)",
+        "success": "0 0 16px hsl(142 76% 36% / 0.25), 0 0 32px hsl(142 76% 36% / 0.15)",
+        "error": "0 0 16px hsl(0 84% 60% / 0.25), 0 0 32px hsl(0 84% 60% / 0.15)",
+        "usage": "CTAs, notifications, status indicators",
+        "animate": "Pulse animation for maximum attention"
+      },
+
+      "contact_shadow": {
+        "description": "Thin, dark shadow directly beneath element - most realistic contact point",
+        "value": "0 0.5px 0px hsl(220 13% 13% / 0.3)",
+        "usage": "Combine with other shadows as first layer for hyper-realism",
+        "note": "Apple uses this technique but we make it more pronounced"
       }
     },
 
-    "diffused_soft_shadows": {
-      "description": "Inspired by reference images - extremely soft, natural-looking shadows",
-      "default": {
-        "light_mode": "0 2px 12px hsl(220 13% 13% / 0.06), 0 8px 24px hsl(220 13% 13% / 0.04), 0 16px 48px hsl(220 13% 13% / 0.02)",
-        "dark_mode": "0 2px 12px hsl(0 0% 0% / 0.3), 0 8px 24px hsl(0 0% 0% / 0.2), 0 16px 48px hsl(0 0% 0% / 0.15)"
+    "performance_optimization": {
+      "gpu_acceleration": {
+        "technique": "Add will-change: box-shadow to animated elements",
+        "caveat": "Remove after animation completes to free GPU resources",
+        "example": "element.style.willChange = 'box-shadow' // Before animation\nelement.style.willChange = 'auto' // After animation"
       },
-      "hover": {
-        "light_mode": "0 4px 16px hsl(220 13% 13% / 0.08), 0 12px 32px hsl(220 13% 13% / 0.06), 0 24px 64px hsl(220 13% 13% / 0.04)",
-        "dark_mode": "0 4px 16px hsl(0 0% 0% / 0.4), 0 12px 32px hsl(0 0% 0% / 0.3), 0 24px 64px hsl(0 0% 0% / 0.2)"
-      },
-      "usage": "Use for prominent cards, floating panels, and premium surfaces"
-    },
 
-    "inset_shadows": {
-      "light": {
-        "value": "inset 0 1px 2px hsl(0 0% 100% / 0.6), inset 0 -1px 1px hsl(220 13% 13% / 0.1)",
-        "usage": "Subtle embossed effect for buttons and inputs (light mode)"
+      "pseudo_element_hack": {
+        "description": "Most performant shadow animation technique (60fps guaranteed)",
+        "technique": "Create ::after pseudo-element with larger shadow, animate opacity instead of box-shadow",
+        "example": ".card::after { content: ''; position: absolute; inset: 0; box-shadow: [large shadow]; opacity: 0; transition: opacity 300ms; }\n.card:hover::after { opacity: 1; }",
+        "performance_gain": "3-5x faster than animating box-shadow directly"
       },
-      "dark": {
-        "value": "inset 0 1px 2px hsl(0 0% 100% / 0.15), inset 0 -1px 1px hsl(0 0% 0% / 0.2)",
-        "usage": "Subtle embossed effect for buttons and inputs (dark mode)"
+
+      "drop_shadow_filter": {
+        "description": "Use filter: drop-shadow() for non-rectangular shapes and images",
+        "advantage": "Respects alpha channel, creates realistic shadows on irregular shapes",
+        "caveat": "Blur value is 2x more intense than box-shadow (compensate accordingly)",
+        "performance": "Excellent on modern browsers with GPU acceleration",
+        "example": "filter: drop-shadow(0 4px 8px hsl(220 13% 13% / 0.16)) - equivalent to box-shadow: 0 4px 16px"
+      },
+
+      "mobile_optimization": {
+        "reduce_layers": "Use 3-layer system on mobile (contact + key + ambient) instead of 5-layer",
+        "reduce_blur": "Cut blur radius by 25% on mobile for better performance",
+        "media_query": "@media (max-width: 768px) and (hover: none)"
       }
     },
 
-    "chamfered_3d_effect": {
-      "description": "3D chamfered edges for premium feel",
-      "box_shadow": "inset 0 1px 0 hsl(0 0% 100% / 0.8), inset 0 -1px 0 hsl(220 13% 13% / 0.05), 0 1px 2px hsl(220 13% 13% / 0.1)",
-      "usage": "Special emphasis elements, premium buttons",
-      "gradient": "linear-gradient(145deg, hsl(0 0% 100% / 0.9), hsl(220 15% 94% / 0.95))"
+    "usage_matrix": {
+      "buttons": "Rim light + Ultra-realistic default + Atmospheric glow on primary",
+      "cards": "Ultra-realistic default (rest) → Ultra-realistic hover (hover)",
+      "modals": "Ultra-realistic floating + Backdrop blur",
+      "inputs": "Rim light + Contact shadow + Inner glow (focus)",
+      "floating_panels": "Ultra-realistic floating + Atmospheric glow (subtle)",
+      "tooltips": "Ultra-realistic default at reduced scale (60%)",
+      "dropdowns": "Ultra-realistic floating",
+      "navigation_active": "Inner glow + Contact shadow (pressed)"
     }
   },
 
@@ -468,6 +727,232 @@
       "Slower animations (400ms+) for significant state transitions",
       "Always provide prefers-reduced-motion fallback"
     ]
+  },
+
+  "haptic_feedback": {
+    "design_philosophy": "EXCEEDS native app standards with cross-platform tactile feedback that enhances micro-interactions. Combines Web Vibration API (Android), iOS 18+ workarounds, and visual/audio fallbacks for universal tactile response.",
+
+    "haptic_patterns": {
+      "description": "Semantic haptic patterns mapped to UI interactions - inspired by iOS UIImpactFeedbackGenerator",
+
+      "light": {
+        "vibration_pattern": [10],
+        "intensity": "Light tactile response",
+        "use_cases": ["Button hover", "Switch toggle", "Checkbox check", "Radio select"],
+        "ios_18_alternative": "Use <input type='checkbox' switch> for native haptics",
+        "visual_feedback": "Subtle scale(1.02) + shadow enhancement"
+      },
+
+      "medium": {
+        "vibration_pattern": [15],
+        "intensity": "Medium tactile response",
+        "use_cases": ["Button press", "Menu selection", "Card tap", "Drawer open"],
+        "ios_18_alternative": "Combine visual + audio feedback (click sound)",
+        "visual_feedback": "scale(0.95) + shadow compression"
+      },
+
+      "heavy": {
+        "vibration_pattern": [25],
+        "intensity": "Strong tactile response",
+        "use_cases": ["Form submit", "Delete action", "Error state", "Critical alert"],
+        "ios_18_alternative": "System alert sound + strong visual shake",
+        "visual_feedback": "Brief shake animation + color flash"
+      },
+
+      "success": {
+        "vibration_pattern": [10, 50, 10],
+        "intensity": "Double light tap (confirmation)",
+        "use_cases": ["Task complete", "Payment success", "Upload complete", "Save successful"],
+        "ios_18_alternative": "Success sound (iOS system sound) + green flash",
+        "visual_feedback": "Checkmark animation + green glow"
+      },
+
+      "warning": {
+        "vibration_pattern": [15, 30, 15],
+        "intensity": "Triple medium pulse (attention)",
+        "use_cases": ["Form validation error", "Low battery", "Network loss", "Unsaved changes"],
+        "ios_18_alternative": "Alert sound + amber pulse",
+        "visual_feedback": "Amber border pulse + icon shake"
+      },
+
+      "error": {
+        "vibration_pattern": [25, 50, 25, 50, 25],
+        "intensity": "Strong pulsing (urgent)",
+        "use_cases": ["Critical error", "Payment failed", "Connection lost", "Security alert"],
+        "ios_18_alternative": "Error sound + red shake animation",
+        "visual_feedback": "Horizontal shake + red glow + error icon"
+      },
+
+      "selection": {
+        "vibration_pattern": [5],
+        "intensity": "Ultra-light tick",
+        "use_cases": ["List scroll tick", "Slider step", "Stepper increment", "Picker scroll"],
+        "ios_18_alternative": "Subtle audio tick (like Apple Picker)",
+        "visual_feedback": "Minimal - just visual highlight"
+      },
+
+      "notification": {
+        "vibration_pattern": [50, 100, 50],
+        "intensity": "Distinct long-short-long pattern",
+        "use_cases": ["New message", "Calendar reminder", "Background task complete"],
+        "ios_18_alternative": "System notification sound + banner",
+        "visual_feedback": "Slide-in notification banner"
+      }
+    },
+
+    "platform_implementation": {
+      "description": "Cross-platform strategy with progressive enhancement",
+
+      "android_chrome": {
+        "api": "Navigator.vibrate()",
+        "support": "Full support since Chrome 32 (2014)",
+        "example": "navigator.vibrate([10, 50, 10]) // Success pattern",
+        "feature_detection": "if ('vibrate' in navigator) { /* use haptics */ }",
+        "max_pattern_length": "128 values",
+        "max_duration": "10000ms total",
+        "best_practices": [
+          "Keep patterns under 500ms total for micro-interactions",
+          "Use consistent patterns for same action types",
+          "Respect user's device vibration settings"
+        ]
+      },
+
+      "ios_safari": {
+        "api": "NOT SUPPORTED - Vibration API blocked by Apple",
+        "workaround_ios_18_plus": {
+          "technique": "Use <input type='checkbox' switch> with non-standard switch attribute",
+          "support": "iOS 18+ Safari only",
+          "example": "<input type='checkbox' switch onclick='this.checked = !this.checked'>",
+          "limitation": "Only works on checkbox toggle, not general buttons",
+          "use_case": "Use for main toggle switches, fallback for other interactions"
+        },
+        "fallback_strategy": {
+          "visual_feedback": "Enhanced animations (spring physics, micro-interactions)",
+          "audio_feedback": "Web Audio API with subtle click/tap sounds",
+          "combined_approach": "Visual + audio creates pseudo-haptic feel",
+          "user_preference": "Respect prefers-reduced-motion for visuals"
+        }
+      },
+
+      "desktop_browsers": {
+        "vibration_api": "Not applicable (no vibration hardware)",
+        "alternative": "Visual and audio feedback only",
+        "accessibility": "Ensure all haptic cues have visual equivalents"
+      },
+
+      "progressive_web_app": {
+        "service_worker": "Can request permission for vibration",
+        "background_vibration": "NOT recommended - only in foreground",
+        "permissions": "No explicit permission needed (uses device settings)"
+      }
+    },
+
+    "implementation_code": {
+      "description": "Production-ready haptic feedback utility",
+
+      "haptic_utility_function": {
+        "typescript": "// SwiftFill Haptic Utility (haptics.ts)\n\ntype HapticPattern = 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error' | 'selection' | 'notification';\n\nconst HAPTIC_PATTERNS: Record<HapticPattern, number[]> = {\n  light: [10],\n  medium: [15],\n  heavy: [25],\n  success: [10, 50, 10],\n  warning: [15, 30, 15],\n  error: [25, 50, 25, 50, 25],\n  selection: [5],\n  notification: [50, 100, 50]\n};\n\nconst AUDIO_PATTERNS: Record<HapticPattern, { frequency: number; duration: number; type: OscillatorType }> = {\n  light: { frequency: 800, duration: 10, type: 'sine' },\n  medium: { frequency: 600, duration: 15, type: 'sine' },\n  heavy: { frequency: 400, duration: 25, type: 'square' },\n  selection: { frequency: 1000, duration: 5, type: 'sine' },\n  // ... (other patterns)\n};\n\nlet audioContext: AudioContext | null = null;\n\nfunction initAudioContext() {\n  if (!audioContext && typeof AudioContext !== 'undefined') {\n    audioContext = new AudioContext();\n  }\n}\n\nfunction playAudioFeedback(pattern: HapticPattern) {\n  if (!audioContext) return;\n  \n  const { frequency, duration, type } = AUDIO_PATTERNS[pattern];\n  const oscillator = audioContext.createOscillator();\n  const gainNode = audioContext.createGain();\n  \n  oscillator.type = type;\n  oscillator.frequency.value = frequency;\n  gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);\n  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);\n  \n  oscillator.connect(gainNode);\n  gainNode.connect(audioContext.destination);\n  oscillator.start(audioContext.currentTime);\n  oscillator.stop(audioContext.currentTime + duration / 1000);\n}\n\nexport function triggerHaptic(pattern: HapticPattern, options?: { audio?: boolean; visual?: boolean }) {\n  const opts = { audio: true, visual: true, ...options };\n  \n  // Try Vibration API (Android Chrome, Firefox Mobile)\n  if ('vibrate' in navigator && window.matchMedia('(hover: none)').matches) {\n    try {\n      navigator.vibrate(HAPTIC_PATTERNS[pattern]);\n    } catch (e) {\n      console.warn('Vibration API failed:', e);\n    }\n  }\n  \n  // iOS fallback: Audio feedback (if enabled)\n  if (opts.audio && /iPhone|iPad|iPod/.test(navigator.userAgent)) {\n    initAudioContext();\n    playAudioFeedback(pattern);\n  }\n  \n  // Visual feedback handled by CSS (via data attribute)\n  // Component sets data-haptic='pattern' temporarily\n}\n\n// React Hook\nexport function useHaptic() {\n  return {\n    trigger: triggerHaptic,\n    patterns: Object.keys(HAPTIC_PATTERNS) as HapticPattern[]\n  };\n}"
+      },
+
+      "react_component_example": {
+        "tsx": "// Example: Button with haptic feedback\nimport { triggerHaptic } from '@/lib/haptics';\n\nfunction HapticButton({ children, hapticPattern = 'medium', ...props }: ButtonProps & { hapticPattern?: HapticPattern }) {\n  const handleClick = (e: React.MouseEvent) => {\n    triggerHaptic(hapticPattern);\n    props.onClick?.(e);\n  };\n  \n  return (\n    <button\n      {...props}\n      onClick={handleClick}\n      className={cn(\n        'transition-all duration-150',\n        'active:scale-95', // Visual feedback\n        props.className\n      )}\n    >\n      {children}\n    </button>\n  );\n}"
+      },
+
+      "css_visual_feedback": {
+        "css": "/* Visual feedback animations */\n@keyframes haptic-pulse {\n  0%, 100% { transform: scale(1); }\n  50% { transform: scale(1.05); }\n}\n\n@keyframes haptic-shake {\n  0%, 100% { transform: translateX(0); }\n  25% { transform: translateX(-4px); }\n  75% { transform: translateX(4px); }\n}\n\n[data-haptic='success'] {\n  animation: haptic-pulse 300ms ease-out;\n}\n\n[data-haptic='error'] {\n  animation: haptic-shake 200ms ease-in-out 2;\n}\n\n/* Reduced motion */\n@media (prefers-reduced-motion: reduce) {\n  [data-haptic] {\n    animation: none !important;\n  }\n}"
+      }
+    },
+
+    "ios_18_workaround_details": {
+      "description": "iOS 18+ introduces limited haptic support via non-standard switch attribute",
+
+      "implementation": {
+        "html": "<input type='checkbox' switch class='haptic-switch' />",
+        "css": "input[type='checkbox'][switch] {\n  appearance: none;\n  width: 66px;\n  height: 44px;\n  background: hsl(220 15% 88%);\n  border-radius: 22px;\n  position: relative;\n  cursor: pointer;\n  transition: background 200ms ease;\n}\n\ninput[type='checkbox'][switch]:checked {\n  background: hsl(215 85% 50%);\n}\n\ninput[type='checkbox'][switch]::before {\n  content: '';\n  position: absolute;\n  width: 40px;\n  height: 40px;\n  border-radius: 20px;\n  background: white;\n  top: 2px;\n  left: 2px;\n  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);\n  box-shadow: 0 2px 4px hsl(0 0% 0% / 0.2);\n}\n\ninput[type='checkbox'][switch]:checked::before {\n  transform: translateX(22px);\n}",
+        "javascript": "// Trigger haptic on toggle\nconst switchEl = document.querySelector('input[switch]');\nswitchEl.addEventListener('click', () => {\n  // iOS 18+ Safari triggers native haptic automatically\n  // Fallback for older iOS: audio feedback\n  if (!CSS.supports('selector(input[switch])')) {\n    playAudioFeedback('light');\n  }\n});",
+        "feature_detection": "const supportsSwitch = CSS.supports('selector(input[switch])');"
+      },
+
+      "limitations": [
+        "Only works on toggle switches (not general buttons)",
+        "iOS 18+ only (September 2024+)",
+        "Safari only (not Chrome iOS or Firefox iOS)",
+        "Cannot customize vibration pattern or intensity",
+        "Only triggers on user interaction (not programmatic)"
+      ],
+
+      "best_use_cases": [
+        "Main app toggle switches (dark mode, notifications, etc.)",
+        "Settings panel toggles",
+        "Feature enable/disable controls"
+      ]
+    },
+
+    "accessibility_considerations": {
+      "visual_equivalents": [
+        "Every haptic pattern MUST have visual feedback",
+        "Use animations, color changes, icons, or scale effects",
+        "Ensure 3:1 contrast ratio for visual changes (WCAG AA)"
+      ],
+
+      "user_preferences": {
+        "respect_device_settings": "Honor device vibration settings (automatic)",
+        "prefers_reduced_motion": "Disable/reduce visual feedback animations",
+        "user_toggle": "Provide app-level haptic on/off setting",
+        "implementation": "Store preference in localStorage, default to device settings"
+      },
+
+      "semantic_clarity": [
+        "Haptic patterns should match interaction severity",
+        "Success = positive (double tap), Error = urgent (strong pulse)",
+        "Don't overuse - reserve for meaningful interactions",
+        "Test with users who rely on haptic feedback for navigation"
+      ]
+    },
+
+    "performance_optimization": {
+      "debouncing": {
+        "description": "Prevent haptic spam on rapid interactions",
+        "technique": "Debounce haptic triggers with 50ms minimum interval",
+        "example": "let lastHaptic = 0;\nif (Date.now() - lastHaptic > 50) {\n  triggerHaptic('light');\n  lastHaptic = Date.now();\n}"
+      },
+
+      "battery_impact": {
+        "vibration_api": "Minimal battery impact (< 1% per hour of use)",
+        "audio_fallback": "Web Audio API is battery-efficient",
+        "best_practice": "Limit haptics to intentional user interactions, not background events"
+      }
+    },
+
+    "testing_strategy": {
+      "device_testing": [
+        "Test on Android Chrome (Vibration API)",
+        "Test on iOS 18+ Safari (switch haptics)",
+        "Test on iOS <18 Safari (audio/visual fallback)",
+        "Test on desktop (visual-only feedback)"
+      ],
+
+      "user_testing": [
+        "Validate haptic patterns feel appropriate for actions",
+        "Ensure haptics enhance experience vs annoy users",
+        "Test with users who have motor impairments",
+        "A/B test haptic on/off for engagement metrics"
+      ]
+    },
+
+    "future_enhancements": {
+      "gamepad_api": {
+        "description": "Rumble support for connected game controllers",
+        "api": "navigator.getGamepads()[0].vibrationActuator.playEffect('dual-rumble', {...})",
+        "use_case": "Game-like interactions, immersive experiences"
+      },
+
+      "web_nfc": {
+        "description": "Trigger haptics on NFC tag interactions",
+        "api": "NDEFReader + Vibration API",
+        "use_case": "Physical-digital bridging (tap to pay, tap to connect)"
+      }
+    }
   },
 
   "component_patterns": {

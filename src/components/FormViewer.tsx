@@ -138,6 +138,13 @@ const fieldNameToIndex: Record<string, number> = useMemo(() => {
     setNumPages(numPages);
     setPdfLoading(false);
     setLoadProgress(100);
+    console.log(`[PDF Loaded] Successfully loaded ${numPages} pages for ${formType}`);
+  };
+
+  const onDocumentLoadError = (error: Error) => {
+    console.error('[PDF Load Error]:', error);
+    console.error('[PDF Path]:', cachedPdfUrl || getPdfPath(formType));
+    setPdfLoading(false); // Stop loading spinner even on error
   };
 
   // Announce edit mode changes to screen readers
@@ -386,6 +393,7 @@ const fieldNameToIndex: Record<string, number> = useMemo(() => {
             <Document
               file={cachedPdfUrl || getPdfPath(formType)}
               onLoadSuccess={onDocumentLoadSuccess}
+              onLoadError={onDocumentLoadError}
               onLoadProgress={({ loaded, total }) => {
                 if (total > 0) {
                   setLoadProgress(Math.round((loaded / total) * 100));

@@ -70,35 +70,35 @@ export async function waitForApp(
     verifyCanvasDimensions = true
   } = options;
 
-  // Step 1: Wait for network to be idle (all initial requests complete)
+  // Step 1: Wait for page to be loaded (NOT networkidle)
+  // networkidle is too strict - modern apps have websockets, long-polling, analytics
+  // that never truly reach "idle". We just need the DOM to be ready.
   if (waitForNetwork) {
-    await page.waitForLoadState('networkidle', { timeout });
+    await page.waitForLoadState('domcontentloaded', { timeout });
   }
 
   // Tutorial is disabled via playwright.config.ts localStorage setting
   // No need to handle it here
 
-  // Step 2: Wait for PDF canvas to exist
-  // Note: We don't use state: 'visible' because the canvas may be in a scrollable container
-  // or have CSS properties that make Playwright think it's not visible, even though it is
-  await page.waitForSelector('.react-pdf__Document canvas', {
-    timeout,
-    state: 'attached'
-  });
+  // Step 2: Wait for the "Loading PDF Form" overlay to disappear
+  // This is more reliable than checking for canvas dimensions
+  // because it directly checks the component's loading state
+  await page.waitForFunction(
+    () => {
+      // Check if the loading overlay text is gone
+      const loadingHeading = Array.from(document.querySelectorAll('h3')).find(
+        el => el.textContent?.includes('Loading PDF Form')
+      );
+      if (loadingHeading) return false; // Still loading
 
-  // Step 3: Verify canvas has actual dimensions (is rendered, not just present)
-  // PDF.js may create canvas elements before rendering content into them
-  if (verifyCanvasDimensions) {
-    await page.waitForFunction(
-      () => {
-        const canvas = document.querySelector('.react-pdf__Document canvas') as HTMLCanvasElement;
-        return canvas && canvas.offsetHeight > 0 && canvas.offsetWidth > 0;
-      },
-      { timeout }
-    );
-  }
+      // Verify PDF canvas exists and has dimensions
+      const canvas = document.querySelector('.react-pdf__Document canvas') as HTMLCanvasElement;
+      return canvas && canvas.offsetHeight > 0 && canvas.offsetWidth > 0;
+    },
+    { timeout }
+  );
 
-  // Step 4: Wait for form input fields to be interactive
+  // Step 3: Wait for form input fields to be interactive
   // Ensures the overlay inputs are ready for user interaction
   // Using 'attached' instead of 'visible' to avoid false negatives with CSS positioning
   await page.waitForSelector('input[placeholder]', {

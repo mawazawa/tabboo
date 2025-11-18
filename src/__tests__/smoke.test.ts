@@ -15,6 +15,22 @@ import { waitForApp } from './helpers/wait-for-app';
 
 test.describe('Critical Product Features (Smoke Tests)', () => {
   test.beforeEach(async ({ page }) => {
+    // Listen for ALL console messages to debug PDF loading
+    page.on('console', msg => {
+      console.log(`[Browser ${msg.type()}]:`, msg.text());
+    });
+
+    // Listen for page errors
+    page.on('pageerror', error => {
+      console.error('[Page Error]:', error.message);
+      console.error('[Stack]:', error.stack);
+    });
+
+    // Listen for failed network requests
+    page.on('requestfailed', request => {
+      console.error('[Request Failed]:', request.url(), request.failure()?.errorText);
+    });
+
     await page.goto('/');
     await waitForApp(page);
   });
