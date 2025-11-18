@@ -139,7 +139,7 @@ const Index = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [toast]);
+  }, []); // toast is a stable function, doesn't need to be in dependencies
 
   // Toast notification when edit mode changes
   useEffect(() => {
@@ -153,7 +153,7 @@ const Index = () => {
         : 'You can now fill form fields',
       duration: 2000,
     });
-  }, [isEditMode, toast]);
+  }, [isEditMode]); // toast is a stable function, doesn't need to be in dependencies
 
   // Fetch vault data for AI Assistant context
   const { data: vaultData, isLoading: isVaultLoading } = useQuery({
