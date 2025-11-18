@@ -62,6 +62,28 @@ All colors MUST be HSL.
       inset 0 1px 0 hsl(0 0% 100% / 0.8),
       inset 0 -1px 0 hsl(220 13% 13% / 0.05),
       0 1px 2px hsl(220 13% 13% / 0.1);
+    
+    /* Refined Soft Shadows (Reference Image Aesthetic) */
+    --shadow-diffused: 
+      0 2px 12px hsl(220 13% 13% / 0.06),
+      0 8px 24px hsl(220 13% 13% / 0.04),
+      0 16px 48px hsl(220 13% 13% / 0.02);
+    --shadow-diffused-hover:
+      0 4px 16px hsl(220 13% 13% / 0.08),
+      0 12px 32px hsl(220 13% 13% / 0.06),
+      0 24px 64px hsl(220 13% 13% / 0.04);
+    --shadow-elevated:
+      0 4px 20px hsl(220 13% 13% / 0.08),
+      0 12px 40px hsl(220 13% 13% / 0.06),
+      0 24px 80px hsl(220 13% 13% / 0.04);
+    
+    /* Inset Shadows/Highlights for Embossed Look */
+    --shadow-inset-light: 
+      inset 0 1px 2px hsl(0 0% 100% / 0.6),
+      inset 0 -1px 1px hsl(220 13% 13% / 0.1);
+    --shadow-inset-dark:
+      inset 0 1px 2px hsl(0 0% 100% / 0.15),
+      inset 0 -1px 1px hsl(0 0% 0% / 0.2);
 
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
@@ -71,6 +93,14 @@ All colors MUST be HSL.
     --glass-bg: hsl(0 0% 100% / 0.95);
     --glass-border: hsl(220 15% 88% / 0.5);
     --glass-blur: blur(12px);
+    
+    /* Refined Glassmorphism (Reference Image Aesthetic) */
+    --glass-refined-bg: hsl(0 0% 100% / 0.92);
+    --glass-refined-border: hsl(220 15% 88% / 0.4);
+    --glass-refined-blur: blur(16px);
+    --glass-refined-shadow: 
+      0 4px 24px hsl(220 13% 13% / 0.06),
+      inset 0 1px 0 hsl(0 0% 100% / 0.5);
     
     /* Micro-interaction scales */
     --scale-hover: 1.05;
@@ -148,6 +178,27 @@ All colors MUST be HSL.
       inset 0 1px 0 hsl(220 15% 25% / 0.4),
       inset 0 -1px 0 hsl(0 0% 0% / 0.3),
       0 1px 2px hsl(0 0% 0% / 0.2);
+    
+    /* Dark Mode Refined Shadows (Override for dark theme) */
+    --shadow-diffused: 
+      0 2px 12px hsl(0 0% 0% / 0.3),
+      0 8px 24px hsl(0 0% 0% / 0.2),
+      0 16px 48px hsl(0 0% 0% / 0.15);
+    --shadow-diffused-hover:
+      0 4px 16px hsl(0 0% 0% / 0.4),
+      0 12px 32px hsl(0 0% 0% / 0.3),
+      0 24px 64px hsl(0 0% 0% / 0.2);
+    --shadow-elevated:
+      0 4px 20px hsl(0 0% 0% / 0.4),
+      0 12px 40px hsl(0 0% 0% / 0.3),
+      0 24px 80px hsl(0 0% 0% / 0.25);
+    
+    /* Dark Mode Glassmorphism */
+    --glass-refined-bg: hsl(220 18% 11% / 0.88);
+    --glass-refined-border: hsl(220 15% 20% / 0.5);
+    --glass-refined-shadow: 
+      0 4px 24px hsl(0 0% 0% / 0.3),
+      inset 0 1px 0 hsl(220 15% 25% / 0.3);
     
     /* Dark mode glassmorphic surfaces */
     --glass-bg: hsl(220 18% 11% / 0.95);
@@ -252,6 +303,61 @@ All colors MUST be HSL.
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border);
+  }
+  
+  /* Refined Glassmorphic Surface (Reference Image Aesthetic) */
+  .glass-refined {
+    background: var(--glass-refined-bg);
+    backdrop-filter: var(--glass-refined-blur);
+    -webkit-backdrop-filter: var(--glass-refined-blur);
+    border: 1px solid var(--glass-refined-border);
+    box-shadow: var(--glass-refined-shadow);
+  }
+  
+  /* Soft Diffused Shadow (Reference Image Aesthetic) */
+  .shadow-diffused {
+    box-shadow: var(--shadow-diffused);
+  }
+  
+  .shadow-diffused:hover {
+    box-shadow: var(--shadow-diffused-hover);
+  }
+  
+  /* Elevated Shadow (For Prominent Cards) */
+  .shadow-elevated {
+    box-shadow: var(--shadow-elevated);
+  }
+  
+  /* Embossed Effect (Inset Shadows/Highlights) */
+  .embossed-light {
+    box-shadow: var(--shadow-inset-light), var(--shadow-diffused);
+  }
+  
+  .embossed-dark {
+    box-shadow: var(--shadow-inset-dark), var(--shadow-diffused);
+  }
+  
+  /* Refined Card Styling (Combines All Effects) */
+  .card-refined {
+    background: var(--glass-refined-bg);
+    backdrop-filter: var(--glass-refined-blur);
+    -webkit-backdrop-filter: var(--glass-refined-blur);
+    border: 1px solid var(--glass-refined-border);
+    box-shadow: var(--shadow-diffused), var(--shadow-inset-light);
+    transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .card-refined:hover {
+    box-shadow: var(--shadow-diffused-hover), var(--shadow-inset-light);
+  }
+  
+  /* Dark Mode Card Refined */
+  .dark .card-refined {
+    box-shadow: var(--shadow-diffused), var(--shadow-inset-dark);
+  }
+  
+  .dark .card-refined:hover {
+    box-shadow: var(--shadow-diffused-hover), var(--shadow-inset-dark);
   }
   
   /* Smooth micro-interactions */

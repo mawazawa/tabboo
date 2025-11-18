@@ -77,11 +77,11 @@ export const FieldNavigationItem = ({
   return (
     <div
       ref={isActive ? activeFieldRef : null}
-      className={`relative space-y-2 p-4 rounded-lg border transition-all duration-300 shadow-3point chamfered spring-hover cursor-pointer ${
+      className={`relative space-y-1 p-2 rounded-md border transition-all duration-200 cursor-pointer ${
         isActive
-          ? 'border-primary bg-primary/5 shadow-3point-hover scale-[1.02]'
+          ? 'border-primary bg-primary/5 shadow-sm scale-[1.01]'
           : isSelected
-          ? 'border-blue-500 bg-blue-500/10 shadow-3point-hover'
+          ? 'border-blue-500 bg-blue-500/10'
           : hasErrors
           ? 'border-destructive bg-destructive/5'
           : 'border-transparent hover:border-muted'
@@ -103,16 +103,16 @@ export const FieldNavigationItem = ({
         <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-destructive via-destructive to-destructive/50 rounded-l-lg" />
       )}
 
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center justify-between gap-1">
         <Label
           htmlFor={config.field}
-          className={`text-xs font-medium transition-colors duration-200 ${
+          className={`text-[11px] font-medium transition-colors duration-200 ${
             isActive ? 'text-primary' : isSelected ? 'text-blue-600' : hasErrors ? 'text-destructive' : 'text-muted-foreground'
           }`}
         >
           {originalIndex + 1}. {config.label}
         </Label>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           {onSaveValidationRules && (
             <ValidationRuleEditor
               fieldName={config.field}
@@ -129,19 +129,19 @@ export const FieldNavigationItem = ({
                 e.stopPropagation();
                 onCopyFromVault(config);
               }}
-              className="h-8 px-3 text-xs gap-1 shadow-3point chamfered spring-hover"
+              className="h-6 px-1.5 text-xs gap-0.5"
               title="Copy from vault"
             >
-              <Copy className="h-4 w-4" strokeWidth={1.5} />
+              <Copy className="h-3 w-3" strokeWidth={1.5} />
             </Button>
           )}
           {isActive && (
-            <span className="text-xs font-semibold text-primary px-2 py-1 rounded-md bg-primary/10 animate-in fade-in duration-200">
+            <span className="text-[10px] font-medium text-primary px-1.5 py-0.5 rounded-sm bg-primary/10 animate-in fade-in duration-200">
               Active
             </span>
           )}
           {isSelected && !isActive && (
-            <span className="text-xs font-semibold text-blue-600 px-2 py-1 rounded-md bg-blue-500/10 animate-in fade-in duration-200">
+            <span className="text-[10px] font-medium text-blue-600 px-1.5 py-0.5 rounded-sm bg-blue-500/10 animate-in fade-in duration-200">
               Selected
             </span>
           )}
@@ -150,17 +150,17 @@ export const FieldNavigationItem = ({
 
       {/* Vault data preview */}
       {config.vaultField && personalInfo && personalInfo[config.vaultField as keyof typeof personalInfo] && (
-        <div className="text-xs text-muted-foreground bg-muted/50 rounded px-2 py-1 font-mono truncate">
+        <div className="text-[10px] text-muted-foreground bg-muted/30 rounded-sm px-1.5 py-0.5 font-mono truncate">
           Saved: {personalInfo[config.vaultField as keyof typeof personalInfo]}
         </div>
       )}
 
       {/* Validation Errors */}
       {hasErrors && (
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           {fieldErrors.map((error, idx) => (
-            <div key={idx} className="text-xs text-destructive bg-destructive/10 rounded px-2 py-1 flex items-start gap-1">
-              <AlertCircle className="h-3 w-3 mt-0.5 flex-shrink-0" />
+            <div key={idx} className="text-[10px] text-destructive bg-destructive/10 rounded-sm px-1.5 py-0.5 flex items-start gap-0.5">
+              <AlertCircle className="h-2.5 w-2.5 mt-0.5 flex-shrink-0" />
               <span>{error.message}</span>
             </div>
           ))}
@@ -181,7 +181,7 @@ export const FieldNavigationItem = ({
           }}
           onClick={(e) => e.stopPropagation()}
           placeholder={config.placeholder}
-          className="field-input h-12 text-base border-hairline shadow-3point chamfered transition-all duration-200"
+          className="field-input h-9 text-sm transition-all duration-200"
           maxLength={config.field === 'state' ? 2 : undefined}
         />
       )}
@@ -200,13 +200,13 @@ export const FieldNavigationItem = ({
           }}
           onClick={(e) => e.stopPropagation()}
           placeholder={config.placeholder}
-          className="field-input min-h-[100px] text-sm resize-none transition-all duration-200"
+          className="field-input min-h-[72px] text-xs resize-none transition-all duration-200"
         />
       )}
 
       {/* Checkbox Field */}
       {config.type === 'checkbox' && (
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1.5">
           <Checkbox
             id={config.field}
             ref={el => fieldRefs.current[originalIndex] = el as unknown as HTMLButtonElement}
@@ -215,7 +215,7 @@ export const FieldNavigationItem = ({
             onKeyDown={(e) => handleKeyDown(e, originalIndex)}
             onFocus={() => setCurrentFieldIndex(originalIndex)}
           />
-          <label htmlFor={config.field} className="text-sm cursor-pointer">
+          <label htmlFor={config.field} className="text-xs cursor-pointer">
             {config.label}
           </label>
         </div>

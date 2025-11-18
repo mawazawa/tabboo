@@ -1,10 +1,41 @@
+/**
+ * Card Component with Refined Styling Option
+ * 
+ * Enhanced with reference image aesthetic:
+ * - Soft diffused shadows for depth
+ * - Glassmorphic background with backdrop blur
+ * - Subtle inset shadows/highlights for embossed look
+ * - Smooth transitions on hover
+ * 
+ * Usage:
+ * - Default: Standard card styling
+ * - Add "card-refined" class for enhanced aesthetic
+ */
+
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("rounded-lg border bg-card text-card-foreground shadow-sm", className)} {...props} />
-));
+export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Use refined styling (glassmorphic, soft shadows, embossed effect) */
+  refined?: boolean;
+}
+
+const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, refined, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(
+        "rounded-lg border bg-card text-card-foreground",
+        refined
+          ? "card-refined" // Uses refined styling from CSS
+          : "shadow-sm", // Default shadow
+        className
+      )}
+      {...props}
+    />
+  )
+);
 Card.displayName = "Card";
 
 const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(

@@ -33,20 +33,20 @@ export const FieldNavigationHeader = ({
   onApplyGroup,
 }: FieldNavigationHeaderProps) => {
   return (
-    <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-sm">
-      <div className="p-3 space-y-2">
+    <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
+      <div className="px-2 py-1.5">
         <div className="flex items-center justify-between gap-2">
           <div className="flex-1 min-w-0">
-            <h2 className="font-semibold text-sm truncate">
+            <h2 className="font-medium text-sm truncate">
               Field {currentFieldIndex + 1}/{totalFields}
             </h2>
             {searchQuery && (
-              <p className="text-xs text-muted-foreground truncate">
+              <p className="text-[10px] text-muted-foreground truncate leading-none mt-0.5">
                 {filteredFieldsCount} results
               </p>
             )}
           </div>
-          <div className="flex items-center gap-1 shrink-0">
+          <div className="flex items-center gap-0.5 shrink-0">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Badge

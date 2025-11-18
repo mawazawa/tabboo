@@ -423,9 +423,9 @@ export const FieldNavigationPanel = ({
                           <span className="text-xs">Adjust</span>
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-56 p-4" side="left" align="start">
-                        <h4 className="text-sm font-semibold mb-3">Position Adjustment</h4>
-                        <div className="grid grid-cols-2 gap-2 mb-3">
+                      <PopoverContent className="w-56 p-2" side="left" align="start">
+                        <h4 className="text-xs font-medium mb-2">Position Adjustment</h4>
+                        <div className="grid grid-cols-2 gap-1 mb-2">
                           <div>
                             <label className="text-[10px] text-muted-foreground">X %</label>
                             <Input
@@ -459,50 +459,50 @@ export const FieldNavigationPanel = ({
                             size="sm"
                             variant="outline"
                             onClick={() => adjustPosition('up')}
-                            className={`h-8 px-2 transition-all duration-75 hover:bg-primary/20 hover:border-primary ${
+                            className={`h-7 px-1.5 transition-all duration-75 hover:bg-primary/20 hover:border-primary ${
                               pressedKey === 'up' ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 shadow-lg scale-95' : ''
                             }`}
                           >
-                            <ChevronUp className="h-4 w-4" strokeWidth={2} />
+                            <ChevronUp className="h-3.5 w-3.5" strokeWidth={2} />
                           </Button>
                           <div></div>
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => adjustPosition('left')}
-                            className={`h-8 px-2 transition-all duration-75 hover:bg-primary/20 hover:border-primary ${
+                            className={`h-7 px-1.5 transition-all duration-75 hover:bg-primary/20 hover:border-primary ${
                               pressedKey === 'left' ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 shadow-lg scale-95' : ''
                             }`}
                           >
-                            <ChevronLeft className="h-4 w-4" strokeWidth={2} />
+                            <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} />
                           </Button>
                           <div className="flex items-center justify-center">
-                            <div className="w-2 h-2 rounded-full bg-muted"></div>
+                            <div className="w-1.5 h-1.5 rounded-full bg-muted"></div>
                           </div>
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => adjustPosition('right')}
-                            className={`h-8 px-2 transition-all duration-75 hover:bg-primary/20 hover:border-primary ${
+                            className={`h-7 px-1.5 transition-all duration-75 hover:bg-primary/20 hover:border-primary ${
                               pressedKey === 'right' ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 shadow-lg scale-95' : ''
                             }`}
                           >
-                            <ChevronRight className="h-4 w-4" strokeWidth={2} />
+                            <ChevronRight className="h-3.5 w-3.5" strokeWidth={2} />
                           </Button>
                           <div></div>
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => adjustPosition('down')}
-                            className={`h-8 px-2 transition-all duration-75 hover:bg-primary/20 hover:border-primary ${
+                            className={`h-7 px-1.5 transition-all duration-75 hover:bg-primary/20 hover:border-primary ${
                               pressedKey === 'down' ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 shadow-lg scale-95' : ''
                             }`}
                           >
-                            <ChevronDown className="h-4 w-4" strokeWidth={2} />
+                            <ChevronDown className="h-3.5 w-3.5" strokeWidth={2} />
                           </Button>
                           <div></div>
                         </div>
-                        <p className="text-xs text-muted-foreground mt-3">
+                        <p className="text-[10px] text-muted-foreground mt-2">
                           Use arrow keys or buttons to fine-tune position
                         </p>
                       </PopoverContent>
