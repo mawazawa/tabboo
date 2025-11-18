@@ -26,7 +26,11 @@ class ErrorTracker {
   private sessionId = this.generateSessionId();
 
   private generateSessionId(): string {
-    return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+    // Pad with zeros to guarantee 9 characters after slicing
+    // This handles edge cases where Math.random() returns very small values
+    // that produce short base-36 strings (e.g., 0.0001 -> "0.0")
+    const randomPart = (Math.random().toString(36) + '00000000000').slice(2, 11);
+    return `${Date.now()}-${randomPart}`;
   }
 
   /**

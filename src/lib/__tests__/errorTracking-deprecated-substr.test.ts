@@ -82,6 +82,39 @@ describe('Error Tracking - Deprecated substr() Method Fix', () => {
   });
 
   /**
+   * EDGE CASE TEST: Padding ensures 9 characters even with very small random values
+   * This test verifies the fix for the flaky test issue where Math.random().toString(36)
+   * can produce short strings that result in fewer than 9 characters after slicing.
+   */
+  test('session ID random part is always 9 characters even with edge case values', () => {
+    // Test the padding logic directly with edge case values
+    const testValues = [0.0001, 0.001, 0.01, 0.1, 0.5, 0.9, 0.9999];
+    
+    for (const testValue of testValues) {
+      // Simulate the fixed implementation
+      const randomPart = (testValue.toString(36) + '00000000000').slice(2, 11);
+      
+      // CRITICAL: Must always be exactly 9 characters
+      expect(randomPart).toHaveLength(9);
+      expect(randomPart).toMatch(/^[0-9a-z]{9}$/);
+    }
+
+    // Also test with actual random values multiple times
+    for (let i = 0; i < 100; i++) {
+      errorTracker.clearLogs();
+      errorTracker.info(`Test log ${i}`);
+      
+      const logs = errorTracker.getLogs();
+      const sessionId = (logs[0] as any).sessionId;
+      const randomPart = sessionId.split('-')[1];
+      
+      // Every single time, must be exactly 9 characters
+      expect(randomPart).toHaveLength(9);
+      expect(randomPart).toMatch(/^[0-9a-z]{9}$/);
+    }
+  });
+
+  /**
    * EDGE CASE TEST: Multiple tracker instances have different session IDs
    */
   test('different error tracker instances have different session IDs', () => {
