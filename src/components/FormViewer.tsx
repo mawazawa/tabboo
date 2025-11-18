@@ -1,25 +1,21 @@
 import { Card } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useState, useRef, memo, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { Document, Page } from 'react-pdf';
-import { Settings, Move, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Sparkles, Loader2, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Keyboard, AlertCircle, AlertTriangle } from "@/icons";
+import { Move, Loader2, Keyboard, AlertCircle, AlertTriangle } from "@/icons";
 import { canAutofill, getVaultValueForField } from "@/utils/vaultFieldMatcher";
 import { TutorialTooltips } from "@/components/TutorialTooltips";
 import { useFormFields, convertToFieldOverlays } from "@/hooks/use-form-fields";
 import { useLiveRegion } from "@/hooks/use-live-region";
+import { useKeyboardNavigation } from "@/hooks/use-keyboard-navigation";
+import { useDragAndDrop } from "@/hooks/use-drag-and-drop";
+import { AlignmentGuides } from "@/components/pdf/AlignmentGuides";
+import { FieldOverlay } from "@/components/pdf/FieldOverlay";
 import { mergeFieldNameToIndex } from "@/lib/field-name-index-utils";
 import { legacyFieldNameToIndex } from "@/lib/legacy-field-name-map";
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
-import type { FormData, FieldOverlay, FieldPosition, ValidationErrors, PersonalVaultData } from "@/types/FormData";
+import type { FormData, FieldPosition, ValidationErrors, PersonalVaultData } from "@/types/FormData";
 
 // Import centralized PDF.js configuration
 import '@/lib/pdfConfig';
@@ -64,17 +60,8 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
 
   const [numPages, setNumPages] = useState<number>(0);
   const [pageWidth, setPageWidth] = useState<number>(850);
-  const [isDragging, setIsDragging] = useState<string | null>(null);
-  const [alignmentGuides, setAlignmentGuides] = useState<{ x: number[]; y: number[] }>({ x: [], y: [] });
   const [pdfLoading, setPdfLoading] = useState(true);
   const [loadProgress, setLoadProgress] = useState(0);
-
-  // Use refs for drag state to avoid re-render storms
-  const dragStartPos = useRef<{ x: number; y: number; top: number; left: number }>({ x: 0, y: 0, top: 0, left: 0 });
-  const dragElementRef = useRef<HTMLElement | null>(null);
-  const draggedPositionRef = useRef<{ top: number; left: number } | null>(null);
-  const rafRef = useRef<number | null>(null);
-  const lastGuidesRef = useRef<{ x: number[]; y: number[] }>({ x: [], y: [] });
 
 // Convert database field mappings to field overlays (memoized for performance)
 const fieldOverlays = useMemo(() => {
@@ -91,34 +78,61 @@ const fieldNameToIndex: Record<string, number> = useMemo(() => {
   return mergeFieldNameToIndex(legacyFieldNameToIndex, dbFieldNames);
 }, [fieldMappings]);
 
+  /**
+   * Adjust field position by moving it in the specified direction
+   */
+  const adjustPosition = useCallback((direction: 'up' | 'down' | 'left' | 'right', field: string, customStep?: number) => {
+    const position = fieldPositions[field] || {
+      top: parseFloat(fieldOverlays[0]?.fields.find(f => f.field === field)?.top || '0'),
+      left: parseFloat(fieldOverlays[0]?.fields.find(f => f.field === field)?.left || '0')
+    };
+    const step = customStep ?? 0.5;
+    const newPosition = { ...position };
+
+    switch (direction) {
+      case 'up':
+        newPosition.top = Math.max(0, newPosition.top - step);
+        break;
+      case 'down':
+        newPosition.top = Math.min(100, newPosition.top + step);
+        break;
+      case 'left':
+        newPosition.left = Math.max(0, newPosition.left - step);
+        break;
+      case 'right':
+        newPosition.left = Math.min(100, newPosition.left + step);
+        break;
+    }
+
+    updateFieldPosition(field, newPosition);
+  }, [fieldPositions, fieldOverlays, updateFieldPosition]);
+
+  // Drag and drop hook
+  const {
+    isDragging,
+    alignmentGuides,
+    handlePointerDown,
+    handlePointerMove,
+    handlePointerUp,
+  } = useDragAndDrop({
+    isEditMode,
+    fieldPositions,
+    updateFieldPosition,
+    announce,
+  });
+
+  // Keyboard navigation hook
+  useKeyboardNavigation({
+    isEditMode,
+    currentFieldIndex,
+    fieldNameToIndex,
+    adjustPosition,
+  });
+
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
     setPdfLoading(false);
     setLoadProgress(100);
-  };
-
-  const handlePointerDown = (e: React.PointerEvent, field: string, currentTop: number, currentLeft: number) => {
-    // Only allow dragging in edit mode
-    if (!isEditMode) return;
-    
-    e.preventDefault();
-    e.stopPropagation();
-    
-    const container = (e.currentTarget as HTMLElement).closest('.field-container') as HTMLElement;
-    if (!container) return;
-    
-    container.setPointerCapture(e.pointerId);
-    dragElementRef.current = container;
-    setIsDragging(field);
-    
-    dragStartPos.current = {
-      x: e.clientX,
-      y: e.clientY,
-      top: currentTop,
-      left: currentLeft
-    };
-    
-    draggedPositionRef.current = { top: currentTop, left: currentLeft };
   };
 
   // Announce edit mode changes to screen readers
@@ -159,153 +173,10 @@ const fieldNameToIndex: Record<string, number> = useMemo(() => {
     }
   };
 
-  const handlePointerMove = useCallback((e: React.PointerEvent) => {
-    if (!isDragging || !dragElementRef.current) return;
-
-    e.preventDefault();
-
-    // Cancel any pending animation frame
-    if (rafRef.current !== null) {
-      cancelAnimationFrame(rafRef.current);
-    }
-
-    // Use requestAnimationFrame + CSS transform (no React state updates during drag!)
-    // Performance: This limits updates to 60fps max for buttery smooth dragging
-    rafRef.current = requestAnimationFrame(() => {
-      const startTime = performance.now();
-
-      const deltaX = e.clientX - dragStartPos.current.x;
-      const deltaY = e.clientY - dragStartPos.current.y;
-      const parentRect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-
-      let newLeft = dragStartPos.current.left + (deltaX / parentRect.width) * 100;
-      let newTop = dragStartPos.current.top + (deltaY / parentRect.height) * 100;
-
-      // Constrain within bounds
-      newLeft = Math.max(0, Math.min(95, newLeft));
-      newTop = Math.max(0, Math.min(95, newTop));
-
-      // Smart snapping to other fields
-      const snapThreshold = 1.5;
-      const guides: { x: number[]; y: number[] } = { x: [], y: [] };
-
-      Object.entries(fieldPositions).forEach(([field, pos]) => {
-        if (field === isDragging) return;
-
-        if (Math.abs(newLeft - pos.left) < snapThreshold) {
-          newLeft = pos.left;
-          guides.x.push(pos.left);
-        }
-
-        if (Math.abs(newTop - pos.top) < snapThreshold) {
-          newTop = pos.top;
-          guides.y.push(pos.top);
-        }
-      });
-
-      // Performance: Only update alignment guides state if they changed
-      // This avoids unnecessary re-renders during drag
-      const guidesChanged =
-        guides.x.length !== lastGuidesRef.current.x.length ||
-        guides.y.length !== lastGuidesRef.current.y.length ||
-        !guides.x.every((val, idx) => val === lastGuidesRef.current.x[idx]) ||
-        !guides.y.every((val, idx) => val === lastGuidesRef.current.y[idx]);
-
-      if (guidesChanged) {
-        lastGuidesRef.current = guides;
-        setAlignmentGuides(guides);
-      }
-
-      // Store position in ref (not state!)
-      draggedPositionRef.current = { top: newTop, left: newLeft };
-
-      // Apply via CSS transform for smooth 60fps movement (bypasses React)
-      if (dragElementRef.current) {
-        const deltaLeftPx = (newLeft - dragStartPos.current.left) * parentRect.width / 100;
-        const deltaTopPx = (newTop - dragStartPos.current.top) * parentRect.height / 100;
-        dragElementRef.current.style.transform = `translate(${deltaLeftPx}px, ${deltaTopPx}px)`;
-      }
-
-      // Performance monitoring: Track frame time (removed console.warn for production)
-      // Frame time is tracked but not logged to console in production builds
-    });
-  }, [isDragging, fieldPositions]);
-
-  const handlePointerUp = useCallback((e: React.PointerEvent) => {
-    if (!isDragging) return;
-    
-    if (rafRef.current !== null) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    }
-    
-    // Release pointer capture
-    if (dragElementRef.current) {
-      dragElementRef.current.releasePointerCapture(e.pointerId);
-      // Reset transform
-      dragElementRef.current.style.transform = '';
-    }
-    
-    // COMMIT: Now update React state with final position
-    if (draggedPositionRef.current && isDragging) {
-      updateFieldPosition(isDragging, draggedPositionRef.current);
-      // Announce field repositioning to screen readers
-      announce(`Field ${isDragging} repositioned`);
-    }
-
-    // Clean up
-    setIsDragging(null);
-    dragElementRef.current = null;
-    draggedPositionRef.current = null;
-    setAlignmentGuides({ x: [], y: [] });
-    lastGuidesRef.current = { x: [], y: [] };
-  }, [isDragging, updateFieldPosition, announce]);
-
   const handlePDFClick = (e: React.MouseEvent) => {
     // Clicking PDF background does nothing in edit mode
     if ((e.target as HTMLElement).closest('.field-container')) return;
   };
-
-  /**
-   * Adjust field position by moving it in the specified direction
-   *
-   * @param direction - Direction to move the field
-   *   - 'up': Decrease Y coordinate (move field UP on PDF)
-   *   - 'down': Increase Y coordinate (move field DOWN on PDF)
-   *   - 'left': Decrease X coordinate (move field LEFT on PDF)
-   *   - 'right': Increase X coordinate (move field RIGHT on PDF)
-   * @param field - Field name to adjust
-   * @param customStep - Optional custom step size (default: 0.5%)
-   */
-  const adjustPosition = useCallback((direction: 'up' | 'down' | 'left' | 'right', field: string, customStep?: number) => {
-    const position = fieldPositions[field] || {
-      top: parseFloat(fieldOverlays[0]?.fields.find(f => f.field === field)?.top || '0'),
-      left: parseFloat(fieldOverlays[0]?.fields.find(f => f.field === field)?.left || '0')
-    };
-    const step = customStep ?? 0.5; // Fine-tuned for precise control, allow override
-    const newPosition = { ...position };
-
-    switch (direction) {
-      case 'up':
-        // Move UP on PDF = decrease top position (Y coordinate)
-        newPosition.top = Math.max(0, newPosition.top - step);
-        break;
-      case 'down':
-        // Move DOWN on PDF = increase top position (Y coordinate)
-        newPosition.top = Math.min(100, newPosition.top + step);
-        break;
-      case 'left':
-        // Move LEFT on PDF = decrease left position (X coordinate)
-        newPosition.left = Math.max(0, newPosition.left - step);
-        break;
-      case 'right':
-        // Move RIGHT on PDF = increase left position (X coordinate)
-        newPosition.left = Math.min(100, newPosition.left + step);
-        break;
-    }
-
-    updateFieldPosition(field, newPosition);
-  }, [fieldPositions, fieldOverlays, updateFieldPosition]);
 
   const handleAutofillField = (field: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -314,53 +185,6 @@ const fieldNameToIndex: Record<string, number> = useMemo(() => {
       updateField(field, value);
     }
   };
-
-  // RAF cleanup on unmount to prevent memory leaks
-  useEffect(() => {
-    return () => {
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = null;
-      }
-    };
-  }, []);
-
-  // Keyboard shortcuts for field positioning
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement;
-      const isArrowKey = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key);
-
-      // In Edit Mode with selected field: arrow keys move the field, even if input is focused
-      if (isEditMode && currentFieldIndex >= 0 && isArrowKey) {
-        const field = Object.keys(fieldNameToIndex).find(
-          f => fieldNameToIndex[f] === currentFieldIndex
-        );
-
-        if (!field) return;
-
-        e.preventDefault(); // Prevent default arrow key behavior in input
-        const step = e.shiftKey ? 5 : 0.5; // Shift key for faster movement
-
-        if (e.key === 'ArrowUp') {
-          adjustPosition('up', field, step);
-        } else if (e.key === 'ArrowDown') {
-          adjustPosition('down', field, step);
-        } else if (e.key === 'ArrowLeft') {
-          adjustPosition('left', field, step);
-        } else if (e.key === 'ArrowRight') {
-          adjustPosition('right', field, step);
-        }
-        return; // Exit early - we handled the arrow key
-      }
-
-      // In Fill Mode: ignore arrow keys if user is typing in an input field
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isEditMode, currentFieldIndex, fieldNameToIndex, adjustPosition]);
 
   // Show loading state while fetching field data from database
   if (isLoadingFields) {
@@ -506,274 +330,44 @@ const fieldNameToIndex: Record<string, number> = useMemo(() => {
                   {pageOverlays && (
                     <div className="absolute inset-0 z-10">
                       {/* Alignment Guides */}
-                      {isDragging && (
-                        <>
-                          {/* Vertical alignment guides */}
-                          {alignmentGuides.x.map((x, i) => (
-                            <div
-                              key={`guide-x-${i}`}
-                              className="absolute top-0 bottom-0 w-0.5 bg-accent shadow-lg pointer-events-none z-40 animate-in fade-in duration-100"
-                              style={{ left: `${x}%` }}
-                            >
-                              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full bg-accent text-accent-foreground text-xs px-2 py-1 rounded-t">
-                                {x.toFixed(1)}%
-                              </div>
-                            </div>
-                          ))}
-                          
-                          {/* Horizontal alignment guides */}
-                          {alignmentGuides.y.map((y, i) => (
-                            <div
-                              key={`guide-y-${i}`}
-                              className="absolute left-0 right-0 h-0.5 bg-accent shadow-lg pointer-events-none z-40 animate-in fade-in duration-100"
-                              style={{ top: `${y}%` }}
-                            >
-                              <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full bg-accent text-accent-foreground text-xs px-2 py-1 rounded-l">
-                                {y.toFixed(1)}%
-                              </div>
-                            </div>
-                          ))}
-                        </>
-                      )}
-                      
+                      {isDragging && <AlignmentGuides guides={alignmentGuides} />}
+
                       {pageOverlays.fields.map((overlay, idx) => {
                         const position = fieldPositions[overlay.field] || {
                           top: parseFloat(overlay.top),
                           left: parseFloat(overlay.left)
                         };
-                        
+
                         const isCurrentField = fieldNameToIndex[overlay.field] === currentFieldIndex;
                         const canAutofillField = canAutofill(overlay.field, vaultData);
                         const hasValue = !!formData[overlay.field as keyof FormData];
-                        
-                        // Determine which directions are available for movement
-                        const canMoveUp = position.top > 1;
-                        const canMoveDown = position.top < 94;
-                        const canMoveLeft = position.left > 1;
-                        const canMoveRight = position.left < 94;
-                        
-                          return (
-                            <div
+
+                        return (
+                          <FieldOverlay
                             key={idx}
-                            data-field={overlay.field}
-                            className={`field-container group absolute z-20 ${isEditMode ? 'select-none touch-none' : ''} ${
-                              isDragging === overlay.field ? 'cursor-grabbing z-50 ring-2 ring-primary shadow-lg scale-105' :
-                              isEditMode ? 'cursor-move ring-2 ring-primary/70' : 'cursor-pointer'
-                            } ${
-                              highlightedField === overlay.field
-                                ? 'ring-2 ring-accent shadow-lg animate-pulse' :
-                              isCurrentField
-                                ? 'ring-2 ring-primary shadow-md bg-primary/5'
-                                : 'ring-1 ring-border/50 hover:ring-primary/50'
-                            } rounded-lg bg-background/80 backdrop-blur-sm p-2 transition-all duration-200`}
-                            style={{
-                              top: `${position.top}%`,
-                              left: `${position.left}%`,
-                              width: overlay.width || 'auto',
-                              height: overlay.height || 'auto',
-                              pointerEvents: 'auto',
-                              // Expand clickable area with negative margin
-                              margin: '-8px',
-                              // Scale with zoom
-                              transform: `scale(${zoom})`,
-                              transformOrigin: 'top left',
-                            }}
-                            onClick={(e) => handleFieldClick(overlay.field, e)}
-                            {...(isEditMode ? { onPointerDown: (e) => handlePointerDown(e, overlay.field, position.top, position.left) } : {})}
-                          >
-                            {/* Visual Direction Indicators */}
-                            {isEditMode && (
-                              <>
-                                {/* Up Arrow Indicator */}
-                                {canMoveUp && (
-                                  <div className="absolute -top-10 left-1/2 -translate-x-1/2 pointer-events-none">
-                                    <ArrowUp className="h-5 w-5 text-primary animate-pulse drop-shadow-lg" strokeWidth={2.5} />
-                                  </div>
-                                )}
-                                
-                                {/* Down Arrow Indicator */}
-                                {canMoveDown && (
-                                  <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 pointer-events-none">
-                                    <ArrowDown className="h-5 w-5 text-primary animate-pulse drop-shadow-lg" strokeWidth={2.5} />
-                                  </div>
-                                )}
-                                
-                                {/* Left Arrow Indicator */}
-                                {canMoveLeft && (
-                                  <div className="absolute top-1/2 -translate-y-1/2 -left-10 pointer-events-none">
-                                    <ArrowLeft className="h-5 w-5 text-primary animate-pulse drop-shadow-lg" strokeWidth={2.5} />
-                                  </div>
-                                )}
-                                
-                                {/* Right Arrow Indicator */}
-                                {canMoveRight && (
-                                  <div className="absolute top-1/2 -translate-y-1/2 -right-10 pointer-events-none">
-                                    <ArrowRight className="h-5 w-5 text-primary animate-pulse drop-shadow-lg" strokeWidth={2.5} />
-                                  </div>
-                                )}
-                              </>
-                            )}
-                            
-                            {/* Simplified Field Controls */}
-                            {isCurrentField && (
-                              <div className="absolute -top-8 left-0 right-0 flex items-center justify-between gap-2">
-                                <div className="px-2 py-1 rounded bg-primary text-primary-foreground text-xs font-medium whitespace-nowrap">
-                                  {overlay.placeholder || overlay.field}
-                                  {canAutofillField && !hasValue && (
-                                    <Sparkles className="inline h-3 w-3 ml-1 animate-pulse" />
-                                  )}
-                                </div>
-                                {isEditMode && (
-                                  <div className="flex gap-1">
-                                    <Button
-                                      size="icon"
-                                      variant="secondary"
-                                      className="h-6 w-6"
-                                      disabled={!canMoveUp}
-                                      aria-label="Move field up"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        adjustPosition('up', overlay.field);
-                                      }}
-                                    >
-                                      <ChevronUp className="h-3 w-3" />
-                                      <span className="sr-only">Move field up</span>
-                                    </Button>
-                                    <Button
-                                      size="icon"
-                                      variant="secondary"
-                                      className="h-6 w-6"
-                                      disabled={!canMoveDown}
-                                      aria-label="Move field down"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        adjustPosition('down', overlay.field);
-                                      }}
-                                    >
-                                      <ChevronDown className="h-3 w-3" />
-                                      <span className="sr-only">Move field down</span>
-                                    </Button>
-                                    <Button
-                                      size="icon"
-                                      variant="secondary"
-                                      className="h-6 w-6"
-                                      disabled={!canMoveLeft}
-                                      aria-label="Move field left"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        adjustPosition('left', overlay.field);
-                                      }}
-                                    >
-                                      <ChevronLeft className="h-3 w-3" />
-                                      <span className="sr-only">Move field left</span>
-                                    </Button>
-                                    <Button
-                                      size="icon"
-                                      variant="secondary"
-                                      className="h-6 w-6"
-                                      disabled={!canMoveRight}
-                                      aria-label="Move field right"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        adjustPosition('right', overlay.field);
-                                      }}
-                                    >
-                                      <ChevronRight className="h-3 w-3" />
-                                      <span className="sr-only">Move field right</span>
-                                    </Button>
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                            {isCurrentField && (
-                              <>
-                                {canAutofillField && !hasValue && (
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        size="icon"
-                                        variant="secondary"
-                                        className="absolute -top-2 -right-10 h-7 w-7 rounded-full"
-                                        aria-label="Autofill field from vault"
-                                        onClick={(e) => handleAutofillField(overlay.field, e)}
-                                        onPointerDown={(e) => {
-                                          e.preventDefault();
-                                          e.stopPropagation();
-                                        }}
-                                      >
-                                        <Sparkles className="h-4 w-4" />
-                                        <span className="sr-only">Autofill from vault</span>
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>Autofill from vault</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                )}
-                              </>
-                            )}
-                            
-                            {overlay.type === 'input' && (
-                              <Input
-                                data-field={overlay.field}
-                                value={formData[overlay.field as keyof FormData] as string || ''}
-                                onChange={(e) => updateField(overlay.field, e.target.value)}
-                                placeholder={overlay.placeholder}
-                                disabled={isEditMode}
-                                style={{ 
-                                  fontSize: `${fieldFontSize}pt`,
-                                  height: `${fieldFontSize * 2}px`
-                                }}
-                                className={`field-input font-mono ${
-                                  isEditMode
-                                    ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
-                                  validationErrors?.[overlay.field]?.length
-                                    ? 'bg-destructive/10 border-destructive'
-                                    : isCurrentField
-                                    ? 'bg-primary/5 border-primary'
-                                    : 'bg-background border-border'
-                                }`}
-                              />
-                            )}
-                            {overlay.type === 'textarea' && (
-                              <Textarea
-                                data-field={overlay.field}
-                                value={formData[overlay.field as keyof FormData] as string || ''}
-                                onChange={(e) => updateField(overlay.field, e.target.value)}
-                                placeholder={overlay.placeholder}
-                                disabled={isEditMode}
-                                style={{ 
-                                  fontSize: `${fieldFontSize}pt`,
-                                  minHeight: `${fieldFontSize * 4}px`
-                                }}
-                                className={`field-input font-mono resize-none ${
-                                  isEditMode
-                                    ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
-                                  validationErrors?.[overlay.field]?.length
-                                    ? 'bg-destructive/10 border-destructive'
-                                    : isCurrentField
-                                    ? 'bg-primary/5 border-primary'
-                                    : 'bg-background border-border'
-                                }`}
-                              />
-                            )}
-                            {overlay.type === 'checkbox' && (
-                              <Checkbox
-                                data-field={overlay.field}
-                                checked={!!formData[overlay.field as keyof FormData]}
-                                onCheckedChange={(checked) => !isEditMode && updateField(overlay.field, checked as boolean)}
-                                disabled={isEditMode}
-                                className={`h-5 w-5 border-2 transition-all duration-200 ${
-                                  isEditMode
-                                    ? 'bg-muted/50 border-muted cursor-move pointer-events-none' :
-                                  isCurrentField 
-                                    ? 'bg-primary/10 border-primary shadow-lg ring-2 ring-primary/20 scale-110' 
-                                    : 'bg-background border-border hover:border-primary/70 hover:bg-primary/5 hover:scale-110 hover:shadow-md active:scale-105 cursor-pointer'
-                                }`}
-                                aria-label={overlay.placeholder || overlay.field}
-                              />
-                            )}
-                          </div>
+                            field={overlay.field}
+                            type={overlay.type}
+                            placeholder={overlay.placeholder}
+                            width={overlay.width}
+                            height={overlay.height}
+                            position={position}
+                            zoom={zoom}
+                            fieldFontSize={fieldFontSize}
+                            formData={formData}
+                            isEditMode={isEditMode}
+                            isCurrentField={isCurrentField}
+                            isDragging={isDragging === overlay.field}
+                            highlightedField={highlightedField}
+                            validationErrors={validationErrors}
+                            vaultData={vaultData}
+                            canAutofillField={canAutofillField}
+                            hasValue={hasValue}
+                            updateField={updateField}
+                            adjustPosition={adjustPosition}
+                            handleFieldClick={handleFieldClick}
+                            handleAutofillField={handleAutofillField}
+                            onPointerDown={isEditMode ? (e) => handlePointerDown(e, overlay.field, position.top, position.left) : undefined}
+                          />
                         );
                       })}
                     </div>

@@ -389,6 +389,52 @@ describe('FormViewer Integration Tests', () => {
   });
 
   /**
+   * TEST 7b: Field font size control
+   */
+  test('applies custom field font size to inputs', async () => {
+    const propsWithFontSize = {
+      ...defaultProps,
+      fieldFontSize: 14
+    };
+
+    renderFormViewer(propsWithFontSize);
+
+    await waitFor(() => {
+      expect(document.querySelector('[data-field="partyName"]')).toBeTruthy();
+    });
+
+    const field = document.querySelector('[data-field="partyName"]') as HTMLElement | null;
+    expect(field).toBeTruthy();
+    if (!field) {
+      throw new Error('Expected partyName field to render');
+    }
+    expect(field.style.fontSize).toBe('14pt');
+  });
+
+  /**
+   * TEST 7c: Desktop edit mode toggle
+   */
+  test('enables edit mode styling when isEditMode is true', async () => {
+    const propsWithEditMode = {
+      ...defaultProps,
+      isEditMode: true
+    };
+
+    renderFormViewer(propsWithEditMode);
+
+    await waitFor(() => {
+      expect(document.querySelector('[data-field="partyName"]')).toBeTruthy();
+    });
+
+    const field = document.querySelector('[data-field="partyName"]') as HTMLElement | null;
+    expect(field).toBeTruthy();
+    if (!field) {
+      throw new Error('Expected partyName field to render');
+    }
+    expect(field.className).toContain('cursor-move');
+  });
+
+  /**
    * TEST 8: Keyboard Navigation
    */
   test.skip('fields support keyboard navigation', async () => {

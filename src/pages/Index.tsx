@@ -172,6 +172,8 @@ const Index = () => {
     staleTime: 1000 * 60, // Cache for 1 minute
     refetchOnWindowFocus: true,
   });
+  const typedVaultData = (vaultData as PersonalVaultData | null) ?? null;
+  const autofillableCount = typedVaultData ? getAutofillableFields(typedVaultData).length : 0;
 
   const updateField = useCallback((field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -189,7 +191,7 @@ const Index = () => {
   }, [validationRules]);
 
   const handleAutofillAll = useCallback(() => {
-    if (!vaultData) {
+    if (!typedVaultData) {
       toast({
         title: "No vault data",
         description: "Please fill out your Personal Data Vault first",
@@ -198,7 +200,7 @@ const Index = () => {
       return;
     }
 
-    const autofilled = autofillAllFromVault(vaultData as PersonalVaultData);
+    const autofilled = autofillAllFromVault(typedVaultData);
     const fieldsCount = Object.keys(autofilled).length;
 
     if (fieldsCount === 0) {
@@ -216,7 +218,7 @@ const Index = () => {
       title: "Success!",
       description: `Autofilled ${fieldsCount} field(s)`,
     });
-  }, [vaultData, toast]);
+  }, [typedVaultData, toast]);
 
   const updateFieldPosition = useCallback((field: string, position: { top: number; left: number }) => {
     setFieldPositions(prev => ({ ...prev, [field]: position }));
@@ -540,6 +542,21 @@ const Index = () => {
     navigate("/auth");
   };
 
+  const sharedFormViewerProps = {
+    formData,
+    updateField,
+    currentFieldIndex,
+    setCurrentFieldIndex,
+    fieldPositions,
+    updateFieldPosition,
+    zoom: pdfZoom,
+    fieldFontSize,
+    highlightedField,
+    validationErrors,
+    vaultData: typedVaultData,
+    isEditMode,
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -699,7 +716,7 @@ const Index = () => {
                   variant="default"
                   size="lg"
                   onClick={handleAutofillAll}
-                  disabled={isVaultLoading || !vaultData}
+                  disabled={isVaultLoading || !typedVaultData}
                   className="gap-2 bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/95 hover:via-primary/85 hover:to-primary/75 shadow-lg hover:shadow-xl transition-all duration-200 font-semibold relative overflow-hidden group hover:scale-105"
                   aria-label="Autofill all compatible fields from vault"
                 >
@@ -709,9 +726,9 @@ const Index = () => {
                     <Sparkles className="h-5 w-5 group-hover:animate-pulse" strokeWidth={2} />
                   )}
                   <span className="relative z-10">AI Magic Fill</span>
-                  {vaultData && !isVaultLoading && (
+                  {typedVaultData && !isVaultLoading && (
                     <Badge variant="secondary" className="ml-1 bg-background/20 hover:bg-background/30 transition-colors text-xs font-bold">
-                      {getAutofillableFields(vaultData as PersonalVaultData).length}
+                      {autofillableCount}
                     </Badge>
                   )}
                   {/* Shimmer effect */}
@@ -721,8 +738,8 @@ const Index = () => {
               <TooltipContent side="bottom" className="max-w-xs">
                 <p className="font-medium mb-1">✨ AI Magic Fill</p>
                 <p className="text-xs text-muted-foreground mb-1">Instantly autofill all compatible fields from your Personal Data Vault</p>
-                {vaultData && !isVaultLoading && (
-                  <p className="text-xs text-green-600 dark:text-green-400 font-semibold">✨ {getAutofillableFields(vaultData as PersonalVaultData).length} fields ready to fill!</p>
+                {typedVaultData && !isVaultLoading && (
+                  <p className="text-xs text-green-600 dark:text-green-400 font-semibold">✨ {autofillableCount} fields ready to fill!</p>
                 )}
                 <p className="text-xs text-muted-foreground mt-2 border-t pt-1">💡 Make this larger and pill-shaped, located in the most likely place users can easily overlay the field</p>
               </TooltipContent>
@@ -927,20 +944,7 @@ const Index = () => {
         {/* Mobile PDF Viewer (full screen, no panels) */}
         <div className="md:hidden flex-1 overflow-hidden">
           <Suspense fallback={<ViewerSkeleton />}>
-            <FormViewer
-              formData={formData}
-              updateField={updateField}
-              currentFieldIndex={currentFieldIndex}
-              setCurrentFieldIndex={setCurrentFieldIndex}
-              fieldPositions={fieldPositions}
-              updateFieldPosition={updateFieldPosition}
-              zoom={pdfZoom}
-              fieldFontSize={fieldFontSize}
-              highlightedField={highlightedField}
-              validationErrors={validationErrors}
-              vaultData={vaultData as PersonalVaultData}
-              isEditMode={isEditMode}
-            />
+            <FormViewer {...sharedFormViewerProps} />
           </Suspense>
         </div>
 
@@ -994,20 +998,7 @@ const Index = () => {
               >
                 <div ref={pdfPanelRef} className="h-full w-full">
                   <Suspense fallback={<ViewerSkeleton />}>
-                    <FormViewer
-                      formData={formData}
-                      updateField={updateField}
-                      currentFieldIndex={currentFieldIndex}
-                      setCurrentFieldIndex={setCurrentFieldIndex}
-                      fieldPositions={fieldPositions}
-                      updateFieldPosition={updateFieldPosition}
-                      zoom={pdfZoom}
-                      fieldFontSize={fieldFontSize}
-                      highlightedField={highlightedField}
-                      validationErrors={validationErrors}
-                      vaultData={vaultData as PersonalVaultData}
-                      isEditMode={isEditMode}
-                    />
+                    <FormViewer {...sharedFormViewerProps} />
                   </Suspense>
                 </div>
               </ResizablePanel>
