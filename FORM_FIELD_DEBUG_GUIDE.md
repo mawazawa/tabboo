@@ -60,19 +60,26 @@ while (element && !element.classList.contains('field-container')) {
 ```
 **Status:** VERIFIED WORKING
 
-### Fix 5: Arrow Key Positioning (CURRENT FOCUS 🟡)
-**Commit:** `88f70ef`
-**Problem:** Arrow keys conflict with text cursor movement when typing
-**Solution:** Two-mode arrow key handling:
+### Fix 5: Arrow Key Positioning (RESOLVED ✅)
+**Commit:** `88f70ef` + `b1740a1`
+**Problem 1:** Arrow keys conflict with text cursor movement when typing
+**Problem 2:** Right panel fields missing `.field-input` class for detection
+**Solution:** Two-mode arrow key handling + add class to right panel:
 1. **Arrow keys alone**: Work when NOT actively typing in field
 2. **Alt/Option + Arrow keys**: ALWAYS work, even when typing
+3. **Critical Fix**: Added `.field-input` class to right panel Input (line 1023) and Textarea (line 1041)
 
-**File:** `src/components/FieldNavigationPanel.tsx` lines 437-462
+**Files:** 
+- `src/components/FieldNavigationPanel.tsx` lines 437-462 (logic)
+- `src/components/FieldNavigationPanel.tsx` lines 1023, 1041 (class fix)
+- `src/components/FormViewer.tsx` lines 817, 835 (already had class)
+
 ```tsx
+// Detection logic (lines 437-462)
 const activeElement = document.activeElement as HTMLElement;
 const isActivelyTyping = activeElement && 
   (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA') &&
-  activeElement.classList.contains('field-input');
+  activeElement.classList.contains('field-input'); // ✅ Now works for both panels!
 
 const isArrowKey = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key);
 const shouldMoveField = isArrowKey && (e.altKey || !isActivelyTyping);
@@ -82,7 +89,13 @@ if (shouldMoveField) {
   adjustPosition(direction);
 }
 ```
-**Status:** NEEDS VERIFICATION
+
+**Root Cause:**
+- PDF overlay fields HAD `.field-input` class → arrow keys worked correctly
+- Right panel fields MISSING `.field-input` class → arrow keys moved field while typing (WRONG!)
+- Logic couldn't detect typing in right panel
+
+**Status:** VERIFIED WORKING ✅
 
 ## Testing Checklist
 
