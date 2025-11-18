@@ -405,6 +405,16 @@ export const FieldNavigationPanel = ({
   // Handle keyboard shortcuts with optimized performance
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // DEBUG: Log ALL arrow key presses
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        console.log('[DEBUG]', 'Arrow key pressed:', e.key, {
+          currentFieldIndex,
+          currentField: FIELD_CONFIG[currentFieldIndex]?.field,
+          activeElement: document.activeElement?.tagName,
+          altKey: e.altKey
+        });
+      }
+      
       const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
       const modKey = isMac ? e.metaKey : e.ctrlKey;
       
@@ -445,14 +455,33 @@ export const FieldNavigationPanel = ({
       const isArrowKey = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key);
       const shouldMoveField = isArrowKey && (e.altKey || !isActivelyTyping); // Alt+Arrow OR not typing
       
+      console.log('[DEBUG]', 'Arrow key check:', {
+        isArrowKey,
+        altKey: e.altKey,
+        isActivelyTyping,
+        shouldMoveField,
+        activeElementTag: activeElement?.tagName,
+        hasFieldInputClass: activeElement?.classList.contains('field-input')
+      });
+      
       if (shouldMoveField) {
         e.preventDefault();
+        
+        // CRITICAL: If no field is selected, select the first one
+        if (currentFieldIndex === -1 || !FIELD_CONFIG[currentFieldIndex]) {
+          setCurrentFieldIndex(0);
+          console.log('[ARROW KEY]', 'No field selected, auto-selecting first field');
+          return; // Wait for next keypress after selection
+        }
+        
         const direction = {
           'ArrowUp': 'up',
           'ArrowDown': 'down',
           'ArrowLeft': 'left',
           'ArrowRight': 'right'
         }[e.key] as 'up' | 'down' | 'left' | 'right';
+        
+        console.log('[ARROW KEY]', `Moving ${FIELD_CONFIG[currentFieldIndex]?.field} ${direction}`);
         
         // Immediate visual feedback with requestAnimationFrame for optimal performance
         requestAnimationFrame(() => {
