@@ -279,19 +279,20 @@ const fieldNameToIndex: Record<string, number> = useMemo(() => {
         )}
 
         <div className="relative min-h-full w-full flex flex-col items-center justify-center p-4">
-          {/* Page Navigation Controls */}
+          {/* Page Navigation Controls - Glassmorphic Styling */}
           {numPages > 1 && !pdfLoading && (
-            <div className="sticky top-4 z-40 mb-4 flex items-center gap-2 bg-background/95 backdrop-blur-sm border rounded-lg px-4 py-2 shadow-lg">
+            <div className="sticky top-4 z-40 mb-4 flex items-center gap-2 bg-background/95 backdrop-blur-md border border-border/50 rounded-xl px-4 py-2.5 shadow-3point transition-all duration-300 hover:shadow-3point-hover">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handlePreviousPage}
                 disabled={currentPDFPage === 1}
                 aria-label="Previous page"
+                className="transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <span className="text-sm font-medium min-w-[80px] text-center">
+              <span className="text-sm font-semibold min-w-[90px] text-center text-foreground/90 tracking-tight">
                 Page {currentPDFPage} of {numPages}
               </span>
               <Button
@@ -300,6 +301,7 @@ const fieldNameToIndex: Record<string, number> = useMemo(() => {
                 onClick={handleNextPage}
                 disabled={currentPDFPage === numPages}
                 aria-label="Next page"
+                className="transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
