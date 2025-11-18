@@ -8,6 +8,7 @@ import { useFormFields, convertToFieldOverlays } from "@/hooks/use-form-fields";
 import { useLiveRegion } from "@/hooks/use-live-region";
 import { useKeyboardNavigation } from "@/hooks/use-keyboard-navigation";
 import { useDragAndDrop } from "@/hooks/use-drag-and-drop";
+import { useRAFMonitoring } from "@/hooks/use-raf-batching";
 import { AlignmentGuides } from "@/components/pdf/AlignmentGuides";
 import { FieldOverlay } from "@/components/pdf/FieldOverlay";
 import { mergeFieldNameToIndex } from "@/lib/field-name-index-utils";

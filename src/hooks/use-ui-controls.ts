@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, RefObject } from 'react';
+import { useState, useCallback, useEffect, useRef, RefObject } from 'react';
 import type { PersonalVaultData } from '@/utils/vaultFieldMatcher';
 import type { User } from '@supabase/supabase-js';
 
@@ -55,19 +55,32 @@ export function useUIControls({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []); // toast is a stable function, doesn't need to be in dependencies
 
-  // Toast notification when edit mode changes
+  // Keep latest toast reference stable
+  const latestToastRef = useRef(toast);
   useEffect(() => {
-    // Skip on initial mount
-    if (isEditMode === false && !user) return;
+    latestToastRef.current = toast;
+  }, [toast]);
 
-    toast({
+  // Toast notification when edit mode changes (skip until user is ready, avoid initial fire)
+  const hasInitializedRef = useRef(false);
+  useEffect(() => {
+    if (!user) return;
+
+    if (!hasInitializedRef.current) {
+      hasInitializedRef.current = true;
+      if (!isEditMode) {
+        return;
+      }
+    }
+
+    latestToastRef.current({
       title: isEditMode ? 'Edit Mode Enabled' : 'Edit Mode Disabled',
       description: isEditMode
         ? 'You can now reposition fields by dragging them or using arrow keys'
         : 'You can now fill form fields',
       duration: 2000,
     });
-  }, [isEditMode, user, toast]);
+  }, [isEditMode, user]);
 
   const handleZoomOut = useCallback(() => {
     setPdfZoom((prev) => Math.max(0.5, prev - 0.1));

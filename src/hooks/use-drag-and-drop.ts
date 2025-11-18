@@ -1,4 +1,5 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback } from 'react';
+import { useThrottledRAF, useRAFMonitoring } from './use-raf-batching';
 import type { FieldPosition } from '@/types/FormData';
 
 interface UseDragAndDropProps {
@@ -24,10 +25,10 @@ export function useDragAndDrop({
 
   // Use refs for drag state to avoid re-render storms
   const dragStartPos = useRef<{ x: number; y: number; top: number; left: number }>({ x: 0, y: 0, top: 0, left: 0 });
-  const dragElementRef = useRef<HTMLElement | null>(null);
-  const draggedPositionRef = useRef<{ top: number; left: number } | null>(null);
-  const rafRef = useRef<number | null>(null);
   const lastGuidesRef = useRef<{ x: number[]; y: number[] }>({ x: [], y: [] });
+
+  // Performance monitoring for drag operations (optional - only logs in dev mode)
+  const { startMonitoring, stopMonitoring } = useRAFMonitoring();
 
   const handlePointerDown = (e: React.PointerEvent, field: string, currentTop: number, currentLeft: number) => {
     // Only allow dragging in edit mode
@@ -40,7 +41,6 @@ export function useDragAndDrop({
     if (!container) return;
 
     container.setPointerCapture(e.pointerId);
-    dragElementRef.current = container;
     setIsDragging(field);
 
     dragStartPos.current = {
@@ -50,115 +50,96 @@ export function useDragAndDrop({
       left: currentLeft
     };
 
-    draggedPositionRef.current = { top: currentTop, left: currentLeft };
+    // Start performance monitoring (dev mode only)
+    startMonitoring();
   };
 
+  // Throttled RAF-based position update (60fps max, even if pointer moves 100+ times/sec)
+  const throttledPositionUpdate = useThrottledRAF((
+    clientX: number,
+    clientY: number,
+    parentRect: DOMRect,
+    field: string
+  ) => {
+    const deltaX = clientX - dragStartPos.current.x;
+    const deltaY = clientY - dragStartPos.current.y;
+
+    let newLeft = dragStartPos.current.left + (deltaX / parentRect.width) * 100;
+    let newTop = dragStartPos.current.top + (deltaY / parentRect.height) * 100;
+
+    // Constrain within bounds
+    newLeft = Math.max(0, Math.min(95, newLeft));
+    newTop = Math.max(0, Math.min(95, newTop));
+
+    // Smart snapping to other fields
+    const snapThreshold = 1.5;
+    const guides: { x: number[]; y: number[] } = { x: [], y: [] };
+
+    Object.entries(fieldPositions).forEach(([otherField, pos]) => {
+      if (otherField === field) return;
+
+      if (Math.abs(newLeft - pos.left) < snapThreshold) {
+        newLeft = pos.left;
+        guides.x.push(pos.left);
+      }
+
+      if (Math.abs(newTop - pos.top) < snapThreshold) {
+        newTop = pos.top;
+        guides.y.push(pos.top);
+      }
+    });
+
+    // Performance: Only update alignment guides state if they changed
+    const guidesChanged =
+      guides.x.length !== lastGuidesRef.current.x.length ||
+      guides.y.length !== lastGuidesRef.current.y.length ||
+      !guides.x.every((val, idx) => val === lastGuidesRef.current.x[idx]) ||
+      !guides.y.every((val, idx) => val === lastGuidesRef.current.y[idx]);
+
+    if (guidesChanged) {
+      lastGuidesRef.current = guides;
+      setAlignmentGuides(guides);
+    }
+
+    // Update position state directly - GPU positioning will handle rendering
+    // This runs at 60fps max thanks to throttledRAF
+    updateFieldPosition(field, { top: newTop, left: newLeft });
+  });
+
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
-    if (!isDragging || !dragElementRef.current) return;
+    if (!isDragging) return;
 
     e.preventDefault();
 
-    // Cancel any pending animation frame
-    if (rafRef.current !== null) {
-      cancelAnimationFrame(rafRef.current);
-    }
+    const parentRect = (e.currentTarget as HTMLElement).getBoundingClientRect();
 
-    // Use requestAnimationFrame + CSS transform (no React state updates during drag!)
-    // Performance: This limits updates to 60fps max for buttery smooth dragging
-    rafRef.current = requestAnimationFrame(() => {
-      const deltaX = e.clientX - dragStartPos.current.x;
-      const deltaY = e.clientY - dragStartPos.current.y;
-      const parentRect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-
-      let newLeft = dragStartPos.current.left + (deltaX / parentRect.width) * 100;
-      let newTop = dragStartPos.current.top + (deltaY / parentRect.height) * 100;
-
-      // Constrain within bounds
-      newLeft = Math.max(0, Math.min(95, newLeft));
-      newTop = Math.max(0, Math.min(95, newTop));
-
-      // Smart snapping to other fields
-      const snapThreshold = 1.5;
-      const guides: { x: number[]; y: number[] } = { x: [], y: [] };
-
-      Object.entries(fieldPositions).forEach(([field, pos]) => {
-        if (field === isDragging) return;
-
-        if (Math.abs(newLeft - pos.left) < snapThreshold) {
-          newLeft = pos.left;
-          guides.x.push(pos.left);
-        }
-
-        if (Math.abs(newTop - pos.top) < snapThreshold) {
-          newTop = pos.top;
-          guides.y.push(pos.top);
-        }
-      });
-
-      // Performance: Only update alignment guides state if they changed
-      // This avoids unnecessary re-renders during drag
-      const guidesChanged =
-        guides.x.length !== lastGuidesRef.current.x.length ||
-        guides.y.length !== lastGuidesRef.current.y.length ||
-        !guides.x.every((val, idx) => val === lastGuidesRef.current.x[idx]) ||
-        !guides.y.every((val, idx) => val === lastGuidesRef.current.y[idx]);
-
-      if (guidesChanged) {
-        lastGuidesRef.current = guides;
-        setAlignmentGuides(guides);
-      }
-
-      // Store position in ref (not state!)
-      draggedPositionRef.current = { top: newTop, left: newLeft };
-
-      // Apply via CSS transform for smooth 60fps movement (bypasses React)
-      if (dragElementRef.current) {
-        const deltaLeftPx = (newLeft - dragStartPos.current.left) * parentRect.width / 100;
-        const deltaTopPx = (newTop - dragStartPos.current.top) * parentRect.height / 100;
-        dragElementRef.current.style.transform = `translate(${deltaLeftPx}px, ${deltaTopPx}px)`;
-      }
-    });
-  }, [isDragging, fieldPositions]);
+    // Throttled to 60fps via RAF
+    throttledPositionUpdate(e.clientX, e.clientY, parentRect, isDragging);
+  }, [isDragging, throttledPositionUpdate]);
 
   const handlePointerUp = useCallback((e: React.PointerEvent) => {
     if (!isDragging) return;
 
-    if (rafRef.current !== null) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
+    // Stop performance monitoring and log results (dev mode only)
+    const metrics = stopMonitoring();
+    if (import.meta.env.DEV && metrics.totalFrames > 0) {
+      console.log(`[Performance] Drag operation completed:`, {
+        avgFPS: metrics.avgFPS,
+        minFPS: metrics.minFPS,
+        frameDrops: metrics.frameDrops,
+        totalFrames: metrics.totalFrames,
+        dropRate: `${((metrics.frameDrops / metrics.totalFrames) * 100).toFixed(1)}%`,
+      });
     }
 
-    // Release pointer capture
-    if (dragElementRef.current) {
-      dragElementRef.current.releasePointerCapture(e.pointerId);
-      // Reset transform
-      dragElementRef.current.style.transform = '';
-    }
+    // Announce field repositioning to screen readers
+    announce(`Field ${isDragging} repositioned`);
 
-    // COMMIT: Now update React state with final position
-    if (draggedPositionRef.current && isDragging) {
-      updateFieldPosition(isDragging, draggedPositionRef.current);
-      // Announce field repositioning to screen readers
-      announce(`Field ${isDragging} repositioned`);
-    }
-
-    // Clean up
+    // Clean up drag state
     setIsDragging(null);
-    dragElementRef.current = null;
-    draggedPositionRef.current = null;
     setAlignmentGuides({ x: [], y: [] });
     lastGuidesRef.current = { x: [], y: [] };
-  }, [isDragging, updateFieldPosition, announce]);
-
-  // RAF cleanup on unmount to prevent memory leaks
-  useEffect(() => {
-    return () => {
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = null;
-      }
-    };
-  }, []);
+  }, [isDragging, announce, stopMonitoring]);
 
   return {
     isDragging,
