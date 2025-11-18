@@ -1,24 +1,26 @@
 /**
  * GPU-Accelerated Positioning Utilities
  *
- * Uses CSS transform: translate3d() instead of top/left for 3-5x faster field movements
- * by leveraging the GPU Compositor and avoiding Layout + Paint phases.
+ * Uses CSS top/left for positioning and transform: scale() for zoom.
+ * Note: We use top/left (not translate3d) because translate percentages are relative
+ * to the element's own size, not the parent container. Since form fields need to be
+ * positioned relative to the PDF page, top/left with percentages is correct.
  *
  * Based on November 2025 best practices:
  * - transform and opacity are the only S-Tier properties (compositor-only)
  * - will-change should be used sparingly and removed after use
  * - Avoid applying will-change to too many elements simultaneously
  *
- * Performance gains:
- * - CPU Layout: Avoided entirely
- * - CPU Paint: Avoided entirely
- * - GPU Compositing: Only operation (16ms budget for 60fps)
+ * Performance considerations:
+ * - Modern browsers GPU-accelerate position: absolute with will-change: transform
+ * - Scale transform is GPU-composited for zoom
+ * - Will-change is applied only during dragging for optimal GPU memory usage
  */
 
 export interface GPUPositionStyle {
   position: 'absolute';
-  top: 0;
-  left: 0;
+  top: string;
+  left: string;
   transform: string;
   transformOrigin: string;
   willChange?: 'transform';
@@ -39,14 +41,16 @@ export function getGPUPositionStyle(
   zoom: number = 1,
   isDragging: boolean = false
 ): GPUPositionStyle {
-  // Combine translate3d (position) and scale (zoom) in single transform
-  // This minimizes composite layer changes
-  const transform = `translate3d(${leftPercent}%, ${topPercent}%, 0) scale(${zoom})`;
+  // Use top/left for positioning (percentages relative to parent container)
+  // Use scale transform only for zoom
+  // FIX: Previously used translate3d with percentages, which were relative to element's
+  // own size, causing all fields to appear at the same location!
+  const transform = zoom !== 1 ? `scale(${zoom})` : 'none';
 
   const baseStyle: GPUPositionStyle = {
     position: 'absolute',
-    top: 0,
-    left: 0,
+    top: `${topPercent}%`,
+    left: `${leftPercent}%`,
     transform,
     transformOrigin: 'top left',
   };
