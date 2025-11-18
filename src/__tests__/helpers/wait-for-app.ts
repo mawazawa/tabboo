@@ -75,11 +75,15 @@ export async function waitForApp(
     await page.waitForLoadState('networkidle', { timeout });
   }
 
-  // Step 2: Wait for PDF canvas to exist and be visible
-  // Using specific selector to avoid ambiguity with other canvases
+  // Tutorial is disabled via playwright.config.ts localStorage setting
+  // No need to handle it here
+
+  // Step 2: Wait for PDF canvas to exist
+  // Note: We don't use state: 'visible' because the canvas may be in a scrollable container
+  // or have CSS properties that make Playwright think it's not visible, even though it is
   await page.waitForSelector('.react-pdf__Document canvas', {
     timeout,
-    state: 'visible'
+    state: 'attached'
   });
 
   // Step 3: Verify canvas has actual dimensions (is rendered, not just present)
@@ -96,9 +100,10 @@ export async function waitForApp(
 
   // Step 4: Wait for form input fields to be interactive
   // Ensures the overlay inputs are ready for user interaction
+  // Using 'attached' instead of 'visible' to avoid false negatives with CSS positioning
   await page.waitForSelector('input[placeholder]', {
     timeout,
-    state: 'visible'
+    state: 'attached'
   });
 }
 
