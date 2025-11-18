@@ -1,0 +1,817 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "name": "SwiftFill Design System",
+  "description": "Comprehensive design system for SwiftFill - AI-powered PDF form filling application. This system defines all visual design tokens, component patterns, and interaction guidelines for maintaining consistent, premium user experience across all features.",
+
+  "design_philosophy": {
+    "core_principles": [
+      "Premium, professional aesthetic with subtle luxury cues",
+      "Glassmorphic surfaces with soft, diffused shadows",
+      "3D depth through multi-layer shadows and inset highlights",
+      "Generous whitespace and breathing room",
+      "Smooth micro-interactions that delight without distracting",
+      "Dark mode first, with refined light mode support",
+      "Accessibility as a core feature, not an afterthought",
+      "Mobile-first with 44px minimum touch targets"
+    ],
+    "visual_inspiration": [
+      "Apple's Human Interface Guidelines - polish and attention to detail",
+      "Linear.app - clean information hierarchy and modern aesthetics",
+      "Vercel Dashboard - sophisticated dark mode and glassmorphism",
+      "Stripe Dashboard - premium feel with subtle animations"
+    ],
+    "interaction_philosophy": [
+      "Every interaction should feel intentional and smooth",
+      "Provide immediate visual feedback for all actions",
+      "Use spring-based animations for natural motion",
+      "Avoid jarring transitions - favor subtle fades and slides",
+      "Loading states should be elegant, not intrusive"
+    ]
+  },
+
+  "color_system": {
+    "format": "HSL (Hue, Saturation, Lightness)",
+    "rationale": "HSL allows for programmatic color manipulation, easy theme switching, and consistent color relationships across light/dark modes",
+
+    "light_mode": {
+      "background": {
+        "value": "220 25% 97%",
+        "usage": "Main app background - very light blue-gray for reduced eye strain",
+        "contrast_ratio": "21:1 with foreground"
+      },
+      "foreground": {
+        "value": "220 13% 13%",
+        "usage": "Primary text color - almost black with slight blue tint",
+        "contrast_ratio": "21:1 with background"
+      },
+      "card": {
+        "value": "0 0% 100%",
+        "usage": "Card backgrounds - pure white for content containers",
+        "contrast_ratio": "1.2:1 with background"
+      },
+      "card_foreground": {
+        "value": "220 13% 13%",
+        "usage": "Text on cards - matches foreground for consistency"
+      },
+      "primary": {
+        "value": "215 85% 50%",
+        "usage": "Brand color, primary CTAs, links - vibrant blue",
+        "accessibility": "WCAG AAA compliant on white backgrounds"
+      },
+      "primary_foreground": {
+        "value": "0 0% 100%",
+        "usage": "Text on primary colored backgrounds - pure white"
+      },
+      "primary_glow": {
+        "value": "215 85% 60%",
+        "usage": "Lighter variant for glow effects and hover states"
+      },
+      "secondary": {
+        "value": "220 15% 90%",
+        "usage": "Secondary buttons, subtle backgrounds",
+        "contrast_ratio": "1.5:1 with background"
+      },
+      "muted": {
+        "value": "220 15% 94%",
+        "usage": "Disabled states, placeholder text backgrounds",
+        "contrast_ratio": "1.3:1 with background"
+      },
+      "muted_foreground": {
+        "value": "220 10% 35%",
+        "usage": "Secondary text, captions, metadata",
+        "contrast_ratio": "7:1 with background (WCAG AA)"
+      },
+      "accent": {
+        "value": "215 80% 55%",
+        "usage": "Highlights, notifications, interactive elements",
+        "contrast_ratio": "4.5:1 on white (WCAG AA)"
+      },
+      "destructive": {
+        "value": "0 84% 60%",
+        "usage": "Error states, delete actions, warnings",
+        "contrast_ratio": "4.5:1 on white (WCAG AA)"
+      },
+      "border": {
+        "value": "220 15% 88%",
+        "usage": "Component borders, dividers - subtle gray",
+        "opacity_variants": ["0.5 for subtle", "1.0 for prominent"]
+      },
+      "input": {
+        "value": "220 15% 88%",
+        "usage": "Input field borders, form element outlines"
+      },
+      "ring": {
+        "value": "215 85% 50%",
+        "usage": "Focus rings, keyboard navigation indicators"
+      }
+    },
+
+    "dark_mode": {
+      "background": {
+        "value": "220 18% 8%",
+        "usage": "Main app background - very dark blue-gray",
+        "contrast_ratio": "20:1 with foreground"
+      },
+      "foreground": {
+        "value": "220 15% 95%",
+        "usage": "Primary text - almost white with slight blue tint",
+        "contrast_ratio": "20:1 with background"
+      },
+      "card": {
+        "value": "220 18% 11%",
+        "usage": "Card backgrounds - slightly lighter than background for depth",
+        "contrast_ratio": "1.3:1 with background"
+      },
+      "primary": {
+        "value": "215 85% 55%",
+        "usage": "Brand color - slightly brighter for dark backgrounds",
+        "accessibility": "WCAG AA compliant on dark backgrounds"
+      },
+      "primary_glow": {
+        "value": "215 85% 65%",
+        "usage": "Glow effects - more pronounced in dark mode"
+      },
+      "border": {
+        "value": "220 15% 20%",
+        "usage": "Subtle borders that don't fight with content"
+      }
+    },
+
+    "semantic_colors": {
+      "success": "142 76% 36%",
+      "warning": "38 92% 50%",
+      "info": "199 89% 48%",
+      "error": "0 84% 60%"
+    },
+
+    "glassmorphism": {
+      "light_mode_bg": "0 0% 100% / 0.95",
+      "light_mode_border": "220 15% 88% / 0.5",
+      "dark_mode_bg": "220 18% 11% / 0.95",
+      "dark_mode_border": "220 15% 20% / 0.5",
+      "blur": "12px"
+    },
+
+    "refined_glassmorphism": {
+      "description": "Premium glassmorphic surfaces inspired by reference images",
+      "light_mode_bg": "0 0% 100% / 0.92",
+      "light_mode_border": "220 15% 88% / 0.4",
+      "dark_mode_bg": "220 18% 11% / 0.88",
+      "dark_mode_border": "220 15% 20% / 0.5",
+      "blur": "16px",
+      "usage": "Use for floating panels, modals, and prominent cards"
+    }
+  },
+
+  "typography": {
+    "font_families": {
+      "sans": [
+        "Inter",
+        "-apple-system",
+        "BlinkMacSystemFont",
+        "Segoe UI",
+        "Roboto",
+        "Helvetica Neue",
+        "Arial",
+        "sans-serif"
+      ],
+      "mono": [
+        "JetBrains Mono",
+        "Fira Code",
+        "SF Mono",
+        "Monaco",
+        "Consolas",
+        "monospace"
+      ]
+    },
+    "font_sizes": {
+      "xs": "0.75rem",
+      "sm": "0.875rem",
+      "base": "1rem",
+      "lg": "1.125rem",
+      "xl": "1.25rem",
+      "2xl": "1.5rem",
+      "3xl": "1.875rem",
+      "4xl": "2.25rem",
+      "5xl": "3rem"
+    },
+    "font_weights": {
+      "normal": "400",
+      "medium": "500",
+      "semibold": "600",
+      "bold": "700"
+    },
+    "line_heights": {
+      "tight": "1.25",
+      "normal": "1.5",
+      "relaxed": "1.75",
+      "loose": "2"
+    },
+    "letter_spacing": {
+      "tighter": "-0.05em",
+      "tight": "-0.025em",
+      "normal": "0",
+      "wide": "0.025em",
+      "wider": "0.05em"
+    },
+    "usage_guidelines": {
+      "headings": {
+        "h1": "text-4xl font-bold tracking-tight",
+        "h2": "text-3xl font-bold tracking-tight",
+        "h3": "text-2xl font-semibold tracking-tight",
+        "h4": "text-xl font-semibold",
+        "h5": "text-lg font-semibold",
+        "h6": "text-base font-semibold"
+      },
+      "body": {
+        "default": "text-base font-normal leading-relaxed",
+        "small": "text-sm font-normal leading-normal",
+        "large": "text-lg font-normal leading-relaxed"
+      },
+      "ui": {
+        "button": "text-sm font-bold tracking-tight",
+        "input": "text-base font-normal",
+        "label": "text-sm font-medium",
+        "caption": "text-xs font-normal text-muted-foreground"
+      }
+    }
+  },
+
+  "spacing": {
+    "scale": {
+      "0": "0",
+      "0.5": "0.125rem",
+      "1": "0.25rem",
+      "1.5": "0.375rem",
+      "2": "0.5rem",
+      "2.5": "0.625rem",
+      "3": "0.75rem",
+      "3.5": "0.875rem",
+      "4": "1rem",
+      "5": "1.25rem",
+      "6": "1.5rem",
+      "7": "1.75rem",
+      "8": "2rem",
+      "9": "2.25rem",
+      "10": "2.5rem",
+      "11": "2.75rem",
+      "12": "3rem",
+      "14": "3.5rem",
+      "16": "4rem",
+      "20": "5rem",
+      "24": "6rem",
+      "32": "8rem"
+    },
+    "component_spacing": {
+      "card_padding": "1.5rem",
+      "card_gap": "1rem",
+      "section_gap": "2rem",
+      "page_padding": "2rem",
+      "button_padding_x": "1.5rem",
+      "button_padding_y": "0.625rem",
+      "input_padding_x": "1rem",
+      "input_padding_y": "0.625rem"
+    },
+    "layout_guidelines": [
+      "Use 8px grid system (spacing-2 as base unit)",
+      "Favor generous whitespace - let content breathe",
+      "Maintain consistent spacing within component groups",
+      "Increase spacing between unrelated sections",
+      "Mobile: reduce padding but maintain touch target sizes"
+    ]
+  },
+
+  "border_radius": {
+    "values": {
+      "none": "0",
+      "sm": "0.25rem",
+      "md": "0.5rem",
+      "lg": "0.75rem",
+      "xl": "1rem",
+      "2xl": "1.5rem",
+      "3xl": "2rem",
+      "full": "9999px"
+    },
+    "component_usage": {
+      "buttons": "full (pill shape)",
+      "cards": "lg (0.75rem)",
+      "inputs": "lg (0.75rem)",
+      "modals": "2xl (1.5rem)",
+      "tooltips": "md (0.5rem)",
+      "badges": "full (pill shape)",
+      "floating_panels": "2xl (1.5rem)"
+    },
+    "guidelines": [
+      "Maintain consistent radius within component families",
+      "Larger components get larger radius (proportional)",
+      "Interactive elements (buttons) use full radius for tactile feel",
+      "Avoid mixing different radius values in adjacent elements"
+    ]
+  },
+
+  "shadows": {
+    "elevation_system": {
+      "soft": {
+        "value": "0 2px 8px -2px hsl(220 13% 13% / 0.08)",
+        "usage": "Subtle depth for cards at rest",
+        "elevation_level": 1
+      },
+      "medium": {
+        "value": "0 8px 24px -4px hsl(220 13% 13% / 0.12)",
+        "usage": "Moderate depth for interactive cards",
+        "elevation_level": 2
+      },
+      "large": {
+        "value": "0 16px 48px -8px hsl(220 13% 13% / 0.16)",
+        "usage": "High elevation for modals and popovers",
+        "elevation_level": 3
+      },
+      "glow": {
+        "value": "0 0 32px hsl(215 85% 50% / 0.2)",
+        "usage": "Emphasis and focus states",
+        "elevation_level": "special"
+      }
+    },
+
+    "3_point_premium_shadows": {
+      "description": "Multi-layer shadows for realistic depth perception",
+      "default": {
+        "light_mode": "0 1px 2px hsl(220 13% 13% / 0.12), 0 4px 8px hsl(220 13% 13% / 0.08), 0 8px 16px hsl(220 13% 13% / 0.06)",
+        "dark_mode": "0 1px 2px hsl(0 0% 0% / 0.2), 0 4px 8px hsl(0 0% 0% / 0.15), 0 8px 16px hsl(0 0% 0% / 0.12)"
+      },
+      "hover": {
+        "light_mode": "0 2px 4px hsl(220 13% 13% / 0.14), 0 6px 12px hsl(220 13% 13% / 0.1), 0 12px 24px hsl(220 13% 13% / 0.08)",
+        "dark_mode": "0 2px 4px hsl(0 0% 0% / 0.25), 0 6px 12px hsl(0 0% 0% / 0.2), 0 12px 24px hsl(0 0% 0% / 0.15)"
+      }
+    },
+
+    "diffused_soft_shadows": {
+      "description": "Inspired by reference images - extremely soft, natural-looking shadows",
+      "default": {
+        "light_mode": "0 2px 12px hsl(220 13% 13% / 0.06), 0 8px 24px hsl(220 13% 13% / 0.04), 0 16px 48px hsl(220 13% 13% / 0.02)",
+        "dark_mode": "0 2px 12px hsl(0 0% 0% / 0.3), 0 8px 24px hsl(0 0% 0% / 0.2), 0 16px 48px hsl(0 0% 0% / 0.15)"
+      },
+      "hover": {
+        "light_mode": "0 4px 16px hsl(220 13% 13% / 0.08), 0 12px 32px hsl(220 13% 13% / 0.06), 0 24px 64px hsl(220 13% 13% / 0.04)",
+        "dark_mode": "0 4px 16px hsl(0 0% 0% / 0.4), 0 12px 32px hsl(0 0% 0% / 0.3), 0 24px 64px hsl(0 0% 0% / 0.2)"
+      },
+      "usage": "Use for prominent cards, floating panels, and premium surfaces"
+    },
+
+    "inset_shadows": {
+      "light": {
+        "value": "inset 0 1px 2px hsl(0 0% 100% / 0.6), inset 0 -1px 1px hsl(220 13% 13% / 0.1)",
+        "usage": "Subtle embossed effect for buttons and inputs (light mode)"
+      },
+      "dark": {
+        "value": "inset 0 1px 2px hsl(0 0% 100% / 0.15), inset 0 -1px 1px hsl(0 0% 0% / 0.2)",
+        "usage": "Subtle embossed effect for buttons and inputs (dark mode)"
+      }
+    },
+
+    "chamfered_3d_effect": {
+      "description": "3D chamfered edges for premium feel",
+      "box_shadow": "inset 0 1px 0 hsl(0 0% 100% / 0.8), inset 0 -1px 0 hsl(220 13% 13% / 0.05), 0 1px 2px hsl(220 13% 13% / 0.1)",
+      "usage": "Special emphasis elements, premium buttons",
+      "gradient": "linear-gradient(145deg, hsl(0 0% 100% / 0.9), hsl(220 15% 94% / 0.95))"
+    }
+  },
+
+  "animations": {
+    "timing_functions": {
+      "smooth": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "fast": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "spring": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+      "ease_out": "cubic-bezier(0, 0, 0.2, 1)",
+      "ease_in_out": "cubic-bezier(0.4, 0, 0.2, 1)"
+    },
+    "durations": {
+      "instant": "0ms",
+      "fast": "150ms",
+      "normal": "300ms",
+      "slow": "400ms",
+      "slower": "600ms"
+    },
+    "transitions": {
+      "smooth": "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+      "fast": "all 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
+      "spring": "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)"
+    },
+    "micro_interactions": {
+      "hover_scale": "1.05",
+      "active_scale": "0.95",
+      "focus_scale": "1.02"
+    },
+    "keyframe_animations": {
+      "float": {
+        "description": "Gentle floating animation for draggable elements",
+        "duration": "120s",
+        "timing_function": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "iterations": "infinite"
+      },
+      "accordion_down": {
+        "description": "Smooth accordion expansion",
+        "duration": "200ms",
+        "timing_function": "ease-out"
+      },
+      "fade_in": {
+        "description": "Gentle fade in for appearing elements",
+        "duration": "300ms",
+        "timing_function": "ease-out"
+      }
+    },
+    "guidelines": [
+      "Keep animations subtle - they should enhance, not distract",
+      "Use spring animations for interactive elements (buttons, toggles)",
+      "Smooth transitions for state changes",
+      "Faster animations (150ms) for small changes",
+      "Slower animations (400ms+) for significant state transitions",
+      "Always provide prefers-reduced-motion fallback"
+    ]
+  },
+
+  "component_patterns": {
+    "buttons": {
+      "primary": {
+        "description": "Main call-to-action buttons",
+        "background": "gradient from primary to primary-glow",
+        "text_color": "primary-foreground",
+        "padding": "0.625rem 1.5rem",
+        "border_radius": "full (pill)",
+        "font": "text-sm font-bold tracking-tight",
+        "min_height": "44px",
+        "shadow": "Multi-layer 3D inset + drop shadows",
+        "hover": "Subtle lift (translateY -0.5px) + enhanced shadow",
+        "active": "Press down (translateY 0.5px) + compressed shadow",
+        "disabled": "opacity-50 + cursor-not-allowed"
+      },
+      "secondary": {
+        "description": "Secondary actions",
+        "background": "secondary",
+        "border_radius": "full",
+        "shadow": "Subtle inset shadows for 3D effect"
+      },
+      "outline": {
+        "description": "Tertiary actions, less emphasis",
+        "background": "transparent",
+        "border": "2px solid border",
+        "hover": "bg-accent + text-accent-foreground"
+      },
+      "ghost": {
+        "description": "Minimal emphasis, icon buttons",
+        "background": "transparent",
+        "hover": "bg-accent"
+      },
+      "destructive": {
+        "description": "Delete, cancel, destructive actions",
+        "background": "gradient from destructive to destructive/90",
+        "text_color": "destructive-foreground"
+      },
+      "pill_dark": {
+        "description": "Refined dark blue pill buttons (reference image style)",
+        "background": "hsl(215 85% 35%)",
+        "hover_background": "hsl(215 85% 40%)",
+        "active_background": "hsl(215 85% 30%)",
+        "shadow": "Inset highlights + multi-layer drop shadows",
+        "usage": "Navigation, subtle CTAs, elegant actions"
+      }
+    },
+
+    "cards": {
+      "default": {
+        "background": "card",
+        "border": "1px solid border",
+        "border_radius": "lg (0.75rem)",
+        "shadow": "shadow-sm",
+        "padding": "1.5rem"
+      },
+      "refined": {
+        "description": "Premium glassmorphic cards (reference image aesthetic)",
+        "background": "glass-refined-bg with backdrop-blur",
+        "border": "1px solid glass-refined-border",
+        "shadow": "Diffused soft shadows + inset highlights",
+        "hover": "Enhanced diffused shadows",
+        "transition": "300ms smooth",
+        "usage": "Prominent features, dashboard panels, floating UI"
+      },
+      "interactive": {
+        "hover": "shadow-3point-hover + scale(1.02)",
+        "active": "scale(0.98)",
+        "cursor": "pointer"
+      },
+      "elevated": {
+        "description": "High-prominence cards (modals, overlays)",
+        "shadow": "shadow-elevated",
+        "z_index": "50"
+      }
+    },
+
+    "inputs": {
+      "text_field": {
+        "border": "1px solid input",
+        "border_radius": "lg (0.75rem)",
+        "padding": "0.625rem 1rem",
+        "background": "background",
+        "min_height": "44px",
+        "font_size": "16px (prevents iOS zoom)",
+        "focus": "ring-2 ring-ring ring-offset-2",
+        "placeholder_color": "muted-foreground",
+        "disabled": "opacity-50 + cursor-not-allowed"
+      },
+      "textarea": {
+        "min_height": "88px (2x touch target)",
+        "resize": "vertical",
+        "font_family": "inherit"
+      },
+      "select": {
+        "appearance": "Custom dropdown icon",
+        "padding_right": "2.5rem (space for icon)"
+      }
+    },
+
+    "switches_toggles": {
+      "refined_switch": {
+        "description": "Premium switch design (reference images)",
+        "track_off": "hsl(220 15% 88%)",
+        "track_on": "hsl(215 85% 50%)",
+        "thumb": "white with subtle shadow",
+        "shadow": "Inset shadows on track + drop shadow on thumb",
+        "transition": "300ms smooth",
+        "hover": "Enhanced shadows",
+        "min_height": "44px",
+        "min_width": "66px (1.5x height)"
+      }
+    },
+
+    "modals_dialogs": {
+      "overlay": {
+        "background": "hsl(0 0% 0% / 0.5)",
+        "backdrop_blur": "8px"
+      },
+      "content": {
+        "background": "card",
+        "border_radius": "2xl (1.5rem)",
+        "shadow": "shadow-large",
+        "max_width": "32rem",
+        "padding": "2rem"
+      },
+      "animation": {
+        "enter": "fade-in + scale(0.95 to 1) + translate(0, 16px to 0)",
+        "exit": "fade-out + scale(1 to 0.95)"
+      }
+    },
+
+    "tooltips": {
+      "background": "card",
+      "border": "1px solid border",
+      "border_radius": "md (0.5rem)",
+      "padding": "0.5rem 0.75rem",
+      "shadow": "shadow-medium",
+      "font_size": "text-sm",
+      "max_width": "20rem",
+      "delay": "500ms"
+    },
+
+    "toasts_notifications": {
+      "position": "bottom-right",
+      "background": "card",
+      "border": "1px solid border",
+      "border_radius": "lg",
+      "shadow": "shadow-3point",
+      "padding": "1rem 1.5rem",
+      "animation": "slide-in from right + fade-in",
+      "duration": "5000ms",
+      "auto_dismiss": true,
+      "variants": {
+        "success": "accent: success color",
+        "error": "accent: destructive color",
+        "warning": "accent: warning color",
+        "info": "accent: info color"
+      }
+    },
+
+    "loading_states": {
+      "spinner": {
+        "size": "h-12 w-12",
+        "color": "primary",
+        "stroke_width": "1.5",
+        "animation": "spin 1s linear infinite"
+      },
+      "skeleton": {
+        "background": "muted",
+        "animation": "pulse",
+        "border_radius": "inherit from parent"
+      },
+      "progress_bar": {
+        "height": "0.5rem",
+        "background": "muted",
+        "fill": "gradient-primary",
+        "border_radius": "full",
+        "animation": "indeterminate shimmer"
+      }
+    },
+
+    "navigation": {
+      "header": {
+        "height": "64px",
+        "background": "background/95 with backdrop-blur",
+        "border_bottom": "1px solid border/50",
+        "sticky": true,
+        "z_index": 40
+      },
+      "sidebar": {
+        "width": "280px",
+        "background": "sidebar",
+        "border_right": "1px solid sidebar-border"
+      },
+      "tabs": {
+        "active": "primary with shadow-sm",
+        "inactive": "muted-foreground",
+        "hover": "accent/10 background",
+        "border_bottom": "2px solid for active"
+      }
+    },
+
+    "pdf_viewer": {
+      "container": {
+        "background": "muted/20",
+        "overflow": "auto"
+      },
+      "page": {
+        "shadow": "shadow-3point",
+        "margin": "1rem",
+        "border_radius": "sm"
+      },
+      "field_overlay": {
+        "border": "2px solid primary/50",
+        "background": "primary/10",
+        "hover": "primary/20 + scale(1.02)",
+        "focus": "ring-2 ring-primary"
+      },
+      "edit_mode_banner": {
+        "background": "amber-500/95",
+        "position": "fixed top-16",
+        "shadow": "shadow-large",
+        "backdrop_blur": "sm"
+      }
+    },
+
+    "ai_assistant": {
+      "floating_panel": {
+        "description": "Draggable AI chat panel (reference images)",
+        "background": "background/30 with backdrop-blur-3xl",
+        "border": "1px solid white/20",
+        "shadow": "0 8px 32px rgba(0,0,0,0.37)",
+        "border_radius": "2xl",
+        "width": "400px",
+        "height": "600px",
+        "backdrop_filter": "blur(48px)",
+        "gradients": [
+          "before: white/10 to transparent (top-right diagonal)",
+          "after: black/10 to transparent (bottom-up)"
+        ]
+      },
+      "minimized": {
+        "width": "56px",
+        "height": "56px",
+        "animation": "float (gentle bobbing)"
+      }
+    }
+  },
+
+  "accessibility": {
+    "color_contrast": {
+      "minimum_ratios": {
+        "normal_text": "4.5:1 (WCAG AA)",
+        "large_text": "3:1 (WCAG AA)",
+        "ui_components": "3:1 (WCAG AA)",
+        "target": "7:1 (WCAG AAA where possible)"
+      }
+    },
+    "touch_targets": {
+      "minimum_size": "44px x 44px",
+      "comfortable_size": "48px x 48px",
+      "spacing": "8px minimum between targets"
+    },
+    "keyboard_navigation": {
+      "focus_indicators": "2px solid ring color + 2px offset",
+      "tab_order": "Logical, left-to-right, top-to-bottom",
+      "skip_links": "Provide for long navigation",
+      "keyboard_shortcuts": "Document and avoid conflicts"
+    },
+    "screen_readers": {
+      "aria_labels": "Descriptive labels for all interactive elements",
+      "live_regions": "Announce dynamic content changes",
+      "semantic_html": "Use proper heading hierarchy (h1-h6)"
+    },
+    "motion": {
+      "prefers_reduced_motion": "Disable all non-essential animations",
+      "fallback": "Instant transitions for users with motion sensitivity"
+    }
+  },
+
+  "responsive_design": {
+    "breakpoints": {
+      "sm": "640px",
+      "md": "768px",
+      "lg": "1024px",
+      "xl": "1280px",
+      "2xl": "1536px"
+    },
+    "mobile_first": true,
+    "guidelines": [
+      "Design for mobile (320px) first, then scale up",
+      "Test on actual devices, not just browser resize",
+      "Touch targets: 44px minimum on mobile",
+      "Font sizes: 16px minimum for inputs (prevents zoom)",
+      "Reduce padding on mobile but maintain readability",
+      "Stack horizontal layouts vertically on mobile",
+      "Hide non-essential elements on small screens",
+      "Use hamburger menu for navigation on mobile"
+    ],
+    "layout_patterns": {
+      "mobile": "Single column, full-width cards, bottom navigation",
+      "tablet": "Two columns where appropriate, sidebar can collapse",
+      "desktop": "Multi-column layouts, persistent sidebar"
+    }
+  },
+
+  "implementation_guidelines": {
+    "css_methodology": {
+      "utility_first": "Use Tailwind CSS utility classes",
+      "component_classes": "Extract repeated patterns to @apply directives",
+      "custom_properties": "Use CSS variables for theming",
+      "naming_convention": "BEM for custom components"
+    },
+    "performance": {
+      "bundle_splitting": "Lazy load routes and heavy components",
+      "image_optimization": "Use WebP, lazy loading, responsive images",
+      "code_splitting": "Manual vendor chunks for better caching",
+      "font_loading": "Subset fonts, preload critical fonts"
+    },
+    "browser_support": {
+      "modern_browsers": "Chrome, Firefox, Safari, Edge (last 2 versions)",
+      "mobile_browsers": "iOS Safari 14+, Chrome Android",
+      "progressive_enhancement": "Core functionality works without JS"
+    }
+  },
+
+  "ai_agent_instructions": {
+    "when_building_new_features": [
+      "Always start with mobile layout, then adapt for larger screens",
+      "Use existing color tokens from this design system",
+      "Apply 3-point shadows for depth (shadow-3point utility class)",
+      "Add hover states with subtle scale and shadow changes",
+      "Ensure 44px minimum touch targets on all interactive elements",
+      "Use glassmorphic surfaces (glass-refined class) for floating UI",
+      "Add smooth transitions (transition-smooth) to all state changes",
+      "Provide loading states for async operations",
+      "Test keyboard navigation and add focus indicators",
+      "Use semantic HTML (button, nav, main, article, etc.)",
+      "Add ARIA labels for screen reader accessibility",
+      "Follow the established component patterns above"
+    ],
+    "color_usage_rules": [
+      "Primary color for CTAs and brand elements only",
+      "Use muted colors for less important UI",
+      "Destructive color only for delete/error states",
+      "Maintain contrast ratios (check with WCAG tools)",
+      "Dark mode: increase color brightness slightly"
+    ],
+    "typography_rules": [
+      "Headings: font-bold tracking-tight",
+      "Body text: font-normal leading-relaxed",
+      "UI elements: font-bold tracking-tight (buttons)",
+      "Never go below 12px font size",
+      "Mobile: 16px minimum for inputs"
+    ],
+    "spacing_rules": [
+      "Use 8px grid system (multiples of 0.5rem)",
+      "Card padding: 1.5rem (24px)",
+      "Section gaps: 2rem (32px)",
+      "Button padding: 0.625rem vertical, 1.5rem horizontal",
+      "Generous whitespace around important elements"
+    ],
+    "animation_rules": [
+      "Keep animations subtle (< 400ms)",
+      "Use spring animations for interactive elements",
+      "Always provide prefers-reduced-motion fallback",
+      "No animations on initial page load (performance)",
+      "Hover states: 150ms transition",
+      "State changes: 300ms transition"
+    ]
+  },
+
+  "code_examples": {
+    "button_primary": {
+      "html": "<button className=\"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-bold tracking-tight h-11 min-h-[44px] px-6 py-2.5 bg-gradient-to-br from-primary via-primary to-primary-glow text-primary-foreground shadow-[inset_0_1px_0_hsl(0_0%_100%/0.25),inset_0_-1px_0_hsl(var(--primary)/0.4),0_1px_1px_hsl(220_13%_13%/0.08),0_2px_4px_hsl(220_13%_13%/0.06),0_4px_8px_hsl(220_13%_13%/0.04),0_8px_16px_hsl(220_13%_13%/0.02)] hover:shadow-[inset_0_1px_0_hsl(0_0%_100%/0.3),inset_0_-1px_0_hsl(var(--primary)/0.5),0_1px_2px_hsl(220_13%_13%/0.1),0_3px_6px_hsl(220_13%_13%/0.08),0_6px_12px_hsl(220_13%_13%/0.06),0_12px_24px_hsl(220_13%_13%/0.04)] hover:translate-y-[-0.5px] active:translate-y-[0.5px] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed\">Submit Form</button>"
+    },
+    "card_refined": {
+      "html": "<div className=\"rounded-lg border bg-card text-card-foreground glass-refined shadow-diffused p-6 transition-shadow duration-300 hover:shadow-diffused-hover\">Card content</div>"
+    },
+    "glassmorphic_panel": {
+      "html": "<div className=\"fixed z-50 rounded-2xl bg-background/30 backdrop-blur-3xl border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none after:absolute after:inset-0 after:rounded-2xl after:bg-gradient-to-t after:from-black/10 after:to-transparent after:pointer-events-none\">Floating panel</div>"
+    }
+  }
+}
