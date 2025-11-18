@@ -3,6 +3,7 @@ import { AdaptiveLayout } from "@/components/layout/AdaptiveLayout";
 import { MobileBottomSheet } from "@/components/layout/MobileBottomSheet";
 import { useWindowSize } from "@/hooks/use-adaptive-layout";
 import { useFieldOperations } from "@/hooks/use-field-operations";
+import { getCurrentFieldPositions } from "@/utils/field-positions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FocusTrap } from "@/components/ui/focus-trap";
 import { IndexHeader } from "./index/components/IndexHeader";
@@ -192,64 +193,15 @@ const Index = () => {
     hasUnsavedChanges,
   });
 
-  // Get current field positions for minimap indicators (supports multiple fields)
-  const getCurrentFieldPositions = () => {
-    const fieldConfigs = [
-      { field: 'partyName', top: 8, left: 5 },
-      { field: 'firmName', top: 10, left: 5 },
-      { field: 'streetAddress', top: 12, left: 5 },
-      { field: 'mailingAddress', top: 14, left: 5 },
-      { field: 'city', top: 16, left: 5 },
-      { field: 'state', top: 16, left: 26 },
-      { field: 'zipCode', top: 16, left: 34 },
-      { field: 'telephoneNo', top: 18, left: 5 },
-      { field: 'faxNo', top: 18, left: 23 },
-      { field: 'email', top: 20, left: 5 },
-      { field: 'attorneyFor', top: 22, left: 5 },
-      { field: 'stateBarNumber', top: 22, left: 36 },
-      { field: 'county', top: 8, left: 50 },
-      { field: 'petitioner', top: 20, left: 77 },
-      { field: 'respondent', top: 22, left: 77 },
-      { field: 'otherParentParty', top: 24, left: 77 },
-      { field: 'caseNumber', top: 27, left: 77 },
-      { field: 'restrainingOrderNone', top: 36, left: 5 },
-      { field: 'restrainingOrderActive', top: 38, left: 5 },
-      { field: 'childCustodyConsent', top: 42, left: 5 },
-      { field: 'visitationConsent', top: 44, left: 5 },
-      { field: 'childCustodyDoNotConsent', top: 46, left: 7 },
-      { field: 'visitationDoNotConsent', top: 46, left: 25 },
-      { field: 'facts', top: 54, left: 5 },
-      { field: 'signatureDate', top: 91, left: 5 },
-      { field: 'printName', top: 93, left: 5 },
-      { field: 'signatureName', top: 95, left: 5 },
-    ];
-
-    const positions: { top: number; left: number }[] = [];
-    
-    // Add current field
-    const currentFieldName = fieldConfigs[currentFieldIndex]?.field;
-    if (currentFieldName) {
-      positions.push(fieldPositions[currentFieldName] || fieldConfigs[currentFieldIndex]);
-    }
-    
-    // Add selected fields
-    selectedFields.forEach(fieldName => {
-      const config = fieldConfigs.find(f => f.field === fieldName);
-      if (config) {
-        positions.push(fieldPositions[fieldName] || { top: config.top, left: config.left });
-      }
-    });
-    
-    // Add highlighted field
-    if (highlightedField) {
-      const config = fieldConfigs.find(f => f.field === highlightedField);
-      if (config && !positions.some(p => p === (fieldPositions[highlightedField] || { top: config.top, left: config.left }))) {
-        positions.push(fieldPositions[highlightedField] || { top: config.top, left: config.left });
-      }
-    }
-
-    return positions;
-  };
+  // Wrapper for getCurrentFieldPositions utility to provide current state
+  const getFieldPositions = useCallback(() => {
+    return getCurrentFieldPositions(
+      currentFieldIndex,
+      fieldPositions,
+      selectedFields,
+      highlightedField
+    );
+  }, [currentFieldIndex, fieldPositions, selectedFields, highlightedField]);
 
   // Check authentication and prefetch data
   useEffect(() => {
@@ -518,7 +470,7 @@ const Index = () => {
           onThumbnailResize={handleThumbnailResize}
           currentPDFPage={currentPDFPage}
           onPageClick={setCurrentPDFPage}
-          getCurrentFieldPositions={getCurrentFieldPositions}
+          getCurrentFieldPositions={getFieldPositions}
           showFieldsPanel={showFieldsPanel}
           showVaultPanel={showVaultPanel}
           userId={user?.id}
