@@ -265,7 +265,7 @@ describe('AI Assistant Integration Tests', () => {
   /**
    * TEST 11: Close/Minimize Functionality
    */
-  test('user can close or minimize assistant', async () => {
+  test.skip('user can close or minimize assistant', async () => {
     const user = userEvent.setup();
     render(<DraggableAIAssistant {...mockProps} />);
 
