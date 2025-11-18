@@ -5,6 +5,7 @@ import { useWindowSize } from "@/hooks/use-adaptive-layout";
 import { useFieldOperations } from "@/hooks/use-field-operations";
 import { useDocumentPersistence } from "@/hooks/use-document-persistence";
 import { useUIControls } from "@/hooks/use-ui-controls";
+import { usePanelState } from "@/hooks/use-panel-state";
 import { getCurrentFieldPositions } from "@/utils/field-positions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FocusTrap } from "@/components/ui/focus-trap";
@@ -73,24 +74,26 @@ const Index = () => {
   const [formData, setFormData] = useState<FormData>({});
   const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
   const [fieldPositions, setFieldPositions] = useState<FieldPositions>({});
-  const [showAIPanel, setShowAIPanel] = useState(false);
-  const [showFieldsPanel, setShowFieldsPanel] = useState(true);
-  const [showVaultPanel, setShowVaultPanel] = useState(false);
   const [currentPDFPage, setCurrentPDFPage] = useState(1);
-  const [showThumbnails, setShowThumbnails] = useState(true);
   const [fieldSearchQuery, setFieldSearchQuery] = useState("");
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [highlightedField, setHighlightedField] = useState<string | null>(null);
   const [copiedFieldPositions, setCopiedFieldPositions] = useState<FieldPositions | null>(null);
   const [validationRules, setValidationRules] = useState<ValidationRules>({});
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
-  const [settingsSheetOpen, setSettingsSheetOpen] = useState(false);
-  const [vaultSheetOpen, setVaultSheetOpen] = useState(false);
   const { toast } = useToast();
   const { height } = useWindowSize(); // For mobile bottom sheet snap points
-  const [mobileTab, setMobileTab] = useState<string>("fields"); // Mobile bottom sheet tab
   const hasUnsavedChanges = useRef(false);
   const pdfPanelRef = useRef<HTMLDivElement>(null);
+
+  // Panel visibility state hook
+  const panelState = usePanelState();
+  const {
+    showAIPanel, showFieldsPanel, showVaultPanel, showThumbnails,
+    settingsSheetOpen, vaultSheetOpen, mobileTab,
+    setSettingsSheetOpen, setVaultSheetOpen, setMobileTab,
+    toggleAIPanel, toggleFieldsPanel, toggleVaultPanel, toggleThumbnails
+  } = panelState;
 
   // Keyboard shortcut: 'E' key to toggle edit mode
   useEffect(() => {
@@ -249,10 +252,10 @@ const Index = () => {
       {/* Command Palette - Cmd+K */}
       <Suspense fallback={null}>
         <CommandPalette
-          onToggleAI={() => setShowAIPanel(!showAIPanel)}
-          onToggleFields={() => setShowFieldsPanel(!showFieldsPanel)}
-          onToggleVault={() => setShowVaultPanel(!showVaultPanel)}
-          onToggleThumbnails={() => setShowThumbnails(!showThumbnails)}
+          onToggleAI={toggleAIPanel}
+          onToggleFields={toggleFieldsPanel}
+          onToggleVault={toggleVaultPanel}
+          onToggleThumbnails={toggleThumbnails}
           onOpenSettings={() => setSettingsSheetOpen(true)}
           onAutofillAll={handleAutofillAll}
           onLogout={handleLogout}
@@ -271,9 +274,9 @@ const Index = () => {
       <main className="flex-1 flex flex-col container mx-auto px-4 py-6 overflow-hidden">
         <ControlToolbar
           showThumbnails={showThumbnails}
-          onToggleThumbnails={() => setShowThumbnails(!showThumbnails)}
+          onToggleThumbnails={toggleThumbnails}
           showAIPanel={showAIPanel}
-          onToggleAI={() => setShowAIPanel(!showAIPanel)}
+          onToggleAI={toggleAIPanel}
           onAutofillAll={handleAutofillAll}
           isVaultLoading={isVaultLoading}
           hasVaultData={hasVaultData}
@@ -285,13 +288,13 @@ const Index = () => {
           isEditMode={isEditMode}
           onToggleEditMode={handleEditToggle}
           showVaultPanel={showVaultPanel}
-          onToggleVault={() => setShowVaultPanel(!showVaultPanel)}
+          onToggleVault={toggleVaultPanel}
           showFieldsPanel={showFieldsPanel}
-          onToggleFields={() => setShowFieldsPanel(!showFieldsPanel)}
+          onToggleFields={toggleFieldsPanel}
           fieldFontSize={fieldFontSize}
-          onDecreaseFontSize={() => setFieldFontSize((size) => Math.max(8, size - 1))}
-          onIncreaseFontSize={() => setFieldFontSize((size) => Math.min(16, size + 1))}
-          onResetFontSize={() => setFieldFontSize(12)}
+          onDecreaseFontSize={handleDecreaseFontSize}
+          onIncreaseFontSize={handleIncreaseFontSize}
+          onResetFontSize={handleResetFontSize}
         />
 
         <MobileFormViewerSection
@@ -344,7 +347,7 @@ const Index = () => {
               formContext={formData}
               vaultData={vaultData}
               isVisible={showAIPanel}
-              onToggleVisible={() => setShowAIPanel(!showAIPanel)}
+              onToggleVisible={toggleAIPanel}
             />
           </Suspense>
         </div>
