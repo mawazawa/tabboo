@@ -1020,7 +1020,7 @@ export const FieldNavigationPanel = ({
                       }}
                       onClick={(e) => e.stopPropagation()}
                       placeholder={config.placeholder}
-                      className="h-12 text-base border-hairline shadow-3point chamfered transition-all duration-200"
+                      className="field-input h-12 text-base border-hairline shadow-3point chamfered transition-all duration-200"
                       maxLength={config.field === 'state' ? 2 : undefined}
                     />
                   )}
@@ -1038,7 +1038,7 @@ export const FieldNavigationPanel = ({
                       }}
                       onClick={(e) => e.stopPropagation()}
                       placeholder={config.placeholder}
-                      className="min-h-[100px] text-sm resize-none transition-all duration-200"
+                      className="field-input min-h-[100px] text-sm resize-none transition-all duration-200"
                     />
                   )}
 
