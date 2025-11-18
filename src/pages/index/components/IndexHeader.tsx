@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { AutoSaveIndicator } from "@/components/AutoSaveIndicator";
 
 interface IndexHeaderProps {
   onNavigateDistribution: () => void;
@@ -16,6 +17,10 @@ interface IndexHeaderProps {
   onPreloadDistribution: () => void;
   onCancelDistribution: () => void;
   onLogout: () => void;
+  // Auto-save indicator props
+  saveStatus: "idle" | "saving" | "saved" | "error" | "offline";
+  lastSaved: Date | null;
+  saveError?: string;
 }
 
 export const IndexHeader = ({
@@ -24,6 +29,9 @@ export const IndexHeader = ({
   onPreloadDistribution,
   onCancelDistribution,
   onLogout,
+  saveStatus,
+  lastSaved,
+  saveError,
 }: IndexHeaderProps) => (
   <header className="border-b-2 bg-card/80 backdrop-blur-sm z-50 shadow-medium flex-shrink-0">
     <div className="container mx-auto px-4 py-4">
@@ -81,6 +89,13 @@ export const IndexHeader = ({
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
+
+          {/* Auto-save Status Indicator */}
+          <AutoSaveIndicator
+            status={saveStatus}
+            lastSaved={lastSaved}
+            errorMessage={saveError}
+          />
 
           <Tooltip>
             <TooltipTrigger asChild>

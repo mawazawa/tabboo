@@ -38,6 +38,10 @@ interface UseDocumentPersistenceReturn {
   loading: boolean;
   documentId: string | null;
   handleLogout: () => Promise<void>;
+  // Auto-save state for indicator
+  saveStatus: "idle" | "saving" | "saved" | "error" | "offline";
+  lastSaved: Date | null;
+  saveError?: string;
 }
 
 export function useDocumentPersistence({
@@ -55,6 +59,11 @@ export function useDocumentPersistence({
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [documentId, setDocumentId] = useState<string | null>(null);
+
+  // Auto-save state tracking for indicator
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error" | "offline">("idle");
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [saveError, setSaveError] = useState<string | undefined>(undefined);
 
   // Check authentication and prefetch data
   useEffect(() => {
@@ -147,24 +156,50 @@ export function useDocumentPersistence({
     loadData();
   }, [user, queryClient, setFormData, setFieldPositions, setValidationRules]);
 
-  // Autosave every 5 seconds
+  // Autosave every 5 seconds with status tracking
   useEffect(() => {
     if (!user) return;
 
     const saveData = async () => {
       if (!documentId || !hasUnsavedChanges.current) return;
 
-      const { error } = await supabase
-        .from('legal_documents')
-        .update({
-          content: formData,
-          metadata: { fieldPositions, validationRules },
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', documentId);
+      // Check if offline
+      if (!navigator.onLine) {
+        setSaveStatus("offline");
+        return;
+      }
 
-      if (!error) {
+      // Start saving
+      setSaveStatus("saving");
+      setSaveError(undefined);
+
+      try {
+        const { error } = await supabase
+          .from('legal_documents')
+          .update({
+            content: formData,
+            metadata: { fieldPositions, validationRules },
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', documentId);
+
+        if (error) throw error;
+
+        // Save successful
         hasUnsavedChanges.current = false;
+        setLastSaved(new Date());
+        setSaveStatus("saved");
+
+        // Transition to idle after 3 seconds
+        setTimeout(() => {
+          setSaveStatus("idle");
+        }, 3000);
+
+      } catch (error) {
+        // Save failed
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        setSaveError(errorMessage);
+        setSaveStatus("error");
       }
     };
 
@@ -195,5 +230,9 @@ export function useDocumentPersistence({
     loading,
     documentId,
     handleLogout,
+    // Auto-save state for indicator
+    saveStatus,
+    lastSaved,
+    saveError,
   };
 }

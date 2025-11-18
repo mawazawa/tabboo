@@ -26,6 +26,7 @@ const TemplateManager = lazy(() => import("@/components/TemplateManager").then(m
 const FieldGroupManager = lazy(() => import("@/components/FieldGroupManager").then(m => ({ default: m.FieldGroupManager })));
 const CommandPalette = lazy(() => import("@/components/CommandPalette").then(m => ({ default: m.CommandPalette })));
 import { OfflineIndicator } from "@/components/OfflineIndicator";
+import { AutoSaveIndicator } from "@/components/AutoSaveIndicator";
 import { FileText, MessageSquare, LogOut, Loader2, Calculator, PanelLeftClose, PanelRightClose, Shield, Settings, Sparkles, Move, ChevronLeft, ChevronRight } from "@/icons";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { snapAllToGrid, alignHorizontal, alignVertical, distributeEvenly } from "@/utils/fieldPresets";
@@ -88,7 +89,15 @@ const Index = () => {
   } = panelState;
 
   // Document persistence hook - handles auth, data loading, and autosave
-  const { user, loading, documentId, handleLogout } = useDocumentPersistence({
+  const {
+    user,
+    loading,
+    documentId,
+    handleLogout,
+    saveStatus,
+    lastSaved,
+    saveError,
+  } = useDocumentPersistence({
     formData,
     fieldPositions,
     validationRules,
@@ -209,6 +218,9 @@ const Index = () => {
         onPreloadDistribution={preloadDistributionCalculator}
         onCancelDistribution={cancelDistributionCalculator}
         onLogout={handleLogout}
+        saveStatus={saveStatus}
+        lastSaved={lastSaved}
+        saveError={saveError}
       />
 
       <main className="flex-1 flex flex-col container mx-auto px-4 py-6 overflow-hidden">
