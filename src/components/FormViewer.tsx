@@ -329,32 +329,28 @@ const fieldNameToIndex: Record<string, number> = useMemo(() => {
         )}
 
         <div className="relative min-h-full w-full flex flex-col items-center justify-center p-4">
-          {/* Page Navigation Controls - Glassmorphic Styling */}
+          {/* Page Navigation Controls - Dark Blue Pill Design */}
           {numPages > 1 && !pdfLoading && (
             <div className="sticky top-4 z-40 mb-4 flex items-center gap-2 bg-background/95 backdrop-blur-md border border-border/50 rounded-xl px-4 py-2.5 shadow-3point transition-all duration-300 hover:shadow-3point-hover">
-              <Button
-                variant="outline"
-                size="sm"
+              <button
                 onClick={handlePreviousPage}
                 disabled={currentPDFPage === 1}
                 aria-label="Previous page"
-                className="transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="btn-pill-dark h-9 w-9 min-h-[36px] min-w-[36px] flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
                 <ChevronLeft className="h-4 w-4" />
-              </Button>
+              </button>
               <span className="text-sm font-semibold min-w-[90px] text-center text-foreground/90 tracking-tight">
                 Page {currentPDFPage} of {numPages}
               </span>
-              <Button
-                variant="outline"
-                size="sm"
+              <button
                 onClick={handleNextPage}
                 disabled={currentPDFPage === numPages}
                 aria-label="Next page"
-                className="transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="btn-pill-dark h-9 w-9 min-h-[36px] min-w-[36px] flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
                 <ChevronRight className="h-4 w-4" />
-              </Button>
+              </button>
             </div>
           )}
 

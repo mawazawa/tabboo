@@ -76,6 +76,12 @@ All colors MUST be HSL.
     --scale-hover: 1.05;
     --scale-active: 0.95;
     --scale-focus: 1.02;
+    
+    /* Dark blue for pill buttons (pleasant, non-glaring) */
+    --blue-dark: 215 85% 35%;
+    --blue-dark-hover: 215 85% 40%;
+    --blue-dark-active: 215 85% 30%;
+    --blue-dark-shadow: 215 85% 20% / 0.3;
 
     /* Mobile touch targets */
     --touch-target-min: 44px;
@@ -138,6 +144,12 @@ All colors MUST be HSL.
     /* Dark mode glassmorphic surfaces */
     --glass-bg: hsl(220 18% 11% / 0.95);
     --glass-border: hsl(220 15% 20% / 0.5);
+    
+    /* Dark mode dark blue pill buttons */
+    --blue-dark: 215 85% 45%;
+    --blue-dark-hover: 215 85% 50%;
+    --blue-dark-active: 215 85% 40%;
+    --blue-dark-shadow: 215 85% 15% / 0.4;
     
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -244,6 +256,44 @@ All colors MUST be HSL.
     transform: scale(var(--scale-focus));
     outline: 2px solid hsl(var(--ring));
     outline-offset: 2px;
+  }
+  
+  /* Dark blue pill button - pleasant 3D effect */
+  .btn-pill-dark {
+    background: hsl(var(--blue-dark));
+    color: hsl(0 0% 100%);
+    border: none;
+    border-radius: 9999px; /* Pill shape */
+    box-shadow: 
+      inset 0 1px 2px hsl(0 0% 100% / 0.2),
+      inset 0 -1px 2px hsl(var(--blue-dark-shadow)),
+      0 2px 4px hsl(var(--blue-dark-shadow)),
+      0 4px 8px hsl(var(--blue-dark-shadow) / 0.5);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .btn-pill-dark:hover:not(:disabled) {
+    background: hsl(var(--blue-dark-hover));
+    box-shadow: 
+      inset 0 1px 2px hsl(0 0% 100% / 0.25),
+      inset 0 -1px 2px hsl(var(--blue-dark-shadow)),
+      0 3px 6px hsl(var(--blue-dark-shadow)),
+      0 6px 12px hsl(var(--blue-dark-shadow) / 0.6);
+    transform: translateY(-1px);
+  }
+  
+  .btn-pill-dark:active:not(:disabled) {
+    background: hsl(var(--blue-dark-active));
+    box-shadow: 
+      inset 0 2px 4px hsl(var(--blue-dark-shadow)),
+      inset 0 -1px 2px hsl(0 0% 100% / 0.1),
+      0 1px 2px hsl(var(--blue-dark-shadow) / 0.4);
+    transform: translateY(0);
+  }
+  
+  .btn-pill-dark:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
   }
   
   /* Fat finger touch targets for mobile */
