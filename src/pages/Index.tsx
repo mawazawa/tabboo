@@ -6,6 +6,7 @@ import { useFieldOperations } from "@/hooks/use-field-operations";
 import { useDocumentPersistence } from "@/hooks/use-document-persistence";
 import { useUIControls } from "@/hooks/use-ui-controls";
 import { usePanelState } from "@/hooks/use-panel-state";
+import { useVaultData } from "@/hooks/use-vault-data";
 import { getCurrentFieldPositions } from "@/utils/field-positions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FocusTrap } from "@/components/ui/focus-trap";
@@ -27,26 +28,17 @@ const CommandPalette = lazy(() => import("@/components/CommandPalette").then(m =
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { FileText, MessageSquare, LogOut, Loader2, Calculator, PanelLeftClose, PanelRightClose, Shield, Settings, Sparkles, Move, ChevronLeft, ChevronRight } from "@/icons";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { 
-  snapAllToGrid, 
-  alignHorizontal, 
-  alignVertical, 
-  distributeEvenly 
-} from "@/utils/fieldPresets";
+import { snapAllToGrid, alignHorizontal, alignVertical, distributeEvenly } from "@/utils/fieldPresets";
 import type { FormTemplate } from "@/utils/templateManager";
-import { autofillAllFromVault, getAutofillableFields, type PersonalVaultData } from "@/utils/vaultFieldMatcher";
-import {
-  preloadDistributionCalculator,
-  cancelDistributionCalculator
-} from "@/utils/routePreloader";
+import { autofillAllFromVault } from "@/utils/vaultFieldMatcher";
+import { preloadDistributionCalculator, cancelDistributionCalculator } from "@/utils/routePreloader";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { PanelSkeleton, ViewerSkeleton } from "./index/components/Skeletons";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { ResizableHandleMulti } from "@/components/ui/resizable-handle-multi";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -107,30 +99,8 @@ const Index = () => {
     setVaultSheetOpen,
   });
 
-  // Fetch vault data for AI Assistant context
-  const { data: vaultData, isLoading: isVaultLoading } = useQuery({
-    queryKey: ['vault-data', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const { data, error } = await supabase
-        .from('personal_info')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      
-      if (error && error.code !== 'PGRST116') {
-        // Error occurred fetching vault data (silently handled)
-        return null;
-      }
-      return data;
-    },
-    enabled: !!user?.id,
-    staleTime: 1000 * 60, // Cache for 1 minute
-    refetchOnWindowFocus: true,
-  });
-  const typedVaultData = (vaultData as PersonalVaultData | null) ?? null;
-  const autofillableCount = typedVaultData ? getAutofillableFields(typedVaultData).length : 0;
-  const hasVaultData = Boolean(typedVaultData);
+  // Vault data hook - fetches user's personal vault data
+  const { vaultData, isVaultLoading, autofillableCount, hasVaultData } = useVaultData(user);
 
   // UI controls hook - handles zoom, font size, edit mode, and thumbnails
   const {
@@ -149,7 +119,7 @@ const Index = () => {
     setIsEditMode,
   } = useUIControls({
     pdfPanelRef,
-    vaultData: typedVaultData,
+    vaultData,
     user,
     toast,
   });
@@ -180,7 +150,7 @@ const Index = () => {
     selectedFields,
     copiedFieldPositions,
     setCopiedFieldPositions,
-    vaultData: typedVaultData,
+    vaultData,
     hasUnsavedChanges,
   });
 
@@ -205,7 +175,7 @@ const Index = () => {
     fieldFontSize,
     highlightedField,
     validationErrors,
-    vaultData: typedVaultData,
+    vaultData,
     isEditMode,
   };
 
