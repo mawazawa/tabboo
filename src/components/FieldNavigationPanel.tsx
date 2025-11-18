@@ -285,7 +285,7 @@ export const FieldNavigationPanel = ({
   };
 
   return (
-    <Card className="h-full border-hairline shadow-3point chamfered flex flex-col overflow-hidden">
+    <Card className="h-full border shadow-sm flex flex-col overflow-hidden">
       <LiveRegionComponent />
 
       <FieldNavigationHeader
@@ -302,7 +302,7 @@ export const FieldNavigationPanel = ({
         onApplyGroup={onApplyGroup}
       />
 
-      <div className="p-3 space-y-2 border-b border-border/50">
+      <div className="px-2 py-1.5 space-y-1.5 border-b border-border/50">
         <Sheet open={settingsSheetOpen} onOpenChange={onSettingsSheetChange}>
           <SheetContent side="right" className="w-[400px] sm:w-[540px]">
             <SheetHeader>
@@ -353,40 +353,39 @@ export const FieldNavigationPanel = ({
           </div>
         )}
 
+        <div className="grid grid-cols-2 gap-1">
+          <Button size="sm" variant="outline" onClick={goToPrevField} disabled={currentFieldIndex === 0} className="h-7 gap-0.5 text-xs">
+            <ChevronUp className="h-3.5 w-3.5" strokeWidth={1.5} />
+            Prev
+          </Button>
+          <Button size="sm" variant="outline" onClick={goToNextField} disabled={currentFieldIndex === FL_320_FIELD_CONFIG.length - 1} className="h-7 gap-0.5 text-xs">
+            Next
+            <ChevronDown className="h-3.5 w-3.5" strokeWidth={1.5} />
+          </Button>
+        </div>
+
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={handleClearFields}
-              className="w-full text-xs gap-1.5 h-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+              className="w-full h-6 gap-1 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
             >
-              <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
-              <span>Clear Form Fields</span>
+              <Trash2 className="h-3 w-3" strokeWidth={1.5} />
+              Clear All
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom">
-            <p>Clear all form field values</p>
-            <p className="text-xs text-muted-foreground">This action cannot be undone</p>
+            <p className="text-xs">Clear all form fields</p>
           </TooltipContent>
         </Tooltip>
-
-        <div className="grid grid-cols-2 gap-1.5">
-          <Button size="sm" variant="outline" onClick={goToPrevField} disabled={currentFieldIndex === 0} className="h-8 gap-1">
-            <ChevronUp className="h-4 w-4" strokeWidth={1.5} />
-            <span className="text-xs">Prev</span>
-          </Button>
-          <Button size="sm" variant="outline" onClick={goToNextField} disabled={currentFieldIndex === FL_320_FIELD_CONFIG.length - 1} className="h-8 gap-1">
-            <span className="text-xs">Next</span>
-            <ChevronDown className="h-4 w-4" strokeWidth={1.5} />
-          </Button>
-        </div>
       </div>
 
       <div ref={scrollViewportRef} className="flex-1 relative overflow-hidden">
         <ScrollArea className="h-full">
-          <div className="p-3 space-y-2">
-            <div className="space-y-2 pb-2 border-b border-border/50">
+          <div className="px-2 py-1.5 space-y-1.5">
+            <div className="space-y-1 pb-1.5 border-b border-border/50">
               <FieldPresetsToolbar
                 selectedFields={selectedFields}
                 onSnapToGrid={onSnapToGrid}
@@ -399,17 +398,17 @@ export const FieldNavigationPanel = ({
                 hasCopiedPositions={hasCopiedPositions}
               />
 
-              <div className="flex gap-1.5">
-                <Button size="sm" variant="outline" onClick={() => setSelectedFields(FL_320_FIELD_CONFIG.map(c => c.field))} className="flex-1 text-xs h-7">
+              <div className="flex gap-1">
+                <Button size="sm" variant="outline" onClick={() => setSelectedFields(FL_320_FIELD_CONFIG.map(c => c.field))} className="flex-1 text-xs h-6">
                   Select All
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => setSelectedFields([])} className="flex-1 text-xs h-7" disabled={selectedFields.length === 0}>
+                <Button size="sm" variant="outline" onClick={() => setSelectedFields([])} className="flex-1 text-xs h-6" disabled={selectedFields.length === 0}>
                   Clear ({selectedFields.length})
                 </Button>
               </div>
 
               {currentFieldIndex >= 0 && currentFieldIndex < FL_320_FIELD_CONFIG.length && (
-                <div className="p-2 bg-muted/30 rounded-lg border space-y-1.5">
+                <div className="p-1.5 bg-muted/20 rounded-md border border-border/50 space-y-1">
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="text-xs font-semibold truncate">
                       {FL_320_FIELD_CONFIG[currentFieldIndex]?.label}

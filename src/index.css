@@ -83,6 +83,14 @@ All colors MUST be HSL.
     --blue-dark-active: 215 85% 30%;
     --blue-dark-shadow: 215 85% 20% / 0.3;
 
+    /* Switch/Toggle design tokens (refined, pleasant) */
+    --switch-track-off: 220 15% 88%;
+    --switch-track-on: 215 85% 50%;
+    --switch-thumb: 0 0% 100%;
+    --switch-thumb-shadow: 0 2px 4px hsl(220 13% 13% / 0.2);
+    --switch-thumb-shadow-hover: 0 4px 8px hsl(220 13% 13% / 0.3);
+    --switch-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
     /* Mobile touch targets */
     --touch-target-min: 44px;
 
@@ -150,6 +158,13 @@ All colors MUST be HSL.
     --blue-dark-hover: 215 85% 50%;
     --blue-dark-active: 215 85% 40%;
     --blue-dark-shadow: 215 85% 15% / 0.4;
+    
+    /* Dark mode switch/toggle tokens */
+    --switch-track-off: 220 15% 20%;
+    --switch-track-on: 215 85% 55%;
+    --switch-thumb: 0 0% 100%;
+    --switch-thumb-shadow: 0 2px 4px hsl(0 0% 0% / 0.3);
+    --switch-thumb-shadow-hover: 0 4px 8px hsl(0 0% 0% / 0.4);
     
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -296,6 +311,65 @@ All colors MUST be HSL.
     cursor: not-allowed;
   }
   
+  /* Refined Switch/Toggle styling */
+  .switch-refined {
+    /* Track styling */
+    background-color: hsl(var(--switch-track-off));
+    border: 1px solid hsl(var(--border) / 0.5);
+    box-shadow: 
+      inset 0 1px 2px hsl(220 13% 13% / 0.1),
+      0 1px 2px hsl(220 13% 13% / 0.05);
+    transition: var(--switch-transition);
+  }
+  
+  .switch-refined[data-state="checked"] {
+    background-color: hsl(var(--switch-track-on));
+    border-color: hsl(var(--switch-track-on));
+    box-shadow: 
+      inset 0 1px 2px hsl(0 0% 100% / 0.2),
+      0 0 8px hsl(var(--switch-track-on) / 0.3);
+  }
+  
+  .switch-refined:hover:not(:disabled) {
+    box-shadow: 
+      inset 0 1px 2px hsl(220 13% 13% / 0.15),
+      0 2px 4px hsl(220 13% 13% / 0.1);
+  }
+  
+  .switch-refined[data-state="checked"]:hover:not(:disabled) {
+    box-shadow: 
+      inset 0 1px 2px hsl(0 0% 100% / 0.25),
+      0 0 12px hsl(var(--switch-track-on) / 0.4);
+  }
+  
+  .switch-thumb-refined {
+    background-color: hsl(var(--switch-thumb));
+    box-shadow: var(--switch-thumb-shadow);
+    transition: var(--switch-transition);
+  }
+  
+  .switch-refined:hover:not(:disabled) .switch-thumb-refined,
+  .switch-refined:focus-visible .switch-thumb-refined {
+    box-shadow: var(--switch-thumb-shadow-hover);
+  }
+  
+  /* Dark mode switch styling */
+  .dark .switch-refined {
+    box-shadow: 
+      inset 0 1px 2px hsl(0 0% 0% / 0.2),
+      0 1px 2px hsl(0 0% 0% / 0.1);
+  }
+  
+  .dark .switch-refined[data-state="checked"] {
+    box-shadow: 
+      inset 0 1px 2px hsl(0 0% 100% / 0.15),
+      0 0 8px hsl(var(--switch-track-on) / 0.4);
+  }
+  
+  .dark .switch-thumb-refined {
+    box-shadow: var(--switch-thumb-shadow);
+  }
+  
   /* Fat finger touch targets for mobile */
   @media (max-width: 768px) {
     button, a, input[type="button"], [role="button"] {
@@ -306,6 +380,19 @@ All colors MUST be HSL.
     input, textarea, select {
       min-height: var(--touch-target-min);
       font-size: 16px; /* Prevents iOS zoom */
+    }
+    
+    /* Ensure switches meet touch target requirements */
+    .switch-refined {
+      min-height: var(--touch-target-min);
+      min-width: calc(var(--touch-target-min) * 1.5);
+    }
+    
+    /* Ensure toggles meet touch target requirements */
+    [role="switch"],
+    [data-state] {
+      min-height: var(--touch-target-min);
+      min-width: var(--touch-target-min);
     }
   }
 
