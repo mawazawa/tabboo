@@ -248,8 +248,12 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     
     // Set this field as active in the control panel
     const fieldIndex = fieldNameToIndex[field];
+    console.log('🖱️ Field clicked:', { field, fieldIndex, isFormElement });
     if (fieldIndex !== undefined) {
       setCurrentFieldIndex(fieldIndex);
+      console.log('✅ Set currentFieldIndex to:', fieldIndex);
+    } else {
+      console.warn('⚠️ Field not found in fieldNameToIndex:', field);
     }
   };
 
@@ -372,12 +376,16 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
    * @param customStep - Optional custom step size (default: 0.5%)
    */
   const adjustPosition = useCallback((direction: 'up' | 'down' | 'left' | 'right', field: string, customStep?: number) => {
+    console.log('📐 adjustPosition called:', { direction, field, customStep });
+
     const position = fieldPositions[field] || {
       top: parseFloat(fieldOverlays[0]?.fields.find(f => f.field === field)?.top || '0'),
       left: parseFloat(fieldOverlays[0]?.fields.find(f => f.field === field)?.left || '0')
     };
     const step = customStep ?? 0.5; // Fine-tuned for precise control, allow override
     const newPosition = { ...position };
+
+    console.log('📐 Current position:', position);
 
     switch (direction) {
       case 'up':
@@ -398,6 +406,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
         break;
     }
 
+    console.log('📐 New position:', newPosition);
     updateFieldPosition(field, newPosition);
   }, [fieldPositions, fieldOverlays, updateFieldPosition]);
 
@@ -426,26 +435,46 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
       const target = e.target as HTMLElement;
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
 
+      // DEBUG: Log arrow key presses
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        console.log('🔍 Arrow key pressed:', {
+          key: e.key,
+          isEditMode,
+          currentFieldIndex,
+          fieldNameToIndexKeys: Object.keys(fieldNameToIndex),
+          fieldNameToIndexSize: Object.keys(fieldNameToIndex).length
+        });
+      }
+
       // Move selected field with arrow keys (only in edit mode)
       if (isEditMode && currentFieldIndex >= 0) {
         const field = Object.keys(fieldNameToIndex).find(
           f => fieldNameToIndex[f] === currentFieldIndex
         );
-        if (!field) return;
+        console.log('🔍 Field lookup:', { currentFieldIndex, foundField: field });
+
+        if (!field) {
+          console.warn('⚠️ No field found for index:', currentFieldIndex);
+          return;
+        }
 
         const step = e.shiftKey ? 5 : 0.5; // Shift key for faster movement
 
         if (e.key === 'ArrowUp') {
           e.preventDefault();
+          console.log('⬆️ Moving field up:', field, 'step:', step);
           adjustPosition('up', field, step);
         } else if (e.key === 'ArrowDown') {
           e.preventDefault();
+          console.log('⬇️ Moving field down:', field, 'step:', step);
           adjustPosition('down', field, step);
         } else if (e.key === 'ArrowLeft') {
           e.preventDefault();
+          console.log('⬅️ Moving field left:', field, 'step:', step);
           adjustPosition('left', field, step);
         } else if (e.key === 'ArrowRight') {
           e.preventDefault();
+          console.log('➡️ Moving field right:', field, 'step:', step);
           adjustPosition('right', field, step);
         }
       }
