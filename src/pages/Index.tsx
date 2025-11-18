@@ -4,6 +4,7 @@ import { MobileBottomSheet } from "@/components/layout/MobileBottomSheet";
 import { useWindowSize } from "@/hooks/use-adaptive-layout";
 import { useFieldOperations } from "@/hooks/use-field-operations";
 import { useDocumentPersistence } from "@/hooks/use-document-persistence";
+import { useUIControls } from "@/hooks/use-ui-controls";
 import { getCurrentFieldPositions } from "@/utils/field-positions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FocusTrap } from "@/components/ui/focus-trap";
@@ -76,11 +77,7 @@ const Index = () => {
   const [showFieldsPanel, setShowFieldsPanel] = useState(true);
   const [showVaultPanel, setShowVaultPanel] = useState(false);
   const [currentPDFPage, setCurrentPDFPage] = useState(1);
-  const [pdfZoom, setPdfZoom] = useState(1);
   const [showThumbnails, setShowThumbnails] = useState(true);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [fieldFontSize, setFieldFontSize] = useState(12); // Default 12pt (PDF form standard)
-  const [thumbnailPanelWidth, setThumbnailPanelWidth] = useState(200);
   const [fieldSearchQuery, setFieldSearchQuery] = useState("");
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [highlightedField, setHighlightedField] = useState<string | null>(null);
@@ -162,6 +159,27 @@ const Index = () => {
   });
   const typedVaultData = (vaultData as PersonalVaultData | null) ?? null;
   const autofillableCount = typedVaultData ? getAutofillableFields(typedVaultData).length : 0;
+  const hasVaultData = Boolean(typedVaultData);
+
+  // UI controls hook - handles zoom, font size, edit mode, and thumbnails
+  const {
+    pdfZoom,
+    fieldFontSize,
+    isEditMode,
+    thumbnailPanelWidth,
+    handleZoomOut,
+    handleZoomIn,
+    handleFitToPage,
+    handleDecreaseFontSize,
+    handleIncreaseFontSize,
+    handleResetFontSize,
+    handleEditToggle,
+    handleThumbnailResize,
+    setIsEditMode,
+  } = useUIControls({
+    pdfPanelRef,
+    vaultData: typedVaultData,
+  });
 
   // Field operations custom hook - handles all field manipulation (13 handlers)
   const {
@@ -217,46 +235,6 @@ const Index = () => {
     vaultData: typedVaultData,
     isEditMode,
   };
-
-  const handleZoomOut = useCallback(() => {
-    setPdfZoom((prev) => Math.max(0.5, prev - 0.1));
-  }, []);
-
-  const handleZoomIn = useCallback(() => {
-    setPdfZoom((prev) => Math.min(2, prev + 0.1));
-  }, []);
-
-  const handleFitToPage = useCallback(() => {
-    const updateZoom = (width: number) => {
-      const targetWidth = 850;
-      const calculatedZoom = Math.min(2, Math.max(0.5, width / targetWidth));
-      setPdfZoom(calculatedZoom);
-    };
-
-    if (pdfPanelRef.current) {
-      updateZoom(pdfPanelRef.current.clientWidth - 48);
-      return;
-    }
-
-    const pdfPanel = document.getElementById("pdf-panel");
-    if (pdfPanel) {
-      updateZoom(pdfPanel.clientWidth - 48);
-      return;
-    }
-
-    setPdfZoom(1);
-  }, []);
-
-  const handleEditToggle = useCallback(() => {
-    setIsEditMode((prev) => !prev);
-  }, []);
-
-  const hasVaultData = Boolean(typedVaultData);
-
-  const handleThumbnailResize = useCallback((size: number) => {
-    const containerWidth = window.innerWidth * 0.75;
-    setThumbnailPanelWidth((size / 100) * containerWidth);
-  }, []);
 
   if (loading) {
     return (
