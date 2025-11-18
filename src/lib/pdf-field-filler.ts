@@ -62,14 +62,15 @@ export async function fillPDFFields(options: FillOptions): Promise<Uint8Array> {
     if (!textValue) continue; // Skip empty checkboxes
 
     // Convert database coordinates (inches from top-left) to PDF points (from bottom-left)
-    const coords = convertCoordinates(position, page);
+    const fontSize = options.fontSize || 12;
+    const coords = convertCoordinates(position, page, fontSize);
 
     // Draw the text
     try {
       page.drawText(textValue, {
         x: coords.x,
         y: coords.y,
-        size: options.fontSize || 12,
+        size: fontSize,
         font: helveticaFont,
         color: rgb(0, 0, 0),
         maxWidth: coords.maxWidth,
@@ -111,9 +112,18 @@ async function fetchFieldPositions(formNumber: string): Promise<FieldPosition[]>
  * Convert database coordinates to PDF points
  * Database: inches from top-left corner
  * PDF: points from bottom-left corner (1 inch = 72 points)
+ *
+ * CRITICAL: PDF drawText() uses Y-coordinate as TEXT BASELINE, not text top.
+ * We must adjust Y-coordinate down by ~85% of font size to position text correctly
+ * within the field bounding box.
  */
-function convertCoordinates(position: FieldPosition, page: PDFPage) {
+function convertCoordinates(position: FieldPosition, page: PDFPage, fontSize: number) {
   const POINTS_PER_INCH = 72;
+
+  // Baseline offset: PDF text renders from baseline, not top
+  // Typical font has cap height at ~70% and baseline at ~85% from top
+  // For 12pt font: 12 * 0.85 = 10.2pt offset needed
+  const BASELINE_RATIO = 0.85;
 
   // Parse database values (stored as strings)
   const topInches = parseFloat(position.position_top);
@@ -127,9 +137,11 @@ function convertCoordinates(position: FieldPosition, page: PDFPage) {
   // X: left margin (inches * 72 = points)
   const x = leftInches * POINTS_PER_INCH;
 
-  // Y: flip from top-origin to bottom-origin
+  // Y: flip from top-origin to bottom-origin + adjust for text baseline
   // PDF y=0 is at bottom, database y=0 is at top
-  const y = pageHeight - (topInches * POINTS_PER_INCH);
+  // Subtract baseline offset so text top aligns with field box top
+  const baselineOffset = fontSize * BASELINE_RATIO;
+  const y = pageHeight - (topInches * POINTS_PER_INCH) - baselineOffset;
 
   // Max width for text wrapping
   const maxWidth = widthInches * POINTS_PER_INCH;
