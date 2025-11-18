@@ -651,7 +651,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                               transformOrigin: 'top left',
                             }}
                             onClick={(e) => handleFieldClick(overlay.field, e)}
-                            onPointerDown={(e) => handlePointerDown(e, overlay.field, position.top, position.left)}
+                            {...(isEditMode ? { onPointerDown: (e) => handlePointerDown(e, overlay.field, position.top, position.left) } : {})}
                           >
                             {/* Visual Direction Indicators */}
                             {isEditMode && (
