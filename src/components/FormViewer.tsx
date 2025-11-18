@@ -222,8 +222,13 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   }, [isEditMode, announce]);
 
   const handleFieldClick = (field: string, e: React.MouseEvent) => {
-    // Prevent event propagation to avoid triggering PDF click
-    e.stopPropagation();
+    // Only stop propagation if clicking the container, not form elements
+    const target = e.target as HTMLElement;
+    const isFormElement = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.getAttribute('role') === 'checkbox';
+    
+    if (!isFormElement) {
+      e.stopPropagation();
+    }
     
     // Set this field as active in the control panel
     const fieldIndex = fieldNameToIndex[field];
