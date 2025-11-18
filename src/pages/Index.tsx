@@ -197,7 +197,7 @@ const Index = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-background via-background to-primary/5 w-full overflow-hidden">
+    <div className="flex flex-col h-screen bg-background w-full overflow-hidden">
       {/* Command Palette - Cmd+K */}
       <Suspense fallback={null}>
         <CommandPalette
