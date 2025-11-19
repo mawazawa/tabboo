@@ -47,6 +47,7 @@ export {
   FileText,
   Grid3x3,
   GripVertical,
+  HelpCircle,
   Keyboard,
   Loader2,
   Lock,
