@@ -19,8 +19,9 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { FieldNavigationHeader } from "./navigation/FieldNavigationHeader";
 import { FieldNavigationItem } from "./navigation/FieldNavigationItem";
 import { LiquidGlassAccordion } from "@/components/ui/liquid-glass-accordion";
+import { LiquidSlider } from "@/components/ui/liquid-slider";
 import { FL_320_FIELD_CONFIG } from "@/config/field-config";
-import { FL_320_FIELD_GROUPS, getGroupCompletionPercentage, getGroupCompletionBadge } from "@/config/field-groups";
+import { FL_320_FIELD_GROUPS, getGroupCompletionPercentage, getGroupCompletionBadge, getOverallFormCompletionPercentage, getOverallFormCompletionCount } from "@/config/field-groups";
 import type { FormData, FieldConfig, FieldPosition, ValidationRules, ValidationErrors } from "@/types/FormData";
 
 interface Template {
@@ -364,6 +365,22 @@ export const FieldNavigationPanel = ({
             Next
             <ChevronDown className="h-3.5 w-3.5" strokeWidth={1.5} />
           </Button>
+        </div>
+
+        {/* Form Completion Progress Slider */}
+        <div className="px-1 py-2">
+          <LiquidSlider
+            label="Form Completion"
+            variant="progress"
+            value={getOverallFormCompletionPercentage(formData)}
+            disabled={true}
+            showValue={true}
+            valueText={(() => {
+              const { completedFields, totalFields } = getOverallFormCompletionCount(formData);
+              const percentage = getOverallFormCompletionPercentage(formData);
+              return `${completedFields}/${totalFields} fields (${percentage}%)`;
+            })()}
+          />
         </div>
 
         <Tooltip>

@@ -1402,6 +1402,504 @@
         "height": "56px",
         "animation": "float (gentle bobbing)"
       }
+    },
+
+    "liquid_slider": {
+      "description": "Premium liquid slider with SVG goo filter physics - created by Jhey Tompkins (Shopify Staff Design Engineer, formerly Google/Vercel). Creates visceral delight through liquid merging, delta motion tracking, and physically-realistic squish/stretch animations.",
+      "developer_credit": "Jhey Tompkins (@jh3yy) - Shopify Staff Design Engineer Chief",
+      "baseline_browser_support": "December 2023 - linear() easing, @property, SVG filters",
+      "use_cases_legal_tech": [
+        "Form completion progress (0-100% with liquid fill animation)",
+        "Confidence rating for AI suggestions (visual certainty indicator)",
+        "Document upload progress (engaging feedback for long uploads)",
+        "Date range selectors (calendar view shortcuts)",
+        "Numeric inputs with visual feedback (age, income, etc.)",
+        "Settings controls (volume, brightness, preference intensity)"
+      ],
+
+      "svg_goo_filter_physics": {
+        "description": "SVG filter that creates liquid merging effect - two separate blobs merge into one organic shape when they get close. Discovered by Lucas Bebber (2019), still the gold standard in 2025.",
+        "technical_implementation": {
+          "filter_definition": {
+            "feGaussianBlur": {
+              "stdDeviation": "13",
+              "purpose": "Creates blur that allows blobs to 'bleed' into each other"
+            },
+            "feColorMatrix": {
+              "values": "1 0 0 0 0, 0 1 0 0 0, 0 0 1 0 0, 0 0 0 13 -10",
+              "purpose": "Creates threshold for liquid merging - alpha channel contrast boost",
+              "explanation": "Matrix multiplies alpha channel by 13, then subtracts 10. Creates hard edge for gooey effect."
+            },
+            "feComposite": {
+              "operator": "atop",
+              "purpose": "Blends everything together - masks out anything outside the filter"
+            }
+          },
+          "css_application": "filter: url(#goo);",
+          "performance": "GPU-accelerated, negligible performance impact on modern browsers"
+        },
+        "browser_support": {
+          "chrome": "All versions (SVG filters supported since Chrome 1)",
+          "firefox": "All versions",
+          "safari": "Limited - works but may have rendering quirks. Provide fallback.",
+          "edge": "All versions",
+          "fallback_strategy": "Detect Safari and disable goo filter, show regular slider with smooth transitions"
+        },
+        "configuration_options": {
+          "blur_strength": {
+            "default": "13px",
+            "light_goo": "8-10px (subtle merging)",
+            "medium_goo": "13-15px (standard, recommended)",
+            "heavy_goo": "18-22px (pronounced liquid effect)"
+          },
+          "contrast_multiplier": {
+            "default": "13",
+            "description": "Higher values = sharper liquid edges. Range: 10-20.",
+            "recommendation": "13-15 for best visual results"
+          }
+        },
+        "references": [
+          "Lucas Bebber - The Gooey Effect (CSS-Tricks, 2019)",
+          "FancyComponents - Gooey SVG Filter (2024)",
+          "Olivier Larose - Text Gooey Morph (2024)"
+        ]
+      },
+
+      "css_at_property_animation": {
+        "description": "CSS @property allows registering custom properties with type definitions, making them animatable. BASELINE as of July 2024 - full browser support achieved.",
+        "browser_support": {
+          "chrome": "113+ (May 2023)",
+          "firefox": "112+ (April 2023)",
+          "safari": "17.2+ (December 2023)",
+          "baseline_achieved": "July 2024",
+          "polyfill_needed": "No - safe to use in production without fallback"
+        },
+        "implementation_pattern": {
+          "definition": "@property --slider-complete { initial-value: 0; inherits: true; syntax: '<integer>'; }",
+          "usage": "element.style.setProperty('--slider-complete', value);",
+          "benefits": [
+            "Type-safe custom properties (integer, length, color, angle)",
+            "Smooth transitions between discrete values",
+            "Browser validates values - prevents invalid CSS",
+            "Inheritance control (inherits: true/false)",
+            "Default values (initial-value)"
+          ]
+        },
+        "liquid_slider_properties": {
+          "--slider-complete": {
+            "syntax": "<integer>",
+            "initial_value": "0",
+            "inherits": "true",
+            "description": "Linear progress of slider thumb (0-100)",
+            "animation": "Linear interpolation, follows user input directly"
+          },
+          "--slider-liquid": {
+            "syntax": "<integer>",
+            "initial_value": "0",
+            "inherits": "true",
+            "description": "Non-linear progress of liquid blob (0-100 with custom curve)",
+            "animation": "Custom keyframe mapping for anticipation/follow-through"
+          },
+          "--delta": {
+            "syntax": "<number>",
+            "initial_value": "0",
+            "inherits": "false",
+            "description": "Movement speed delta for squish/stretch physics (0-5)",
+            "animation": "Set on pointermove, reset on pointerup"
+          }
+        },
+        "references": [
+          "MDN - @property (updated November 2025)",
+          "MDN - CSS Properties and Values API (October 2025)",
+          "Web.dev - @property Tutorial (2024)"
+        ]
+      },
+
+      "delta_motion_tracking": {
+        "description": "Tracks pointer movement speed during drag to create squish/stretch physics. Faster drag = more squish horizontally, more stretch vertically. Creates physical realism like pulling taffy.",
+        "implementation": {
+          "tracking_code": "const delta = Math.min(Math.abs(e.movementX), 5);",
+          "application": "element.style.setProperty('--delta', delta);",
+          "reset_on_release": "element.style.setProperty('--delta', 0);"
+        },
+        "asymmetric_scale_transform": {
+          "css": "scale: calc(1.4 + (var(--delta) * 0.05)) calc(1.4 - (var(--delta) * 0.05));",
+          "explanation": "Horizontal scale increases with delta, vertical scale decreases. Creates squish effect.",
+          "at_rest": "scale(1.4, 1.4) - slightly enlarged",
+          "max_speed": "scale(1.65, 1.15) - squished horizontally, stretched vertically"
+        },
+        "configuration": {
+          "delta_cap": {
+            "default": "5",
+            "description": "Maximum delta value to prevent extreme distortion",
+            "recommendation": "3-8 depending on slider size"
+          },
+          "scale_multiplier": {
+            "default": "0.05",
+            "description": "How much scale changes per delta unit",
+            "recommendation": "0.03-0.08 for subtle to pronounced effect"
+          },
+          "base_scale": {
+            "default": "1.4",
+            "description": "Resting scale of liquid blob (larger than thumb)",
+            "recommendation": "1.2-1.6 for different visual weights"
+          }
+        },
+        "performance": "Use CSS transforms (GPU-accelerated), avoid triggering layout/paint",
+        "accessibility": "Does not affect functionality - purely visual enhancement"
+      },
+
+      "liquid_keyframe_mapping": {
+        "description": "Non-linear progress curve for liquid blob. Creates anticipation (blob lags behind thumb) and follow-through (blob catches up at endpoints). Physics principle from traditional animation.",
+        "curve_definition": {
+          "0%": "0 (start)",
+          "10%": "60 (rapid catch-up - anticipation)",
+          "90%": "60 (stays in middle - lag behind thumb)",
+          "100%": "100 (final catch-up - follow-through)"
+        },
+        "mathematical_formula": {
+          "if_0_to_10_percent": "liquidValue = (percentComplete / 10) * 60",
+          "if_10_to_90_percent": "liquidValue = 60",
+          "if_90_to_100_percent": "liquidValue = 60 + ((percentComplete - 90) / 10) * 40"
+        },
+        "visual_effect": "Thumb moves linearly, liquid blob 'chases' it with organic lag. At endpoints, liquid catches up with satisfying merge.",
+        "customization": {
+          "lag_amount": {
+            "default": "60 (middle position)",
+            "high_lag": "50 (more pronounced lag)",
+            "low_lag": "70 (subtle lag)",
+            "no_lag": "Use linear(0, 1) instead"
+          },
+          "catch_up_zones": {
+            "default": "0-10%, 90-100%",
+            "fast_catch_up": "0-5%, 95-100%",
+            "slow_catch_up": "0-20%, 80-100%"
+          }
+        },
+        "alternative_implementation": "Use linear() easing function for native CSS animation (see next section)"
+      },
+
+      "linear_easing_function": {
+        "description": "CSS linear() function creates springs, bounces, and custom easing curves in NATIVE CSS. BASELINE as of December 2023. Revolutionary for web animation - no JavaScript needed.",
+        "browser_support": {
+          "chrome": "113+ (May 2023)",
+          "firefox": "112+ (April 2023)",
+          "safari": "17.2+ (December 2023)",
+          "baseline_achieved": "December 2023",
+          "polyfill_needed": "No - production ready"
+        },
+        "syntax": "linear(0, 0.25, 0.75, 1) - comma-separated stops between 0 and 1",
+        "advanced_syntax": "linear(0, 0.5 75%, 1) - optional percentages define stop positions",
+        "jhey_17_point_bounce": {
+          "description": "Jhey Tompkins' signature 17-point bounce curve for endpoint animations",
+          "curve": "linear(0, 0.004, 0.016, 0.035, 0.063, 0.098, 0.141, 0.191, 0.25, 0.316, 0.391, 0.563, 0.766, 1.01, 0.946, 1.008, 1)",
+          "usage": "animation-timing-function: linear(...);",
+          "effect": "Natural spring-like bounce when slider reaches min/max values",
+          "duration": "600ms recommended"
+        },
+        "spring_effect": {
+          "description": "Create spring physics without JavaScript libraries",
+          "example": "linear(0, 0.009, 0.035, 0.078, 0.137, 0.215, 0.312, 0.427, 0.562, 0.718, 0.896, 1.077, 1.196, 1.251, 1.247, 1.187, 1.082, 0.986, 0.933, 0.919, 0.944, 0.989, 1.024, 1.033, 1.016, 0.991, 0.977, 0.974, 0.981, 0.991, 0.998, 1)",
+          "tool": "https://linear-easing-generator.netlify.app/ - Josh W. Comeau's generator"
+        },
+        "implementation_in_slider": {
+          "endpoint_bounce": "Animate when value === min or value === max",
+          "trigger": "On input event, check if value reached endpoint",
+          "animation": "Apply bounce animation with linear() timing",
+          "reset": "Remove animation class on completion"
+        },
+        "references": [
+          "Josh W. Comeau - Springs and Bounces in Native CSS (October 2025)",
+          "MDN - linear() easing function (November 2025)",
+          "CSS-Tricks - linear() Tutorial (2025)"
+        ]
+      },
+
+      "multi_layer_shadow_system": {
+        "description": "Ultra-premium 8+ shadow system for liquid slider. Creates depth, light source consistency, and tactile realism. Exceeds Apple's standards.",
+        "thumb_shadows": {
+          "light_mode": "0 1px 2px hsl(220 13% 13% / 0.08), 0 2px 4px hsl(220 13% 13% / 0.12), 0 4px 8px hsl(220 13% 13% / 0.16), 0 8px 16px hsl(220 13% 13% / 0.1)",
+          "dark_mode": "0 1px 2px hsl(0 0% 0% / 0.2), 0 2px 4px hsl(0 0% 0% / 0.25), 0 4px 8px hsl(0 0% 0% / 0.3), 0 8px 16px hsl(0 0% 0% / 0.18)",
+          "layers": ["Contact shadow", "Key light", "Ambient occlusion", "Atmospheric glow"]
+        },
+        "liquid_blob_shadows": {
+          "outer_shadow": "Same as thumb shadows + additional diffusion layer",
+          "inner_glow": "inset 0 1px 2px hsl(0 0% 100% / 0.25) - rim lighting effect",
+          "purpose": "Creates 3D depth, looks like glass/liquid material"
+        },
+        "track_shadows": {
+          "inset_shadow": "inset 0 2px 4px hsl(220 13% 13% / 0.1)",
+          "purpose": "Track appears recessed below surface"
+        },
+        "hover_state": "Enhance all shadows by 1.2x intensity + slight blur increase",
+        "active_state": "Reduce shadows by 0.8x intensity (pressed into surface)",
+        "performance": "Use will-change: box-shadow; for GPU acceleration during drag"
+      },
+
+      "gsap_draggable_integration": {
+        "description": "Industry-standard drag library from GreenSock. Used by Palmer (Uncommon agency), Shopify, and countless Fortune 500 sites. Touch-enabled, momentum-based, GPU-accelerated.",
+        "installation": "npm install gsap",
+        "import": "import { Draggable } from 'gsap/Draggable'; gsap.registerPlugin(Draggable);",
+        "basic_setup": {
+          "code": "Draggable.create('.slider-thumb', { type: 'x', bounds: '.slider-track', onDrag: updateValue });",
+          "explanation": "Creates draggable instance with horizontal movement, bounded to track"
+        },
+        "advanced_features": {
+          "inertia": {
+            "plugin": "InertiaPlugin (Club GreenSock premium)",
+            "config": "inertia: true, resistance: 300",
+            "effect": "Momentum-based deceleration after release - feels natural"
+          },
+          "bounds": {
+            "type": "CSS selector or element",
+            "purpose": "Constrains drag area",
+            "example": "bounds: { minX: 0, maxX: trackWidth }"
+          },
+          "snap": {
+            "config": "snap: { x: (value) => Math.round(value / stepSize) * stepSize }",
+            "purpose": "Snap to discrete values (e.g., integers)"
+          },
+          "throw_props": {
+            "description": "Physics-based throwing (requires InertiaPlugin)",
+            "config": "throwProps: true, resistance: 500",
+            "effect": "Flick slider and it decelerates naturally"
+          }
+        },
+        "delta_tracking_integration": {
+          "onDragStart": "Start listening to pointermove for delta calculation",
+          "onDrag": "Update --slider-complete and --slider-liquid properties",
+          "onDragEnd": "Reset delta to 0, stop listening to pointermove"
+        },
+        "touch_optimization": {
+          "native_touch": "Draggable automatically handles touch events",
+          "prevent_scroll": "allowNativeTouchScrolling: false on vertical sliders",
+          "tap_threshold": "minimumMovement: 2 - prevents accidental drags"
+        },
+        "performance": "Uses requestAnimationFrame, GPU-accelerated transforms, highly optimized",
+        "license": "Free for testing, requires Club GreenSock license for commercial use ($99/year)"
+      },
+
+      "progressive_enhancement": {
+        "description": "Slider works without JavaScript, enhanced with JS. Follows web standards and accessibility best practices.",
+        "base_layer": {
+          "html": "<input type='range' min='0' max='100' step='1' value='50' />",
+          "functionality": "Native HTML5 range input - fully functional without JS",
+          "styling": "Custom CSS for track, thumb, and range styling"
+        },
+        "enhancement_layer": {
+          "gsap_draggable": "Replaces native drag with GSAP for smoother feel",
+          "svg_goo_filter": "Adds liquid merging effect",
+          "delta_motion": "Adds squish/stretch physics",
+          "endpoint_bounce": "Adds satisfying bounce at min/max"
+        },
+        "fallback_strategy": {
+          "no_javascript": "Native range input works perfectly",
+          "old_browsers": "Detect @property support, disable liquid animations if unsupported",
+          "safari_quirks": "Detect Safari, disable goo filter (rendering issues), keep other effects",
+          "prefers_reduced_motion": "Disable all animations except necessary transitions"
+        },
+        "feature_detection": {
+          "at_property": "CSS.supports('@property', '--test')",
+          "linear_easing": "CSS.supports('animation-timing-function', 'linear(0, 1)')",
+          "svg_filters": "typeof SVGFEGaussianBlurElement !== 'undefined'"
+        }
+      },
+
+      "accessibility": {
+        "aria_labels": {
+          "input": "aria-label='Form completion progress: 75%'",
+          "live_region": "aria-live='polite' aria-atomic='true' for value announcements"
+        },
+        "keyboard_support": {
+          "arrow_keys": "Left/Right or Up/Down to adjust value",
+          "home_end": "Home = min value, End = max value",
+          "page_up_down": "Jump by larger increments (10%)",
+          "focus_indicator": "2px solid ring with 2px offset"
+        },
+        "screen_reader": {
+          "role": "role='slider' (implicit on input[type=range])",
+          "aria_valuemin": "Minimum value",
+          "aria_valuemax": "Maximum value",
+          "aria_valuenow": "Current value",
+          "aria_valuetext": "Human-readable value (e.g., '75% complete')"
+        },
+        "touch_targets": {
+          "minimum_size": "44px x 44px (WCAG 2.2)",
+          "recommended_size": "56px x 56px for liquid blob thumb",
+          "padding": "Expand hit area beyond visual bounds"
+        },
+        "prefers_reduced_motion": {
+          "disable": "Goo filter, squish/stretch, bounce animations",
+          "keep": "Instant value updates, focus indicators",
+          "fallback": "Simple linear transition (200ms ease-out)"
+        }
+      },
+
+      "swiftfill_use_cases": {
+        "form_completion_progress": {
+          "description": "Main use case - shows how much of FL-320 form is complete",
+          "min": "0",
+          "max": "100",
+          "step": "1",
+          "label": "Form Completion: {value}%",
+          "color_scheme": {
+            "0_33_percent": "hsl(0 85% 50%) - red (low progress)",
+            "34_66_percent": "hsl(45 85% 50%) - amber (medium progress)",
+            "67_100_percent": "hsl(120 85% 40%) - green (high progress)"
+          },
+          "visual_feedback": "Liquid fills track from left to right, goo merges at 100%",
+          "haptic": "Light haptic at 25%, 50%, 75%, 100%"
+        },
+        "ai_confidence_rating": {
+          "description": "Shows AI's confidence in suggested field values",
+          "min": "0",
+          "max": "100",
+          "step": "1",
+          "label": "AI Confidence: {value}%",
+          "color_scheme": {
+            "0_50_percent": "hsl(0 85% 50%) - red (low confidence)",
+            "51_80_percent": "hsl(45 85% 50%) - amber (medium confidence)",
+            "81_100_percent": "hsl(120 85% 40%) - green (high confidence)"
+          },
+          "interaction": "Read-only (user cannot drag), animated when AI updates suggestion",
+          "visual_feedback": "Liquid blob pulses when confidence changes"
+        },
+        "document_upload_progress": {
+          "description": "Engaging feedback during long document uploads",
+          "min": "0",
+          "max": "100",
+          "step": "0.1",
+          "label": "Uploading: {value}%",
+          "color_scheme": "primary gradient (consistent with brand)",
+          "visual_feedback": "Liquid animates continuously during upload, bounces at 100%",
+          "haptic": "Success haptic pattern on completion"
+        },
+        "numeric_input_slider": {
+          "description": "Alternative to text input for bounded numeric values",
+          "examples": [
+            "Age: min=0, max=120, step=1",
+            "Income: min=0, max=500000, step=1000",
+            "Children: min=0, max=20, step=1",
+            "Years married: min=0, max=100, step=1"
+          ],
+          "benefits": "Prevents invalid input, provides visual feedback, more engaging than text field",
+          "accessibility": "Provide text input alternative for precise control"
+        }
+      },
+
+      "performance_optimization": {
+        "gpu_acceleration": {
+          "properties": ["transform", "opacity"],
+          "will_change": "will-change: transform, box-shadow; (only during drag)",
+          "avoid": "width, height, top, left (triggers layout/paint)"
+        },
+        "requestAnimationFrame": "GSAP uses RAF internally, no manual RAF needed",
+        "debouncing": {
+          "value_updates": "Throttle onInput callback to 16ms (60fps)",
+          "live_regions": "Debounce screen reader announcements to 500ms",
+          "network_sync": "Debounce form autosave to 2000ms"
+        },
+        "lazy_loading": {
+          "gsap": "Lazy load GSAP only when slider is visible (IntersectionObserver)",
+          "svg_filters": "Inline SVG filters in DOM (no external fetch)",
+          "initialization": "Initialize Draggable on first interaction, not on mount"
+        },
+        "memory_management": {
+          "cleanup": "draggable.kill() on component unmount",
+          "event_listeners": "Remove pointermove listeners on drag end",
+          "refs": "Clear React refs on unmount"
+        }
+      },
+
+      "implementation_checklist": {
+        "required_dependencies": [
+          "gsap@^3.12.5 (latest stable)",
+          "react@^18.0.0",
+          "typescript@^5.0.0"
+        ],
+        "optional_dependencies": [
+          "gsap InertiaPlugin (Club GreenSock premium - momentum effects)"
+        ],
+        "file_structure": [
+          "src/components/ui/liquid-slider.tsx - Main component",
+          "src/components/ui/liquid-slider.stories.tsx - Storybook documentation",
+          "design/LIQUID_SLIDER_GUIDE.md - Developer documentation"
+        ],
+        "browser_testing": [
+          "Chrome 113+ (primary target)",
+          "Firefox 112+",
+          "Safari 17.2+ (verify goo filter rendering)",
+          "Edge 113+",
+          "Mobile Safari iOS 17.2+",
+          "Chrome Android"
+        ],
+        "accessibility_testing": [
+          "NVDA screen reader (Windows)",
+          "VoiceOver (macOS/iOS)",
+          "Keyboard navigation (all interactions)",
+          "Color contrast (WCAG AAA)",
+          "Touch target sizes (44px minimum)",
+          "prefers-reduced-motion support"
+        ]
+      },
+
+      "coding_agent_instructions": {
+        "critical_warnings": [
+          "NEVER use deprecated CSS filter syntax (use SVG <filter> element)",
+          "NEVER apply goo filter directly to thumb (creates performance issues)",
+          "NEVER forget to clean up GSAP instances on unmount (memory leak)",
+          "NEVER use transform: translate() on slider (breaks GSAP bounds)",
+          "ALWAYS test on Safari (goo filter has rendering quirks)",
+          "ALWAYS provide keyboard navigation (not just drag)",
+          "ALWAYS use @property for custom properties (enables smooth transitions)",
+          "ALWAYS debounce screen reader announcements (prevents spam)"
+        ],
+        "implementation_order": [
+          "1. Create base HTML5 range input (works without JS)",
+          "2. Add custom CSS styling (track, thumb, colors)",
+          "3. Add SVG goo filter to DOM (inline in component)",
+          "4. Initialize GSAP Draggable on component mount",
+          "5. Set up @property custom properties",
+          "6. Implement delta motion tracking (pointermove listeners)",
+          "7. Add liquid keyframe mapping logic",
+          "8. Add endpoint bounce animations (linear() timing)",
+          "9. Add multi-layer shadows for depth",
+          "10. Implement accessibility features (ARIA, keyboard)",
+          "11. Add progressive enhancement fallbacks",
+          "12. Test thoroughly (browser, accessibility, performance)"
+        ],
+        "common_pitfalls": {
+          "goo_filter_not_working": "Check SVG filter ID matches CSS filter: url(#goo)",
+          "draggable_not_bounded": "Ensure bounds element exists before initializing",
+          "liquid_not_animating": "Verify @property is defined BEFORE using in CSS",
+          "poor_performance": "Remove will-change after drag ends, use GPU properties only",
+          "safari_rendering_broken": "Provide fallback, disable goo filter on Safari",
+          "keyboard_not_working": "Ensure native input is not display:none (use opacity:0 instead)"
+        },
+        "debugging_tips": [
+          "DevTools: Inspect SVG filter application (should see filter: url(#goo) in computed styles)",
+          "DevTools: Check @property registration (CSS.getPropertyValue('--slider-complete'))",
+          "Console: Log GSAP instance (draggable.vars, draggable.target, draggable.x)",
+          "Console: Verify delta values (log on pointermove)",
+          "Performance: Record timeline during drag (should be 60fps, no layout thrashing)",
+          "Accessibility: Test with screen reader (VoiceOver: Cmd+F5, NVDA: Ctrl+Alt+N)"
+        ]
+      },
+
+      "references_and_credits": {
+        "original_creator": "Jhey Tompkins (@jh3yy) - Shopify Staff Design Engineer Chief, formerly Google/Vercel",
+        "codepen_source": "https://codepen.io/jh3y/pen/[pen-id] (liquid-slider)",
+        "goo_filter_technique": "Lucas Bebber - The Gooey Effect (CSS-Tricks, 2019)",
+        "linear_easing_guide": "Josh W. Comeau - Springs and Bounces in Native CSS (October 2025)",
+        "at_property_docs": "MDN Web Docs - @property (November 2025)",
+        "gsap_docs": "GreenSock - Draggable Plugin Documentation (2025)",
+        "inspiration_sites": [
+          "Palmer.com (Uncommon agency - draggable product grid)",
+          "Shopify.com (Jhey's employer - cutting-edge interactions)",
+          "linear.app (sophisticated UI interactions)",
+          "vercel.com (advanced motion design)"
+        ]
+      }
     }
   },
 

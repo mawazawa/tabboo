@@ -238,3 +238,52 @@ export const getGroupCompletionBadge = (
 
   return `${completedFields}/${group.fields.length} complete`;
 };
+
+/**
+ * Get overall form completion percentage across all field groups
+ * @param formData - Current form data
+ * @returns Overall percentage of completed fields (0-100)
+ */
+export const getOverallFormCompletionPercentage = (
+  formData: Record<string, unknown>
+): number => {
+  // Get all unique fields from all groups
+  const allFields = new Set<string>();
+  FL_320_FIELD_GROUPS.forEach(group => {
+    group.fields.forEach(field => allFields.add(field));
+  });
+
+  // Count completed fields
+  const completedFields = Array.from(allFields).filter(fieldName => {
+    const value = formData[fieldName];
+    return value !== undefined && value !== null && value !== '';
+  }).length;
+
+  return Math.round((completedFields / allFields.size) * 100);
+};
+
+/**
+ * Get overall form completion count
+ * @param formData - Current form data
+ * @returns Object with completedFields and totalFields
+ */
+export const getOverallFormCompletionCount = (
+  formData: Record<string, unknown>
+): { completedFields: number; totalFields: number } => {
+  // Get all unique fields from all groups
+  const allFields = new Set<string>();
+  FL_320_FIELD_GROUPS.forEach(group => {
+    group.fields.forEach(field => allFields.add(field));
+  });
+
+  // Count completed fields
+  const completedFields = Array.from(allFields).filter(fieldName => {
+    const value = formData[fieldName];
+    return value !== undefined && value !== null && value !== '';
+  }).length;
+
+  return {
+    completedFields,
+    totalFields: allFields.size
+  };
+};

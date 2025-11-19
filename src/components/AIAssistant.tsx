@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { LiquidSlider } from "@/components/ui/liquid-slider";
 import { Send, Loader2, Sparkles } from "@/icons";
 import { useGroqStream } from "@/hooks/useGroqStream";
 import { toast } from "sonner";
@@ -13,6 +14,48 @@ import type { FormData, PersonalVaultData } from "@/types/FormData";
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+}
+
+/**
+ * Calculate AI confidence score based on response characteristics
+ * Returns a value between 0-100
+ *
+ * Algorithm:
+ * - Base: 70 (default medium-high confidence)
+ * - Length bonus: +15 for responses >200 chars (detailed = confident)
+ * - Hedging penalty: -5 per hedging word (might, possibly, maybe, could, etc.)
+ * - Strong language bonus: +3 per strong word (definitely, clearly, certainly, etc.)
+ * - Data/numbers bonus: +5 if contains numbers/statistics
+ * - Capped at 0-100 range
+ */
+function calculateAIConfidence(response: string): number {
+  let confidence = 70; // Base confidence (medium-high)
+
+  // Length bonus (longer responses = more thorough = more confident)
+  if (response.length > 200) confidence += 15;
+
+  // Hedging language detection (reduces confidence)
+  const hedgingWords = ['might', 'possibly', 'maybe', 'could', 'perhaps',
+                        'not sure', 'unsure', 'uncertain', 'unclear', 'probably'];
+  const hedgeCount = hedgingWords.reduce((count, word) =>
+    count + (response.toLowerCase().match(new RegExp(word, 'g'))?.length || 0), 0
+  );
+  confidence -= hedgeCount * 5;
+
+  // Strong language detection (increases confidence)
+  const strongWords = ['definitely', 'clearly', 'certainly', 'absolutely',
+                       'confirmed', 'verified', 'required', 'must'];
+  const strongCount = strongWords.reduce((count, word) =>
+    count + (response.toLowerCase().match(new RegExp(word, 'g'))?.length || 0), 0
+  );
+  confidence += strongCount * 3;
+
+  // Data/numbers presence (increases confidence)
+  const hasNumbers = /\d+/.test(response);
+  if (hasNumbers) confidence += 5;
+
+  // Cap between 0-100
+  return Math.max(0, Math.min(100, Math.round(confidence)));
 }
 
 interface SuggestedAction {
@@ -36,6 +79,7 @@ export const AIAssistant = ({ formContext, vaultData }: AIAssistantProps) => {
   const [input, setInput] = useState('');
   const [showInput, setShowInput] = useState(false);
   const [suggestedActions, setSuggestedActions] = useState<SuggestedAction[]>([]);
+  const [aiConfidence, setAiConfidence] = useState(85); // Initial confidence for welcome message
   const { streamChat, isLoading, cancelStream } = useGroqStream();
   const scrollRef = useRef<HTMLDivElement>(null);
   const hasAnalyzed = useRef(false);
@@ -149,7 +193,9 @@ export const AIAssistant = ({ formContext, vaultData }: AIAssistantProps) => {
         });
       },
       onDone: () => {
-        // Stream completed successfully
+        // Stream completed successfully - calculate confidence
+        const confidence = calculateAIConfidence(assistantContent);
+        setAiConfidence(confidence);
       },
       onError: (error) => {
         // Stream error occurred - show user toast
@@ -165,18 +211,37 @@ export const AIAssistant = ({ formContext, vaultData }: AIAssistantProps) => {
   return (
     <Card className="h-full flex flex-col border-2 shadow-medium">
       <CardHeader className="bg-gradient-to-r from-primary to-accent text-primary-foreground pb-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 mb-3">
           <div className="w-12 h-12 rounded-full overflow-hidden bg-background p-1 shadow-glow">
-            <ProgressiveImage 
-              src={aiAssistant} 
-              alt="AI Assistant" 
+            <ProgressiveImage
+              src={aiAssistant}
+              alt="AI Assistant"
               className="w-full h-full object-contain"
             />
           </div>
-          <div>
+          <div className="flex-1">
             <CardTitle className="text-xl">SwiftFill Pro AI</CardTitle>
             <p className="text-sm text-primary-foreground/80">Your intelligent form assistant</p>
           </div>
+        </div>
+
+        {/* AI Confidence Rating */}
+        <div className="mt-2 px-1">
+          <LiquidSlider
+            label="AI Confidence"
+            variant="confidence"
+            value={aiConfidence}
+            disabled={true}
+            showValue={true}
+            valueText={
+              aiConfidence >= 81
+                ? 'High confidence'
+                : aiConfidence >= 51
+                ? 'Medium confidence'
+                : 'Low confidence'
+            }
+            className="text-primary-foreground"
+          />
         </div>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col p-0">
