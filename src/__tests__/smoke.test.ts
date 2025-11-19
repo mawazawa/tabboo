@@ -76,21 +76,42 @@ test.describe('Critical Product Features (Smoke Tests)', () => {
   /**
    * TEST 2: Field Input Functionality
    * Verifies that users can type into form fields and see their input
+   *
+   * NOTE: This test uses database-driven field mappings. If database migrations haven't been
+   * applied, there may be no fields to test. The test will use the first two available fields.
    */
   test('user can fill out text fields', async ({ page }) => {
-    // Find a text input field (using data-field attribute or aria-label)
-    const partyNameField = page.locator('[data-field="partyName"]').first();
+    // Wait for at least one input field with data-field to exist
+    // This confirms fields have loaded from the database
+    await page.waitForSelector('input[data-field]', { state: 'attached', timeout: 15000 });
 
-    // Type into the field
-    await partyNameField.fill('Jane Smith');
+    // Get all available input fields
+    const allFieldNames = await page.evaluate(() => {
+      const inputs = Array.from(document.querySelectorAll('input[data-field]'));
+      return inputs.map(f => f.getAttribute('data-field')).filter(Boolean);
+    });
 
-    // Verify the value was set
-    await expect(partyNameField).toHaveValue('Jane Smith');
+    console.log('[DEBUG] Found input fields:', allFieldNames);
 
-    // Test another field
-    const emailField = page.locator('[data-field="email"]').first();
-    await emailField.fill('jane@example.com');
-    await expect(emailField).toHaveValue('jane@example.com');
+    if (allFieldNames.length === 0) {
+      throw new Error('No input fields found on page. Database migrations may not be applied.');
+    }
+
+    // Test the first available field
+    const firstFieldName = allFieldNames[0]!;
+    const firstField = page.locator(`[data-field="${firstFieldName}"]`).first();
+
+    await firstField.fill('Test Value 1');
+    await expect(firstField).toHaveValue('Test Value 1');
+
+    // Test the second available field if it exists
+    if (allFieldNames.length > 1) {
+      const secondFieldName = allFieldNames[1]!;
+      const secondField = page.locator(`[data-field="${secondFieldName}"]`).first();
+
+      await secondField.fill('Test Value 2');
+      await expect(secondField).toHaveValue('Test Value 2');
+    }
   });
 
   /**
@@ -102,10 +123,29 @@ test.describe('Critical Product Features (Smoke Tests)', () => {
    * 2. Drag a field to a new position
    * 3. See the field move visually
    * 4. Have the position persist
+   *
+   * NOTE: This test uses database-driven field mappings. If database migrations haven't been
+   * applied, there may be no fields to test. The test will use the first available field.
    */
   test('user can enable edit mode and drag fields', async ({ page }) => {
-    // Find a field to drag
-    const field = page.locator('[data-field="partyName"]').first();
+    // Wait for at least one input field to appear
+    await page.waitForSelector('[data-field]', { state: 'attached', timeout: 15000 });
+
+    // Get all available fields (any type: input, textarea, checkbox)
+    const allFieldNames = await page.evaluate(() => {
+      const fields = Array.from(document.querySelectorAll('[data-field]'));
+      return fields.map(f => f.getAttribute('data-field')).filter(Boolean);
+    });
+
+    console.log('[DEBUG] Found fields for drag test:', allFieldNames);
+
+    if (allFieldNames.length === 0) {
+      throw new Error('No fields found on page for drag test. Database migrations may not be applied.');
+    }
+
+    // Use the first available field
+    const fieldName = allFieldNames[0]!;
+    const field = page.locator(`[data-field="${fieldName}"]`).first();
     await field.waitFor({ state: 'visible' });
 
     // Click the field to select it
