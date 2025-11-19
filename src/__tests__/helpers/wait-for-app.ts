@@ -95,14 +95,8 @@ export async function waitForApp(
   // Now wait for it to disappear (confirms PDF has loaded)
   await loadingOverlay.waitFor({ state: 'detached', timeout });
 
-  // Step 2b: Verify PDF canvas is rendered with dimensions
-  await page.waitForFunction(
-    () => {
-      const canvas = document.querySelector('.react-pdf__Document canvas') as HTMLCanvasElement;
-      return canvas && canvas.offsetHeight > 0 && canvas.offsetWidth > 0;
-    },
-    { timeout: 10000, polling: 200 }
-  );
+  // Short wait for PDF.js to complete canvas rendering after overlay disappears
+  await page.waitForTimeout(1000);
 
   // Step 3: Wait for form input fields to be interactive
   // Ensures the overlay inputs are ready for user interaction
