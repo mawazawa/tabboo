@@ -34,3 +34,6 @@ playwright-report/
 playwright/.cache/
 e2e-test-results.log
 playwright/.auth
+
+*storybook.log
+storybook-static
