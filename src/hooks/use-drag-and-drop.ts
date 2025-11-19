@@ -40,7 +40,14 @@ export function useDragAndDrop({
     const container = (e.currentTarget as HTMLElement).closest('.field-container') as HTMLElement;
     if (!container) return;
 
-    container.setPointerCapture(e.pointerId);
+    // Try to capture pointer (may fail in test environments with synthetic events)
+    try {
+      container.setPointerCapture(e.pointerId);
+    } catch (error) {
+      // Pointer capture not available (e.g., in Playwright tests)
+      // Drag will still work without capture, just less robust for edge cases
+      console.warn('[Drag] setPointerCapture failed:', error);
+    }
     setIsDragging(field);
 
     dragStartPos.current = {
