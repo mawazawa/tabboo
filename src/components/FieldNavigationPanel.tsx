@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Move, Search, X, Trash2 } from "@/icons";
+import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Move, Search, X, Trash2, User, Scale, FileText, Calendar, Shield, Calculator, Package, Lock, MoreHorizontal, MessageSquare } from "@/icons";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -18,7 +18,9 @@ import { TemplateManager } from "./TemplateManager";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { FieldNavigationHeader } from "./navigation/FieldNavigationHeader";
 import { FieldNavigationItem } from "./navigation/FieldNavigationItem";
+import { LiquidGlassAccordion } from "@/components/ui/liquid-glass-accordion";
 import { FL_320_FIELD_CONFIG } from "@/config/field-config";
+import { FL_320_FIELD_GROUPS, getGroupCompletionPercentage, getGroupCompletionBadge } from "@/config/field-groups";
 import type { FormData, FieldConfig, FieldPosition, ValidationRules, ValidationErrors } from "@/types/FormData";
 
 interface Template {
@@ -552,7 +554,8 @@ export const FieldNavigationPanel = ({
                 <p className="text-sm text-muted-foreground">No fields found</p>
                 <p className="text-xs text-muted-foreground/60 mt-1">Try a different search term</p>
               </div>
-            ) : (
+            ) : searchQuery ? (
+              // When searching, show flat list of filtered fields
               filteredFields.map((config) => {
                 const originalIndex = FL_320_FIELD_CONFIG.findIndex(f => f.field === config.field);
                 const isActive = originalIndex === currentFieldIndex;
@@ -577,6 +580,76 @@ export const FieldNavigationPanel = ({
                     onCopyFromVault={copyFromVault}
                     activeFieldRef={isActive ? activeFieldRef : undefined}
                   />
+                );
+              })
+            ) : (
+              // When not searching, show grouped accordion view
+              FL_320_FIELD_GROUPS.map((group) => {
+                // Get icon component by name
+                const iconMap: Record<string, React.ReactNode> = {
+                  User: <User className="h-4 w-4" />,
+                  Scale: <Scale className="h-4 w-4" />,
+                  FileText: <FileText className="h-4 w-4" />,
+                  Calendar: <Calendar className="h-4 w-4" />,
+                  Shield: <Shield className="h-4 w-4" />,
+                  Calculator: <Calculator className="h-4 w-4" />,
+                  Package: <Package className="h-4 w-4" />,
+                  Lock: <Lock className="h-4 w-4" />,
+                  MoreHorizontal: <MoreHorizontal className="h-4 w-4" />,
+                  MessageSquare: <MessageSquare className="h-4 w-4" />,
+                };
+
+                const icon = group.icon ? iconMap[group.icon] : null;
+                const completionPercentage = getGroupCompletionPercentage(group.id, formData);
+                const badge = getGroupCompletionBadge(group.id, formData);
+
+                // Get fields for this group
+                const groupFields = group.fields
+                  .map(fieldName => FL_320_FIELD_CONFIG.find(f => f.field === fieldName))
+                  .filter((config): config is FieldConfig => config !== undefined);
+
+                return (
+                  <LiquidGlassAccordion
+                    key={group.id}
+                    summary={group.title}
+                    icon={icon}
+                    badge={badge}
+                    completionPercentage={completionPercentage}
+                    variant="field-group"
+                    name="fl-320-sections"
+                    width="100%"
+                    noIntro
+                    defaultOpen={group.defaultOpen}
+                  >
+                    <div className="space-y-1.5">
+                      {groupFields.map((config) => {
+                        const originalIndex = FL_320_FIELD_CONFIG.findIndex(f => f.field === config.field);
+                        const isActive = originalIndex === currentFieldIndex;
+                        const isSelected = selectedFields.includes(config.field);
+
+                        return (
+                          <FieldNavigationItem
+                            key={config.field}
+                            config={config}
+                            originalIndex={originalIndex}
+                            isActive={isActive}
+                            isSelected={isSelected}
+                            formData={formData}
+                            updateField={updateField}
+                            setCurrentFieldIndex={setCurrentFieldIndex}
+                            setSelectedFields={setSelectedFields}
+                            onFieldHover={onFieldHover}
+                            validationRules={validationRules}
+                            validationErrors={validationErrors}
+                            onSaveValidationRules={onSaveValidationRules}
+                            personalInfo={personalInfo}
+                            onCopyFromVault={copyFromVault}
+                            activeFieldRef={isActive ? activeFieldRef : undefined}
+                          />
+                        );
+                      })}
+                    </div>
+                  </LiquidGlassAccordion>
                 );
               })
             )}
