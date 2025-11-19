@@ -102,6 +102,8 @@ test.describe('Critical Product Features (Smoke Tests)', () => {
     const firstFieldName = allFieldNames[0]!;
     const firstField = page.locator(`input[data-field="${firstFieldName}"]`).first();
 
+    // Scroll element into view (fields are in overflow container)
+    await firstField.scrollIntoViewIfNeeded();
     await firstField.fill('Test Value 1');
     await expect(firstField).toHaveValue('Test Value 1');
 
@@ -110,6 +112,7 @@ test.describe('Critical Product Features (Smoke Tests)', () => {
       const secondFieldName = allFieldNames[1]!;
       const secondField = page.locator(`input[data-field="${secondFieldName}"]`).first();
 
+      await secondField.scrollIntoViewIfNeeded();
       await secondField.fill('Test Value 2');
       await expect(secondField).toHaveValue('Test Value 2');
     }
@@ -150,6 +153,9 @@ test.describe('Critical Product Features (Smoke Tests)', () => {
     const fieldName = allFieldNames[0]!;
     const field = page.locator(`[data-field="${fieldName}"].field-container`).first();
     await field.waitFor({ state: 'attached' });
+
+    // Scroll element into view (fields are in overflow container)
+    await field.scrollIntoViewIfNeeded();
 
     // Click the field to select it
     await field.click();
