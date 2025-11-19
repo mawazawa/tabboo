@@ -216,27 +216,19 @@ test.describe('Critical Product Features (Smoke Tests)', () => {
       throw new Error('Field bounding box not found');
     }
 
-    // Perform drag operation using page.mouse API (properly handles pointer capture)
-    const centerX = initialBox.x + initialBox.width / 2;
-    const centerY = initialBox.y + initialBox.height / 2;
+    // Perform drag operation using locator.dragTo() for proper pointer event simulation
+    // Calculate target position (100px right, 50px down from center)
+    const targetX = initialBox.x + initialBox.width / 2 + 100;
+    const targetY = initialBox.y + initialBox.height / 2 + 50;
 
-    // Move mouse to field center and start drag
-    await page.mouse.move(centerX, centerY);
-    await page.mouse.down();
+    // Drag the field to the new position
+    // This properly generates pointerdown, pointermove, pointerup events
+    await field.dragTo(page.locator('body'), {
+      targetPosition: { x: targetX, y: targetY },
+      force: true, // Bypass actionability checks (field might be in overflow container)
+    });
 
-    // Wait for pointerdown to register
-    await page.waitForTimeout(100);
-
-    // Drag to new position (100px right, 50px down)
-    await page.mouse.move(centerX + 100, centerY + 50);
-
-    // Wait for React to update position
-    await page.waitForTimeout(100);
-
-    // Release mouse
-    await page.mouse.up();
-
-    // Wait for any animations to complete
+    // Wait for any animations and React state updates to complete
     await page.waitForTimeout(500);
 
     // Get new position using getBoundingClientRect (works with GPU transforms)
