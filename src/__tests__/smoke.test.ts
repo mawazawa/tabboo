@@ -98,8 +98,9 @@ test.describe('Critical Product Features (Smoke Tests)', () => {
     }
 
     // Test the first available field
+    // Use input[data-field] to target the actual input element, not the container div
     const firstFieldName = allFieldNames[0]!;
-    const firstField = page.locator(`[data-field="${firstFieldName}"]`).first();
+    const firstField = page.locator(`input[data-field="${firstFieldName}"]`).first();
 
     await firstField.fill('Test Value 1');
     await expect(firstField).toHaveValue('Test Value 1');
@@ -107,7 +108,7 @@ test.describe('Critical Product Features (Smoke Tests)', () => {
     // Test the second available field if it exists
     if (allFieldNames.length > 1) {
       const secondFieldName = allFieldNames[1]!;
-      const secondField = page.locator(`[data-field="${secondFieldName}"]`).first();
+      const secondField = page.locator(`input[data-field="${secondFieldName}"]`).first();
 
       await secondField.fill('Test Value 2');
       await expect(secondField).toHaveValue('Test Value 2');
@@ -144,9 +145,11 @@ test.describe('Critical Product Features (Smoke Tests)', () => {
     }
 
     // Use the first available field
+    // For drag test, we need the field container, and we use 'attached' state
+    // because fields might be in overflow containers (not 'visible' to Playwright)
     const fieldName = allFieldNames[0]!;
-    const field = page.locator(`[data-field="${fieldName}"]`).first();
-    await field.waitFor({ state: 'visible' });
+    const field = page.locator(`[data-field="${fieldName}"].field-container`).first();
+    await field.waitFor({ state: 'attached' });
 
     // Click the field to select it
     await field.click();
