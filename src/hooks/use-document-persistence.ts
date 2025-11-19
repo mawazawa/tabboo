@@ -174,6 +174,10 @@ export function useDocumentPersistence({
       setSaveError(undefined);
 
       try {
+        // Debug logging for field position saves
+        const positionCount = Object.keys(fieldPositions).length;
+        console.log(`[AutoSave] Saving ${positionCount} field positions to database...`);
+
         const { error } = await supabase
           .from('legal_documents')
           .update({
@@ -186,6 +190,7 @@ export function useDocumentPersistence({
         if (error) throw error;
 
         // Save successful
+        console.log(`[AutoSave] ✓ Successfully saved ${positionCount} field positions`);
         hasUnsavedChanges.current = false;
         setLastSaved(new Date());
         setSaveStatus("saved");

@@ -97,6 +97,7 @@ export function useFieldOperations({
 
   const updateFieldPosition = useCallback(
     (field: string, position: { top: number; left: number }) => {
+      console.log(`[Field Position] ${field} moved to (${position.top.toFixed(2)}%, ${position.left.toFixed(2)}%)`);
       setFieldPositions((prev) => ({ ...prev, [field]: position }));
       hasUnsavedChanges.current = true;
     },
