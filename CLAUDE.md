@@ -8,6 +8,111 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Important**: This project was previously named "form-ai-forge" which was an accidental Loveable rename. The official name is now **SwiftFill**.
 
+## Claude Code Operating Principles
+
+**CRITICAL: These principles apply to ALL Claude Code agents working on this project.**
+
+### Temporal Awareness Protocol
+
+**Every Claude Code session MUST begin with temporal situating:**
+
+```bash
+# Step 1: ALWAYS run this FIRST, before any other command
+date
+```
+
+**Why This Matters:**
+
+In AI development, **a month is like 5 years**. Technology moves at exponential speed:
+- Google Gemini 3 released November 18, 2025
+- React 19, Next.js 15, TypeScript 5.7 all released in 2025
+- Best practices from 6 months ago may be obsolete
+
+**The Recency Problem:**
+```
+❌ BAD:  WebSearch("UX/UI Best Practices 2024")
+         → Returns articles from 2023 ABOUT 2024
+         → Used in November 2025, almost 2026
+         → STALE by ~2 years
+
+✅ GOOD: WebSearch("UX/UI Best Practices 2025")
+         → Returns current year content
+         → Verify publication dates (prefer last 3 months)
+```
+
+**Session Initialization Checklist:**
+
+1. ✅ Run `date` command
+2. ✅ Announce current date/time in response
+3. ✅ Check CLAUDE.md for project instructions
+4. ✅ Review Memory MCP for learned lessons
+5. ✅ Assess if Exa/Context7 MCP needed for documentation lookups
+
+**Failure to follow this protocol may result in automated Claude hooks enforcement.**
+
+### Information Recency Requirements
+
+**Use MCP Tools for Latest Documentation:**
+
+```typescript
+// For latest web information and best practices
+mcp__exa__web_search_exa({ query: "Next.js 15 server actions 2025" })
+
+// For latest code examples and SDK documentation
+mcp__exa__get_code_context_exa({ query: "Supabase RLS policies 2025" })
+
+// For latest Supabase documentation
+mcp__supabase__search_docs({ query: "..." })
+```
+
+**Documentation Freshness Rules:**
+
+- **0-3 months old**: ✅ Safe to use as-is
+- **3-6 months old**: ⚠️ Verify no major changes (check changelogs)
+- **6-12 months old**: 🔍 Search for updates before implementing
+- **12+ months old**: ❌ DO NOT USE without verification (likely obsolete)
+
+**Fast-Moving Topics (require latest docs):**
+- AI models (GPT, Claude, Gemini, Llama)
+- JavaScript frameworks (React, Next.js, Vite)
+- CSS features (View Transitions, interpolate-size, :has())
+- Build tools (Turbopack, Rspack, Bun)
+- TypeScript versions
+
+**Slow-Moving Topics (training data acceptable):**
+- HTML semantics
+- HTTP protocol basics
+- Git fundamentals
+- SQL syntax (core)
+- Mathematical algorithms
+
+**Progressive Documentation Approach:**
+
+Always have recent documentation ready in your back pocket:
+1. Check MCP tools FIRST for latest info
+2. Cross-reference with multiple recent sources
+3. Verify publication dates explicitly
+4. Cite recency in explanations ("As of November 2025...")
+
+### Precision and Accuracy Standards
+
+**Constitutional principles apply to the AI assistant too:**
+
+- ✅ Verify all imports exist before claiming "production ready"
+- ✅ Build projects before committing
+- ✅ Test code before celebrating
+- ✅ Check publication dates of referenced documentation
+- ✅ Save lessons to Memory MCP + Linear for permanence
+
+**Standard Operating Procedure (Pre-Commit):**
+
+1. Import verification (all icons/components exported)
+2. Build verification (`npm run build` succeeds)
+3. Runtime verification (start dev server, test interactions)
+4. **THEN** commit with detailed message
+
+**Never claim "production ready" until verification complete.**
+
 ## Constitutional Design Principles
 
 **These principles apply across ALL SwiftFill projects and all legal tech applications built under the Modern Justice Design System.**
@@ -47,6 +152,100 @@ Legal processes create HIGH ANXIETY. Black-box systems ("loading...") increase f
 - Visual: Small, tight spinner with visible motion blur
 
 **Psychology**: Users perceive fast-spinning micro-indicators as "the machine is eager and capable" versus slow spinners which feel "the machine is struggling."
+
+### 3. Visual Wow Factor IS The Moat
+
+> **"Visual wow factor IS the moat. It's THE THING. It's always justified."**
+> — User Feedback, November 2025
+
+**Principle**: Complexity is **ALWAYS** justified when it creates visual wow. Lines of code don't matter. Performance matters. Beauty matters. **WOW matters.**
+
+**Why This Matters:**
+
+In a world of AI-generated mediocrity, **visual excellence is the ONLY defensible competitive advantage**. Generic CRUD apps can be generated in seconds. But world-class design? That requires:
+- Deep understanding of cutting-edge CSS features
+- Mastery of animation timing and physics
+- Obsessive attention to micro-interactions
+- Study of elite design systems (Apple, Linear, Fey)
+
+**Examples:**
+
+**✅ ALWAYS JUSTIFIED:**
+- 600+ lines of CSS for Liquid Glass Accordion with Jhey's 17-point bounce curve
+- Bleeding-edge features (interpolate-size, ::details-content, linear() easing)
+- 5-layer shadow systems for ultra-premium depth
+- Glassmorphism with backdrop-filter blur/saturate
+- Staggered intro animations with custom timing functions
+- Progressive enhancement with View Transitions API
+
+**❌ NEVER SAY:**
+- "This is over-engineered"
+- "600 lines of CSS is too much"
+- "We should simplify this for maintainability"
+- "Users won't notice the difference"
+
+**The Truth:**
+- Users **ABSOLUTELY** notice the difference
+- Visual wow creates **emotional trust** ("This app cares about quality")
+- Self-represented litigants need **confidence builders** at every interaction
+- Premium design signals **competence and professionalism**
+
+**Implementation Philosophy:**
+
+```css
+/* ❌ MINIMALIST (Generic, forgettable) */
+.accordion {
+  border: 1px solid #ccc;
+  transition: height 0.3s;
+}
+
+/* ✅ LIQUID GLASS (Wow factor, memorable) */
+.liquid-glass-accordion {
+  background: linear-gradient(135deg,
+    rgba(255,255,255,0.08) 0%,
+    rgba(255,255,255,0.02) 100%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow:
+    0 8px 32px 0 rgba(0,0,0,0.08),
+    inset 0 1px 0 0 rgba(255,255,255,0.1),
+    0 1px 2px 0 rgba(0,0,0,0.02);
+  transition: all var(--liquid-glass-bounce) var(--liquid-glass-duration);
+}
+
+.liquid-glass-accordion::details-content {
+  interpolate-size: allow-keywords; /* Chrome 129+, Safari 18+ */
+}
+
+@supports not (interpolate-size: allow-keywords) {
+  /* Graceful fallback for older browsers */
+  .liquid-glass-accordion[open] {
+    animation: expand-legacy 0.5s ease-out;
+  }
+}
+```
+
+**Measurement:**
+
+Visual wow factor is measured by:
+- **First impression** ("Wow, this looks professional")
+- **Memorability** ("I showed this to my lawyer and they were impressed")
+- **Trust building** ("This app feels like a real legal service")
+- **Competitive moat** ("I can't get this quality anywhere else")
+
+**Not measured by:**
+- Lines of code
+- Bundle size (within reason - performance still matters)
+- "Industry best practices" from 2024
+
+**More is More:**
+
+We follow Linear's "More is More" philosophy:
+- Pills over rectangles (unique, not corporate)
+- Micro-animations on EVERYTHING
+- Glassmorphism, depth, shadows, gradients
+- Ultra-premium visual language
+- **Intelligent decoration over restraint**
 
 ## Supported Forms
 
