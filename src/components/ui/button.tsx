@@ -3,6 +3,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
+import { triggerHaptic, type HapticPattern } from "@/lib/haptics";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-bold tracking-tight ring-offset-background spring-snappy focus-wcag-enhanced disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
@@ -34,12 +35,43 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  /**
+   * Optional haptic feedback pattern to trigger on click.
+   * Provides tactile feedback on supported devices (Android, iOS 18+).
+   * @example
+   * <Button haptic="medium">Save</Button>
+   * <Button haptic="success">Submit</Button>
+   * <Button haptic="heavy" variant="destructive">Delete</Button>
+   */
+  haptic?: HapticPattern;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, haptic, onClick, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
-    return <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />;
+
+    // Wrap onClick to trigger haptic feedback before user's onClick
+    const handleClick = React.useCallback(
+      (e: React.MouseEvent<HTMLButtonElement>) => {
+        // Trigger haptic feedback if specified
+        if (haptic) {
+          triggerHaptic(haptic);
+        }
+
+        // Call user's onClick handler
+        onClick?.(e);
+      },
+      [haptic, onClick]
+    );
+
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        onClick={handleClick}
+        {...props}
+      />
+    );
   },
 );
 Button.displayName = "Button";

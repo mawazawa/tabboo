@@ -262,6 +262,7 @@ export const FieldGroupManager = ({
                           handleDeleteGroup(group.id);
                         }}
                         title="Delete group"
+                        haptic="heavy"
                       >
                         <Trash2 className="h-3 w-3" />
                       </Button>

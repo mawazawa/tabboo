@@ -75,6 +75,7 @@ export function ExportPDFButton({
       disabled={disabled || isExporting}
       size="lg"
       className="gap-2"
+      haptic="success"
     >
       {isExporting ? (
         <>

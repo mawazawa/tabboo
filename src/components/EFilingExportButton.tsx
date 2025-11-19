@@ -123,6 +123,7 @@ export function EFilingExportButton({
           size="lg"
           variant="default"
           className={className}
+          haptic="medium"
         >
           <Download className="h-4 w-4 mr-2" />
           Export for E-Filing
@@ -336,12 +337,14 @@ export function EFilingExportButton({
             variant="outline"
             onClick={() => setIsOpen(false)}
             disabled={isExporting}
+            haptic="light"
           >
             Cancel
           </Button>
           <Button
             onClick={handleExport}
             disabled={isExporting || exceedsLimit}
+            haptic="success"
           >
             {isExporting ? (
               <>

@@ -10,6 +10,7 @@ const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const DistributionCalculator = lazy(() => import("./pages/DistributionCalculator"));
+const HapticTest = lazy(() => import("./pages/HapticTest"));
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/" element={<Index />} />
               <Route path="/distribution-calculator" element={<DistributionCalculator />} />
+              <Route path="/haptic-test" element={<HapticTest />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
