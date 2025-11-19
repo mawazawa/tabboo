@@ -200,22 +200,18 @@ export const WithIcons: Story = {
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
         <Button>
-          <Download className="h-4 w-4" />
-          Download
+          <Download className="h-4 w-4" /> Download
         </Button>
         <Button variant="destructive">
-          <Trash2 className="h-4 w-4" />
-          Delete
+          <Trash2 className="h-4 w-4" /> Delete
         </Button>
       </div>
       <div className="flex items-center gap-3">
         <Button variant="outline">
-          <Check className="h-4 w-4" />
-          Approve
+          <Check className="h-4 w-4" /> Approve
         </Button>
         <Button variant="outline">
-          <X className="h-4 w-4" />
-          Reject
+          <X className="h-4 w-4" /> Reject
         </Button>
       </div>
     </div>
@@ -328,8 +324,7 @@ export const RealWorldExamples: Story = {
             Cancel
           </Button>
           <Button haptic="success">
-            <Check className="h-4 w-4" />
-            Save & Continue
+            <Check className="h-4 w-4" /> Save & Continue
           </Button>
         </div>
       </div>
@@ -339,12 +334,10 @@ export const RealWorldExamples: Story = {
         <h4 className="text-sm font-semibold mb-3">Export Options</h4>
         <div className="flex flex-col gap-2">
           <Button haptic="success">
-            <Download className="h-4 w-4" />
-            Export PDF
+            <Download className="h-4 w-4" /> Export PDF
           </Button>
           <Button variant="secondary">
-            <Play className="h-4 w-4" />
-            Export for E-Filing
+            <Play className="h-4 w-4" /> Export for E-Filing
           </Button>
         </div>
       </div>
@@ -354,12 +347,10 @@ export const RealWorldExamples: Story = {
         <h4 className="text-sm font-semibold mb-3">Dangerous Actions</h4>
         <div className="flex gap-3">
           <Button variant="destructive" haptic="heavy">
-            <Trash2 className="h-4 w-4" />
-            Delete All Fields
+            <Trash2 className="h-4 w-4" /> Delete All Fields
           </Button>
           <Button variant="destructive" haptic="heavy">
-            <X className="h-4 w-4" />
-            Clear Form
+            <X className="h-4 w-4" /> Clear Form
           </Button>
         </div>
       </div>
@@ -465,12 +456,10 @@ export const ModernJusticeDesign: Story = {
           <div className="flex gap-3">
             <Button>Save Document</Button>
             <Button>
-              <Check className="h-4 w-4" />
-              Submit Form
+              <Check className="h-4 w-4" /> Submit Form
             </Button>
             <Button>
-              <Download className="h-4 w-4" />
-              Export PDF
+              <Download className="h-4 w-4" /> Export PDF
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
@@ -482,12 +471,10 @@ export const ModernJusticeDesign: Story = {
           <h4 className="text-sm font-medium mb-2">Destructive Actions</h4>
           <div className="flex gap-3">
             <Button variant="destructive">
-              <Trash2 className="h-4 w-4" />
-              Delete All
+              <Trash2 className="h-4 w-4" /> Delete All
             </Button>
             <Button variant="destructive">
-              <X className="h-4 w-4" />
-              Clear Form
+              <X className="h-4 w-4" /> Clear Form
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
@@ -570,8 +557,7 @@ export const StatefulProcessButton: Story = {
             }}
             celebrationDuration={2000}
           >
-            <Download className="h-4 w-4" />
-            Save Document
+            <Download className="h-4 w-4" /> Save Document
           </StatefulButton>
           <p className="text-xs text-muted-foreground mt-2">
             Click to see: Ultra-fast spinners (4x speed) → 0.1s chronometer → Step-by-step visualization → Success celebration
