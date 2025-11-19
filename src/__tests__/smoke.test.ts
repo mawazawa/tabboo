@@ -102,8 +102,11 @@ test.describe('Critical Product Features (Smoke Tests)', () => {
     const firstFieldName = allFieldNames[0]!;
     const firstField = page.locator(`input[data-field="${firstFieldName}"]`).first();
 
-    // Scroll element into view (fields are in overflow container)
-    await firstField.scrollIntoViewIfNeeded();
+    // Scroll element into view using JavaScript (bypass Playwright visibility checks for overflow containers)
+    await page.evaluate((fieldName) => {
+      const input = document.querySelector(`input[data-field="${fieldName}"]`);
+      if (input) input.scrollIntoView({ behavior: 'instant', block: 'center' });
+    }, firstFieldName);
     await firstField.fill('Test Value 1');
     await expect(firstField).toHaveValue('Test Value 1');
 
@@ -112,7 +115,11 @@ test.describe('Critical Product Features (Smoke Tests)', () => {
       const secondFieldName = allFieldNames[1]!;
       const secondField = page.locator(`input[data-field="${secondFieldName}"]`).first();
 
-      await secondField.scrollIntoViewIfNeeded();
+      // Scroll element into view using JavaScript (bypass Playwright visibility checks for overflow containers)
+      await page.evaluate((fieldName) => {
+        const input = document.querySelector(`input[data-field="${fieldName}"]`);
+        if (input) input.scrollIntoView({ behavior: 'instant', block: 'center' });
+      }, secondFieldName);
       await secondField.fill('Test Value 2');
       await expect(secondField).toHaveValue('Test Value 2');
     }
@@ -154,8 +161,11 @@ test.describe('Critical Product Features (Smoke Tests)', () => {
     const field = page.locator(`[data-field="${fieldName}"].field-container`).first();
     await field.waitFor({ state: 'attached' });
 
-    // Scroll element into view (fields are in overflow container)
-    await field.scrollIntoViewIfNeeded();
+    // Scroll element into view using JavaScript (bypass Playwright visibility checks for overflow containers)
+    await page.evaluate((fieldName) => {
+      const container = document.querySelector(`[data-field="${fieldName}"].field-container`);
+      if (container) container.scrollIntoView({ behavior: 'instant', block: 'center' });
+    }, fieldName);
 
     // Click the field to select it
     await field.click();
