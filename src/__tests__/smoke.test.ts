@@ -196,8 +196,20 @@ test.describe('Critical Product Features (Smoke Tests)', () => {
     // Use .first() to handle multiple matching elements (strict mode)
     await expect(page.getByText(/drag mode active|edit mode|repositioning/i).first()).toBeVisible({ timeout: 5000 });
 
-    // Get initial position
-    const initialBox = await field.boundingBox();
+    // Get initial position using getBoundingClientRect (works with GPU transforms)
+    // Playwright's boundingBox() can return null for GPU-transformed elements
+    const initialBox = await page.evaluate((fieldName) => {
+      const container = document.querySelector(`[data-field="${fieldName}"].field-container`);
+      if (!container) return null;
+      const rect = container.getBoundingClientRect();
+      return {
+        x: rect.x,
+        y: rect.y,
+        width: rect.width,
+        height: rect.height
+      };
+    }, fieldName);
+
     expect(initialBox).toBeTruthy();
 
     if (!initialBox) {
@@ -221,8 +233,19 @@ test.describe('Critical Product Features (Smoke Tests)', () => {
     // Wait for any animations to complete
     await page.waitForTimeout(500);
 
-    // Get new position
-    const newBox = await field.boundingBox();
+    // Get new position using getBoundingClientRect (works with GPU transforms)
+    const newBox = await page.evaluate((fieldName) => {
+      const container = document.querySelector(`[data-field="${fieldName}"].field-container`);
+      if (!container) return null;
+      const rect = container.getBoundingClientRect();
+      return {
+        x: rect.x,
+        y: rect.y,
+        width: rect.width,
+        height: rect.height
+      };
+    }, fieldName);
+
     expect(newBox).toBeTruthy();
 
     if (!newBox) {
