@@ -141,7 +141,7 @@ export const StatefulButton = React.forwardRef<HTMLButtonElement, StatefulButton
     const renderContent = () => {
       switch (state) {
         case "idle":
-          return <span className="relative z-10">{children}</span>;
+          return <span className="relative z-10 inline-flex items-center gap-2">{children}</span>;
 
         case "processing":
           return (
