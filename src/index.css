@@ -69,7 +69,7 @@ All colors MUST be HSL.
     --shadow-medium: 0 8px 24px -4px hsl(220 13% 13% / 0.12);
     --shadow-large: 0 16px 48px -8px hsl(220 13% 13% / 0.16);
     --shadow-glow: 0 0 32px hsl(215 85% 50% / 0.2);
-    --shadow-3point: 
+    --shadow-3point:
       0 1px 2px hsl(220 13% 13% / 0.12),
       0 4px 8px hsl(220 13% 13% / 0.08),
       0 8px 16px hsl(220 13% 13% / 0.06);
@@ -81,6 +81,20 @@ All colors MUST be HSL.
       inset 0 1px 0 hsl(0 0% 100% / 0.8),
       inset 0 -1px 0 hsl(220 13% 13% / 0.05),
       0 1px 2px hsl(220 13% 13% / 0.1);
+
+    /* OPTIONAL: 5-Layer Ultra-Realistic Shadow (use sparingly for premium elements) */
+    --shadow-ultra:
+      0 0.5px 1px hsl(220 13% 13% / 0.04),   /* Contact shadow */
+      0 1px 2px hsl(220 13% 13% / 0.08),     /* Key light */
+      0 2px 4px hsl(220 13% 13% / 0.12),     /* Ambient occlusion */
+      0 4px 8px hsl(220 13% 13% / 0.16),     /* Penumbra */
+      0 8px 16px hsl(220 13% 13% / 0.08);    /* Atmospheric glow */
+    --shadow-ultra-hover:
+      0 1px 2px hsl(220 13% 13% / 0.06),
+      0 2px 4px hsl(220 13% 13% / 0.10),
+      0 4px 8px hsl(220 13% 13% / 0.14),
+      0 8px 16px hsl(220 13% 13% / 0.18),
+      0 16px 32px hsl(220 13% 13% / 0.12);
     
     /* Refined Soft Shadows (Reference Image Aesthetic) */
     --shadow-diffused: 
@@ -696,8 +710,41 @@ All colors MUST be HSL.
     box-shadow: var(--switch-thumb-shadow);
   }
   
+  /* Haptic Visual Feedback (iOS fallback + Android enhancement) */
+  @keyframes haptic-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+  }
+
+  @keyframes haptic-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+  }
+
+  [data-haptic='success'] {
+    animation: haptic-pulse 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  [data-haptic='error'] {
+    animation: haptic-shake 150ms ease-in-out 2;
+  }
+
+  [data-haptic='light'],
+  [data-haptic='medium'],
+  [data-haptic='heavy'] {
+    animation: haptic-pulse 100ms ease-out;
+  }
+
+  /* Respect reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    [data-haptic] {
+      animation: none !important;
+    }
+  }
+
   /* Fat finger touch targets for mobile */
-  @media (max-width: 768px) {
+  @media (max-width: 768px) and (hover: none) {
     button, a, input[type="button"], [role="button"] {
       min-height: var(--touch-target-min);
       min-width: var(--touch-target-min);
@@ -707,18 +754,35 @@ All colors MUST be HSL.
       min-height: var(--touch-target-min);
       font-size: 16px; /* Prevents iOS zoom */
     }
-    
+
     /* Ensure switches meet touch target requirements */
     .switch-refined {
       min-height: var(--touch-target-min);
       min-width: calc(var(--touch-target-min) * 1.5);
     }
-    
+
     /* Ensure toggles meet touch target requirements */
     [role="switch"],
     [data-state] {
       min-height: var(--touch-target-min);
       min-width: var(--touch-target-min);
+    }
+
+    /* MOBILE BLUR OPTIMIZATION (Nov 2025 best practices) */
+    /* Reduce backdrop-filter blur by 40% on mobile for better performance */
+    .liquid-glass {
+      backdrop-filter: blur(14px) saturate(180%);
+      -webkit-backdrop-filter: blur(14px) saturate(180%);
+    }
+
+    .glass-refined {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .glass-surface {
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
     }
   }
 
