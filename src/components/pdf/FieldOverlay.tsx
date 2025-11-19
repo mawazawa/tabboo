@@ -99,8 +99,10 @@ function FieldOverlayComponent({
       } rounded-lg bg-background/80 backdrop-blur-sm p-2 transition-all duration-200`}
       style={{
         ...gpuPositionStyle,
-        width: width || 'auto',
-        height: height || 'auto',
+        // Container auto-sizes to fit content (input/textarea/checkbox)
+        // Database width/height percentages are for positioning reference, not container sizing
+        width: 'fit-content',
+        height: 'fit-content',
         pointerEvents: 'auto',
         // Expand clickable area with negative margin
         margin: '-8px',
@@ -291,7 +293,7 @@ function FieldOverlayComponent({
           checked={!!formData[field as keyof FormData]}
           onCheckedChange={(checked) => !isEditMode && updateField(field, checked as boolean)}
           disabled={isEditMode}
-          className={`h-5 w-5 border-2 transition-all duration-200 ${
+          className={`h-3.5 w-3.5 border transition-all duration-200 ${
             isEditMode
               ? 'bg-muted/50 border-muted cursor-move pointer-events-none'
               : isCurrentField
