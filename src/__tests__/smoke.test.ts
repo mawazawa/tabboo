@@ -216,35 +216,25 @@ test.describe('Critical Product Features (Smoke Tests)', () => {
       throw new Error('Field bounding box not found');
     }
 
-    // Perform drag operation
-    // Use Playwright's native drag API which properly handles pointer events and setPointerCapture
+    // Perform drag operation using page.mouse API (properly handles pointer capture)
     const centerX = initialBox.x + initialBox.width / 2;
     const centerY = initialBox.y + initialBox.height / 2;
 
-    await field.dispatchEvent('pointerdown', {
-      button: 0,
-      clientX: centerX,
-      clientY: centerY
-    });
+    // Move mouse to field center and start drag
+    await page.mouse.move(centerX, centerY);
+    await page.mouse.down();
 
-    // Wait a moment for pointerdown to register
+    // Wait for pointerdown to register
     await page.waitForTimeout(100);
 
-    // Move the pointer to simulate drag (100px right, 50px down)
-    await field.dispatchEvent('pointermove', {
-      clientX: centerX + 100,
-      clientY: centerY + 50
-    });
+    // Drag to new position (100px right, 50px down)
+    await page.mouse.move(centerX + 100, centerY + 50);
 
-    // Wait for React to update
+    // Wait for React to update position
     await page.waitForTimeout(100);
 
-    // Release the pointer
-    await field.dispatchEvent('pointerup', {
-      button: 0,
-      clientX: centerX + 100,
-      clientY: centerY + 50
-    });
+    // Release mouse
+    await page.mouse.up();
 
     // Wait for any animations to complete
     await page.waitForTimeout(500);
