@@ -83,7 +83,8 @@ export async function waitForApp(
   // Step 2: Wait for the PDF loading overlay to disappear
   // The overlay has specific selectors we can target
   // Wait for loading text to not be visible (React removes it when pdfLoading = false)
-  const loadingOverlay = page.getByText('Loading PDF Form');
+  // Use .first() to handle multiple instances (e.g., thumbnails sidebar + main viewer)
+  const loadingOverlay = page.getByText('Loading PDF Form').first();
 
   // First, wait for the overlay to appear (confirms FormViewer has mounted)
   try {

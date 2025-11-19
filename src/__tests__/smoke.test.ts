@@ -40,16 +40,26 @@ test.describe('Critical Product Features (Smoke Tests)', () => {
    * Verifies that the PDF form loads and displays correctly
    */
   test('PDF form renders correctly', async ({ page }) => {
-    // Wait for PDF to load
-    await expect(page.locator('.react-pdf__Document')).toBeVisible({ timeout: 10000 });
-
-    // Verify at least one page is rendered
+    // Verify PDF pages are rendered in the DOM
+    // Note: Elements may be in overflow containers, so we check for existence and count
     const pdfPages = page.locator('.react-pdf__Page');
-    await expect(pdfPages.first()).toBeVisible();
+
+    // Wait for at least one PDF page to exist
+    await pdfPages.first().waitFor({ state: 'attached', timeout: 10000 });
 
     // Verify page count is correct (FL-320 should have 2 pages)
     const pageCount = await pdfPages.count();
     expect(pageCount).toBeGreaterThanOrEqual(1);
+
+    // Verify canvas elements exist and have dimensions (indicates rendering)
+    const canvas = page.locator('.react-pdf__Page canvas').first();
+    await canvas.waitFor({ state: 'attached', timeout: 5000 });
+
+    // Check that canvas has actual dimensions (proof of rendering)
+    const box = await canvas.boundingBox();
+    expect(box).toBeTruthy();
+    expect(box!.width).toBeGreaterThan(0);
+    expect(box!.height).toBeGreaterThan(0);
   });
 
   /**
