@@ -1,0 +1,62 @@
+/**
+ * SwiftFill Design Tokens - Dark Mode
+ * Overrides for dark theme
+ */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+  --alias-color-text-primary: {foundation.color.blue.100};
+  --alias-color-text-secondary: {foundation.color.gray.400};
+  --alias-color-text-inverse: {foundation.color.gray.900};
+  --alias-color-text-disabled: {foundation.color.gray.600};
+  --alias-color-surface-background: {foundation.color.blue.950};
+  --alias-color-surface-card: {foundation.color.gray.800};
+  --alias-color-surface-elevated: {foundation.color.gray.700};
+  --alias-color-border-default: {foundation.color.gray.700};
+  --alias-color-border-subtle: {foundation.color.gray.800};
+  --alias-color-border-strong: {foundation.color.gray.600};
+  --alias-color-brand-primary: {foundation.color.blue.500};
+  --alias-color-brand-primary-hover: {foundation.color.blue.400};
+  --alias-color-brand-primary-subtle: {foundation.color.gray.800};
+  --alias-color-interactive-default: {foundation.color.blue.500};
+  --alias-color-interactive-hover: {foundation.color.blue.400};
+  --alias-color-interactive-active: {foundation.color.blue.300};
+  --alias-color-interactive-disabled: {foundation.color.gray.700};
+  --alias-color-interactive-focus-ring: {foundation.color.blue.500};
+  --component-button-secondary-background: {foundation.color.gray.700};
+  --component-button-secondary-background-hover: {foundation.color.gray.600};
+  --component-input-background: {foundation.color.gray.800};
+  --component-input-border: {foundation.color.gray.700};
+  --component-modal-backdrop: hsl(220, 18%, 8%, 0.9);
+}
+
+}
+
+[data-theme="dark"] {
+ {
+  --alias-color-text-primary: {foundation.color.blue.100};
+  --alias-color-text-secondary: {foundation.color.gray.400};
+  --alias-color-text-inverse: {foundation.color.gray.900};
+  --alias-color-text-disabled: {foundation.color.gray.600};
+  --alias-color-surface-background: {foundation.color.blue.950};
+  --alias-color-surface-card: {foundation.color.gray.800};
+  --alias-color-surface-elevated: {foundation.color.gray.700};
+  --alias-color-border-default: {foundation.color.gray.700};
+  --alias-color-border-subtle: {foundation.color.gray.800};
+  --alias-color-border-strong: {foundation.color.gray.600};
+  --alias-color-brand-primary: {foundation.color.blue.500};
+  --alias-color-brand-primary-hover: {foundation.color.blue.400};
+  --alias-color-brand-primary-subtle: {foundation.color.gray.800};
+  --alias-color-interactive-default: {foundation.color.blue.500};
+  --alias-color-interactive-hover: {foundation.color.blue.400};
+  --alias-color-interactive-active: {foundation.color.blue.300};
+  --alias-color-interactive-disabled: {foundation.color.gray.700};
+  --alias-color-interactive-focus-ring: {foundation.color.blue.500};
+  --component-button-secondary-background: {foundation.color.gray.700};
+  --component-button-secondary-background-hover: {foundation.color.gray.600};
+  --component-input-background: {foundation.color.gray.800};
+  --component-input-border: {foundation.color.gray.700};
+  --component-modal-backdrop: hsl(220, 18%, 8%, 0.9);
+}
+
+}

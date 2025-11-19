@@ -1,0 +1,87 @@
+{
+  "$schema": "https://design-tokens.org/schemas/2025.10/tokens.json",
+  "$version": "1.0.0",
+  "$type": "design-tokens",
+  "$description": "SwiftFill Dark Mode Theme - Overrides for alias and component tokens",
+
+  "$extensions": {
+    "swiftfill": {
+      "theme": "dark",
+      "inheritsFrom": "tokens.json",
+      "lastUpdated": "2025-01-18"
+    }
+  },
+
+  "alias": {
+    "$type": "group",
+    "$description": "Dark mode overrides for semantic tokens",
+
+    "color": {
+      "$type": "group",
+
+      "text": {
+        "$type": "group",
+        "primary": { "$type": "color", "$value": "{foundation.color.blue.100}", "$description": "Light text on dark background" },
+        "secondary": { "$type": "color", "$value": "{foundation.color.gray.400}" },
+        "inverse": { "$type": "color", "$value": "{foundation.color.gray.900}" },
+        "disabled": { "$type": "color", "$value": "{foundation.color.gray.600}" }
+      },
+
+      "surface": {
+        "$type": "group",
+        "background": { "$type": "color", "$value": "{foundation.color.blue.950}", "$description": "Very dark blue-gray" },
+        "card": { "$type": "color", "$value": "{foundation.color.gray.800}", "$description": "Slightly lighter than background" },
+        "elevated": { "$type": "color", "$value": "{foundation.color.gray.700}" }
+      },
+
+      "border": {
+        "$type": "group",
+        "default": { "$type": "color", "$value": "{foundation.color.gray.700}" },
+        "subtle": { "$type": "color", "$value": "{foundation.color.gray.800}" },
+        "strong": { "$type": "color", "$value": "{foundation.color.gray.600}" }
+      },
+
+      "brand": {
+        "$type": "group",
+        "primary": { "$type": "color", "$value": "{foundation.color.blue.500}", "$description": "Slightly brighter for dark mode" },
+        "primary-hover": { "$type": "color", "$value": "{foundation.color.blue.400}" },
+        "primary-subtle": { "$type": "color", "$value": "{foundation.color.gray.800}" }
+      },
+
+      "interactive": {
+        "$type": "group",
+        "default": { "$type": "color", "$value": "{foundation.color.blue.500}" },
+        "hover": { "$type": "color", "$value": "{foundation.color.blue.400}" },
+        "active": { "$type": "color", "$value": "{foundation.color.blue.300}" },
+        "disabled": { "$type": "color", "$value": "{foundation.color.gray.700}" },
+        "focus-ring": { "$type": "color", "$value": "{foundation.color.blue.500}" }
+      }
+    }
+  },
+
+  "component": {
+    "$type": "group",
+    "$description": "Component-specific dark mode overrides",
+
+    "button": {
+      "$type": "group",
+
+      "secondary": {
+        "$type": "group",
+        "background": { "$type": "color", "$value": "{foundation.color.gray.700}" },
+        "background-hover": { "$type": "color", "$value": "{foundation.color.gray.600}" }
+      }
+    },
+
+    "input": {
+      "$type": "group",
+      "background": { "$type": "color", "$value": "{foundation.color.gray.800}" },
+      "border": { "$type": "color", "$value": "{foundation.color.gray.700}" }
+    },
+
+    "modal": {
+      "$type": "group",
+      "backdrop": { "$type": "color", "$value": "hsl(220, 18%, 8%, 0.9)", "$description": "Darker backdrop for dark mode" }
+    }
+  }
+}
