@@ -18,9 +18,9 @@ import {
   Trash2,
   Check,
   X,
-  Info,
-  Vibrate,
-  Smartphone,
+  AlertCircle,
+  CheckCircle,
+  Play,
 } from '@/icons';
 import { useHaptic } from '@/hooks/use-haptic';
 import { ExportPDFButton } from '@/components/ExportPDFButton';
@@ -57,7 +57,7 @@ export default function HapticTest() {
 
         {/* Platform Support Info */}
         <Alert>
-          <Info className="h-4 w-4" />
+          <AlertCircle className="h-4 w-4" />
           <AlertTitle>Platform Support</AlertTitle>
           <AlertDescription>
             <div className="space-y-1 mt-2">
@@ -105,7 +105,7 @@ export default function HapticTest() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Vibrate className="h-5 w-5" />
+              <Play className="h-5 w-5" />
               Haptic Patterns
             </CardTitle>
             <CardDescription>
@@ -183,7 +183,7 @@ export default function HapticTest() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Smartphone className="h-5 w-5" />
+              <CheckCircle className="h-5 w-5" />
               Production Components
             </CardTitle>
             <CardDescription>
