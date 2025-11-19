@@ -80,22 +80,28 @@ export async function waitForApp(
   // Tutorial is disabled via playwright.config.ts localStorage setting
   // No need to handle it here
 
-  // Step 2: Wait for the "Loading PDF Form" overlay to disappear
-  // This is more reliable than checking for canvas dimensions
-  // because it directly checks the component's loading state
+  // Step 2: Wait for the PDF loading overlay to disappear
+  // The overlay has specific selectors we can target
+  // Wait for loading text to not be visible (React removes it when pdfLoading = false)
+  const loadingOverlay = page.getByText('Loading PDF Form');
+
+  // First, wait for the overlay to appear (confirms FormViewer has mounted)
+  try {
+    await loadingOverlay.waitFor({ state: 'visible', timeout: 5000 });
+  } catch {
+    // Overlay might not appear if PDF loads instantly, that's OK
+  }
+
+  // Now wait for it to disappear (confirms PDF has loaded)
+  await loadingOverlay.waitFor({ state: 'detached', timeout });
+
+  // Step 2b: Verify PDF canvas is rendered with dimensions
   await page.waitForFunction(
     () => {
-      // Check if the loading overlay text is gone
-      const loadingHeading = Array.from(document.querySelectorAll('h3')).find(
-        el => el.textContent?.includes('Loading PDF Form')
-      );
-      if (loadingHeading) return false; // Still loading
-
-      // Verify PDF canvas exists and has dimensions
       const canvas = document.querySelector('.react-pdf__Document canvas') as HTMLCanvasElement;
       return canvas && canvas.offsetHeight > 0 && canvas.offsetWidth > 0;
     },
-    { timeout }
+    { timeout: 10000, polling: 200 }
   );
 
   // Step 3: Wait for form input fields to be interactive
