@@ -217,18 +217,34 @@ test.describe('Critical Product Features (Smoke Tests)', () => {
     }
 
     // Perform drag operation
-    // Strategy: Use pointer actions for precise control
-    await page.mouse.move(initialBox.x + initialBox.width / 2, initialBox.y + initialBox.height / 2);
-    await page.mouse.down();
+    // Use Playwright's native drag API which properly handles pointer events and setPointerCapture
+    const centerX = initialBox.x + initialBox.width / 2;
+    const centerY = initialBox.y + initialBox.height / 2;
 
-    // Drag to a new position (100px right, 50px down)
-    await page.mouse.move(
-      initialBox.x + initialBox.width / 2 + 100,
-      initialBox.y + initialBox.height / 2 + 50,
-      { steps: 10 } // Smooth movement
-    );
+    await field.dispatchEvent('pointerdown', {
+      button: 0,
+      clientX: centerX,
+      clientY: centerY
+    });
 
-    await page.mouse.up();
+    // Wait a moment for pointerdown to register
+    await page.waitForTimeout(100);
+
+    // Move the pointer to simulate drag (100px right, 50px down)
+    await field.dispatchEvent('pointermove', {
+      clientX: centerX + 100,
+      clientY: centerY + 50
+    });
+
+    // Wait for React to update
+    await page.waitForTimeout(100);
+
+    // Release the pointer
+    await field.dispatchEvent('pointerup', {
+      button: 0,
+      clientX: centerX + 100,
+      clientY: centerY + 50
+    });
 
     // Wait for any animations to complete
     await page.waitForTimeout(500);
