@@ -8,6 +8,46 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Important**: This project was previously named "form-ai-forge" which was an accidental Loveable rename. The official name is now **SwiftFill**.
 
+## Constitutional Design Principles
+
+**These principles apply across ALL SwiftFill projects and all legal tech applications built under the Modern Justice Design System.**
+
+### 1. Every Second of Waiting is an Opportunity
+
+> **"Every second of waiting is an opportunity to reassure, educate, or entertain your users."**
+> — Source: Shakuro, "Milliseconds Matter - How Time Builds UX" (2025)
+
+**Application**: Never show a blank loading spinner. Always use waiting time to:
+- **Reassure**: Show what's happening ("Encrypting your data...")
+- **Educate**: Explain WHY it's happening ("Protecting your privacy")
+- **Entertain**: Use delightful micro-animations, progress indicators, or interesting facts
+- **Build Trust**: Display process steps with completion checkmarks
+- **Reduce Anxiety**: Show millisecond/chronometer timers to prove speed and precision
+
+**Examples**:
+- ✅ Button shows: "Validating form... 12ms ✓" → "Encrypting data... 8ms ✓" → "Saving... 15ms ✓"
+- ✅ File upload shows: "Analyzing document... Page 1 of 4" with animated progress
+- ✅ AI response shows: "Thinking... [animated brain icon]" → "Researching case law..."
+- ❌ Generic spinner with no context
+- ❌ "Please wait..." with no explanation
+
+**Why This Matters for Self-Represented Litigants**:
+Legal processes create HIGH ANXIETY. Black-box systems ("loading...") increase fear and confusion. Transparent processes ("Here's what I'm doing for you, and it took 12 milliseconds") build TRUST and CONFIDENCE. Users learn how the system works, reducing cognitive load for future interactions.
+
+### 2. Ultra-Fast Micro-Process Indicators
+
+**Principle**: For sub-processes (validation, encryption, saving), loading indicators should spin **3-5x faster** than standard spinners and display **0.1-second chronometers**.
+
+**Why**: Speed conveys competence, precision, and eagerness to help. A "rushed" appearance for micro-processes signals "This system is WORKING HARD for you" rather than "This system is slow."
+
+**Implementation**:
+- Standard spinner: 1 rotation/second
+- Micro-process spinner: 3-5 rotations/second
+- Chronometer: 0.1s increments (not milliseconds) for human readability
+- Visual: Small, tight spinner with visible motion blur
+
+**Psychology**: Users perceive fast-spinning micro-indicators as "the machine is eager and capable" versus slow spinners which feel "the machine is struggling."
+
 ## Supported Forms
 
 SwiftFill currently supports three California Judicial Council forms:
