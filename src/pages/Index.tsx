@@ -236,17 +236,10 @@ const Index = () => {
       </Suspense>
       
       <IndexHeader
-        onNavigateDistribution={() => navigate("/distribution-calculator")}
-        onNavigateHome={() => navigate("/")}
-        onPreloadDistribution={preloadDistributionCalculator}
-        onCancelDistribution={cancelDistributionCalculator}
         onLogout={handleLogout}
         saveStatus={saveStatus}
-        lastSaved={lastSaved}
-        saveError={saveError}
         currentFormType={formType}
         onFormTypeChange={handleFormTypeChange}
-        hasUnsavedChanges={hasUnsavedChanges.current}
       />
 
       <main className="flex-1 flex flex-col container mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 overflow-hidden">
