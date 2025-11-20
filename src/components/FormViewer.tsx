@@ -11,7 +11,7 @@ import { useFormFields, convertToFieldOverlays } from "@/hooks/use-form-fields";
 import { useLiveRegion } from "@/hooks/use-live-region";
 import { useKeyboardNavigation } from "@/hooks/use-keyboard-navigation";
 import { useDragAndDrop } from "@/hooks/use-drag-and-drop";
-import { usePdfLoading } from "@/hooks/use-pdf-loading";
+import { usePdfLoading, getPdfPath } from "@/hooks/use-pdf-loading";
 import { mergeFieldNameToIndex } from "@/lib/field-name-index-utils";
 import { legacyFieldNameToIndex } from "@/lib/legacy-field-name-map";
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
@@ -228,7 +228,7 @@ const fieldNameToIndex: Record<string, number> = useMemo(() => {
           
           <div className="w-full" style={{ maxWidth: `${pageWidth * zoom}px` }}>
             <Document
-              file={cachedPdfUrl || `/fl320.pdf`}
+              file={cachedPdfUrl || getPdfPath(formType)}
               onLoadSuccess={onDocumentLoadSuccess}
               onLoadError={onDocumentLoadError}
               onLoadProgress={onLoadProgress}

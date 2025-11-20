@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { pdfCache } from "@/utils/pdf-cache";
 import type { FormType } from "@/components/FormViewer";
 
-const getPdfPath = (formType: FormType): string => {
+export const getPdfPath = (formType: FormType): string => {
   const pdfPaths: Record<FormType, string> = {
     'FL-320': '/fl320.pdf',
     'FL-300': '/fl300.pdf',
@@ -21,11 +21,15 @@ export const usePdfLoading = (formType: FormType) => {
   const [loadProgress, setLoadProgress] = useState(0);
   const [currentPDFPage, setCurrentPDFPage] = useState<number>(1);
   const [cachedPdfUrl, setCachedPdfUrl] = useState<string | null>(null);
+  
+  // Use ref to track current blob URL for cleanup to avoid stale closure
+  const blobUrlRef = useRef<string | null>(null);
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
     setPdfLoading(false);
     setLoadProgress(100);
+    console.log(`[PDF Loaded] Successfully loaded ${numPages} pages for ${formType}`);
   };
 
   const onDocumentLoadError = (error: Error) => {
@@ -35,18 +39,50 @@ export const usePdfLoading = (formType: FormType) => {
   };
 
   useEffect(() => {
+    let isMounted = true;
+
     const loadPdf = async () => {
-      const pdfPath = getPdfPath(formType);
-      const cached = await pdfCache.get(pdfPath);
-      if (cached) {
-        setCachedPdfUrl(cached);
+      try {
+        const pdfPath = getPdfPath(formType);
+        const fullUrl = window.location.origin + pdfPath;
+        const blob = await pdfCache.get(fullUrl);
+
+        if (isMounted) {
+          // Create blob URL from cached blob
+          const blobUrl = URL.createObjectURL(blob);
+          blobUrlRef.current = blobUrl; // Track current blob URL for cleanup
+          setCachedPdfUrl(blobUrl);
+
+          if (import.meta.env.DEV) {
+            const stats = pdfCache.getStats();
+            console.log('[PDF Cache Stats]', {
+              cacheHitRate: `${stats.cacheHitRate.toFixed(1)}%`,
+              memoryHits: stats.memoryHits,
+              indexedDBHits: stats.indexedDBHits,
+              networkFetches: stats.networkFetches,
+            });
+          }
+        }
+      } catch (error) {
+        console.error('[PDF Cache] Failed to load PDF:', error);
+        if (isMounted) {
+          // Fallback to direct path if cache fails
+          const fallbackPath = getPdfPath(formType);
+          setCachedPdfUrl(fallbackPath);
+          blobUrlRef.current = null;
+        }
       }
     };
+
     loadPdf();
 
     return () => {
-      if (cachedPdfUrl && cachedPdfUrl.startsWith('blob:')) {
-        URL.revokeObjectURL(cachedPdfUrl);
+      isMounted = false;
+      // Clean up blob URL using ref to avoid stale closure
+      // This ensures we always revoke the current blob URL, not a stale one
+      if (blobUrlRef.current && blobUrlRef.current.startsWith('blob:')) {
+        URL.revokeObjectURL(blobUrlRef.current);
+        blobUrlRef.current = null;
       }
     };
   }, [formType]);
@@ -58,7 +94,7 @@ export const usePdfLoading = (formType: FormType) => {
     loadProgress,
     currentPDFPage,
     setCurrentPDFPage,
-    cachedPdfUrl,
+    cachedPdfUrl: cachedPdfUrl || getPdfPath(formType), // Always return valid path
     onDocumentLoadSuccess,
     onDocumentLoadError,
     onLoadProgress: ({ loaded, total }: { loaded: number; total: number }) => {

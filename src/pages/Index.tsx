@@ -29,6 +29,7 @@ const FieldGroupManager = lazy(() => import("@/components/FieldGroupManager").th
 const CommandPalette = lazy(() => import("@/components/CommandPalette").then(m => ({ default: m.CommandPalette })));
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { AutoSaveIndicator } from "@/components/AutoSaveIndicator";
+import { WelcomeTour } from "@/components/WelcomeTour";
 import { FileText, MessageSquare, LogOut, Loader2, Calculator, PanelLeftClose, PanelRightClose, Shield, Settings, Sparkles, Move, ChevronLeft, ChevronRight } from "@/icons";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { snapAllToGrid, alignHorizontal, alignVertical, distributeEvenly } from "@/utils/fieldPresets";
@@ -221,6 +222,9 @@ const Index = () => {
 
   return (
     <div className="flex flex-col h-screen bg-background w-full overflow-hidden">
+      {/* Welcome Tour - First-time user onboarding */}
+      <WelcomeTour />
+
       {/* Command Palette - Cmd+K */}
       <Suspense fallback={null}>
         <CommandPalette
