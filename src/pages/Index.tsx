@@ -14,6 +14,8 @@ import { IndexHeader } from "./index/components/IndexHeader";
 import { ControlToolbar } from "./index/components/ControlToolbar";
 import { MobileFormViewerSection } from "./index/components/MobileFormViewerSection";
 import { DesktopWorkspace } from "./index/components/DesktopWorkspace";
+import { FormTypeSelector } from "@/components/FormTypeSelector";
+import type { FormType } from "@/components/FormViewer";
 
 // Aggressive code splitting - lazy load all heavy components
 const FormViewer = lazy(() => import("@/components/FormViewer").then(m => ({ default: m.FormViewer })));
@@ -64,6 +66,7 @@ import type { FormData, ValidationRules, ValidationErrors, FieldPositions, Valid
 const Index = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [formType, setFormType] = useState<FormType>('FL-320');
   const [formData, setFormData] = useState<FormData>({});
   const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
   const [fieldPositions, setFieldPositions] = useState<FieldPositions>({});
@@ -173,6 +176,25 @@ const Index = () => {
     );
   }, [currentFieldIndex, fieldPositions, selectedFields, highlightedField]);
 
+  // Handle form type change - clear form data when switching
+  const handleFormTypeChange = useCallback((newFormType: FormType) => {
+    setFormType(newFormType);
+    // Clear form data and reset state for new form
+    setFormData({});
+    setFieldPositions({});
+    setCurrentFieldIndex(0);
+    setCurrentPDFPage(1);
+    setSelectedFields([]);
+    setHighlightedField(null);
+    setValidationErrors({});
+    hasUnsavedChanges.current = false;
+
+    toast({
+      title: "Form Switched",
+      description: `Switched to ${newFormType}. Start filling out the new form.`,
+    });
+  }, [toast]);
+
   const sharedFormViewerProps = {
     formData,
     updateField,
@@ -180,6 +202,7 @@ const Index = () => {
     setCurrentFieldIndex,
     fieldPositions,
     updateFieldPosition,
+    formType,
     zoom: pdfZoom,
     fieldFontSize,
     highlightedField,
@@ -221,6 +244,9 @@ const Index = () => {
         saveStatus={saveStatus}
         lastSaved={lastSaved}
         saveError={saveError}
+        currentFormType={formType}
+        onFormTypeChange={handleFormTypeChange}
+        hasUnsavedChanges={hasUnsavedChanges.current}
       />
 
       <main className="flex-1 flex flex-col container mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 overflow-hidden">

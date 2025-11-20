@@ -1,9 +1,7 @@
 import { useRef } from "react";
-import { Input } from "@/components/ui/input";
+import { Input, Button, Label } from "@liquid-justice/design-system";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Copy, AlertCircle } from "@/icons";
 import { ValidationRuleEditor } from "@/components/ValidationRuleEditor";
 import type { FieldConfig, FormData, ValidationRules, ValidationErrors } from "@/types/FormData";

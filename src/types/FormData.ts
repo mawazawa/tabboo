@@ -1677,3 +1677,402 @@ export interface DV105FormData {
   item13_otherSchedule?: string;
   item13_startDate?: string;
 }
+
+/**
+ * FL-300 Form Data Interface - Request for Order
+ * Based on Official California Judicial Council Form FL-300 (Rev. July 1, 2025)
+ * Used to request court orders in family law cases
+ */
+export interface FL300FormData {
+  // ================== SECTION 1: ATTORNEY/PARTY INFORMATION (Header) ==================
+  /** State Bar Number (6 digits) */
+  stateBarNumber?: string;
+
+  /** Name of attorney or self-represented party */
+  partyName?: string;
+
+  /** Law firm name */
+  firmName?: string;
+
+  /** Street address of attorney or party */
+  streetAddress?: string;
+
+  /** City */
+  city?: string;
+
+  /** State (2-letter code) */
+  state?: string;
+
+  /** ZIP code (5 or 9 digits) */
+  zipCode?: string;
+
+  /** Telephone number */
+  telephoneNo?: string;
+
+  /** Fax number */
+  faxNo?: string;
+
+  /** Email address */
+  email?: string;
+
+  /** Name of person attorney represents */
+  attorneyFor?: string;
+
+  // ================== SECTION 2: COURT INFORMATION (Header) ==================
+  /** Superior Court of California, County of... */
+  county?: string;
+
+  /** Court street address */
+  courtStreetAddress?: string;
+
+  /** Court mailing address */
+  courtMailingAddress?: string;
+
+  /** Court city and ZIP code */
+  courtCityAndZip?: string;
+
+  /** Court branch name */
+  branchName?: string;
+
+  // ================== SECTION 3: CASE INFORMATION (Header) ==================
+  /** Petitioner name */
+  petitioner?: string;
+
+  /** Respondent name */
+  respondent?: string;
+
+  /** Other parent or party name */
+  otherParentParty?: string;
+
+  /** Court case number */
+  caseNumber?: string;
+
+  // ================== ITEM 1: TO THE COURT ==================
+  /** Request hearing date */
+  requestHearingDate?: string;
+
+  /** Request hearing time */
+  requestHearingTime?: string;
+
+  /** Request hearing in (department/room) */
+  requestHearingRoom?: string;
+
+  /** At (court address) */
+  requestCourtAddress?: string;
+
+  // ================== ITEM 2: TEMPORARY EMERGENCY ORDERS ==================
+  /** I am asking for temporary emergency (ex parte) orders */
+  requestTempEmergency?: boolean;
+
+  /** Without notice to other party */
+  tempEmergencyWithoutNotice?: boolean;
+
+  /** With notice to other party */
+  tempEmergencyWithNotice?: boolean;
+
+  /** I have completed and attached form FL-303 */
+  attachedFL303?: boolean;
+
+  /** I have completed and attached form FL-305 */
+  attachedFL305?: boolean;
+
+  // ================== ITEM 3: CHILD CUSTODY AND VISITATION ==================
+  /** Requesting child custody orders */
+  requestChildCustody?: boolean;
+
+  /** Requesting visitation (parenting time) orders */
+  requestVisitation?: boolean;
+
+  /** Details of custody/visitation request */
+  custodyVisitationDetails?: string;
+
+  // ================== ITEM 4: CHILD SUPPORT ==================
+  /** Requesting child support orders */
+  requestChildSupport?: boolean;
+
+  /** I have completed and attached form FL-150 (Income and Expense Declaration) */
+  childSupportAttachedFL150?: boolean;
+
+  /** Details of child support request */
+  childSupportDetails?: string;
+
+  // ================== ITEM 5: SPOUSAL OR DOMESTIC PARTNER SUPPORT ==================
+  /** Requesting spousal/partner support orders */
+  requestSpousalSupport?: boolean;
+
+  /** I have completed and attached form FL-150 */
+  spousalSupportAttachedFL150?: boolean;
+
+  /** Details of spousal support request */
+  spousalSupportDetails?: string;
+
+  // ================== ITEM 6: PROPERTY CONTROL ==================
+  /** Requesting property control orders */
+  requestPropertyControl?: boolean;
+
+  /** Details of property control request */
+  propertyControlDetails?: string;
+
+  // ================== ITEM 7: ATTORNEY'S FEES AND COSTS ==================
+  /** Requesting attorney's fees and costs */
+  requestAttorneyFees?: boolean;
+
+  /** I have completed and attached form FL-150 */
+  attorneyFeesAttachedFL150?: boolean;
+
+  /** I have completed and attached form FL-158 (Supporting Declaration for Attorney's Fees) */
+  attorneyFeesAttachedFL158?: boolean;
+
+  /** Details of attorney fees request */
+  attorneyFeesDetails?: string;
+
+  // ================== ITEM 8: DOMESTIC VIOLENCE RESTRAINING/PROTECTIVE ORDER ==================
+  /** Requesting domestic violence restraining order */
+  requestDVRestrainingOrder?: boolean;
+
+  /** Details of DV restraining order request */
+  dvRestrainingOrderDetails?: string;
+
+  // ================== ITEM 9: OTHER ORDERS ==================
+  /** Requesting other orders */
+  requestOtherOrders?: boolean;
+
+  /** Details of other orders requested */
+  otherOrdersDetails?: string;
+
+  // ================== ITEM 10: FACTS IN SUPPORT ==================
+  /** Facts to support the orders requested above */
+  factsInSupport?: string;
+
+  /** Continued on Attachment 10 (specify page number) */
+  factsAttachmentPage?: string;
+
+  // ================== ITEM 11: ATTACHMENTS ==================
+  /** Number of pages attached */
+  numberPagesAttached?: string;
+
+  // ================== SIGNATURE SECTION ==================
+  /** I declare under penalty of perjury under the laws of the State of California that the foregoing is true and correct */
+  declarationUnderPenalty?: boolean;
+
+  /** Date signature was made */
+  signatureDate?: string;
+
+  /** Typed or printed name for signature */
+  printName?: string;
+
+  /** Electronic or handwritten signature */
+  signature?: string;
+}
+
+/**
+ * FL-303 Form Data Interface - Declaration Regarding Notice and Service
+ * Based on Official California Judicial Council Form FL-303 (Rev. July 1, 2020)
+ * Used to declare notice given for temporary emergency (ex parte) orders
+ */
+export interface FL303FormData {
+  // ================== CASE INFORMATION (Header) ==================
+  /** Your name */
+  yourName?: string;
+
+  /** Superior Court of California, County of... */
+  county?: string;
+
+  /** Petitioner name */
+  petitioner?: string;
+
+  /** Respondent name */
+  respondent?: string;
+
+  /** Other parent or party name */
+  otherParentParty?: string;
+
+  /** Court case number */
+  caseNumber?: string;
+
+  // ================== ITEM 1: NOTICE GIVEN ==================
+  /** I gave notice to (select all that apply) */
+  noticeGivenTo?: string;
+
+  /** The petitioner */
+  noticeGivenToPetitioner?: boolean;
+
+  /** The respondent */
+  noticeGivenToRespondent?: boolean;
+
+  /** Other party (name) */
+  noticeGivenToOther?: boolean;
+  noticeGivenToOtherName?: string;
+
+  /** Attorney for the petitioner (name) */
+  noticeGivenToPetitionerAttorney?: boolean;
+  noticeGivenToPetitionerAttorneyName?: string;
+
+  /** Attorney for the respondent (name) */
+  noticeGivenToRespondentAttorney?: boolean;
+  noticeGivenToRespondentAttorneyName?: string;
+
+  /** Other (specify) */
+  noticeGivenToOtherPerson?: boolean;
+  noticeGivenToOtherPersonName?: string;
+
+  // ================== ITEM 2: METHOD OF NOTICE ==================
+  /** By personal service at (date and time) */
+  noticeMethodPersonalService?: boolean;
+  noticePersonalServiceDateTime?: string;
+
+  /** By telephone at (date and time) */
+  noticeMethodTelephone?: boolean;
+  noticeTelephoneDateTime?: string;
+
+  /** By fax at (date and time) */
+  noticeMethodFax?: boolean;
+  noticeFaxDateTime?: string;
+
+  /** By email at (date and time) */
+  noticeMethodEmail?: boolean;
+  noticeEmailDateTime?: string;
+
+  /** By other means (specify method and date/time) */
+  noticeMethodOther?: boolean;
+  noticeOtherMethod?: string;
+  noticeOtherDateTime?: string;
+
+  // ================== ITEM 3: NO NOTICE / GOOD CAUSE ==================
+  /** I did not give notice to the person(s) listed above because */
+  noNoticeGiven?: boolean;
+
+  /** Good cause exists for the court to grant temporary emergency orders without notice */
+  noNoticeGoodCause?: boolean;
+
+  /** Reasons for good cause */
+  noNoticeReasons?: string;
+
+  // ================== ITEM 4: RELIEF REQUESTED ==================
+  /** I am requesting the following temporary emergency relief */
+  reliefRequested?: string;
+
+  // ================== SIGNATURE SECTION ==================
+  /** I declare under penalty of perjury under the laws of the State of California that the foregoing is true and correct */
+  declarationUnderPenalty?: boolean;
+
+  /** Date signature was made */
+  signatureDate?: string;
+
+  /** Typed or printed name for signature */
+  printName?: string;
+
+  /** Electronic or handwritten signature */
+  signature?: string;
+}
+
+/**
+ * FL-305 Form Data Interface - Temporary Emergency (Ex Parte) Orders
+ * Based on Official California Judicial Council Form FL-305 (Rev. July 1, 2016)
+ * Court's decision on temporary emergency orders requested
+ */
+export interface FL305FormData {
+  // ================== CASE INFORMATION (Header) ==================
+  /** Superior Court of California, County of... */
+  county?: string;
+
+  /** Petitioner name */
+  petitioner?: string;
+
+  /** Respondent name */
+  respondent?: string;
+
+  /** Other parent or party name */
+  otherParentParty?: string;
+
+  /** Court case number */
+  caseNumber?: string;
+
+  // ================== HEARING INFORMATION ==================
+  /** Date of hearing */
+  hearingDate?: string;
+
+  /** Time of hearing */
+  hearingTime?: string;
+
+  /** Department or room */
+  hearingDepartment?: string;
+
+  /** Judge's name */
+  judgeName?: string;
+
+  // ================== ITEM 1: TEMPORARY EMERGENCY ORDERS ==================
+  /** The court makes the following temporary emergency orders */
+  ordersGranted?: boolean;
+
+  // ================== ITEM 2: CHILD CUSTODY ==================
+  /** Temporary custody of children is granted to */
+  tempCustodyGrantedToPetitioner?: boolean;
+  tempCustodyGrantedToRespondent?: boolean;
+  tempCustodyGrantedToOther?: boolean;
+  tempCustodyGrantedToOtherName?: string;
+
+  /** Children's names and custody arrangement */
+  tempCustodyDetails?: string;
+
+  // ================== ITEM 3: VISITATION (PARENTING TIME) ==================
+  /** Temporary visitation (parenting time) orders */
+  tempVisitationOrders?: string;
+
+  // ================== ITEM 4: CHILD SUPPORT ==================
+  /** Temporary child support */
+  tempChildSupportAmount?: string;
+  tempChildSupportPayableTo?: string;
+  tempChildSupportPayableBy?: string;
+  tempChildSupportStartDate?: string;
+
+  // ================== ITEM 5: SPOUSAL/PARTNER SUPPORT ==================
+  /** Temporary spousal/partner support */
+  tempSpousalSupportAmount?: string;
+  tempSpousalSupportPayableTo?: string;
+  tempSpousalSupportPayableBy?: string;
+  tempSpousalSupportStartDate?: string;
+
+  // ================== ITEM 6: PROPERTY CONTROL ==================
+  /** Temporary property control orders */
+  tempPropertyControlOrders?: string;
+
+  // ================== ITEM 7: ATTORNEY'S FEES AND COSTS ==================
+  /** Temporary attorney fees orders */
+  tempAttorneyFeesAmount?: string;
+  tempAttorneyFeesPayableTo?: string;
+  tempAttorneyFeesPayableBy?: string;
+
+  // ================== ITEM 8: DOMESTIC VIOLENCE RESTRAINING ORDER ==================
+  /** Temporary domestic violence restraining order */
+  tempDVRestrainingOrder?: boolean;
+  tempDVRestrainingOrderDetails?: string;
+
+  // ================== ITEM 9: OTHER ORDERS ==================
+  /** Other temporary orders */
+  tempOtherOrders?: string;
+
+  // ================== ITEM 10: EXPIRATION ==================
+  /** These orders expire on (date) */
+  ordersExpireDate?: string;
+
+  /** These orders remain in effect until the hearing on (date) */
+  ordersRemainUntilHearing?: boolean;
+
+  /** These orders remain in effect until further order of the court */
+  ordersRemainUntilFurtherOrder?: boolean;
+
+  // ================== ITEM 11: SERVICE ==================
+  /** The person requesting these orders must have the Request for Order and all attachments served on the other party */
+  requiresService?: boolean;
+
+  /** Service must be completed by (date) */
+  serviceDueDate?: string;
+
+  // ================== JUDICIAL SIGNATURE ==================
+  /** Judge's signature */
+  judgeSignature?: string;
+
+  /** Date signed */
+  judgeSignatureDate?: string;
+}

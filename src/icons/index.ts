@@ -48,6 +48,7 @@ export {
   Grid3x3,
   GripVertical,
   HelpCircle,
+  Info,
   Keyboard,
   Loader2,
   Lock,

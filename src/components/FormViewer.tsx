@@ -1,5 +1,4 @@
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, Button } from "@liquid-justice/design-system";
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { Document, Page } from 'react-pdf';
 import { Move, Loader2, Keyboard, AlertCircle, AlertTriangle, ChevronLeft, ChevronRight } from "@/icons";
@@ -23,7 +22,7 @@ import type { FormData, FieldPosition, ValidationErrors, PersonalVaultData } fro
 // Import centralized PDF.js configuration
 import '@/lib/pdfConfig';
 
-export type FormType = 'FL-320' | 'DV-100' | 'DV-105';
+export type FormType = 'FL-320' | 'FL-300' | 'FL-303' | 'FL-305' | 'DV-100' | 'DV-105';
 
 interface Props {
   formData: FormData;
@@ -45,6 +44,9 @@ interface Props {
 const getPdfPath = (formType: FormType): string => {
   const pdfPaths: Record<FormType, string> = {
     'FL-320': '/fl320.pdf',
+    'FL-300': '/fl300.pdf',
+    'FL-303': '/fl303.pdf',
+    'FL-305': '/fl305.pdf',
     'DV-100': '/dv100.pdf',
     'DV-105': '/dv105.pdf',
   };

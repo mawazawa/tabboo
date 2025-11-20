@@ -1,9 +1,6 @@
 import { useState, useRef, useEffect, memo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle, Button, Input, LiquidSlider } from "@liquid-justice/design-system";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { LiquidSlider } from "@/components/ui/liquid-slider";
 import { Send, Loader2, Sparkles } from "@/icons";
 import { useGroqStream } from "@/hooks/useGroqStream";
 import { toast } from "sonner";

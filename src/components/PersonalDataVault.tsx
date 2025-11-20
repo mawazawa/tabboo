@@ -7,9 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button, Input, Label } from "@liquid-justice/design-system";
 import { Shield, Save, Loader2 } from "@/icons";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";

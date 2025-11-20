@@ -348,7 +348,7 @@ describe('FormViewer - UX Critical Tests', () => {
       // Zoom to 2x
       rerender(
         <QueryClientProvider client={queryClient}>
-          <FormViewer {...defaultProps} zoom: 2 } />
+          <FormViewer {...defaultProps} zoom={2} />
         </QueryClientProvider>
       );
 
@@ -788,6 +788,64 @@ describe('FormViewer - UX Critical Tests', () => {
 
       const activeElement = document.activeElement;
       expect(activeElement).toBeTruthy();
+    });
+  });
+
+  describe('Zoom Prop Syntax', () => {
+    test('should accept zoom prop with correct JSX syntax', () => {
+      // This test verifies the bug fix for line 351
+      // Bug: <FormViewer {...defaultProps} zoom: 2 } />
+      // Fix: <FormViewer {...defaultProps} zoom={2} />
+
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: { retry: false },
+        },
+      });
+
+      // This should compile without syntax errors
+      const { container } = render(
+        <QueryClientProvider client={queryClient}>
+          <FormViewer {...defaultProps} zoom={2} />
+        </QueryClientProvider>
+      );
+
+      expect(container).toBeInTheDocument();
+    });
+
+    test('should accept different zoom values with correct syntax', () => {
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: { retry: false },
+        },
+      });
+
+      // Test with zoom=1
+      const { rerender } = render(
+        <QueryClientProvider client={queryClient}>
+          <FormViewer {...defaultProps} zoom={1} />
+        </QueryClientProvider>
+      );
+
+      expect(screen.getByTestId('pdf-document')).toBeInTheDocument();
+
+      // Test with zoom=1.5
+      rerender(
+        <QueryClientProvider client={queryClient}>
+          <FormViewer {...defaultProps} zoom={1.5} />
+        </QueryClientProvider>
+      );
+
+      expect(screen.getByTestId('pdf-document')).toBeInTheDocument();
+
+      // Test with zoom=2 (the original bug location)
+      rerender(
+        <QueryClientProvider client={queryClient}>
+          <FormViewer {...defaultProps} zoom={2} />
+        </QueryClientProvider>
+      );
+
+      expect(screen.getByTestId('pdf-document')).toBeInTheDocument();
     });
   });
 });

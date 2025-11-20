@@ -1,12 +1,6 @@
 import { CloudOff, Cloud, RefreshCw } from "@/icons";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button, Badge, Tooltip, TooltipContent, TooltipTrigger } from "@liquid-justice/design-system";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 export const OfflineIndicator = () => {
   const { isOnline, pendingCount, isSyncing, syncNow } = useOfflineSync();

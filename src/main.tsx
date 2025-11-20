@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
+// import "@liquid-justice/design-system/styles"; // TODO: Build liquid-justice package
 import "./index.css";
 
 // Register service worker for offline support (production only)
