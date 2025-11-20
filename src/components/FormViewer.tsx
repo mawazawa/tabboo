@@ -431,8 +431,6 @@ const fieldNameToIndex: Record<string, number> = useMemo(() => {
                                   field={overlay.field}
                                   type={overlay.type}
                                   placeholder={overlay.placeholder}
-                                  width={overlay.width}
-                                  height={overlay.height}
                                   position={position}
                                   zoom={zoom}
                                   fieldFontSize={fieldFontSize}
@@ -446,7 +444,6 @@ const fieldNameToIndex: Record<string, number> = useMemo(() => {
                                   canAutofillField={canAutofillField}
                                   hasValue={hasValue}
                                   updateField={updateField}
-                                  adjustPosition={adjustPosition}
                                   handleFieldClick={handleFieldClick}
                                   handleAutofillField={handleAutofillField}
                                   onPointerDown={isEditMode ? (e) => handlePointerDown(e, overlay.field, position.top, position.left) : undefined}
