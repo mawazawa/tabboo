@@ -251,13 +251,28 @@ const Index = () => {
 
       <main className="flex-1 flex flex-col container mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 overflow-hidden">
         <ControlToolbar
+          showThumbnails={showThumbnails}
+          onToggleThumbnails={toggleThumbnails}
+          showAIPanel={showAIPanel}
+          onToggleAI={toggleAIPanel}
           onAutofillAll={handleAutofillAll}
           isVaultLoading={isVaultLoading}
           hasVaultData={hasVaultData}
+          autofillableCount={autofillableCount}
           pdfZoom={pdfZoom}
           onZoomOut={handleZoomOut}
           onZoomIn={handleZoomIn}
           onFitToPage={handleFitToPage}
+          isEditMode={isEditMode}
+          onToggleEditMode={handleEditToggle}
+          showVaultPanel={showVaultPanel}
+          onToggleVault={toggleVaultPanel}
+          showFieldsPanel={showFieldsPanel}
+          onToggleFields={toggleFieldsPanel}
+          fieldFontSize={fieldFontSize}
+          onDecreaseFontSize={handleDecreaseFontSize}
+          onIncreaseFontSize={handleIncreaseFontSize}
+          onResetFontSize={handleResetFontSize}
           formData={formData}
           fieldPositions={fieldPositions}
           caseNumber={formData.caseNumber}
