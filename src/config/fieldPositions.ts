@@ -23,25 +23,40 @@ export interface FieldConfig {
 /**
  * Default field positions for FL-320 form
  * Coordinates are in percentage of parent container
+ * Updated November 2025 with user-corrected positions
  */
 export const DEFAULT_FIELD_POSITIONS: Record<string, FieldPosition> = {
-  partyName: { top: 15.8, left: 5, width: '40%' },
-  streetAddress: { top: 19, left: 5, width: '40%' },
-  city: { top: 22.5, left: 5, width: '23%' },
+  // Left column - Party information
+  partyName: { top: 6.00, left: 15.80, width: '40%' },
+  firmName: { top: 13.50, left: 9.50, width: '40%' },
+  streetAddress: { top: 17.50, left: 11.00, width: '40%' },
+  city: { top: 10.50, left: 12.50, width: '23%' },
   state: { top: 22.5, left: 29.5, width: '7%' },
   zipCode: { top: 22.5, left: 38, width: '7%' },
-  telephoneNo: { top: 25.8, left: 5, width: '16%' },
-  faxNo: { top: 25.8, left: 23, width: '22%' },
-  email: { top: 29.2, left: 5, width: '40%' },
-  attorneyFor: { top: 32.5, left: 5, width: '40%' },
-  county: { top: 15.8, left: 55, width: '40%' },
-  petitioner: { top: 22.5, left: 55, width: '40%' },
+  telephoneNo: { top: 15.50, left: 14.00, width: '16%' },
+  faxNo: { top: 45.00, left: 20.52, width: '22%' },
+  emailAddress: { top: 16.50, left: 15.50, width: '40%' },
+  attorneyOrPartyName: { top: 28.00, left: 6.50, width: '40%' },
+  attorneyFor: { top: 19.00, left: 17.00, width: '40%' },
+  stateBarNumber: { top: 55.50, left: 6.50, width: '20%' },
+
+  // Right column - Court information
+  county: { top: 42.50, left: 4.51, width: '40%' },
+  courtStreetAddress: { top: 17.50, left: 20.00, width: '40%' },
+  courtMailingAddress: { top: 26.00, left: 22.50, width: '40%' },
+  courtCityAndZip: { top: 42.00, left: 17.50, width: '40%' },
+  petitioner: { top: 73.97, left: 20.00, width: '40%' },
   respondent: { top: 26.5, left: 55, width: '40%' },
   caseNumber: { top: 32.5, left: 55, width: '40%' },
+
+  // Checkboxes - Item 2
+  item2b_childCustodyDisagree: { top: 20.00, left: 53.00 },
   noOrders: { top: 43.5, left: 25.5 },
   agreeOrders: { top: 46.5, left: 25.5 },
   consentCustody: { top: 53, left: 25.5 },
   consentVisitation: { top: 56, left: 25.5 },
+
+  // Bottom section
   facts: { top: 68, left: 5, width: '90%', height: '15%' },
   signatureDate: { top: 90, left: 5, width: '20%' },
   signatureName: { top: 90, left: 50, width: '40%' },
