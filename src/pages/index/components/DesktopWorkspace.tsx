@@ -169,7 +169,7 @@ export const DesktopWorkspace = ({
         {showThumbnails && <ResizableHandleMulti withHandle className="hover:bg-primary/30 transition-colors" />}
 
         <ResizablePanel id="pdf-panel" order={2} defaultSize={75} minSize={50}>
-          <div ref={pdfPanelRef} className="h-full w-full">
+          <div ref={pdfPanelRef} className="h-full w-full" data-tour="form-viewer">
             <Suspense fallback={viewerFallback}>
               <FormViewerComponent {...sharedFormViewerProps} />
             </Suspense>

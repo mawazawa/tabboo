@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { FL_320_FIELD_CONFIG } from "@/config/field-config";
 
 interface UseFieldNavigationKeyboardProps {
@@ -23,6 +23,8 @@ export const useFieldNavigationKeyboard = ({
   searchInputRef
 }: UseFieldNavigationKeyboardProps) => {
   const [pressedKey, setPressedKey] = useState<'up' | 'down' | 'left' | 'right' | null>(null);
+  // Track timeout ID for cleanup to prevent memory leaks
+  const focusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const adjustPositionCallback = useCallback((direction: 'up' | 'down' | 'left' | 'right') => {
     adjustPosition(direction);
@@ -36,7 +38,17 @@ export const useFieldNavigationKeyboard = ({
       if (modKey && e.key === 'f') {
         e.preventDefault();
         setShowSearch(prev => !prev);
-        setTimeout(() => searchInputRef.current?.focus(), 100);
+        
+        // Clear any existing timeout before creating a new one
+        if (focusTimeoutRef.current) {
+          clearTimeout(focusTimeoutRef.current);
+        }
+        
+        // Store timeout ID for cleanup
+        focusTimeoutRef.current = setTimeout(() => {
+          searchInputRef.current?.focus();
+          focusTimeoutRef.current = null;
+        }, 100);
         return;
       }
 
@@ -103,6 +115,12 @@ export const useFieldNavigationKeyboard = ({
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
+      
+      // Clean up any pending timeout to prevent memory leaks
+      if (focusTimeoutRef.current) {
+        clearTimeout(focusTimeoutRef.current);
+        focusTimeoutRef.current = null;
+      }
     };
   }, [currentFieldIndex, showPositionControl, showSearch, adjustPositionCallback, setCurrentFieldIndex, setShowSearch, setShowPositionControl, searchInputRef]);
 

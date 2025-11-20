@@ -70,7 +70,7 @@ export const ControlToolbar = ({
   fieldPositions,
   caseNumber,
 }: ControlToolbarProps) => (
-  <div className="flex items-center justify-between gap-1 mb-3 px-2 py-1.5 bg-card/80 backdrop-blur-md rounded-lg border border-border/30 shadow-sm flex-shrink-0">
+  <div data-tour="toolbar" className="flex items-center justify-between gap-1 mb-3 px-2 py-1.5 bg-card/80 backdrop-blur-md rounded-lg border border-border/30 shadow-sm flex-shrink-0">
     {/* Left: Panel toggles */}
     <div className="flex items-center gap-0.5">
       <Tooltip>
@@ -113,6 +113,7 @@ export const ControlToolbar = ({
             size="sm"
             onClick={onToggleVault}
             className={cn("h-6 px-1.5 gap-1 text-[10px]", showVaultPanel && "bg-muted")}
+            data-tour="vault-button"
           >
             <Shield className="h-3 w-3" strokeWidth={1.5} />
             Vault
