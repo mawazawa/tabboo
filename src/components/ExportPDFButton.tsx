@@ -4,11 +4,12 @@ import { Download, Loader2 } from '@/icons';
 import { fillPDFFields } from '@/lib/pdf-field-filler';
 import { downloadPDF, generateFilename } from '@/lib/pdf-downloader';
 import { useToast } from '@/hooks/use-toast';
-import type { FormData } from '@/types/FormData';
+import type { FormData, FieldPositions } from '@/types/FormData';
 
 interface Props {
   formData: FormData;
   formType: 'FL-320' | 'DV-100' | 'DV-105';
+  fieldPositions?: FieldPositions;
   caseNumber?: string;
   onExportComplete?: () => void;
   disabled?: boolean;
@@ -17,6 +18,7 @@ interface Props {
 export function ExportPDFButton({
   formData,
   formType,
+  fieldPositions,
   caseNumber,
   onExportComplete,
   disabled = false
@@ -41,6 +43,7 @@ export function ExportPDFButton({
         pdfPath: pdfPaths[formType],
         formNumber: formType, // 'FL-320', 'DV-100', etc.
         fontSize: 12,
+        fieldPositions, // Pass user's field positions (percentages)
       });
 
       // 3. Download filled PDF

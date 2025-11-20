@@ -13,7 +13,7 @@ import {
 } from "@/icons";
 import { cn } from "@/lib/utils";
 import { ExportPDFButton } from "@/components/ExportPDFButton";
-import type { FormData } from "@/types/FormData";
+import type { FormData, FieldPositions } from "@/types/FormData";
 
 interface ControlToolbarProps {
   showThumbnails: boolean;
@@ -39,6 +39,7 @@ interface ControlToolbarProps {
   onIncreaseFontSize: () => void;
   onResetFontSize: () => void;
   formData: FormData;
+  fieldPositions: FieldPositions;
   caseNumber?: string;
 }
 
@@ -66,6 +67,7 @@ export const ControlToolbar = ({
   onIncreaseFontSize,
   onResetFontSize,
   formData,
+  fieldPositions,
   caseNumber,
 }: ControlToolbarProps) => (
   <div className="flex items-center justify-between gap-1 mb-3 px-2 py-1.5 bg-card/80 backdrop-blur-md rounded-lg border border-border/30 shadow-sm flex-shrink-0">
@@ -233,6 +235,7 @@ export const ControlToolbar = ({
       <ExportPDFButton
         formData={formData}
         formType="FL-320"
+        fieldPositions={fieldPositions}
         caseNumber={caseNumber}
       />
     </div>

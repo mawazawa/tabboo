@@ -7,6 +7,7 @@ interface FillOptions {
   pdfPath: string; // '/fl320.pdf'
   formNumber: string; // 'FL-320', 'DV-100', etc.
   fontSize?: number; // Default 12pt
+  fieldPositions?: Record<string, { top: number; left: number }>; // User's field positions (percentages)
 }
 
 interface FieldPosition {
@@ -36,44 +37,90 @@ export async function fillPDFFields(options: FillOptions): Promise<Uint8Array> {
   pdfDoc.registerFontkit(fontkit);
   const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-  // 3. Fetch field positions from database
-  const fieldPositions = await fetchFieldPositions(options.formNumber);
-  console.log(`[PDF Filler] Found ${fieldPositions.length} field position mappings`);
+  // 3. Get field positions - use user's positions if provided, otherwise fetch from database
+  const useUserPositions = options.fieldPositions && Object.keys(options.fieldPositions).length > 0;
+
+  let dbPositions: FieldPosition[] = [];
+  if (!useUserPositions) {
+    dbPositions = await fetchFieldPositions(options.formNumber);
+    console.log(`[PDF Filler] Found ${dbPositions.length} field position mappings from database`);
+  } else {
+    console.log(`[PDF Filler] Using ${Object.keys(options.fieldPositions!).length} user field positions`);
+  }
 
   // 4. Draw text for each field in formData
   let fieldsDrawn = 0;
+  const fontSize = options.fontSize || 12;
+
+  // US Letter dimensions in inches
+  const PAGE_WIDTH_INCHES = 8.5;
+  const PAGE_HEIGHT_INCHES = 11;
+  const POINTS_PER_INCH = 72;
+
   for (const [fieldKey, value] of Object.entries(options.formData)) {
     // Skip empty values (but allow numeric zero)
     if (value === null || value === undefined || value === '') continue;
 
-    // Find position data for this field
-    const position = fieldPositions.find(p => p.form_field_name === fieldKey);
-    if (!position) {
-      console.warn(`[PDF Filler] No position data for field: ${fieldKey}`);
-      continue;
+    // Get the first page (FL-320 is single page for most fields)
+    // TODO: Support multi-page forms by storing page number in fieldPositions
+    const page = pdfDoc.getPage(0);
+    const { height: pageHeight } = page.getSize();
+
+    let x: number, y: number, maxWidth: number;
+    let fieldType = 'input';
+
+    if (useUserPositions && options.fieldPositions![fieldKey]) {
+      // Convert user's percentage positions to PDF points
+      const pos = options.fieldPositions![fieldKey];
+
+      // Convert percentages to inches, then to points
+      const leftInches = (pos.left / 100) * PAGE_WIDTH_INCHES;
+      const topInches = (pos.top / 100) * PAGE_HEIGHT_INCHES;
+
+      x = leftInches * POINTS_PER_INCH;
+
+      // PDF Y-axis is from bottom, user positions are from top
+      // Also adjust for text baseline (~85% of font size)
+      const BASELINE_RATIO = 0.85;
+      const baselineOffset = fontSize * BASELINE_RATIO;
+      y = pageHeight - (topInches * POINTS_PER_INCH) - baselineOffset;
+
+      // Default max width (3 inches)
+      maxWidth = 3 * POINTS_PER_INCH;
+
+      // Determine field type from field name
+      if (fieldKey.includes('checkbox') || fieldKey.includes('Checkbox') ||
+          fieldKey.startsWith('item2a_') || fieldKey.startsWith('item2b_')) {
+        fieldType = 'checkbox';
+      }
+    } else {
+      // Use database positions
+      const position = dbPositions.find(p => p.form_field_name === fieldKey);
+      if (!position) {
+        console.warn(`[PDF Filler] No position data for field: ${fieldKey}`);
+        continue;
+      }
+
+      const coords = convertCoordinates(position, page, fontSize);
+      x = coords.x;
+      y = coords.y;
+      maxWidth = coords.maxWidth;
+      fieldType = position.field_type;
     }
 
-    // Get the page
-    const pageIndex = position.page_number - 1; // Database is 1-indexed
-    const page = pdfDoc.getPage(pageIndex);
-
     // Convert value to string (handle booleans as checkmarks)
-    const textValue = formatFieldValue(value, position.field_type);
+    const textValue = formatFieldValue(value, fieldType);
     if (!textValue) continue; // Skip empty checkboxes
-
-    // Convert database coordinates (inches from top-left) to PDF points (from bottom-left)
-    const fontSize = options.fontSize || 12;
-    const coords = convertCoordinates(position, page, fontSize);
 
     // Draw the text
     try {
       page.drawText(textValue, {
-        x: coords.x,
-        y: coords.y,
+        x,
+        y,
         size: fontSize,
         font: helveticaFont,
         color: rgb(0, 0, 0),
-        maxWidth: coords.maxWidth,
+        maxWidth,
       });
       fieldsDrawn++;
     } catch (error) {

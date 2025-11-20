@@ -274,6 +274,7 @@ const Index = () => {
           onIncreaseFontSize={handleIncreaseFontSize}
           onResetFontSize={handleResetFontSize}
           formData={formData}
+          fieldPositions={fieldPositions}
           caseNumber={formData.caseNumber}
         />
 
