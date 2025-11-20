@@ -21,7 +21,9 @@
     "test:workflows": "playwright test workflows.test.ts",
     "test:all": "npm run test && npm run test:e2e",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "test:visual": "npx playwright test --project=visual-regression",
+    "test:visual:update": "npx playwright test --project=visual-regression --update-snapshots"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

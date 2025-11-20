@@ -7,14 +7,34 @@ import { defineConfig, devices } from '@playwright/test';
  * These tests would have caught the drag-and-drop bug.
  */
 export default defineConfig({
-  testDir: './src/__tests__',
-  testMatch: ['**/*.e2e.test.ts', '**/smoke.test.ts', '**/workflows.test.ts'],
+  testDir: './',
+  testMatch: [
+    'src/__tests__/**/*.e2e.test.ts',
+    'src/__tests__/**/smoke.test.ts',
+    'src/__tests__/**/workflows.test.ts',
+    'tests/visual-regression/**/*.spec.ts',
+  ],
 
   // Test timeout configuration
-  timeout: 30000, // 30s per test
+  timeout: 60000, // 60s per test (visual tests take longer)
   expect: {
-    timeout: 5000, // 5s for assertions
+    timeout: 10000, // 10s for assertions
+    toHaveScreenshot: {
+      // Allow some pixel differences for anti-aliasing
+      maxDiffPixels: 100,
+      // Threshold for color comparison (0-1)
+      threshold: 0.2,
+      // Disable animations for consistent screenshots
+      animations: 'disabled',
+    },
+    toMatchSnapshot: {
+      maxDiffPixelRatio: 0.05, // 5% pixel difference allowed
+    },
   },
+
+  // Snapshot configuration
+  snapshotDir: './tests/visual-regression/snapshots',
+  snapshotPathTemplate: '{snapshotDir}/{testFileDir}/{testFileName}-snapshots/{arg}{-projectName}{ext}',
 
   // Run tests in files in parallel
   fullyParallel: true,
@@ -65,6 +85,17 @@ export default defineConfig({
         storageState: 'playwright/.auth/user.json',
       },
       dependencies: ['setup'],
+    },
+
+    // Visual regression tests - no auth needed
+    {
+      name: 'visual-regression',
+      testMatch: 'tests/visual-regression/**/*.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        // No auth needed for visual tests
+      },
+      // No dependencies - runs independently
     },
 
     // Uncomment to test on more browsers
