@@ -59,7 +59,8 @@ export const sanitizeFormData = <T extends Record<string, string | number | bool
 
   for (const [key, value] of Object.entries(data)) {
     if (typeof value === 'string') {
-      sanitized[key as keyof T] = sanitizeString(value) as T[keyof T];
+      // Apply HTML sanitization to prevent XSS, then trim
+      sanitized[key as keyof T] = sanitizeString(sanitizeHtml(value)) as T[keyof T];
     } else if (typeof value === 'boolean' || typeof value === 'number') {
       sanitized[key as keyof T] = value as T[keyof T];
     } else if (value === null || value === undefined) {
