@@ -7,6 +7,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // Lazy load route components for code splitting
 const Index = lazy(() => import("./pages/Index"));
+const CanvasView = lazy(() => import("./pages/CanvasView"));
 const Auth = lazy(() => import("./pages/Auth"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const DistributionCalculator = lazy(() => import("./pages/DistributionCalculator"));
@@ -32,6 +33,7 @@ const App = () => (
             <Routes>
               <Route path="/auth" element={<Auth />} />
               <Route path="/" element={<Index />} />
+              <Route path="/canvas" element={<CanvasView />} />
               <Route path="/distribution-calculator" element={<DistributionCalculator />} />
               <Route path="/haptic-test" element={<HapticTest />} />
               <Route path="/ex-parte-rfo" element={<ExParteRFO />} />
