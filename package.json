@@ -249,12 +249,23 @@
           "FIREBASE_PROJECT": "justiceos"
         }
       },
+      "exa": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "exa-mcp-server"
+        ],
+        "enabled": true,
+        "env": {
+          "EXA_API_KEY": "c3206133-e55a-4859-8510-c5884dbe900d"
+        }
+      },
       "filesystem": {
         "command": "npx",
         "args": [
           "-y",
           "@modelcontextprotocol/server-filesystem",
-          "/Users/mathieuwauters/Desktop/code/v0-justice-os-ai",
+          "/Users/mathieuwauters/Desktop/code/tabboo",
           "/Users/mathieuwauters/Desktop/code",
           "/Users/mathieuwauters/.claude"
         ],
@@ -274,7 +285,7 @@
           "-y",
           "@modelcontextprotocol/server-git",
           "--repository",
-          "/Users/mathieuwauters/Desktop/code/v0-justice-os-ai"
+          "/Users/mathieuwauters/Desktop/code/tabboo"
         ],
         "enabled": true
       },
