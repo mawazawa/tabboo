@@ -1,7 +1,10 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Canvas } from '@/components/canvas/Canvas';
 import { CanvasFormViewer } from '@/components/canvas/CanvasFormViewer';
-import { Search, Settings, Database, Users, Layers, Upload, AlertTriangle, MapPin, CloudUpload, Loader2, CheckCircle, XCircle, X, FileText } from '@/icons';
+import { ExpandingFormViewer } from '@/components/canvas/ExpandingFormViewer';
+import { ProceduralTimeline } from '@/components/canvas/ProceduralTimeline';
+import { PROCEDURAL_FLOWS, FORM_NAME_TO_TYPE } from '@/components/canvas/constants';
+import { Search, Settings, Database, Users, Layers, Upload, AlertTriangle, MapPin, CloudUpload, Loader2, CheckCircle, XCircle, X, FileText, ChevronRight } from '@/icons';
 import { useNavigate } from 'react-router-dom';
 import { useDocumentPersistence } from '@/hooks/use-document-persistence';
 import { useVaultData } from '@/hooks/use-vault-data';
@@ -12,13 +15,17 @@ export default function CanvasView() {
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<'ORG' | 'PROCEDURE' | 'VAULT' | 'FORM'>('FORM');
   const [activeForms, setActiveForms] = useState<Array<{ id: string; formType: FormType; position: { x: number; y: number }; scale: number }>>([]);
+  const [expandingForm, setExpandingForm] = useState<{ formType: FormType; originPosition: { x: number; y: number; width: number; height: number } } | null>(null);
   const [formDataMap, setFormDataMap] = useState<Record<string, FormData>>({});
   const [fieldPositionsMap, setFieldPositionsMap] = useState<Record<string, FieldPositions>>({});
   const [currentFieldIndexMap, setCurrentFieldIndexMap] = useState<Record<string, number>>({});
   const [validationRulesMap, setValidationRulesMap] = useState<Record<string, ValidationRules>>({});
+  const [showFormSubmenu, setShowFormSubmenu] = useState(false);
   const hasUnsavedChanges = useRef(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formIdCounter = useRef(0);
+  
+  const availableForms: FormType[] = ['FL-320', 'DV-100', 'DV-105'];
 
   // Document persistence for each form
   const {
@@ -54,21 +61,38 @@ export default function CanvasView() {
 
   const { vaultData, isVaultLoading, autofillableCount, hasVaultData } = useVaultData(user);
 
-  const openForm = useCallback((formType: FormType) => {
-    const formId = `form-${formIdCounter.current++}`;
-    const newForm = {
-      id: formId,
-      formType,
-      position: { x: 100 + activeForms.length * 50, y: 100 + activeForms.length * 50 },
-      scale: 0.8
-    };
-    setActiveForms(prev => [...prev, newForm]);
-    setFormDataMap(prev => ({ ...prev, [formId]: {} }));
-    setFieldPositionsMap(prev => ({ ...prev, [formId]: {} }));
-    setCurrentFieldIndexMap(prev => ({ ...prev, [formId]: 0 }));
-    setValidationRulesMap(prev => ({ ...prev, [formId]: {} }));
-    setViewMode('FORM');
+  const openForm = useCallback((formType: FormType, originPosition?: { x: number; y: number; width: number; height: number }) => {
+    if (originPosition) {
+      // Open with expansion animation
+      setExpandingForm({ formType, originPosition });
+      const formId = `form-${formIdCounter.current++}`;
+      setFormDataMap(prev => ({ ...prev, [formId]: {} }));
+      setFieldPositionsMap(prev => ({ ...prev, [formId]: {} }));
+      setCurrentFieldIndexMap(prev => ({ ...prev, [formId]: 0 }));
+      setValidationRulesMap(prev => ({ ...prev, [formId]: {} }));
+    } else {
+      // Open normally
+      const formId = `form-${formIdCounter.current++}`;
+      const newForm = {
+        id: formId,
+        formType,
+        position: { x: 100 + activeForms.length * 50, y: 100 + activeForms.length * 50 },
+        scale: 0.8
+      };
+      setActiveForms(prev => [...prev, newForm]);
+      setFormDataMap(prev => ({ ...prev, [formId]: {} }));
+      setFieldPositionsMap(prev => ({ ...prev, [formId]: {} }));
+      setCurrentFieldIndexMap(prev => ({ ...prev, [formId]: 0 }));
+      setValidationRulesMap(prev => ({ ...prev, [formId]: {} }));
+      setViewMode('FORM');
+    }
   }, [activeForms.length]);
+
+  const handleFormExpansionComplete = useCallback(() => {
+    // The ExpandingFormViewer will now render the full CanvasFormViewer
+    // We just need to mark it as no longer expanding so it stays rendered
+    // The form data is already being managed in the expanding form state
+  }, []);
 
   const closeForm = useCallback((formId: string) => {
     setActiveForms(prev => prev.filter(f => f.id !== formId));
@@ -102,21 +126,60 @@ export default function CanvasView() {
     setCurrentFieldIndexMap(prev => ({ ...prev, [formId]: index }));
   }, []);
 
-  const NavItem = ({ icon, label, active, onClick }: { icon: React.ReactNode, label: string, active: boolean, onClick: () => void }) => (
-    <div 
-      onClick={onClick}
-      className={`
-        flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all whitespace-nowrap relative overflow-hidden group/item
-        ${active 
-          ? 'bg-white/40 border border-white/50 text-blue-700 shadow-[inset_0_0_20px_rgba(255,255,255,0.5)]' 
-          : 'text-slate-500 hover:bg-white/20 hover:text-slate-800 hover:border hover:border-white/20 border border-transparent'}
-      `}
-    >
-      {active && <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none"></div>}
-      <div className="min-w-[20px] flex justify-center relative z-10">{icon}</div>
-      <span className="font-medium text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 delay-75 relative z-10">
-        {label}
-      </span>
+  const NavItem = ({ icon, label, active, onClick, hasSubmenu, submenuOpen, onSubmenuToggle }: { 
+    icon: React.ReactNode, 
+    label: string, 
+    active: boolean, 
+    onClick: () => void,
+    hasSubmenu?: boolean,
+    submenuOpen?: boolean,
+    onSubmenuToggle?: () => void
+  }) => (
+    <div className="relative">
+      <div 
+        onClick={onClick}
+        className={`
+          flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all whitespace-nowrap relative overflow-hidden group/item
+          ${active 
+            ? 'bg-white/40 border border-white/50 text-blue-700 shadow-[inset_0_0_20px_rgba(255,255,255,0.5)]' 
+            : 'text-slate-500 hover:bg-white/20 hover:text-slate-800 hover:border hover:border-white/20 border border-transparent'}
+        `}
+      >
+        {active && <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none"></div>}
+        <div className="min-w-[20px] flex justify-center relative z-10">{icon}</div>
+        <span className="font-medium text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 delay-75 relative z-10">
+          {label}
+        </span>
+        {hasSubmenu && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onSubmenuToggle?.();
+            }}
+            className={`ml-auto relative z-10 transition-transform ${submenuOpen ? 'rotate-90' : ''}`}
+          >
+            <ChevronRight size={16} />
+          </button>
+        )}
+      </div>
+      {hasSubmenu && submenuOpen && (
+        <div className="ml-4 mt-1 space-y-1 animate-in slide-in-from-top-2">
+          {availableForms.map(formType => (
+            <div
+              key={formType}
+              onClick={(e) => {
+                e.stopPropagation();
+                openForm(formType);
+                setShowFormSubmenu(false);
+              }}
+              className="flex items-center gap-2 px-3 py-2 rounded-xl cursor-pointer hover:bg-white/20 text-slate-600 hover:text-slate-800 transition-all text-sm"
+            >
+              <FileText size={14} />
+              <span>{formType}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 
@@ -178,7 +241,13 @@ export default function CanvasView() {
             icon={<FileText size={20} />} 
             label="Forms" 
             active={viewMode === 'FORM'} 
-            onClick={() => setViewMode('FORM')} 
+            onClick={() => {
+              setViewMode('FORM');
+              setShowFormSubmenu(!showFormSubmenu);
+            }}
+            hasSubmenu
+            submenuOpen={showFormSubmenu}
+            onSubmenuToggle={() => setShowFormSubmenu(!showFormSubmenu)}
           />
           <NavItem 
             icon={<Users size={20} />} 
@@ -246,13 +315,13 @@ export default function CanvasView() {
             </div>
           )}
           {viewMode === 'PROCEDURE' && (
-            <div className="flex items-center justify-center h-full w-full">
-              <div className="text-center text-slate-400 bg-white/50 p-12 rounded-3xl backdrop-blur-sm border border-white/50">
-                <Layers size={48} className="mx-auto mb-4 opacity-50" />
-                <h2 className="text-xl font-bold text-slate-600">Procedural Timeline</h2>
-                <p className="text-sm">Procedural flow view coming soon</p>
-              </div>
-            </div>
+            <ProceduralTimeline
+              phases={PROCEDURAL_FLOWS.EVICTION}
+              onFormClick={(formName, cardPosition) => {
+                const formType = (FORM_NAME_TO_TYPE[formName] || 'FL-320') as FormType;
+                openForm(formType, cardPosition);
+              }}
+            />
           )}
           {viewMode === 'VAULT' && (
             <div className="flex items-center justify-center h-full w-full">
@@ -264,6 +333,45 @@ export default function CanvasView() {
             </div>
           )}
         </Canvas>
+
+        {/* Render Expanding Form (if any) */}
+        {expandingForm && (
+          <ExpandingFormViewer
+            formType={expandingForm.formType}
+            formData={formDataMap[`expanding-${expandingForm.formType}`] || {}}
+            updateField={(field, value) => {
+              const formId = `expanding-${expandingForm.formType}`;
+              setFormDataMap(prev => ({
+                ...prev,
+                [formId]: { ...prev[formId], [field]: value }
+              }));
+            }}
+            fieldPositions={fieldPositionsMap[`expanding-${expandingForm.formType}`] || {}}
+            updateFieldPosition={(field, position) => {
+              const formId = `expanding-${expandingForm.formType}`;
+              setFieldPositionsMap(prev => ({
+                ...prev,
+                [formId]: { ...prev[formId], [field]: position }
+              }));
+            }}
+            currentFieldIndex={currentFieldIndexMap[`expanding-${expandingForm.formType}`] || 0}
+            setCurrentFieldIndex={(index) => {
+              const formId = `expanding-${expandingForm.formType}`;
+              setCurrentFieldIndexMap(prev => ({ ...prev, [formId]: index }));
+            }}
+            originPosition={expandingForm.originPosition}
+            onClose={() => {
+              setExpandingForm(null);
+              const formId = `expanding-${expandingForm.formType}`;
+              setFormDataMap(prev => {
+                const next = { ...prev };
+                delete next[formId];
+                return next;
+              });
+            }}
+            onAnimationComplete={handleFormExpansionComplete}
+          />
+        )}
 
         {/* Render Active Forms */}
         {activeForms.map(form => (

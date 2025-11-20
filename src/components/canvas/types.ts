@@ -13,7 +13,7 @@ export interface OrgNode {
 export interface ProceduralStep {
   title: string;
   desc: string;
-  forms: string[];
+  forms: string[]; // Form names like "FL-320", "DV-100", etc.
   micro: string[];
 }
 
