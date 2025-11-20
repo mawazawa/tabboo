@@ -36,6 +36,31 @@ export function useUIControls({
   const [fieldFontSize, setFieldFontSize] = useState(12); // Default 12pt (PDF form standard)
   const [isEditMode, setIsEditMode] = useState(false);
   const [thumbnailPanelWidth, setThumbnailPanelWidth] = useState(200);
+  const hasAutoFitted = useRef(false);
+
+  // Auto-fit PDF to screen on initial load
+  useEffect(() => {
+    if (hasAutoFitted.current) return;
+
+    const attemptFit = () => {
+      const pdfPanel = pdfPanelRef.current || document.getElementById("pdf-panel");
+      if (pdfPanel && pdfPanel.clientWidth > 0) {
+        const targetWidth = 850;
+        const calculatedZoom = Math.min(2, Math.max(0.5, (pdfPanel.clientWidth - 48) / targetWidth));
+        setPdfZoom(calculatedZoom);
+        hasAutoFitted.current = true;
+      }
+    };
+
+    // Try immediately
+    attemptFit();
+
+    // Retry after a short delay if panel not ready
+    if (!hasAutoFitted.current) {
+      const timer = setTimeout(attemptFit, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [pdfPanelRef]);
 
   // Keyboard shortcut: 'E' key to toggle edit mode
   useEffect(() => {

@@ -284,29 +284,8 @@ export const LiquidSlider = React.forwardRef<HTMLInputElement, LiquidSliderProps
       updateSliderPosition(currentValue);
     }, []);
 
-    // Variant-specific colors
-    const getVariantColors = () => {
-      // Guard against division by zero when max === min
-      const range = max - min;
-      const percentage = range === 0 ? 0 : ((currentValue - min) / range) * 100;
-
-      switch (variant) {
-        case 'progress':
-          if (percentage < 34) return 'hsl(0 85% 50%)'; // Red
-          if (percentage < 67) return 'hsl(45 85% 50%)'; // Amber
-          return 'hsl(120 85% 40%)'; // Green
-        case 'confidence':
-          if (percentage < 51) return 'hsl(0 85% 50%)'; // Red
-          if (percentage < 81) return 'hsl(45 85% 50%)'; // Amber
-          return 'hsl(120 85% 40%)'; // Green
-        case 'upload':
-          return 'hsl(215 85% 50%)'; // Primary blue
-        default:
-          return 'hsl(215 85% 50%)'; // Default primary
-      }
-    };
-
-    const liquidColor = getVariantColors();
+    // Clean Apple-style blue for all variants
+    const liquidColor = '#007AFF';
 
     return (
       <div
@@ -388,42 +367,31 @@ export const LiquidSlider = React.forwardRef<HTMLInputElement, LiquidSliderProps
               }}
             />
 
-            {/* Liquid Blob Container (with goo filter) */}
-            <div
-              className={cn(
-                'liquid-slider__liquid-container absolute top-1/2 -translate-y-1/2 pointer-events-none',
-                supportsGooFilter && !reducedMotion && 'goo-filter'
-              )}
-              style={{
-                left: `calc(var(--slider-liquid) * 1%)`,
-                filter: supportsGooFilter && !reducedMotion ? 'url(#goo)' : 'none',
-              }}
-            >
-              {/* Liquid Blob */}
+            {/* Liquid Blob Container - only show with goo filter for merging effect */}
+            {supportsGooFilter && !reducedMotion && (
               <div
-                ref={liquidRef}
-                className="liquid-slider__liquid absolute"
+                className="liquid-slider__liquid-container absolute top-1/2 -translate-y-1/2 pointer-events-none goo-filter"
                 style={{
-                  width: '56px',
-                  height: '56px',
-                  background: liquidColor,
-                  borderRadius: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  boxShadow: `
-                    0 1px 2px hsl(0 0% 0% / 0.08),
-                    0 2px 4px hsl(0 0% 0% / 0.12),
-                    0 4px 8px hsl(0 0% 0% / 0.16),
-                    0 8px 16px hsl(0 0% 0% / 0.1)
-                  `,
-                  scale: !reducedMotion
-                    ? `calc(1.4 + (var(--delta) * 0.05)) calc(1.4 - (var(--delta) * 0.05))`
-                    : '1',
-                  transition: reducedMotion ? 'transform 200ms ease-out' : 'none',
+                  left: `calc(var(--slider-liquid) * 1%)`,
+                  filter: 'url(#goo)',
                 }}
-              />
-            </div>
+              >
+                <div
+                  ref={liquidRef}
+                  className="liquid-slider__liquid absolute"
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    background: liquidColor,
+                    borderRadius: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    scale: `calc(1.4 + (var(--delta) * 0.05)) calc(1.4 - (var(--delta) * 0.05))`,
+                  }}
+                />
+              </div>
+            )}
 
-            {/* Draggable Thumb */}
+            {/* Draggable Thumb - single clean circle */}
             <div
               ref={thumbRef}
               className={cn(
@@ -432,8 +400,8 @@ export const LiquidSlider = React.forwardRef<HTMLInputElement, LiquidSliderProps
               )}
               style={{
                 left: `calc(var(--slider-complete) * 1%)`,
-                width: '56px',
-                height: '56px',
+                width: '40px',
+                height: '40px',
                 transform: 'translate(-50%, -50%)',
                 willChange: isDragging ? 'transform, box-shadow' : 'auto',
               }}
@@ -442,20 +410,11 @@ export const LiquidSlider = React.forwardRef<HTMLInputElement, LiquidSliderProps
                 className="w-full h-full rounded-full"
                 style={{
                   background: liquidColor,
-                  boxShadow: isDragging
-                    ? `
-                      0 1px 2px hsl(0 0% 0% / 0.1),
-                      0 2px 6px hsl(0 0% 0% / 0.15),
-                      0 4px 12px hsl(0 0% 0% / 0.2),
-                      0 8px 24px hsl(0 0% 0% / 0.15)
-                    `
-                    : `
-                      0 1px 2px hsl(0 0% 0% / 0.08),
-                      0 2px 4px hsl(0 0% 0% / 0.12),
-                      0 4px 8px hsl(0 0% 0% / 0.16),
-                      0 8px 16px hsl(0 0% 0% / 0.1)
-                    `,
-                  transition: reducedMotion ? 'box-shadow 200ms ease-out' : 'box-shadow 300ms ease-out',
+                  boxShadow: `
+                    0 2px 8px hsl(0 0% 0% / 0.15),
+                    0 4px 16px hsl(0 0% 0% / 0.1)
+                  `,
+                  transition: 'box-shadow 200ms ease-out',
                 }}
               />
             </div>

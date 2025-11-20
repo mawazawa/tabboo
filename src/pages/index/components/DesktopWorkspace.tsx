@@ -147,9 +147,9 @@ export const DesktopWorkspace = ({
         <ResizablePanel
           id="thumbnail-panel"
           order={1}
-          defaultSize={25}
-          minSize={15}
-          maxSize={40}
+          defaultSize={15}
+          minSize={10}
+          maxSize={35}
           collapsible
           collapsedSize={0}
           onResize={onThumbnailResize}

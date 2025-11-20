@@ -68,227 +68,175 @@ export const ControlToolbar = ({
   formData,
   caseNumber,
 }: ControlToolbarProps) => (
-  <div className="flex items-center justify-between gap-3 mb-6 p-4 bg-card/85 backdrop-blur-xl rounded-xl border border-border/40 shadow-[0_2px_8px_hsl(220_13%_13%/0.04),inset_0_1px_0_hsl(0_0%_100%/0.4)] flex-shrink-0 spring-smooth">
-    <div className="flex items-center gap-3">
+  <div className="flex items-center justify-between gap-2 mb-4 px-3 py-2 bg-card/80 backdrop-blur-md rounded-lg border border-border/30 shadow-sm flex-shrink-0">
+    {/* Left: Panel toggles */}
+    <div className="flex items-center gap-1">
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
-            variant={showThumbnails ? "default" : "ghost"}
+            variant="ghost"
             size="sm"
             onClick={onToggleThumbnails}
-            className="gap-2 spring-snappy hover:scale-105"
-            aria-label={showThumbnails ? "Hide page thumbnails" : "Show page thumbnails"}
+            className={cn("h-7 w-7 p-0", showThumbnails && "bg-muted")}
           >
-            <PanelLeftClose className={cn("h-4 w-4 transition-transform", !showThumbnails && "rotate-180")} strokeWidth={1.5} />
-            <span className="font-medium">Pages</span>
+            <PanelLeftClose className={cn("h-3.5 w-3.5", !showThumbnails && "rotate-180")} strokeWidth={1.5} />
           </Button>
         </TooltipTrigger>
         <TooltipContent side="bottom">
-          <p className="font-medium">{showThumbnails ? "Hide" : "Show"} Pages</p>
-          <p className="text-xs text-muted-foreground">Navigate through form pages with thumbnails</p>
+          <p>{showThumbnails ? "Hide" : "Show"} Pages</p>
         </TooltipContent>
       </Tooltip>
-
-      <div className="h-6 w-px bg-border mx-1" />
 
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
-            variant={showAIPanel ? "default" : "outline"}
-            size="default"
+            variant="ghost"
+            size="sm"
             onClick={onToggleAI}
-            className="gap-2 font-semibold relative group hover:scale-105 spring-snappy"
-            aria-label="Toggle AI Chat Assistant"
+            className={cn("h-7 px-2 gap-1 text-xs", showAIPanel && "bg-muted")}
           >
-            <MessageSquare className="h-4 w-4" strokeWidth={2} />
-            <span>AI Chat Fill</span>
-            {showAIPanel && <span className="absolute -top-1 -right-1 h-2 w-2 bg-green-500 rounded-full animate-pulse" />}
+            <MessageSquare className="h-3.5 w-3.5" strokeWidth={1.5} />
+            Chat
           </Button>
         </TooltipTrigger>
-        <TooltipContent side="bottom" className="max-w-xs">
-          <p className="font-medium mb-1">AI Chat Fill</p>
-          <p className="text-xs text-muted-foreground">Ask questions and get help filling out your form using AI</p>
-          <p className="text-xs text-primary mt-1">💡 More prominent and auto-interactive for AI core feature</p>
+        <TooltipContent side="bottom">
+          <p>AI Chat Assistant</p>
         </TooltipContent>
       </Tooltip>
+    </div>
 
-      <div className="h-6 w-px bg-border mx-1" />
-
+    {/* Center: AI Magic Fill - The Hero Button */}
+    <div className="flex items-center gap-2">
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
-            variant="default"
-            size="lg"
             onClick={onAutofillAll}
             disabled={isVaultLoading || !hasVaultData}
-            className="gap-2 bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/95 hover:via-primary/85 hover:to-primary/75 shadow-lg hover:shadow-xl spring-snappy font-semibold relative overflow-hidden group hover:scale-105"
-            aria-label="Autofill all compatible fields from vault"
+            className="h-8 px-4 gap-2 bg-[#1a365d] hover:bg-[#2a4a7f] text-white font-semibold relative overflow-hidden group shadow-md hover:shadow-lg transition-all"
           >
-            {isVaultLoading ? <Loader2 className="h-5 w-5 animate-spin" strokeWidth={2} /> : <Sparkles className="h-5 w-5 group-hover:animate-pulse" strokeWidth={2} />}
-            <span className="relative z-10">AI Magic Fill</span>
-            {hasVaultData && !isVaultLoading && (
-              <Badge variant="secondary" className="ml-1 bg-background/20 hover:bg-background/30 transition-colors text-xs font-bold">
+            {isVaultLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" strokeWidth={2} />
+            ) : (
+              <Sparkles className="h-4 w-4" strokeWidth={2} />
+            )}
+            <span>AI Magic Fill</span>
+            {hasVaultData && !isVaultLoading && autofillableCount > 0 && (
+              <Badge variant="secondary" className="ml-1 h-5 px-1.5 bg-white/20 text-[10px] font-bold">
                 {autofillableCount}
               </Badge>
             )}
-            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/25 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+            {/* Iridescent shimmer effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
           </Button>
         </TooltipTrigger>
-        <TooltipContent side="bottom" className="max-w-xs">
-          <p className="font-medium mb-1">✨ AI Magic Fill</p>
-          <p className="text-xs text-muted-foreground mb-1">Instantly autofill all compatible fields from your Personal Data Vault</p>
-          {hasVaultData && !isVaultLoading && (
-            <p className="text-xs text-green-600 dark:text-green-400 font-semibold">✨ {autofillableCount} fields ready to fill!</p>
-          )}
-          <p className="text-xs text-muted-foreground mt-2 border-t pt-1">
-            💡 Make this larger and pill-shaped, located in the most likely place users can easily overlay the field
-          </p>
+        <TooltipContent side="bottom">
+          <p className="font-medium">✨ AI Magic Fill</p>
+          <p className="text-xs text-muted-foreground">Auto-fill {autofillableCount} fields from your vault</p>
         </TooltipContent>
       </Tooltip>
 
-      <div className="h-6 w-px bg-border mx-1" />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onToggleVault}
+            className={cn("h-7 px-2 gap-1 text-xs", showVaultPanel && "bg-muted")}
+          >
+            <Shield className="h-3.5 w-3.5" strokeWidth={1.5} />
+            Vault
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">
+          <p>Personal Data Vault</p>
+        </TooltipContent>
+      </Tooltip>
+    </div>
 
+    {/* Right: Zoom, Font, Edit, Export */}
+    <div className="flex items-center gap-1">
+      {/* Zoom controls */}
+      <div className="flex items-center">
+        <Button variant="ghost" size="sm" onClick={onZoomOut} disabled={pdfZoom <= 0.5} className="h-6 w-6 p-0 text-xs">
+          −
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onFitToPage}
+          className="h-6 px-1.5 text-[10px] font-mono"
+        >
+          {Math.round(pdfZoom * 100)}%
+        </Button>
+        <Button variant="ghost" size="sm" onClick={onZoomIn} disabled={pdfZoom >= 2} className="h-6 w-6 p-0 text-xs">
+          +
+        </Button>
+      </div>
+
+      <div className="h-4 w-px bg-border/50 mx-1" />
+
+      {/* Font size controls */}
+      <div className="flex items-center">
+        <Button variant="ghost" size="sm" onClick={onDecreaseFontSize} disabled={fieldFontSize <= 8} className="h-6 w-6 p-0 text-[10px]">
+          A
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onResetFontSize}
+          className="h-6 px-1 text-[10px] font-mono"
+        >
+          {fieldFontSize}
+        </Button>
+        <Button variant="ghost" size="sm" onClick={onIncreaseFontSize} disabled={fieldFontSize >= 16} className="h-6 w-6 p-0 text-xs">
+          A
+        </Button>
+      </div>
+
+      <div className="h-4 w-px bg-border/50 mx-1" />
+
+      {/* Edit mode */}
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onToggleEditMode}
+            className={cn("h-7 w-7 p-0", isEditMode && "bg-muted")}
+          >
+            <Move className="h-3.5 w-3.5" strokeWidth={1.5} />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{isEditMode ? "Exit Edit Mode" : "Edit Mode"} (E)</p>
+        </TooltipContent>
+      </Tooltip>
+
+      {/* Fields panel */}
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onToggleFields}
+            className={cn("h-7 w-7 p-0", showFieldsPanel && "bg-muted")}
+          >
+            <PanelRightClose className={cn("h-3.5 w-3.5", !showFieldsPanel && "rotate-180")} strokeWidth={1.5} />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{showFieldsPanel ? "Hide" : "Show"} Fields</p>
+        </TooltipContent>
+      </Tooltip>
+
+      <div className="h-4 w-px bg-border/50 mx-1" />
+
+      {/* Export PDF */}
       <ExportPDFButton
         formData={formData}
         formType="FL-320"
         caseNumber={caseNumber}
       />
-    </div>
-
-    <div className="flex items-center gap-1 px-2">
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="sm" onClick={onZoomOut} disabled={pdfZoom <= 0.5} className="h-8 w-8 p-0">
-            <span className="text-lg font-semibold">−</span>
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Zoom out (minimum 50%)</p>
-        </TooltipContent>
-      </Tooltip>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant={pdfZoom === 1 ? "default" : "ghost"}
-            size="sm"
-            onClick={onFitToPage}
-            className="flex items-center gap-1 px-3 min-w-[120px] justify-center spring-snappy"
-          >
-            <FileText className="h-3.5 w-3.5" strokeWidth={1.5} />
-            <span className="text-sm font-medium">{pdfZoom === 1 ? "Fit to Page" : `${Math.round(pdfZoom * 100)}%`}</span>
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Scale PDF to fit viewport perfectly</p>
-        </TooltipContent>
-      </Tooltip>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="sm" onClick={onZoomIn} disabled={pdfZoom >= 2} className="h-8 w-8 p-0">
-            <span className="text-lg font-semibold">+</span>
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Zoom in (maximum 200%)</p>
-        </TooltipContent>
-      </Tooltip>
-    </div>
-
-    <div className="flex items-center gap-1 bg-muted/30 rounded-md px-1 py-0.5">
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="sm" onClick={onDecreaseFontSize} disabled={fieldFontSize <= 8} className="h-7 w-7 p-0">
-            <span className="text-sm">A</span>
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Decrease field font size (minimum 8pt)</p>
-        </TooltipContent>
-      </Tooltip>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant={fieldFontSize === 12 ? "default" : "ghost"}
-            size="sm"
-            onClick={onResetFontSize}
-            className="flex items-center gap-1 px-2.5 min-w-[70px] justify-center h-7 text-xs font-semibold"
-          >
-            <span className="text-xs">Font</span>
-            <span className="font-mono">{fieldFontSize}pt</span>
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Reset to default 12pt font size</p>
-        </TooltipContent>
-      </Tooltip>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="sm" onClick={onIncreaseFontSize} disabled={fieldFontSize >= 16} className="h-7 w-7 p-0">
-            <span className="text-base font-semibold">A</span>
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Increase field font size (maximum 16pt)</p>
-        </TooltipContent>
-      </Tooltip>
-    </div>
-
-    <div className="flex items-center gap-2 border-l border-border/50 pl-4">
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant={isEditMode ? "default" : "ghost"} size="sm" onClick={onToggleEditMode} className={cn("gap-2", !isEditMode && "hover:bg-primary/10")}>
-            <Move className="h-4 w-4" strokeWidth={1.5} />
-            {isEditMode ? "Exit Edit" : "Edit Mode"}
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{isEditMode ? "Exit edit mode to fill form fields (E)" : "Enable edit mode to reposition fields (E)"}</p>
-        </TooltipContent>
-      </Tooltip>
-    </div>
-
-    <div className="flex items-center gap-2">
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant={showVaultPanel ? "default" : "ghost"}
-            size="sm"
-            onClick={onToggleVault}
-            className="gap-2 spring-snappy hover:scale-105"
-            aria-label={showVaultPanel ? "Hide Personal Data Vault" : "Show Personal Data Vault"}
-          >
-            <Shield className="h-4 w-4" strokeWidth={1.5} />
-            <span className="font-medium">Vault</span>
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side="bottom">
-          <p className="font-medium mb-1">{showVaultPanel ? "Hide" : "Show"} Vault</p>
-          <p className="text-xs text-muted-foreground">Securely manage your personal information</p>
-          <p className="text-xs text-primary mt-1">💡 Should be visually clear meaning and should be placed at the outer edge of toolbar</p>
-        </TooltipContent>
-      </Tooltip>
-
-      <div className="h-6 w-px bg-border mx-1" />
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant={showFieldsPanel && !showVaultPanel ? "default" : "ghost"}
-            size="sm"
-            onClick={onToggleFields}
-            className="gap-2 spring-snappy hover:scale-105"
-            aria-label={showFieldsPanel ? "Hide Fields panel" : "Show Fields panel"}
-          >
-            <span className="font-medium">Fields</span>
-            <PanelRightClose className={cn("h-4 w-4 transition-transform", !showFieldsPanel && "rotate-180")} strokeWidth={1.5} />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side="bottom">
-          <p className="font-medium mb-1">{showFieldsPanel ? "Hide" : "Show"} Fields</p>
-          <p className="text-xs text-muted-foreground">Navigate and fill form fields sequentially</p>
-          <p className="text-xs text-primary mt-1">💡 Should be visually clear meaning and should be placed at the very outer edge of the toolbar</p>
-        </TooltipContent>
-      </Tooltip>
     </div>
   </div>
 );
