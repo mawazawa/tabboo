@@ -149,7 +149,9 @@ export const LiquidSlider = React.forwardRef<HTMLInputElement, LiquidSliderProps
      */
     const updateSliderPosition = useCallback(
       (newValue: number) => {
-        const percentComplete = ((newValue - min) / (max - min)) * 100;
+        // Guard against division by zero when max === min
+        const range = max - min;
+        const percentComplete = range === 0 ? 0 : ((newValue - min) / range) * 100;
         const liquidValue = calculateLiquidValue(percentComplete);
 
         // Update CSS custom properties
@@ -284,7 +286,9 @@ export const LiquidSlider = React.forwardRef<HTMLInputElement, LiquidSliderProps
 
     // Variant-specific colors
     const getVariantColors = () => {
-      const percentage = ((currentValue - min) / (max - min)) * 100;
+      // Guard against division by zero when max === min
+      const range = max - min;
+      const percentage = range === 0 ? 0 : ((currentValue - min) / range) * 100;
 
       switch (variant) {
         case 'progress':
@@ -459,17 +463,21 @@ export const LiquidSlider = React.forwardRef<HTMLInputElement, LiquidSliderProps
         </div>
 
         {/* Debug Mode */}
-        {debug && (
+        {debug && (() => {
+          const debugRange = max - min;
+          const debugPercent = debugRange === 0 ? 0 : ((currentValue - min) / debugRange) * 100;
+          return (
           <div className="mt-4 p-4 bg-muted rounded-lg text-xs font-mono space-y-1">
             <div>Value: {currentValue}</div>
-            <div>Percent: {Math.round(((currentValue - min) / (max - min)) * 100)}%</div>
-            <div>Liquid: {Math.round(calculateLiquidValue(((currentValue - min) / (max - min)) * 100))}%</div>
+            <div>Percent: {Math.round(debugPercent)}%</div>
+            <div>Liquid: {Math.round(calculateLiquidValue(debugPercent))}%</div>
             <div>Delta: {delta.toFixed(2)}</div>
             <div>Dragging: {isDragging ? 'Yes' : 'No'}</div>
             <div>Goo Filter: {supportsGooFilter ? 'Enabled' : 'Disabled (Safari)'}</div>
             <div>Reduced Motion: {reducedMotion ? 'Yes' : 'No'}</div>
           </div>
-        )}
+          );
+        })()}
       </div>
     );
   }
