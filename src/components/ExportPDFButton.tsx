@@ -73,19 +73,20 @@ export function ExportPDFButton({
     <Button
       onClick={handleExport}
       disabled={disabled || isExporting}
-      size="lg"
-      className="gap-2"
+      variant="ghost"
+      size="sm"
+      className="h-6 px-1.5 gap-1 text-[10px]"
       haptic="success"
     >
       {isExporting ? (
         <>
-          <Loader2 className="h-4 w-4 animate-spin" />
-          Exporting...
+          <Loader2 className="h-3 w-3 animate-spin" />
+          <span className="hidden sm:inline">...</span>
         </>
       ) : (
         <>
-          <Download className="h-4 w-4" />
-          Export PDF
+          <Download className="h-3 w-3" />
+          <span className="hidden sm:inline">PDF</span>
         </>
       )}
     </Button>

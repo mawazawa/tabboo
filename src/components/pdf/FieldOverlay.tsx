@@ -295,12 +295,12 @@ function FieldOverlayComponent({
           checked={!!formData[field as keyof FormData]}
           onCheckedChange={(checked) => !isEditMode && updateField(field, checked as boolean)}
           disabled={isEditMode}
-          className={`h-4 w-4 border rounded-none transition-all duration-200 ${
+          className={`h-2 w-3 border rounded-none transition-all duration-200 ${
             isEditMode
               ? 'bg-muted/50 border-muted cursor-move pointer-events-none'
               : isCurrentField
-              ? 'bg-primary/10 border-primary shadow-lg ring-2 ring-primary/20'
-              : 'bg-background border-border hover:border-primary/70 hover:bg-primary/5 hover:shadow-md active:scale-95 cursor-pointer'
+              ? 'bg-primary/10 border-primary shadow-sm ring-1 ring-primary/20'
+              : 'bg-background border-border hover:border-primary/70 hover:bg-primary/5 active:scale-95 cursor-pointer'
           }`}
           aria-label={placeholder || field}
         />
