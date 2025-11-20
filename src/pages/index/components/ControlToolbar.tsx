@@ -68,18 +68,18 @@ export const ControlToolbar = ({
   formData,
   caseNumber,
 }: ControlToolbarProps) => (
-  <div className="flex items-center justify-between gap-2 mb-4 px-3 py-2 bg-card/80 backdrop-blur-md rounded-lg border border-border/30 shadow-sm flex-shrink-0">
+  <div className="flex items-center justify-between gap-1 mb-3 px-2 py-1.5 bg-card/80 backdrop-blur-md rounded-lg border border-border/30 shadow-sm flex-shrink-0">
     {/* Left: Panel toggles */}
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-0.5">
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
             variant="ghost"
             size="sm"
             onClick={onToggleThumbnails}
-            className={cn("h-7 w-7 p-0", showThumbnails && "bg-muted")}
+            className={cn("h-6 w-6 p-0", showThumbnails && "bg-muted")}
           >
-            <PanelLeftClose className={cn("h-3.5 w-3.5", !showThumbnails && "rotate-180")} strokeWidth={1.5} />
+            <PanelLeftClose className={cn("h-3 w-3", !showThumbnails && "rotate-180")} strokeWidth={1.5} />
           </Button>
         </TooltipTrigger>
         <TooltipContent side="bottom">
@@ -93,45 +93,14 @@ export const ControlToolbar = ({
             variant="ghost"
             size="sm"
             onClick={onToggleAI}
-            className={cn("h-7 px-2 gap-1 text-xs", showAIPanel && "bg-muted")}
+            className={cn("h-6 px-1.5 gap-1 text-[10px]", showAIPanel && "bg-muted")}
           >
-            <MessageSquare className="h-3.5 w-3.5" strokeWidth={1.5} />
+            <MessageSquare className="h-3 w-3" strokeWidth={1.5} />
             Chat
           </Button>
         </TooltipTrigger>
         <TooltipContent side="bottom">
           <p>AI Chat Assistant</p>
-        </TooltipContent>
-      </Tooltip>
-    </div>
-
-    {/* Center: AI Magic Fill - The Hero Button */}
-    <div className="flex items-center gap-2">
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            onClick={onAutofillAll}
-            disabled={isVaultLoading || !hasVaultData}
-            className="h-8 px-4 gap-2 bg-[#1a365d] hover:bg-[#2a4a7f] text-white font-semibold relative overflow-hidden group shadow-md hover:shadow-lg transition-all"
-          >
-            {isVaultLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" strokeWidth={2} />
-            ) : (
-              <Sparkles className="h-4 w-4" strokeWidth={2} />
-            )}
-            <span>AI Magic Fill</span>
-            {hasVaultData && !isVaultLoading && autofillableCount > 0 && (
-              <Badge variant="secondary" className="ml-1 h-5 px-1.5 bg-white/20 text-[10px] font-bold">
-                {autofillableCount}
-              </Badge>
-            )}
-            {/* Iridescent shimmer effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side="bottom">
-          <p className="font-medium">✨ AI Magic Fill</p>
-          <p className="text-xs text-muted-foreground">Auto-fill {autofillableCount} fields from your vault</p>
         </TooltipContent>
       </Tooltip>
 
@@ -141,9 +110,9 @@ export const ControlToolbar = ({
             variant="ghost"
             size="sm"
             onClick={onToggleVault}
-            className={cn("h-7 px-2 gap-1 text-xs", showVaultPanel && "bg-muted")}
+            className={cn("h-6 px-1.5 gap-1 text-[10px]", showVaultPanel && "bg-muted")}
           >
-            <Shield className="h-3.5 w-3.5" strokeWidth={1.5} />
+            <Shield className="h-3 w-3" strokeWidth={1.5} />
             Vault
           </Button>
         </TooltipTrigger>
@@ -153,47 +122,76 @@ export const ControlToolbar = ({
       </Tooltip>
     </div>
 
-    {/* Right: Zoom, Font, Edit, Export */}
-    <div className="flex items-center gap-1">
+    {/* Center: Zoom controls + AI Magic Fill */}
+    <div className="flex items-center gap-2">
       {/* Zoom controls */}
       <div className="flex items-center">
-        <Button variant="ghost" size="sm" onClick={onZoomOut} disabled={pdfZoom <= 0.5} className="h-6 w-6 p-0 text-xs">
+        <Button variant="ghost" size="sm" onClick={onZoomOut} disabled={pdfZoom <= 0.5} className="h-5 w-5 p-0 text-[10px]">
           −
         </Button>
         <Button
           variant="ghost"
           size="sm"
           onClick={onFitToPage}
-          className="h-6 px-1.5 text-[10px] font-mono"
+          className="h-5 px-1 text-[9px] font-mono"
         >
           {Math.round(pdfZoom * 100)}%
         </Button>
-        <Button variant="ghost" size="sm" onClick={onZoomIn} disabled={pdfZoom >= 2} className="h-6 w-6 p-0 text-xs">
+        <Button variant="ghost" size="sm" onClick={onZoomIn} disabled={pdfZoom >= 2} className="h-5 w-5 p-0 text-[10px]">
           +
         </Button>
       </div>
 
-      <div className="h-4 w-px bg-border/50 mx-1" />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            onClick={onAutofillAll}
+            disabled={isVaultLoading || !hasVaultData}
+            className="h-7 px-3 gap-1.5 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-medium relative overflow-hidden group shadow-sm hover:shadow-md transition-all"
+          >
+            {isVaultLoading ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={2} />
+            ) : (
+              <Sparkles className="h-3.5 w-3.5" strokeWidth={2} />
+            )}
+            <span>AI Fill</span>
+            {hasVaultData && !isVaultLoading && autofillableCount > 0 && (
+              <Badge variant="secondary" className="ml-0.5 h-4 px-1 bg-white/20 text-[9px] font-bold">
+                {autofillableCount}
+              </Badge>
+            )}
+            {/* Iridescent shimmer effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">
+          <p className="font-medium">AI Magic Fill</p>
+          <p className="text-xs text-muted-foreground">Auto-fill {autofillableCount} fields from vault</p>
+        </TooltipContent>
+      </Tooltip>
+    </div>
 
+    {/* Right: Font, Edit, Fields, Export */}
+    <div className="flex items-center gap-0.5">
       {/* Font size controls */}
       <div className="flex items-center">
-        <Button variant="ghost" size="sm" onClick={onDecreaseFontSize} disabled={fieldFontSize <= 8} className="h-6 w-6 p-0 text-[10px]">
+        <Button variant="ghost" size="sm" onClick={onDecreaseFontSize} disabled={fieldFontSize <= 8} className="h-5 w-5 p-0 text-[9px]">
           A
         </Button>
         <Button
           variant="ghost"
           size="sm"
           onClick={onResetFontSize}
-          className="h-6 px-1 text-[10px] font-mono"
+          className="h-5 px-0.5 text-[9px] font-mono"
         >
           {fieldFontSize}
         </Button>
-        <Button variant="ghost" size="sm" onClick={onIncreaseFontSize} disabled={fieldFontSize >= 16} className="h-6 w-6 p-0 text-xs">
+        <Button variant="ghost" size="sm" onClick={onIncreaseFontSize} disabled={fieldFontSize >= 16} className="h-5 w-5 p-0 text-[10px]">
           A
         </Button>
       </div>
 
-      <div className="h-4 w-px bg-border/50 mx-1" />
+      <div className="h-3 w-px bg-border/50 mx-0.5" />
 
       {/* Edit mode */}
       <Tooltip>
@@ -202,9 +200,9 @@ export const ControlToolbar = ({
             variant="ghost"
             size="sm"
             onClick={onToggleEditMode}
-            className={cn("h-7 w-7 p-0", isEditMode && "bg-muted")}
+            className={cn("h-6 w-6 p-0", isEditMode && "bg-muted")}
           >
-            <Move className="h-3.5 w-3.5" strokeWidth={1.5} />
+            <Move className="h-3 w-3" strokeWidth={1.5} />
           </Button>
         </TooltipTrigger>
         <TooltipContent>
@@ -219,9 +217,9 @@ export const ControlToolbar = ({
             variant="ghost"
             size="sm"
             onClick={onToggleFields}
-            className={cn("h-7 w-7 p-0", showFieldsPanel && "bg-muted")}
+            className={cn("h-6 w-6 p-0", showFieldsPanel && "bg-muted")}
           >
-            <PanelRightClose className={cn("h-3.5 w-3.5", !showFieldsPanel && "rotate-180")} strokeWidth={1.5} />
+            <PanelRightClose className={cn("h-3 w-3", !showFieldsPanel && "rotate-180")} strokeWidth={1.5} />
           </Button>
         </TooltipTrigger>
         <TooltipContent>
@@ -229,7 +227,7 @@ export const ControlToolbar = ({
         </TooltipContent>
       </Tooltip>
 
-      <div className="h-4 w-px bg-border/50 mx-1" />
+      <div className="h-3 w-px bg-border/50 mx-0.5" />
 
       {/* Export PDF */}
       <ExportPDFButton

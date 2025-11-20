@@ -92,11 +92,11 @@ function FieldOverlayComponent({
           : 'cursor-pointer'
       } ${
         highlightedField === field
-          ? 'ring-2 ring-accent shadow-lg animate-pulse'
+          ? 'ring-1 ring-accent shadow-md animate-pulse'
           : isCurrentField
-          ? 'ring-2 ring-primary shadow-md bg-primary/5'
-          : 'ring-1 ring-border/50 hover:ring-primary/50'
-      } rounded-sm bg-background/90 backdrop-blur-sm p-1.5 transition-all duration-200`}
+          ? 'ring-1 ring-primary shadow-sm bg-primary/5'
+          : 'ring-1 ring-border/30 hover:ring-primary/50'
+      } rounded-sm bg-background/80 backdrop-blur-sm p-0.5 transition-all duration-200`}
       style={{
         ...gpuPositionStyle,
         // Container auto-sizes to fit content (input/textarea/checkbox)
@@ -110,34 +110,34 @@ function FieldOverlayComponent({
       onClick={(e) => handleFieldClick(field, e)}
       {...(onPointerDown ? { onPointerDown } : {})}
     >
-      {/* Visual Direction Indicators */}
-      {isEditMode && (
+      {/* Visual Direction Indicators - only show on current field */}
+      {isEditMode && isCurrentField && (
         <>
           {/* Up Arrow Indicator */}
           {canMoveUp && (
-            <div className="absolute -top-10 left-1/2 -translate-x-1/2 pointer-events-none">
-              <ArrowUp className="h-5 w-5 text-primary animate-pulse drop-shadow-lg" strokeWidth={2.5} />
+            <div className="absolute -top-6 left-1/2 -translate-x-1/2 pointer-events-none">
+              <ArrowUp className="h-3.5 w-3.5 text-primary animate-pulse drop-shadow-lg" strokeWidth={2.5} />
             </div>
           )}
 
           {/* Down Arrow Indicator */}
           {canMoveDown && (
-            <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 pointer-events-none">
-              <ArrowDown className="h-5 w-5 text-primary animate-pulse drop-shadow-lg" strokeWidth={2.5} />
+            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 pointer-events-none">
+              <ArrowDown className="h-3.5 w-3.5 text-primary animate-pulse drop-shadow-lg" strokeWidth={2.5} />
             </div>
           )}
 
           {/* Left Arrow Indicator */}
           {canMoveLeft && (
-            <div className="absolute top-1/2 -translate-y-1/2 -left-10 pointer-events-none">
-              <ArrowLeft className="h-5 w-5 text-primary animate-pulse drop-shadow-lg" strokeWidth={2.5} />
+            <div className="absolute top-1/2 -translate-y-1/2 -left-6 pointer-events-none">
+              <ArrowLeft className="h-3.5 w-3.5 text-primary animate-pulse drop-shadow-lg" strokeWidth={2.5} />
             </div>
           )}
 
           {/* Right Arrow Indicator */}
           {canMoveRight && (
-            <div className="absolute top-1/2 -translate-y-1/2 -right-10 pointer-events-none">
-              <ArrowRight className="h-5 w-5 text-primary animate-pulse drop-shadow-lg" strokeWidth={2.5} />
+            <div className="absolute top-1/2 -translate-y-1/2 -right-6 pointer-events-none">
+              <ArrowRight className="h-3.5 w-3.5 text-primary animate-pulse drop-shadow-lg" strokeWidth={2.5} />
             </div>
           )}
         </>
@@ -251,8 +251,9 @@ function FieldOverlayComponent({
           placeholder={placeholder}
           disabled={isEditMode}
           style={{
-            fontSize: `${fieldFontSize}pt`,
-            height: `${fieldFontSize * 2}px`,
+            fontSize: `${fieldFontSize * 0.75}pt`,
+            height: `${fieldFontSize}px`,
+            padding: '2px 4px',
           }}
           className={`field-input font-mono ${
             isEditMode
@@ -273,8 +274,9 @@ function FieldOverlayComponent({
           placeholder={placeholder}
           disabled={isEditMode}
           style={{
-            fontSize: `${fieldFontSize}pt`,
-            minHeight: `${fieldFontSize * 4}px`,
+            fontSize: `${fieldFontSize * 0.75}pt`,
+            minHeight: `${fieldFontSize * 2}px`,
+            padding: '2px 4px',
           }}
           className={`field-input font-mono resize-none ${
             isEditMode
