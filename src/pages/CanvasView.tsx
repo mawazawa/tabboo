@@ -3,13 +3,17 @@ import { Canvas } from '@/components/canvas/Canvas';
 import { CanvasFormViewer } from '@/components/canvas/CanvasFormViewer';
 import { ExpandingFormViewer } from '@/components/canvas/ExpandingFormViewer';
 import { ProceduralTimeline } from '@/components/canvas/ProceduralTimeline';
-import { PROCEDURAL_FLOWS, FORM_NAME_TO_TYPE } from '@/components/canvas/constants';
-import { Search, Settings, Database, Users, Layers, Upload, AlertTriangle, MapPin, CloudUpload, Loader2, CheckCircle, XCircle, X, FileText, ChevronRight } from '@/icons';
+import { LiquidAssistant } from '@/components/canvas/LiquidAssistant';
+import { IngestionReview } from '@/components/canvas/IngestionReview';
+import { OrgChart } from '@/components/canvas/OrgChart';
+import { PROCEDURAL_FLOWS, FORM_NAME_TO_TYPE, ORG_DATA } from '@/components/canvas/constants';
+import { Search, Database, Users, Layers, CloudUpload, CheckCircle, FileText, ChevronRight, MapPin } from '@/icons';
 import { useNavigate } from 'react-router-dom';
 import { useDocumentPersistence } from '@/hooks/use-document-persistence';
 import { useVaultData } from '@/hooks/use-vault-data';
 import type { FormType } from '@/components/FormViewer';
 import type { FormData, FieldPositions, ValidationRules } from '@/types/FormData';
+import type { CaseMetadata, IngestionStatus, OrgNode } from '@/components/canvas/types';
 
 export default function CanvasView() {
   const navigate = useNavigate();
@@ -24,6 +28,18 @@ export default function CanvasView() {
   const hasUnsavedChanges = useRef(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formIdCounter = useRef(0);
+
+  // Ingestion State
+  const [isDragging, setIsDragging] = useState(false);
+  const [ingestionStatus, setIngestionStatus] = useState<IngestionStatus>('IDLE');
+  const [extractedData, setExtractedData] = useState<CaseMetadata | null>(null);
+
+  // Assistant State
+  const [assistantOpen, setAssistantOpen] = useState(true);
+  const [assistantContext, setAssistantContext] = useState('Canvas View - Form Editor');
+
+  // Org Chart State
+  const [activeNode, setActiveNode] = useState<OrgNode | null>(null);
   
   const availableForms: FormType[] = ['FL-320', 'DV-100', 'DV-105'];
 
@@ -60,6 +76,93 @@ export default function CanvasView() {
   });
 
   const { vaultData, isVaultLoading, autofillableCount, hasVaultData } = useVaultData(user);
+
+  // Auto-save Restoration for Ingestion
+  useEffect(() => {
+    const savedDraft = localStorage.getItem('liquid_ingestion_draft');
+    if (savedDraft && ingestionStatus === 'IDLE') {
+      try {
+        const data = JSON.parse(savedDraft);
+        setExtractedData(data);
+        setIngestionStatus('REVIEW');
+        setAssistantContext('Restored Ingestion Session');
+      } catch (e) {
+        localStorage.removeItem('liquid_ingestion_draft');
+      }
+    }
+  }, []);
+
+  // Drag and Drop Handlers
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (e.relatedTarget === null) {
+      setIsDragging(false);
+    }
+  };
+
+  const handleDrop = useCallback(async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      await processFile(files[0]);
+    }
+  }, []);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      await processFile(e.target.files[0]);
+    }
+  };
+
+  const triggerFileUpload = () => {
+    fileInputRef.current?.click();
+  };
+
+  const processFile = async (file: File) => {
+    if (!file.type.includes('pdf') && !file.type.includes('image')) {
+      alert('Please upload a PDF or Image file.');
+      return;
+    }
+
+    setIngestionStatus('ANALYZING');
+    setAssistantContext(`Analyzing document: ${file.name}`);
+
+    // Simulate AI extraction (replace with actual Mistral OCR call)
+    setTimeout(() => {
+      const mockData: CaseMetadata = {
+        caseNumber: 'FL-2025-001234',
+        plaintiff: 'Jane Smith',
+        defendant: 'John Doe',
+        filingDate: new Date().toLocaleDateString(),
+        documentType: 'Domestic Violence Restraining Order',
+        summary: 'Request for temporary restraining order based on alleged incidents of domestic abuse.'
+      };
+      setExtractedData(mockData);
+      setIngestionStatus('REVIEW');
+    }, 2000);
+  };
+
+  const handleIngestionConfirm = (data: CaseMetadata) => {
+    console.log('Graph Updated with:', data);
+    setIngestionStatus('SUCCESS');
+    setAssistantContext(`Ingested Case: ${data.caseNumber}`);
+    setTimeout(() => {
+      setIngestionStatus('IDLE');
+      setExtractedData(null);
+    }, 3000);
+  };
+
+  const handleNodeClick = (node: OrgNode) => {
+    setActiveNode(node);
+    setAssistantContext(`Selected Court: ${node.role}, Judge ${node.judge}, Dept ${node.dept}`);
+  };
 
   const openForm = useCallback((formType: FormType, originPosition?: { x: number; y: number; width: number; height: number }) => {
     if (originPosition) {
@@ -184,7 +287,21 @@ export default function CanvasView() {
   );
 
   return (
-    <div className="w-screen h-screen relative bg-slate-50 text-slate-900 overflow-hidden">
+    <div
+      className="w-screen h-screen relative bg-slate-50 text-slate-900 overflow-hidden"
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
+      {/* Hidden File Input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
+        onChange={handleFileUpload}
+        accept="application/pdf,image/*"
+      />
+
       {/* Search Bar */}
       <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-2xl transition-all spring-smooth">
         <div className="
@@ -270,7 +387,18 @@ export default function CanvasView() {
           
           <div className="h-px bg-gradient-to-r from-transparent via-white/40 to-transparent w-full my-1"></div>
 
-          <div 
+          <div
+            onClick={triggerFileUpload}
+            className="
+              flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all whitespace-nowrap group/ingest spring-smooth
+              hover:bg-white/20 hover:border hover:border-white/20 text-slate-600
+            "
+          >
+            <div className="min-w-[20px] flex justify-center text-slate-500 group-hover/ingest:text-emerald-600 transition-colors"><CloudUpload size={20} /></div>
+            <span className="font-medium text-sm opacity-0 group-hover:opacity-100 transition-opacity spring-smooth group-hover/ingest:text-emerald-700">Ingest File</span>
+          </div>
+
+          <div
             onClick={() => openForm('FL-320')}
             className="
               flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all whitespace-nowrap group/form spring-smooth
@@ -307,13 +435,7 @@ export default function CanvasView() {
             </div>
           )}
           {viewMode === 'ORG' && (
-            <div className="flex items-center justify-center h-full w-full">
-              <div className="text-center text-slate-400 bg-white/50 p-12 rounded-3xl backdrop-blur-sm border border-white/50">
-                <Users size={48} className="mx-auto mb-4 opacity-50" />
-                <h2 className="text-xl font-bold text-slate-600">Court Topology</h2>
-                <p className="text-sm">Organization chart view coming soon</p>
-              </div>
-            </div>
+            <OrgChart data={ORG_DATA} onNodeClick={handleNodeClick} />
           )}
           {viewMode === 'PROCEDURE' && (
             <ProceduralTimeline
@@ -402,7 +524,72 @@ export default function CanvasView() {
             initialScale={form.scale}
           />
         ))}
+
+        {/* Drag Overlay */}
+        {isDragging && (
+          <div className="absolute inset-6 z-50 border-4 border-dashed border-blue-400/50 rounded-[3rem] bg-blue-50/30 backdrop-blur-sm flex items-center justify-center pointer-events-none">
+            <div className="bg-white/80 backdrop-blur-xl px-10 py-6 rounded-3xl shadow-2xl flex flex-col items-center gap-4 animate-bounce border border-white/60">
+              <CloudUpload size={56} className="text-blue-500 drop-shadow-lg" />
+              <div className="text-xl font-bold text-slate-800">Drop to Ingest</div>
+            </div>
+          </div>
+        )}
       </main>
+
+      {/* Map Pin Overlay for OrgChart */}
+      {activeNode && activeNode.lat && viewMode === 'ORG' && (
+        <div className="absolute top-24 right-6 z-40 w-80 bg-white/80 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.1)] rounded-2xl border border-white/60 p-4 animate-in slide-in-from-right">
+          <div className="flex items-start justify-between mb-3">
+            <div>
+              <h3 className="font-bold text-slate-800">{activeNode.role}</h3>
+              <p className="text-xs text-slate-500">Dept {activeNode.dept}</p>
+            </div>
+            <div className="bg-blue-500/10 p-2 rounded-xl text-blue-600">
+              <MapPin size={18} />
+            </div>
+          </div>
+          <div className="h-32 bg-slate-100 rounded-xl mb-3 relative overflow-hidden group cursor-pointer">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-slate-100"></div>
+            <span className="absolute bottom-2 left-2 bg-white/90 backdrop-blur text-slate-900 text-[10px] font-bold px-2 py-1 rounded-lg shadow-sm">
+              Open Geospatial View
+            </span>
+          </div>
+          <button onClick={() => setActiveNode(null)} className="mt-1 w-full text-xs py-2 text-slate-400 hover:text-slate-600 font-medium">Dismiss</button>
+        </div>
+      )}
+
+      {/* Ingestion Review Modal */}
+      {(ingestionStatus === 'ANALYZING' || ingestionStatus === 'REVIEW') && (
+        <IngestionReview
+          data={extractedData}
+          isLoading={ingestionStatus === 'ANALYZING'}
+          onConfirm={handleIngestionConfirm}
+          onCancel={() => {
+            setIngestionStatus('IDLE');
+            setExtractedData(null);
+            localStorage.removeItem('liquid_ingestion_draft');
+          }}
+        />
+      )}
+
+      {/* Success Notification */}
+      {ingestionStatus === 'SUCCESS' && (
+        <div className="fixed top-24 right-6 z-[200] bg-emerald-50/90 backdrop-blur border border-emerald-200 text-emerald-800 px-6 py-4 rounded-2xl shadow-xl flex items-center gap-4 animate-in slide-in-from-right">
+          <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center"><CheckCircle size={16} /></div>
+          <div>
+            <div className="font-bold text-sm">Ingestion Complete</div>
+            <div className="text-xs opacity-80">Sealed to Personal Data Vault.</div>
+          </div>
+        </div>
+      )}
+
+      {/* Liquid Assistant */}
+      <LiquidAssistant
+        context={assistantContext}
+        isOpen={assistantOpen}
+        onToggle={() => setAssistantOpen(!assistantOpen)}
+        onClose={() => setAssistantOpen(false)}
+      />
     </div>
   );
 }

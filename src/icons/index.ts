@@ -14,6 +14,7 @@
 
 // Export all icons used across the application in alphabetical order
 export {
+  Activity,
   AlignCenter,
   AlignLeft,
   AlignRight,
@@ -47,12 +48,14 @@ export {
   Eye,
   FileJson,
   FileText,
+  Gavel,
   Grid3x3,
   GripVertical,
   HelpCircle,
   Info,
   Keyboard,
   Layers,
+  LayoutDashboard,
   Loader2,
   Lock,
   LogOut,
