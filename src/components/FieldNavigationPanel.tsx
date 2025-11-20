@@ -1,4 +1,4 @@
-import { Card, Input, Button, Tooltip, TooltipContent, TooltipTrigger } from "@liquid-justice/design-system";
+import { Card, Input, Button, Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/liquid-justice-temp";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -15,7 +15,7 @@ import { TemplateManager } from "./TemplateManager";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { FieldNavigationHeader } from "./navigation/FieldNavigationHeader";
 import { FieldNavigationItem } from "./navigation/FieldNavigationItem";
-import { LiquidGlassAccordion, LiquidSlider } from "@liquid-justice/design-system";
+import { LiquidGlassAccordion, AccordionContent, AccordionItem, AccordionTrigger, LiquidSlider } from "@/components/ui/liquid-justice-temp";
 import { FL_320_FIELD_CONFIG } from "@/config/field-config";
 import { FL_320_FIELD_GROUPS, getGroupCompletionPercentage, getGroupCompletionBadge, getOverallFormCompletionPercentage, getOverallFormCompletionCount } from "@/config/field-groups";
 import type { FormData, FieldConfig, FieldPosition, ValidationRules, ValidationErrors } from "@/types/FormData";

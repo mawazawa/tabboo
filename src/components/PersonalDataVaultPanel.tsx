@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Card, Input, Label, Button, Badge } from "@liquid-justice/design-system";
+import { Card, Input, Label, Button, Badge } from "@/components/ui/liquid-justice-temp";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Shield, Save, Loader2, AlertCircle, CheckCircle } from "@/icons";
 import { toast } from "sonner";

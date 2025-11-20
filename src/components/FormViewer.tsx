@@ -1,4 +1,4 @@
-import { Card, Button } from "@liquid-justice/design-system";
+import { Card, Button } from "@/components/ui/liquid-justice-temp";
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { Document, Page } from 'react-pdf';
 import { Move, Loader2, Keyboard, AlertCircle, AlertTriangle, ChevronLeft, ChevronRight } from "@/icons";

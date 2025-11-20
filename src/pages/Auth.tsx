@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Button, Input, Label, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@liquid-justice/design-system";
+import { Button, Input, Label, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/liquid-justice-temp";
 import { toast } from "sonner";
 import { Loader2, Scale } from "@/icons";
 

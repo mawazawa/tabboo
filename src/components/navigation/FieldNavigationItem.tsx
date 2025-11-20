@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Input, Button, Label } from "@liquid-justice/design-system";
+import { Input, Button, Label } from "@/components/ui/liquid-justice-temp";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Copy, AlertCircle } from "@/icons";

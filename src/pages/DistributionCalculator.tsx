@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Input, Label, Card, CardContent, CardHeader, CardTitle, Separator } from "@liquid-justice/design-system";
+import { Button, Input, Label, Card, CardContent, CardHeader, CardTitle, Separator } from "@/components/ui/liquid-justice-temp";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Calculator, AlertTriangle, CheckCircle, ArrowLeft, GripVertical } from "@/icons";
 import { supabase } from "@/integrations/supabase/client";

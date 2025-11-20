@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FileText, AlertTriangle, Info } from '@/icons';
-import { Button, Card, Badge, Label } from '@liquid-justice/design-system';
+import { Button, Card, Badge, Label } from '@/components/ui/liquid-justice-temp';
 import {
   Select,
   SelectContent,

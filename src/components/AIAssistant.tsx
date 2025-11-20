@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, memo } from "react";
-import { Card, CardContent, CardHeader, CardTitle, Button, Input, LiquidSlider } from "@liquid-justice/design-system";
+import { Card, CardContent, CardHeader, CardTitle, Button, Input, LiquidSlider } from "@/components/ui/liquid-justice-temp";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, Loader2, Sparkles } from "@/icons";
 import { useGroqStream } from "@/hooks/useGroqStream";

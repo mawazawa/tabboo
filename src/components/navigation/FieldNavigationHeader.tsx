@@ -1,4 +1,4 @@
-import { Badge, Tooltip, TooltipContent, TooltipTrigger } from "@liquid-justice/design-system";
+import { Badge, Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/liquid-justice-temp";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Search, Settings, Package, Trash2 } from "@/icons";
 import { FieldGroupManager } from "@/components/FieldGroupManager";

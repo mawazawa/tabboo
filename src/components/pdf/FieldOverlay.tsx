@@ -96,7 +96,7 @@ function FieldOverlayComponent({
           : isCurrentField
           ? 'ring-2 ring-primary shadow-md bg-primary/5'
           : 'ring-1 ring-border/50 hover:ring-primary/50'
-      } rounded-lg bg-background/80 backdrop-blur-sm p-2 transition-all duration-200`}
+      } rounded-sm bg-background/90 backdrop-blur-sm p-1.5 transition-all duration-200`}
       style={{
         ...gpuPositionStyle,
         // Container auto-sizes to fit content (input/textarea/checkbox)
@@ -293,12 +293,12 @@ function FieldOverlayComponent({
           checked={!!formData[field as keyof FormData]}
           onCheckedChange={(checked) => !isEditMode && updateField(field, checked as boolean)}
           disabled={isEditMode}
-          className={`h-3.5 w-3.5 border transition-all duration-200 ${
+          className={`h-4 w-4 border rounded-none transition-all duration-200 ${
             isEditMode
               ? 'bg-muted/50 border-muted cursor-move pointer-events-none'
               : isCurrentField
-              ? 'bg-primary/10 border-primary shadow-lg ring-2 ring-primary/20 scale-110'
-              : 'bg-background border-border hover:border-primary/70 hover:bg-primary/5 hover:scale-110 hover:shadow-md active:scale-105 cursor-pointer'
+              ? 'bg-primary/10 border-primary shadow-lg ring-2 ring-primary/20'
+              : 'bg-background border-border hover:border-primary/70 hover:bg-primary/5 hover:shadow-md active:scale-95 cursor-pointer'
           }`}
           aria-label={placeholder || field}
         />

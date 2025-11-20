@@ -1,5 +1,5 @@
 import { CloudOff, Cloud, RefreshCw } from "@/icons";
-import { Button, Badge, Tooltip, TooltipContent, TooltipTrigger } from "@liquid-justice/design-system";
+import { Button, Badge, Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/liquid-justice-temp";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
 
 export const OfflineIndicator = () => {
