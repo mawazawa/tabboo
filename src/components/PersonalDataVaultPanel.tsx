@@ -172,6 +172,22 @@ export const PersonalDataVaultPanel = ({ userId, onDataChange }: PersonalDataVau
 
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-3">
+          {/* Empty state onboarding */}
+          {filledCount === 0 && (
+            <div className="text-center py-6 px-4 space-y-3 bg-muted/30 rounded-lg border-hairline">
+              <div className="w-12 h-12 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
+                <Shield className="w-6 h-6 text-primary" strokeWidth={1.5} />
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-medium text-sm">Your vault is empty</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Add your personal information below to auto-fill forms instantly.
+                  Your data is encrypted and stored securely.
+                </p>
+              </div>
+            </div>
+          )}
+
           {VAULT_FIELDS.map((field) => {
             const isFilled = !!formData[field.vaultField];
             const hasFormMapping = field.formFields && field.formFields.length > 0;

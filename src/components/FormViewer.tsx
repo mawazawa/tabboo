@@ -1,19 +1,19 @@
-import { Card, Button } from "@/components/ui/liquid-justice-temp";
-import { useState, useCallback, useEffect, useMemo } from "react";
-import { Document, Page } from 'react-pdf';
-import { Move, Loader2, Keyboard, AlertCircle, AlertTriangle, ChevronLeft, ChevronRight } from "@/icons";
-import { canAutofill, getVaultValueForField } from "@/utils/vaultFieldMatcher";
+import { useCallback, useEffect, useMemo } from "react";
+import { Document } from 'react-pdf';
+import { Loader2 } from "@/icons";
+import { getVaultValueForField } from "@/utils/vaultFieldMatcher";
 import { TutorialTooltips } from "@/components/TutorialTooltips";
+import { PDFLoadingState } from "@/components/pdf/PDFLoadingState";
+import { PDFErrorState } from "@/components/pdf/PDFErrorState";
+import { EditModeBanner } from "@/components/pdf/EditModeBanner";
+import { PDFPageRenderer } from "@/components/pdf/PDFPageRenderer";
 import { useFormFields, convertToFieldOverlays } from "@/hooks/use-form-fields";
 import { useLiveRegion } from "@/hooks/use-live-region";
 import { useKeyboardNavigation } from "@/hooks/use-keyboard-navigation";
 import { useDragAndDrop } from "@/hooks/use-drag-and-drop";
-import { useRAFMonitoring } from "@/hooks/use-raf-batching";
-import { AlignmentGuides } from "@/components/pdf/AlignmentGuides";
-import { FieldOverlay } from "@/components/pdf/FieldOverlay";
+import { usePdfLoading } from "@/hooks/use-pdf-loading";
 import { mergeFieldNameToIndex } from "@/lib/field-name-index-utils";
 import { legacyFieldNameToIndex } from "@/lib/legacy-field-name-map";
-import { pdfCache } from "@/utils/pdf-cache";
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
@@ -40,19 +40,6 @@ interface Props {
   isEditMode?: boolean;
 }
 
-// Helper function to get PDF path based on form type
-const getPdfPath = (formType: FormType): string => {
-  const pdfPaths: Record<FormType, string> = {
-    'FL-320': '/fl320.pdf',
-    'FL-300': '/fl300.pdf',
-    'FL-303': '/fl303.pdf',
-    'FL-305': '/fl305.pdf',
-    'DV-100': '/dv100.pdf',
-    'DV-105': '/dv105.pdf',
-  };
-  return pdfPaths[formType];
-};
-
 export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurrentFieldIndex, fieldPositions, updateFieldPosition, formType = 'FL-320', zoom = 1, fieldFontSize = 12, highlightedField = null, validationErrors = {}, vaultData = null, isEditMode = false }: Props) => {
   // Live region for screen reader announcements
   const { announce, LiveRegionComponent } = useLiveRegion({
@@ -63,12 +50,19 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   // Fetch form fields from database based on formType
   const { data: fieldMappings, isLoading: isLoadingFields, error: fieldsError } = useFormFields(formType);
 
-  const [numPages, setNumPages] = useState<number>(0);
-  const [pageWidth, setPageWidth] = useState<number>(850);
-  const [pdfLoading, setPdfLoading] = useState(true);
-  const [loadProgress, setLoadProgress] = useState(0);
-  const [currentPDFPage, setCurrentPDFPage] = useState<number>(1);
-  const [cachedPdfUrl, setCachedPdfUrl] = useState<string | null>(null);
+  // PDF loading hook
+  const {
+    numPages,
+    pageWidth,
+    pdfLoading,
+    loadProgress,
+    currentPDFPage,
+    setCurrentPDFPage,
+    cachedPdfUrl,
+    onDocumentLoadSuccess,
+    onDocumentLoadError,
+    onLoadProgress
+  } = usePdfLoading(formType);
 
 // Convert database field mappings to field overlays (memoized for performance)
 const fieldOverlays = useMemo(() => {
@@ -136,71 +130,10 @@ const fieldNameToIndex: Record<string, number> = useMemo(() => {
     adjustPosition,
   });
 
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-    setNumPages(numPages);
-    setPdfLoading(false);
-    setLoadProgress(100);
-    console.log(`[PDF Loaded] Successfully loaded ${numPages} pages for ${formType}`);
-  };
-
-  const onDocumentLoadError = (error: Error) => {
-    console.error('[PDF Load Error]:', error);
-    console.error('[PDF Path]:', cachedPdfUrl || getPdfPath(formType));
-    setPdfLoading(false); // Stop loading spinner even on error
-  };
-
   // Announce edit mode changes to screen readers
   useEffect(() => {
     announce(isEditMode ? 'Edit mode activated. You can now drag fields to reposition them.' : 'Edit mode deactivated. Fields are now locked.');
   }, [isEditMode, announce]);
-
-  // Load PDF through cache (Phase 3: IndexedDB optimization)
-  useEffect(() => {
-    let isMounted = true;
-    let blobUrl: string | null = null;
-
-    const loadPdf = async () => {
-      try {
-        const pdfPath = getPdfPath(formType);
-        const fullUrl = window.location.origin + pdfPath;
-
-        // Load PDF through triple-layer cache
-        const blob = await pdfCache.get(fullUrl);
-
-        if (isMounted) {
-          blobUrl = URL.createObjectURL(blob);
-          setCachedPdfUrl(blobUrl);
-
-          // Log cache statistics in dev mode
-          if (import.meta.env.DEV) {
-            const stats = pdfCache.getStats();
-            console.log('[PDF Cache Stats]', {
-              cacheHitRate: `${stats.cacheHitRate.toFixed(1)}%`,
-              memoryHits: stats.memoryHits,
-              indexedDBHits: stats.indexedDBHits,
-              networkFetches: stats.networkFetches,
-            });
-          }
-        }
-      } catch (error) {
-        console.error('[PDF Cache] Failed to load PDF:', error);
-        if (isMounted) {
-          // Fallback to direct path if cache fails
-          setCachedPdfUrl(getPdfPath(formType));
-        }
-      }
-    };
-
-    loadPdf();
-
-    return () => {
-      isMounted = false;
-      // Clean up blob URL to prevent memory leaks
-      if (blobUrl) {
-        URL.revokeObjectURL(blobUrl);
-      }
-    };
-  }, [formType]);
 
   const handleFieldClick = useCallback((field: string, e: React.MouseEvent) => {
     // Check if clicking on form element OR any parent up to the container
@@ -273,39 +206,12 @@ const fieldNameToIndex: Record<string, number> = useMemo(() => {
 
   // Show error state if field fetching failed
   if (fieldsError) {
-    return (
-      <div className="h-full w-full flex items-center justify-center bg-muted/20">
-        <Card className="p-6 max-w-md">
-          <div className="text-center space-y-4">
-            <AlertTriangle className="h-12 w-12 mx-auto text-destructive" />
-            <h3 className="font-semibold text-lg">Error Loading Form Fields</h3>
-            <p className="text-sm text-muted-foreground">
-              Failed to load {formType} form field definitions from the database.
-            </p>
-            <p className="text-xs text-muted-foreground font-mono bg-muted p-2 rounded">
-              {fieldsError.message}
-            </p>
-          </div>
-        </Card>
-      </div>
-    );
+    return <PDFErrorState type="error" formType={formType} errorMessage={fieldsError.message} />;
   }
 
   // Show warning if no fields were loaded
   if (!fieldMappings || fieldMappings.length === 0) {
-    return (
-      <div className="h-full w-full flex items-center justify-center bg-muted/20">
-        <Card className="p-6 max-w-md">
-          <div className="text-center space-y-4">
-            <AlertCircle className="h-12 w-12 mx-auto text-warning" />
-            <h3 className="font-semibold text-lg">No Form Fields Found</h3>
-            <p className="text-sm text-muted-foreground">
-              No field mappings found for {formType} in the database.
-            </p>
-          </div>
-        </Card>
-      </div>
-    );
+    return <PDFErrorState type="no-fields" formType={formType} />;
   }
 
   return (
@@ -315,156 +221,56 @@ const fieldNameToIndex: Record<string, number> = useMemo(() => {
 
         <TutorialTooltips />
 
-        {/* Edit Mode Active Banner */}
-        {isEditMode && (
-          <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 px-6 py-3 bg-amber-500/95 text-white rounded-lg shadow-lg backdrop-blur-sm animate-in slide-in-from-top border-2 border-amber-400">
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <Move className="h-5 w-5" />
-                <div className="absolute inset-0 bg-white/30 blur-sm animate-pulse" />
-              </div>
-              <div>
-                <div className="font-bold text-sm">✅ DRAG MODE ACTIVE</div>
-                <div className="text-xs flex items-center gap-2 mt-0.5">
-                  <span className="font-semibold">Click & drag any field to reposition</span>
-                  <span className="opacity-70">• Or use</span>
-                  <Keyboard className="h-3 w-3 inline" />
-                  <span className="opacity-70">arrow keys</span>
-                  <span className="opacity-70">• Press E or Esc to exit</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        {isEditMode && <EditModeBanner />}
 
         <div className="relative min-h-full w-full flex flex-col items-center justify-center p-4">
-
-          {pdfLoading && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-background/80 backdrop-blur-sm z-50">
-              <div className="w-full max-w-md bg-card rounded-lg border-2 shadow-3point chamfered p-8">
-                <div className="flex flex-col items-center gap-4">
-                  <div className="relative">
-                    <Loader2 className="h-12 w-12 animate-spin text-primary" strokeWidth={1.5} />
-                    <div className="absolute inset-0 bg-primary/20 blur-xl animate-pulse" />
-                  </div>
-                  <div className="text-center space-y-2">
-                    <h3 className="text-lg font-semibold">Loading PDF Form</h3>
-                    <p className="text-sm text-muted-foreground">Preparing your {formType} form...</p>
-                  </div>
-                  {loadProgress > 0 && loadProgress < 100 && (
-                    <div className="w-full">
-                      <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-300"
-                          style={{ width: `${loadProgress}%` }}
-                        />
-                      </div>
-                      <p className="text-xs text-muted-foreground text-center mt-2">{loadProgress}%</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
+          {pdfLoading && <PDFLoadingState loadProgress={loadProgress} formType={formType} />}
           
           <div className="w-full" style={{ maxWidth: `${pageWidth * zoom}px` }}>
             <Document
-              file={cachedPdfUrl || getPdfPath(formType)}
+              file={cachedPdfUrl || `/fl320.pdf`}
               onLoadSuccess={onDocumentLoadSuccess}
               onLoadError={onDocumentLoadError}
-              onLoadProgress={({ loaded, total }) => {
-                if (total > 0) {
-                  setLoadProgress(Math.round((loaded / total) * 100));
-                }
-              }}
+              onLoadProgress={onLoadProgress}
               className="flex flex-col items-center w-full"
               loading=""
             >
               {Array.from(new Array(numPages), (el, index) => {
                 const pageNum = index + 1;
-
-                // Performance: Only render current page ± 1 page buffer
-                // This reduces DOM overhead for multi-page PDFs (30-40% improvement)
-                const pageBuffer = 1;
-                const shouldRenderPage = Math.abs(pageNum - currentPDFPage) <= pageBuffer;
-
                 const pageOverlays = fieldOverlays.find(o => o.page === pageNum);
 
                 return (
-                  <div
+                  <PDFPageRenderer
                     key={`page_${pageNum}`}
-                    className={`relative mb-4 w-full ${isEditMode ? 'touch-none' : ''}`}
-                    onPointerMove={handlePointerMove}
-                    onPointerUp={handlePointerUp}
-                    onPointerLeave={handlePointerUp}
-                    onClick={handlePDFClick}
-                  >
-                    {shouldRenderPage ? (
-                      <>
-                        <Page
-                          pageNumber={pageNum}
-                          width={pageWidth * zoom}
-                          renderTextLayer={false}
-                          renderAnnotationLayer={false}
-                          className="w-full"
-                          loading=""
-                        />
-
-                        {pageOverlays && (
-                          <div className="absolute inset-0 z-10">
-                            {/* Alignment Guides */}
-                            {isDragging && <AlignmentGuides guides={alignmentGuides} />}
-
-                            {pageOverlays.fields.map((overlay, idx) => {
-                              const position = fieldPositions[overlay.field] || {
-                                top: parseFloat(overlay.top),
-                                left: parseFloat(overlay.left)
-                              };
-
-                              const isCurrentField = fieldNameToIndex[overlay.field] === currentFieldIndex;
-                              const canAutofillField = canAutofill(overlay.field, vaultData);
-                              const hasValue = !!formData[overlay.field as keyof FormData];
-
-                              return (
-                                <FieldOverlay
-                                  key={idx}
-                                  field={overlay.field}
-                                  type={overlay.type}
-                                  placeholder={overlay.placeholder}
-                                  position={position}
-                                  zoom={zoom}
-                                  fieldFontSize={fieldFontSize}
-                                  formData={formData}
-                                  isEditMode={isEditMode}
-                                  isCurrentField={isCurrentField}
-                                  isDragging={isDragging === overlay.field}
-                                  highlightedField={highlightedField}
-                                  validationErrors={validationErrors}
-                                  vaultData={vaultData}
-                                  canAutofillField={canAutofillField}
-                                  hasValue={hasValue}
-                                  updateField={updateField}
-                                  handleFieldClick={handleFieldClick}
-                                  handleAutofillField={handleAutofillField}
-                                  onPointerDown={isEditMode ? (e) => handlePointerDown(e, overlay.field, position.top, position.left) : undefined}
-                                />
-                              );
-                            })}
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      // Placeholder for unrendered pages to maintain scroll height
-                      <div className="w-full bg-muted/10 flex items-center justify-center" style={{ height: `${pageWidth * zoom * 1.294}px` }}>
-                        <p className="text-muted-foreground text-sm">Page {pageNum}</p>
-                      </div>
-                    )}
-                </div>
-              );
-            })}
-          </Document>
+                    pageNum={pageNum}
+                    currentPDFPage={currentPDFPage}
+                    pageWidth={pageWidth}
+                    zoom={zoom}
+                    fieldFontSize={fieldFontSize}
+                    isEditMode={isEditMode}
+                    isDragging={isDragging}
+                    alignmentGuides={alignmentGuides}
+                    pageOverlays={pageOverlays}
+                    fieldPositions={fieldPositions}
+                    formData={formData}
+                    currentFieldIndex={currentFieldIndex}
+                    fieldNameToIndex={fieldNameToIndex}
+                    highlightedField={highlightedField}
+                    validationErrors={validationErrors}
+                    vaultData={vaultData}
+                    updateField={updateField}
+                    handleFieldClick={handleFieldClick}
+                    handleAutofillField={handleAutofillField}
+                    handlePointerMove={handlePointerMove}
+                    handlePointerUp={handlePointerUp}
+                    handlePDFClick={handlePDFClick}
+                    handlePointerDown={handlePointerDown}
+                  />
+                );
+              })}
+            </Document>
+          </div>
         </div>
-      </div>
     </div>
   );
 };
