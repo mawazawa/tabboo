@@ -163,7 +163,7 @@ export default function CanvasView() {
         )}
       </div>
       {hasSubmenu && submenuOpen && (
-        <div className="ml-4 mt-1 space-y-1 animate-in slide-in-from-top-2">
+        <div className="ml-4 mt-1 space-y-1 animate-in slide-in-from-top-2 spring-bounce">
           {availableForms.map(formType => (
             <div
               key={formType}
@@ -172,9 +172,9 @@ export default function CanvasView() {
                 openForm(formType);
                 setShowFormSubmenu(false);
               }}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl cursor-pointer hover:bg-white/20 text-slate-600 hover:text-slate-800 transition-all text-sm"
+              className="flex items-center gap-2 px-3 py-2 liquid-glass rounded-xl cursor-pointer hover:scale-105 text-slate-700 hover:text-slate-900 transition-all spring-snappy text-sm font-medium shadow-[var(--shadow-diffused)] hover:shadow-[var(--shadow-diffused-hover)]"
             >
-              <FileText size={14} />
+              <FileText size={14} className="text-blue-600" />
               <span>{formType}</span>
             </div>
           ))}
@@ -186,16 +186,14 @@ export default function CanvasView() {
   return (
     <div className="w-screen h-screen relative bg-slate-50 text-slate-900 overflow-hidden">
       {/* Search Bar */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-2xl transition-all">
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-2xl transition-all spring-smooth">
         <div className="
-          relative w-full
-          bg-white/20 backdrop-blur-xl backdrop-saturate-150
-          border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.05),inset_0_0_0_1px_rgba(255,255,255,0.2)]
+          relative w-full liquid-glass
           rounded-full p-1.5
           flex items-center gap-2
-          group
+          group shadow-[var(--shadow-diffused)]
+          hover:shadow-[var(--shadow-diffused-hover)]
         ">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/40 to-transparent pointer-events-none"></div>
           
           <div className="pl-4 text-slate-500 group-focus-within:text-blue-600 transition-colors z-10">
             <Search size={18} />
@@ -226,10 +224,12 @@ export default function CanvasView() {
       {/* Navigation Rail */}
       <div className="fixed left-4 top-1/2 -translate-y-1/2 z-[60] group">
         <div className="
-          bg-white/30 backdrop-blur-2xl border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.05)]
+          liquid-glass
           rounded-[2rem] p-2 flex flex-col gap-2
-          transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1)
-          w-14 hover:w-64 overflow-hidden ring-1 ring-white/20
+          transition-all spring-bounce
+          w-14 hover:w-64 overflow-hidden
+          shadow-[var(--shadow-elevated)]
+          hover:shadow-[var(--shadow-ultra)]
         ">
           <div className="w-10 h-10 rounded-full bg-white/40 border border-white/50 flex items-center justify-center text-blue-600 mb-4 mx-auto shadow-sm">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="drop-shadow-sm">
@@ -273,12 +273,13 @@ export default function CanvasView() {
           <div 
             onClick={() => openForm('FL-320')}
             className="
-              flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all whitespace-nowrap group/form
-              hover:bg-white/20 hover:border hover:border-white/20 text-slate-600
+              flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all whitespace-nowrap group/form spring-smooth
+              liquid-glass hover:scale-105 text-slate-700 hover:text-emerald-700
+              shadow-[var(--shadow-diffused)] hover:shadow-[var(--shadow-diffused-hover)]
             "
           >
-            <div className="min-w-[20px] flex justify-center text-slate-500 group-hover/form:text-emerald-600 transition-colors"><FileText size={20} /></div>
-            <span className="font-medium text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 delay-75 group-hover/form:text-emerald-700">New Form</span>
+            <div className="min-w-[20px] flex justify-center text-slate-500 group-hover/form:text-emerald-600 transition-colors spring-snappy"><FileText size={20} /></div>
+            <span className="font-medium text-sm opacity-0 group-hover:opacity-100 transition-opacity spring-smooth group-hover/form:text-emerald-700">New Form</span>
           </div>
         </div>
       </div>

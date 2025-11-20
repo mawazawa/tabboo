@@ -45,15 +45,22 @@ export const ExpandingFormViewer: React.FC<ExpandingFormViewerProps> = ({
 
   useEffect(() => {
     const startTime = performance.now();
-    const duration = 600; // 600ms animation
+    const duration = 500; // 500ms matches --spring-duration-medium
 
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
       
-      // Easing function (ease-out cubic)
-      const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
-      const eased = easeOutCubic(progress);
+      // Spring physics easing (matches design system --spring-bounce)
+      // cubic-bezier(0.68, -0.55, 0.265, 1.55) - Playful bounce
+      const springBounce = (t: number) => {
+        // Approximate spring-bounce curve: cubic-bezier(0.68, -0.55, 0.265, 1.55)
+        // This creates a playful bounce effect
+        return t < 0.5 
+          ? 4 * t * t * t 
+          : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      };
+      const eased = springBounce(progress);
 
       // Interpolate position
       setCurrentPosition({
@@ -99,10 +106,11 @@ export const ExpandingFormViewer: React.FC<ExpandingFormViewerProps> = ({
           transition: 'none'
         }}
       >
-        <div className="w-full h-full bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/50 flex items-center justify-center overflow-hidden">
-          <div className="text-center p-4">
-            <div className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-            <p className="text-xs text-slate-600 font-medium font-mono">{formType}</p>
+        <div className="w-full h-full liquid-glass rounded-2xl flex items-center justify-center overflow-hidden shadow-[var(--shadow-ultra)]">
+          <div className="text-center p-4 relative z-10">
+            <div className="w-10 h-10 border-[3px] border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3 shadow-[0_0_16px_hsl(215_85%_50%/0.3)]"></div>
+            <p className="text-xs text-slate-700 font-semibold font-mono tracking-wide">{formType}</p>
+            <div className="mt-2 h-1 w-24 bg-gradient-to-r from-transparent via-blue-500/50 to-transparent rounded-full mx-auto animate-pulse"></div>
           </div>
         </div>
       </div>

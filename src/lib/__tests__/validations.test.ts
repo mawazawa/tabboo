@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formDataSchema } from '../validations';
+import { formDataSchema, dv100FormDataSchema } from '../validations';
 
 describe('formDataSchema', () => {
   describe('partyName validation', () => {
@@ -40,6 +40,16 @@ describe('formDataSchema', () => {
     it('should accept empty string', () => {
       const result = formDataSchema.safeParse({ email: '' });
       expect(result.success).toBe(true);
+    });
+
+    it('should allow clearing email field (regression test for empty string bug)', () => {
+      // This tests the specific bug where email validation rejected empty strings
+      // User scenario: user fills email, then needs to clear it
+      const withEmail = formDataSchema.safeParse({ email: 'test@example.com' });
+      expect(withEmail.success).toBe(true);
+
+      const clearedEmail = formDataSchema.safeParse({ email: '' });
+      expect(clearedEmail.success).toBe(true);
     });
   });
 
@@ -263,6 +273,37 @@ describe('formDataSchema', () => {
       if (!result.success) {
         expect(result.error.errors[0].path).toContain('partyName');
       }
+    });
+  });
+});
+
+describe('dv100FormDataSchema', () => {
+  describe('item1d_email validation', () => {
+    it('should accept valid email', () => {
+      const result = dv100FormDataSchema.safeParse({ item1d_email: 'test@example.com' });
+      expect(result.success).toBe(true);
+    });
+
+    it('should reject invalid email', () => {
+      const result = dv100FormDataSchema.safeParse({ item1d_email: 'invalid-email' });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.errors[0].message).toBe('Invalid email address');
+      }
+    });
+
+    it('should accept empty string', () => {
+      const result = dv100FormDataSchema.safeParse({ item1d_email: '' });
+      expect(result.success).toBe(true);
+    });
+
+    it('should allow clearing email field (regression test for empty string bug)', () => {
+      // This tests the specific bug where email validation rejected empty strings
+      const withEmail = dv100FormDataSchema.safeParse({ item1d_email: 'user@domain.com' });
+      expect(withEmail.success).toBe(true);
+
+      const clearedEmail = dv100FormDataSchema.safeParse({ item1d_email: '' });
+      expect(clearedEmail.success).toBe(true);
     });
   });
 });

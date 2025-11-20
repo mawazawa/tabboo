@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ProceduralPhase } from './types';
 import { FileText, ArrowRight, ChevronDown, Circle } from '@/icons';
+import { cn } from '@/lib/utils';
 import type { FormType } from '@/components/FormViewer';
 
 interface ProceduralTimelineProps {
@@ -50,17 +51,16 @@ export const ProceduralTimeline: React.FC<ProceduralTimelineProps> = ({ phases, 
               const isExpanded = expandedStep === step.title;
               
               return (
-                <div 
-                  key={j} 
-                  className={`
-                    ml-10 bg-white rounded-2xl border transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer overflow-hidden relative
-                    ${isExpanded 
-                      ? 'border-blue-400 shadow-[0_12px_32px_-8px_rgba(59,130,246,0.3)] scale-105 z-20' 
-                      : 'border-slate-200 shadow-sm hover:shadow-md hover:border-blue-300'
-                    }
-                  `}
-                  onClick={() => toggleStep(step.title)}
-                >
+                  <div 
+                    key={j} 
+                    className={cn(
+                      "ml-10 liquid-glass rounded-2xl cursor-pointer overflow-hidden relative spring-smooth",
+                      isExpanded 
+                        ? 'border-blue-400/50 shadow-[var(--shadow-ultra-hover)] scale-105 z-20' 
+                        : 'shadow-[var(--shadow-diffused)] hover:shadow-[var(--shadow-diffused-hover)] hover:scale-[1.02]'
+                    )}
+                    onClick={() => toggleStep(step.title)}
+                  >
                   {/* Connector dot */}
                   <div className={`
                     absolute top-8 -left-[27px] w-4 h-4 rounded-full bg-white border-[3px] transition-all duration-300
@@ -117,12 +117,14 @@ export const ProceduralTimeline: React.FC<ProceduralTimelineProps> = ({ phases, 
                                     onClick={(e) => handleFormClick(e, form)}
                                     className="
                                       flex flex-col items-center justify-center gap-2 p-3 
-                                      bg-amber-50 border border-amber-200 rounded-xl 
-                                      text-amber-800 hover:bg-amber-100 hover:shadow-sm transition-all
+                                      liquid-glass rounded-xl 
+                                      text-amber-800 hover:scale-105 transition-all spring-snappy
                                       active:scale-95 cursor-pointer group/form-mini
+                                      shadow-[var(--shadow-diffused)] hover:shadow-[var(--shadow-diffused-hover)]
+                                      border-amber-200/50
                                     "
                                   >
-                                     <FileText size={18} className="group-hover/form-mini:scale-110 transition-transform" />
+                                     <FileText size={18} className="group-hover/form-mini:scale-110 transition-transform spring-snappy text-amber-700" />
                                      <span className="font-mono text-[10px] font-bold">{form}</span>
                                   </div>
                                 ))}

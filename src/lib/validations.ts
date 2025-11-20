@@ -36,7 +36,9 @@ export const formDataSchema = z.object({
   zipCode: z.string().trim().regex(/^\d{5}(-\d{4})?$|^$/, "ZIP code must be 5 or 9 digits").optional().or(z.literal("")),
   telephoneNo: z.string().trim().max(20, "Phone number must be less than 20 characters").optional(),
   faxNo: z.string().trim().max(20, "Fax number must be less than 20 characters").optional(),
-  email: z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters").optional().or(z.literal("")),
+  email: z.string().trim().max(255, "Email must be less than 255 characters").refine(val => val === '' || z.string().email().safeParse(val).success, {
+    message: "Invalid email address"
+  }).optional().or(z.literal("")),
   attorneyFor: z.string().trim().max(200, "Attorney field must be less than 200 characters").optional(),
   county: z.string().trim().max(100, "County must be less than 100 characters").optional(),
   petitioner: z.string().trim().max(200, "Petitioner must be less than 200 characters").optional(),
@@ -91,7 +93,9 @@ export const dv100FormDataSchema = z.object({
   item1c_zip: z.string().trim().regex(/^\d{5}(-\d{4})?$|^$/, "ZIP code must be 5 or 9 digits").optional().or(z.literal("")),
   item1d_telephone: z.string().trim().regex(/^[\d\s\-\(\)]+$|^$/, "Invalid phone number format").max(20, "Phone number too long").optional().or(z.literal("")),
   item1d_fax: z.string().trim().regex(/^[\d\s\-\(\)]+$|^$/, "Invalid fax number format").max(20, "Fax number too long").optional().or(z.literal("")),
-  item1d_email: z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters").optional().or(z.literal("")),
+  item1d_email: z.string().trim().max(255, "Email must be less than 255 characters").refine(val => val === '' || z.string().email().safeParse(val).success, {
+    message: "Invalid email address"
+  }).optional().or(z.literal("")),
   item1e_lawyerName: z.string().trim().max(200, "Lawyer name must be less than 200 characters").optional(),
   item1e_stateBarNo: z.string().trim().max(20, "Bar number must be less than 20 characters").optional(),
   item1e_firmName: z.string().trim().max(200, "Firm name must be less than 200 characters").optional(),

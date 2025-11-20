@@ -78,14 +78,16 @@ export const Canvas: React.FC<CanvasProps> = ({ children }) => {
     isDragging.current = false;
   };
 
-  // Grid Calculation:
-  // Made the grid points finer (1px radius) and lighter (#cbd5e1 - slate 300) 
-  // to reduce visual weight on mobile screens.
+  // Premium Canvas Background with Depth
+  // Uses subtle gradient overlay for depth perception
   const gridStyle = {
-    backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)',
-    backgroundSize: `${32 * scale}px ${32 * scale}px`,
-    backgroundPosition: `${position.x}px ${position.y}px`,
-    backgroundColor: '#f8fafc'
+    backgroundImage: `
+      radial-gradient(#cbd5e1 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(220 15% 98% / 0.5), hsl(220 15% 96% / 0.3))
+    `,
+    backgroundSize: `${32 * scale}px ${32 * scale}px, 100% 100%`,
+    backgroundPosition: `${position.x}px ${position.y}px, 0 0`,
+    backgroundColor: 'hsl(220 15% 98%)'
   };
 
   return (
@@ -115,7 +117,7 @@ export const Canvas: React.FC<CanvasProps> = ({ children }) => {
       
       {/* Navigation Controls Overlay */}
       <div className="absolute bottom-8 left-24 flex flex-col gap-2 pointer-events-none">
-        <div className="bg-white/80 backdrop-blur p-2 rounded-lg shadow-lg border border-white/50 pointer-events-auto flex gap-2 text-xs text-slate-500 font-mono">
+        <div className="liquid-glass p-2 rounded-lg shadow-[var(--shadow-diffused)] pointer-events-auto flex gap-2 text-xs text-slate-600 font-mono font-medium">
            <span>X: {position.x.toFixed(0)}</span>
            <span>Y: {position.y.toFixed(0)}</span>
            <span>Z: {(scale * 100).toFixed(0)}%</span>

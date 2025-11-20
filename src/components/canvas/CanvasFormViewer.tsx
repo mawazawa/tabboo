@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { FormViewer, FormType } from '@/components/FormViewer';
 import { X, Move, Maximize2, Minimize2 } from '@/icons';
+import { cn } from '@/lib/utils';
 import type { FormData, FieldPosition } from '@/types/FormData';
 
 interface CanvasFormViewerProps {
@@ -70,7 +71,7 @@ export const CanvasFormViewer: React.FC<CanvasFormViewerProps> = ({
     return (
       <div
         ref={containerRef}
-        className="fixed z-50 bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/50 cursor-move"
+        className="fixed z-50 liquid-glass rounded-2xl cursor-move spring-smooth shadow-[var(--shadow-ultra)]"
         style={{
           left: position.x,
           top: position.y,
@@ -82,9 +83,9 @@ export const CanvasFormViewer: React.FC<CanvasFormViewerProps> = ({
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       >
-        <div className="flex items-center justify-between p-4 h-full">
+        <div className="flex items-center justify-between p-4 h-full relative z-10">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500/20 to-blue-600/30 backdrop-blur-sm flex items-center justify-center border border-blue-200/30 shadow-[inset_0_1px_0_hsl(0_0%_100%/0.5)]">
               <Move size={16} className="text-blue-600" />
             </div>
             <div>
@@ -95,14 +96,14 @@ export const CanvasFormViewer: React.FC<CanvasFormViewerProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsMinimized(false)}
-              className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-white/20 rounded-lg transition-all spring-snappy hover:scale-110 active:scale-95"
             >
               <Maximize2 size={16} />
             </button>
             {onClose && (
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-red-100 rounded-lg transition-colors text-red-600"
+                className="p-2 hover:bg-red-500/20 rounded-lg transition-all spring-snappy hover:scale-110 active:scale-95 text-red-600"
               >
                 <X size={16} />
               </button>
@@ -116,7 +117,12 @@ export const CanvasFormViewer: React.FC<CanvasFormViewerProps> = ({
   return (
     <div
       ref={containerRef}
-      className="fixed z-50 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/50 overflow-hidden"
+      className={cn(
+        "fixed z-50 liquid-glass rounded-2xl overflow-hidden spring-smooth",
+        isDragging 
+          ? "shadow-[var(--shadow-ultra-hover)] scale-[1.01]" 
+          : "shadow-[var(--shadow-ultra)] hover:shadow-[var(--shadow-ultra-hover)]"
+      )}
       style={{
         left: position.x,
         top: position.y,
@@ -133,9 +139,9 @@ export const CanvasFormViewer: React.FC<CanvasFormViewerProps> = ({
       onWheel={handleWheel}
     >
       {/* Header */}
-      <div className="h-14 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between px-6 cursor-move">
+      <div className="h-14 liquid-glass border-b border-white/20 flex items-center justify-between px-6 cursor-move relative z-10 shadow-[inset_0_1px_0_hsl(0_0%_100%/0.6)]">
         <div className="flex items-center gap-3 text-slate-700">
-          <div className="bg-blue-100 p-1.5 rounded-lg text-blue-600">
+          <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/30 backdrop-blur-sm p-1.5 rounded-lg text-blue-600 border border-blue-200/30 shadow-[inset_0_1px_0_hsl(0_0%_100%/0.5)]">
             <Move size={18} />
           </div>
           <span className="font-mono font-bold text-lg">{formType} Editor</span>
@@ -143,14 +149,14 @@ export const CanvasFormViewer: React.FC<CanvasFormViewerProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsMinimized(true)}
-            className="p-2 hover:bg-slate-200 rounded-lg transition-colors"
+            className="p-2 hover:bg-white/20 rounded-lg transition-all spring-snappy hover:scale-110 active:scale-95"
           >
             <Minimize2 size={18} />
           </button>
           {onClose && (
             <button
               onClick={onClose}
-              className="p-2 hover:bg-red-100 rounded-lg transition-colors text-red-600"
+              className="p-2 hover:bg-red-500/20 rounded-lg transition-all spring-snappy hover:scale-110 active:scale-95 text-red-600"
             >
               <X size={20} />
             </button>
