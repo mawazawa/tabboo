@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Card } from "@/components/ui/liquid-justice-temp";
-import { Keyboard, FileText, Shield, Sparkles, CheckCircle, Zap } from "@/icons";
+import { Keyboard, FileText, Shield, Sparkles, CheckCircle, Settings } from "@/icons";
 
 interface TourStep {
   title: string;
@@ -29,7 +29,7 @@ const TOUR_STEPS: TourStep[] = [
   {
     title: "The Control Toolbar",
     description: "Zoom, edit mode, autofill from vault - all your tools are here. Quick actions at your fingertips.",
-    icon: <Zap className="w-8 h-8" strokeWidth={1.5} />,
+    icon: <Settings className="w-8 h-8" strokeWidth={1.5} />,
     hint: "Press Tab to continue",
     targetSelector: '[data-tour="toolbar"]',
     position: 'bottom'

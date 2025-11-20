@@ -15,7 +15,7 @@ export default function CanvasView() {
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<'ORG' | 'PROCEDURE' | 'VAULT' | 'FORM'>('FORM');
   const [activeForms, setActiveForms] = useState<Array<{ id: string; formType: FormType; position: { x: number; y: number }; scale: number }>>([]);
-  const [expandingForm, setExpandingForm] = useState<{ formType: FormType; originPosition: { x: number; y: number; width: number; height: number } } | null>(null);
+  const [expandingForm, setExpandingForm] = useState<{ formId: string; formType: FormType; originPosition: { x: number; y: number; width: number; height: number } } | null>(null);
   const [formDataMap, setFormDataMap] = useState<Record<string, FormData>>({});
   const [fieldPositionsMap, setFieldPositionsMap] = useState<Record<string, FieldPositions>>({});
   const [currentFieldIndexMap, setCurrentFieldIndexMap] = useState<Record<string, number>>({});
@@ -64,8 +64,8 @@ export default function CanvasView() {
   const openForm = useCallback((formType: FormType, originPosition?: { x: number; y: number; width: number; height: number }) => {
     if (originPosition) {
       // Open with expansion animation
-      setExpandingForm({ formType, originPosition });
       const formId = `form-${formIdCounter.current++}`;
+      setExpandingForm({ formId, formType, originPosition });
       setFormDataMap(prev => ({ ...prev, [formId]: {} }));
       setFieldPositionsMap(prev => ({ ...prev, [formId]: {} }));
       setCurrentFieldIndexMap(prev => ({ ...prev, [formId]: 0 }));
@@ -339,32 +339,44 @@ export default function CanvasView() {
         {expandingForm && (
           <ExpandingFormViewer
             formType={expandingForm.formType}
-            formData={formDataMap[`expanding-${expandingForm.formType}`] || {}}
+            formData={formDataMap[expandingForm.formId] || {}}
             updateField={(field, value) => {
-              const formId = `expanding-${expandingForm.formType}`;
               setFormDataMap(prev => ({
                 ...prev,
-                [formId]: { ...prev[formId], [field]: value }
+                [expandingForm.formId]: { ...prev[expandingForm.formId], [field]: value }
               }));
             }}
-            fieldPositions={fieldPositionsMap[`expanding-${expandingForm.formType}`] || {}}
+            fieldPositions={fieldPositionsMap[expandingForm.formId] || {}}
             updateFieldPosition={(field, position) => {
-              const formId = `expanding-${expandingForm.formType}`;
               setFieldPositionsMap(prev => ({
                 ...prev,
-                [formId]: { ...prev[formId], [field]: position }
+                [expandingForm.formId]: { ...prev[expandingForm.formId], [field]: position }
               }));
             }}
-            currentFieldIndex={currentFieldIndexMap[`expanding-${expandingForm.formType}`] || 0}
+            currentFieldIndex={currentFieldIndexMap[expandingForm.formId] || 0}
             setCurrentFieldIndex={(index) => {
-              const formId = `expanding-${expandingForm.formType}`;
-              setCurrentFieldIndexMap(prev => ({ ...prev, [formId]: index }));
+              setCurrentFieldIndexMap(prev => ({ ...prev, [expandingForm.formId]: index }));
             }}
             originPosition={expandingForm.originPosition}
             onClose={() => {
+              const formId = expandingForm.formId;
               setExpandingForm(null);
-              const formId = `expanding-${expandingForm.formType}`;
               setFormDataMap(prev => {
+                const next = { ...prev };
+                delete next[formId];
+                return next;
+              });
+              setFieldPositionsMap(prev => {
+                const next = { ...prev };
+                delete next[formId];
+                return next;
+              });
+              setCurrentFieldIndexMap(prev => {
+                const next = { ...prev };
+                delete next[formId];
+                return next;
+              });
+              setValidationRulesMap(prev => {
                 const next = { ...prev };
                 delete next[formId];
                 return next;
