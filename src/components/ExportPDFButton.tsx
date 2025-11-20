@@ -1,6 +1,5 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Download, Loader2 } from '@/icons';
+import { Download } from '@/icons';
+import { StatefulButton, type ProcessStep } from '@/components/ui/stateful-button';
 import { fillPDFFields } from '@/lib/pdf-field-filler';
 import { downloadPDF, generateFilename } from '@/lib/pdf-downloader';
 import { useToast } from '@/hooks/use-toast';
@@ -23,12 +22,14 @@ export function ExportPDFButton({
   onExportComplete,
   disabled = false
 }: Props) {
-  const [isExporting, setIsExporting] = useState(false);
   const { toast } = useToast();
+  const processSteps: ProcessStep[] = [
+    { name: 'Preparing template', duration: 250 },
+    { name: 'Filling fields', duration: 400 },
+    { name: 'Generating PDF', duration: 450 },
+  ];
 
   const handleExport = async () => {
-    setIsExporting(true);
-
     try {
       // 1. Get PDF path
       const pdfPaths = {
@@ -68,31 +69,27 @@ export function ExportPDFButton({
         description: 'Please check your form inputs and try again. If the issue persists, try refreshing the page.',
         variant: 'destructive',
       });
-    } finally {
-      setIsExporting(false);
+      throw error instanceof Error ? error : new Error('Export failed');
     }
   };
 
   return (
-    <Button
-      onClick={handleExport}
-      disabled={disabled || isExporting}
+    <StatefulButton
+      onComplete={handleExport}
+      processSteps={processSteps}
+      successMessage="Export ready!"
+      errorMessage="Export failed"
       variant="ghost"
       size="sm"
       className="h-6 px-1.5 gap-1 text-[10px]"
+      expandOnProcess={false}
+      disabled={disabled}
       haptic="success"
     >
-      {isExporting ? (
-        <>
-          <Loader2 className="h-3 w-3 animate-spin" />
-          <span className="hidden sm:inline">...</span>
-        </>
-      ) : (
-        <>
-          <Download className="h-3 w-3" />
-          <span className="hidden sm:inline">PDF</span>
-        </>
-      )}
-    </Button>
+      <>
+        <Download className="h-3 w-3" />
+        <span className="hidden sm:inline">PDF</span>
+      </>
+    </StatefulButton>
   );
 }

@@ -33,8 +33,8 @@ const App = () => (
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
               <Route path="/auth" element={<Auth />} />
-              <Route path="/" element={<Index />} />
-              <Route path="/canvas" element={<CanvasView />} />
+              <Route path="/" element={<CanvasView />} />
+              <Route path="/dashboard" element={<Index />} />
               <Route path="/distribution-calculator" element={<DistributionCalculator />} />
               <Route path="/haptic-test" element={<HapticTest />} />
               <Route path="/ex-parte-rfo" element={<ExParteRFO />} />

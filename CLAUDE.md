@@ -143,6 +143,8 @@ Legal processes create HIGH ANXIETY. Black-box systems ("loading...") increase f
 
 **Principle**: For sub-processes (validation, encryption, saving), loading indicators should spin **3-5x faster** than standard spinners and display **0.1-second chronometers**.
 
+**Mandate**: Implement "Stateful Buttons" for **ALL** async operations to provide micro-process transparency.
+
 **Why**: Speed conveys competence, precision, and eagerness to help. A "rushed" appearance for micro-processes signals "This system is WORKING HARD for you" rather than "This system is slow."
 
 **Implementation**:
