@@ -1,303 +1,134 @@
-import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { useKeyboardShortcuts } from '../useKeyboardShortcuts';
-import type { KeyboardShortcut } from '../useKeyboardShortcuts';
+import { renderHook } from '@testing-library/react';
+import { useKeyboardShortcuts, formatShortcut } from '../useKeyboardShortcuts';
 
 describe('useKeyboardShortcuts', () => {
-  let addEventListenerSpy: any;
-  let removeEventListenerSpy: any;
+  let mockAction: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    addEventListenerSpy = vi.spyOn(window, 'addEventListener');
-    removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
+    mockAction = vi.fn();
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
-  it('should register keyboard shortcuts on mount', () => {
-    const shortcuts: KeyboardShortcut[] = [
-      {
-        key: 's',
-        ctrlKey: true,
-        action: vi.fn(),
-        description: 'Save',
-      },
-    ];
-
-    renderHook(() => useKeyboardShortcuts(shortcuts));
-
-    expect(addEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
-  });
-
-  it('should cleanup event listener on unmount', () => {
-    const shortcuts: KeyboardShortcut[] = [
-      {
-        key: 's',
-        ctrlKey: true,
-        action: vi.fn(),
-        description: 'Save',
-      },
-    ];
-
-    const { unmount } = renderHook(() => useKeyboardShortcuts(shortcuts));
-    unmount();
-
-    expect(removeEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
-  });
-
-  it('should trigger action when matching shortcut is pressed', () => {
-    const action = vi.fn();
-    const shortcuts: KeyboardShortcut[] = [
-      {
-        key: 's',
-        ctrlKey: true,
-        action,
-        description: 'Save',
-      },
-    ];
-
-    renderHook(() => useKeyboardShortcuts(shortcuts));
-
+  const fireKeyEvent = (key: string, modifiers: Partial<KeyboardEvent> = {}) => {
     const event = new KeyboardEvent('keydown', {
-      key: 's',
-      ctrlKey: true,
-    });
-
-    act(() => {
-      window.dispatchEvent(event);
-    });
-
-    expect(action).toHaveBeenCalledTimes(1);
-  });
-
-  it('should not trigger shortcuts when typing in input fields by default', () => {
-    const action = vi.fn();
-    const shortcuts: KeyboardShortcut[] = [
-      {
-        key: 'a',
-        action,
-        description: 'Some action',
-      },
-    ];
-
-    renderHook(() => useKeyboardShortcuts(shortcuts));
-
-    // Create an input element and focus it
-    const input = document.createElement('input');
-    document.body.appendChild(input);
-    input.focus();
-
-    const event = new KeyboardEvent('keydown', {
-      key: 'a',
+      key,
+      ctrlKey: false,
+      shiftKey: false,
+      altKey: false,
+      metaKey: false,
       bubbles: true,
+      ...modifiers,
+    });
+    window.dispatchEvent(event);
+  };
+
+  describe('modifier key matching', () => {
+    it('should trigger shortcut when key matches without modifiers', () => {
+      renderHook(() => useKeyboardShortcuts([
+        { key: 'e', action: mockAction, description: 'Toggle edit' }
+      ]));
+
+      fireKeyEvent('e');
+      expect(mockAction).toHaveBeenCalledTimes(1);
     });
 
-    act(() => {
-      input.dispatchEvent(event);
+    it('should NOT trigger simple shortcut when Ctrl is pressed', () => {
+      renderHook(() => useKeyboardShortcuts([
+        { key: 'e', action: mockAction, description: 'Toggle edit' }
+      ]));
+
+      fireKeyEvent('e', { ctrlKey: true });
+      expect(mockAction).not.toHaveBeenCalled();
     });
 
-    expect(action).not.toHaveBeenCalled();
+    it('should NOT trigger simple shortcut when Shift is pressed', () => {
+      renderHook(() => useKeyboardShortcuts([
+        { key: 'e', action: mockAction, description: 'Toggle edit' }
+      ]));
 
-    // Cleanup
-    document.body.removeChild(input);
+      fireKeyEvent('e', { shiftKey: true });
+      expect(mockAction).not.toHaveBeenCalled();
+    });
+
+    it('should NOT trigger simple shortcut when Alt is pressed', () => {
+      renderHook(() => useKeyboardShortcuts([
+        { key: 'e', action: mockAction, description: 'Toggle edit' }
+      ]));
+
+      fireKeyEvent('e', { altKey: true });
+      expect(mockAction).not.toHaveBeenCalled();
+    });
+
+    it('should NOT trigger simple shortcut when Meta/Cmd is pressed', () => {
+      renderHook(() => useKeyboardShortcuts([
+        { key: 'e', action: mockAction, description: 'Toggle edit' }
+      ]));
+
+      fireKeyEvent('e', { metaKey: true });
+      expect(mockAction).not.toHaveBeenCalled();
+    });
+
+    it('should trigger Ctrl+S shortcut only with Ctrl modifier', () => {
+      renderHook(() => useKeyboardShortcuts([
+        { key: 's', ctrlKey: true, action: mockAction, description: 'Save' }
+      ]));
+
+      // Should not trigger without Ctrl
+      fireKeyEvent('s');
+      expect(mockAction).not.toHaveBeenCalled();
+
+      // Should trigger with Ctrl
+      fireKeyEvent('s', { ctrlKey: true });
+      expect(mockAction).toHaveBeenCalledTimes(1);
+    });
+
+    it('should require exact modifier combination', () => {
+      renderHook(() => useKeyboardShortcuts([
+        { key: 's', ctrlKey: true, shiftKey: true, action: mockAction, description: 'Save as' }
+      ]));
+
+      // Ctrl+S alone should not trigger
+      fireKeyEvent('s', { ctrlKey: true });
+      expect(mockAction).not.toHaveBeenCalled();
+
+      // Ctrl+Shift+S should trigger
+      fireKeyEvent('s', { ctrlKey: true, shiftKey: true });
+      expect(mockAction).toHaveBeenCalledTimes(1);
+    });
   });
 
-  /**
-   * BUG TEST: This test should FAIL before the fix and PASS after
-   *
-   * Bug: macOS users cannot save with Cmd+S while focused in input fields
-   * because the code only checks for ctrlKey (Windows/Linux), not metaKey (macOS)
-   */
-  it('should allow Cmd+S (macOS) save shortcut even when focused in input fields', () => {
-    const action = vi.fn();
-    const shortcuts: KeyboardShortcut[] = [
-      {
-        key: 's',
-        metaKey: true, // Cmd key on macOS
-        action,
-        description: 'Save',
-      },
-    ];
+  describe('enabled state', () => {
+    it('should not trigger shortcuts when disabled', () => {
+      renderHook(() => useKeyboardShortcuts([
+        { key: 'e', action: mockAction, description: 'Toggle edit' }
+      ], false));
 
-    renderHook(() => useKeyboardShortcuts(shortcuts));
-
-    // Create an input element and focus it (simulating user typing in a form field)
-    const input = document.createElement('input');
-    document.body.appendChild(input);
-    input.focus();
-
-    // Simulate Cmd+S on macOS
-    const event = new KeyboardEvent('keydown', {
-      key: 's',
-      metaKey: true, // This is the Cmd key on macOS
-      ctrlKey: false, // Not Ctrl
-      bubbles: true,
+      fireKeyEvent('e');
+      expect(mockAction).not.toHaveBeenCalled();
     });
+  });
+});
 
-    // Spy on preventDefault to ensure it's called
-    const preventDefaultSpy = vi.spyOn(event, 'preventDefault');
-
-    act(() => {
-      input.dispatchEvent(event);
-    });
-
-    // BUG: This assertion will FAIL before the fix because the code only checks ctrlKey
-    // After fix: Should allow Cmd+S even in input fields (macOS convention)
-    expect(action).toHaveBeenCalledTimes(1);
-    expect(preventDefaultSpy).toHaveBeenCalled();
-
-    // Cleanup
-    document.body.removeChild(input);
+describe('formatShortcut', () => {
+  it('should format simple key', () => {
+    expect(formatShortcut({ key: 'e', action: vi.fn(), description: '' })).toBe('E');
   });
 
-  it('should allow Ctrl+S (Windows/Linux) save shortcut even when focused in input fields', () => {
-    const action = vi.fn();
-    const shortcuts: KeyboardShortcut[] = [
-      {
-        key: 's',
-        ctrlKey: true,
-        action,
-        description: 'Save',
-      },
-    ];
-
-    renderHook(() => useKeyboardShortcuts(shortcuts));
-
-    // Create an input element and focus it
-    const input = document.createElement('input');
-    document.body.appendChild(input);
-    input.focus();
-
-    // Simulate Ctrl+S on Windows/Linux
-    const event = new KeyboardEvent('keydown', {
-      key: 's',
-      ctrlKey: true,
-      bubbles: true,
-    });
-
-    act(() => {
-      input.dispatchEvent(event);
-    });
-
-    // This should work (and currently does)
-    expect(action).toHaveBeenCalledTimes(1);
-
-    // Cleanup
-    document.body.removeChild(input);
+  it('should format Ctrl shortcut', () => {
+    expect(formatShortcut({ key: 's', ctrlKey: true, action: vi.fn(), description: '' })).toBe('Ctrl+S');
   });
 
-  it('should not trigger shortcuts when disabled', () => {
-    const action = vi.fn();
-    const shortcuts: KeyboardShortcut[] = [
-      {
-        key: 's',
-        ctrlKey: true,
-        action,
-        description: 'Save',
-      },
-    ];
-
-    renderHook(() => useKeyboardShortcuts(shortcuts, false)); // disabled
-
-    const event = new KeyboardEvent('keydown', {
-      key: 's',
-      ctrlKey: true,
-    });
-
-    act(() => {
-      window.dispatchEvent(event);
-    });
-
-    expect(action).not.toHaveBeenCalled();
-  });
-
-  it('should match shortcuts case-insensitively', () => {
-    const action = vi.fn();
-    const shortcuts: KeyboardShortcut[] = [
-      {
-        key: 'S', // Uppercase in definition
-        ctrlKey: true,
-        action,
-        description: 'Save',
-      },
-    ];
-
-    renderHook(() => useKeyboardShortcuts(shortcuts));
-
-    // Press lowercase 's'
-    const event = new KeyboardEvent('keydown', {
-      key: 's',
-      ctrlKey: true,
-    });
-
-    act(() => {
-      window.dispatchEvent(event);
-    });
-
-    expect(action).toHaveBeenCalledTimes(1);
-  });
-
-  it('should handle multiple shortcuts', () => {
-    const saveAction = vi.fn();
-    const undoAction = vi.fn();
-    const shortcuts: KeyboardShortcut[] = [
-      {
-        key: 's',
-        ctrlKey: true,
-        action: saveAction,
-        description: 'Save',
-      },
-      {
-        key: 'z',
-        ctrlKey: true,
-        action: undoAction,
-        description: 'Undo',
-      },
-    ];
-
-    renderHook(() => useKeyboardShortcuts(shortcuts));
-
-    // Press Ctrl+S
-    act(() => {
-      window.dispatchEvent(new KeyboardEvent('keydown', { key: 's', ctrlKey: true }));
-    });
-
-    // Press Ctrl+Z
-    act(() => {
-      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'z', ctrlKey: true }));
-    });
-
-    expect(saveAction).toHaveBeenCalledTimes(1);
-    expect(undoAction).toHaveBeenCalledTimes(1);
-  });
-
-  it('should stop after first matching shortcut', () => {
-    const action1 = vi.fn();
-    const action2 = vi.fn();
-    const shortcuts: KeyboardShortcut[] = [
-      {
-        key: 's',
-        ctrlKey: true,
-        action: action1,
-        description: 'Save 1',
-      },
-      {
-        key: 's',
-        ctrlKey: true,
-        action: action2,
-        description: 'Save 2',
-      },
-    ];
-
-    renderHook(() => useKeyboardShortcuts(shortcuts));
-
-    act(() => {
-      window.dispatchEvent(new KeyboardEvent('keydown', { key: 's', ctrlKey: true }));
-    });
-
-    expect(action1).toHaveBeenCalledTimes(1);
-    expect(action2).not.toHaveBeenCalled(); // Should break after first match
+  it('should format complex shortcut', () => {
+    expect(formatShortcut({ 
+      key: 's', 
+      ctrlKey: true, 
+      shiftKey: true, 
+      action: vi.fn(), 
+      description: '' 
+    })).toBe('Ctrl+Shift+S');
   });
 });

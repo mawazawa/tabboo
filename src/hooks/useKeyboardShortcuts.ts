@@ -33,10 +33,11 @@ export const useKeyboardShortcuts = (shortcuts: KeyboardShortcut[], enabled = tr
 
     for (const shortcut of shortcuts) {
       const keyMatches = event.key.toLowerCase() === shortcut.key.toLowerCase();
-      const ctrlMatches = shortcut.ctrlKey === undefined || event.ctrlKey === shortcut.ctrlKey;
-      const shiftMatches = shortcut.shiftKey === undefined || event.shiftKey === shortcut.shiftKey;
-      const altMatches = shortcut.altKey === undefined || event.altKey === shortcut.altKey;
-      const metaMatches = shortcut.metaKey === undefined || event.metaKey === shortcut.metaKey;
+      // Treat undefined modifiers as false (modifier must NOT be pressed)
+      const ctrlMatches = event.ctrlKey === !!shortcut.ctrlKey;
+      const shiftMatches = event.shiftKey === !!shortcut.shiftKey;
+      const altMatches = event.altKey === !!shortcut.altKey;
+      const metaMatches = event.metaKey === !!shortcut.metaKey;
 
       if (keyMatches && ctrlMatches && shiftMatches && altMatches && metaMatches) {
         event.preventDefault();
