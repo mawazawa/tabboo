@@ -199,7 +199,9 @@ jobs:
   # Job 3: Auto-merge when all checks pass
   auto-merge:
     needs: auto-review-and-fix
-    if: success()
+    if: |
+      github.event_name == 'pull_request' &&
+      needs.auto-review-and-fix.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - name: Wait for all checks

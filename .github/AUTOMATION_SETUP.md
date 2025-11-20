@@ -18,7 +18,7 @@ Go to: **Repository Settings → Secrets and variables → Actions**
 |------------|-------------|------------|
 | `CLAUDE_CODE_OAUTH_TOKEN` | CloudMax OAuth token | Run `/install-github-app` in Claude Code terminal, or from Claude subscription settings |
 | `LINEAR_API_KEY` | Linear API key | Linear Settings → API → Personal API keys |
-| `EXA_API_KEY` | Exa search API | Your existing key: `c3206133-e55a-4859-8510-c5884dbe900d` |
+| `EXA_API_KEY` | Exa search API | Get from [exa.ai](https://exa.ai) dashboard |
 | `SUPABASE_ACCESS_TOKEN` | Supabase access token | Your existing token |
 
 ### Neo4j Knowledge Graph
