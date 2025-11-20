@@ -3,7 +3,6 @@ import { Input, Button, Label } from "@/components/ui/liquid-justice-temp";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Copy, AlertCircle } from "@/icons";
-import { ValidationRuleEditor } from "@/components/ValidationRuleEditor";
 import type { FieldConfig, FormData, ValidationRules, ValidationErrors } from "@/types/FormData";
 
 interface FieldNavigationItemProps {
@@ -111,14 +110,7 @@ export const FieldNavigationItem = ({
           {originalIndex + 1}. {config.label}
         </Label>
         <div className="flex items-center gap-1">
-          {onSaveValidationRules && (
-            <ValidationRuleEditor
-              fieldName={config.field}
-              currentRules={validationRules[config.field] || []}
-              onSave={onSaveValidationRules}
-              triggerless={false}
-            />
-          )}
+          {/* Copy from vault button */}
           {config.vaultField && personalInfo && personalInfo[config.vaultField as keyof typeof personalInfo] && (
             <Button
               size="sm"
@@ -133,11 +125,7 @@ export const FieldNavigationItem = ({
               <Copy className="h-3 w-3" strokeWidth={1.5} />
             </Button>
           )}
-          {isActive && (
-            <span className="text-[10px] font-medium text-primary px-1.5 py-0.5 rounded-sm bg-primary/10 animate-in fade-in duration-200">
-              Active
-            </span>
-          )}
+          {/* Selection indicator for multi-select only */}
           {isSelected && !isActive && (
             <span className="text-[10px] font-medium text-blue-600 px-1.5 py-0.5 rounded-sm bg-blue-500/10 animate-in fade-in duration-200">
               Selected

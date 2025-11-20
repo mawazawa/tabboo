@@ -151,13 +151,9 @@ export function FormTypeSelector({
           </SelectContent>
         </Select>
 
-        {/* Current Form Info Badge */}
+        {/* Current Form Info Badge - simplified to reduce anxiety */}
         <div className="hidden lg:flex items-center gap-2 text-xs text-muted-foreground">
           <span>{currentFormMetadata.pages} pages</span>
-          <span>•</span>
-          <span>{currentFormMetadata.fields} fields</span>
-          <span>•</span>
-          <span>~{currentFormMetadata.estimatedMinutes} min</span>
           {currentFormMetadata.status !== 'production' && (
             <>
               <span>•</span>

@@ -62,9 +62,10 @@ export function ExportPDFButton({
     } catch (error) {
       console.error('Export failed:', error);
 
+      // User-friendly error message - hide technical details
       toast({
-        title: 'Export Failed',
-        description: error instanceof Error ? error.message : 'Unknown error',
+        title: 'Unable to Generate PDF',
+        description: 'Please check your form inputs and try again. If the issue persists, try refreshing the page.',
         variant: 'destructive',
       });
     } finally {
