@@ -15,7 +15,8 @@ import { TemplateManager } from "./TemplateManager";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { FieldNavigationHeader } from "./navigation/FieldNavigationHeader";
 import { FieldNavigationItem } from "./navigation/FieldNavigationItem";
-import { LiquidGlassAccordion, AccordionContent, AccordionItem, AccordionTrigger, LiquidSlider } from "@/components/ui/liquid-justice-temp";
+import { LiquidGlassAccordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/liquid-justice-temp";
+import { Progress } from "@/components/ui/progress";
 import { FL_320_FIELD_CONFIG } from "@/config/field-config";
 import { FL_320_FIELD_GROUPS, getGroupCompletionPercentage, getGroupCompletionBadge, getOverallFormCompletionPercentage, getOverallFormCompletionCount } from "@/config/field-groups";
 import type { FormData, FieldConfig, FieldPosition, ValidationRules, ValidationErrors } from "@/types/FormData";
@@ -363,21 +364,25 @@ export const FieldNavigationPanel = ({
           </Button>
         </div>
 
-        {/* Form Completion Progress Slider */}
-        <div className="px-1 py-2">
-          <LiquidSlider
-            label="Form Completion"
-            variant="progress"
-            value={getOverallFormCompletionPercentage(formData)}
-            disabled={true}
-            showValue={true}
-            valueText={(() => {
-              const { completedFields, totalFields } = getOverallFormCompletionCount(formData);
-              const percentage = getOverallFormCompletionPercentage(formData);
-              return `${completedFields}/${totalFields} fields (${percentage}%)`;
-            })()}
-          />
-        </div>
+        {/* Form Completion Progress - simplified */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="px-1 py-2 cursor-help">
+              <Progress
+                value={getOverallFormCompletionPercentage(formData)}
+                className="h-1 bg-muted"
+              />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            <p className="text-xs">
+              {(() => {
+                const { completedFields, totalFields } = getOverallFormCompletionCount(formData);
+                return `${completedFields} of ${totalFields} fields completed`;
+              })()}
+            </p>
+          </TooltipContent>
+        </Tooltip>
 
         <Tooltip>
           <TooltipTrigger asChild>

@@ -149,7 +149,7 @@ export const ControlToolbar = ({
           <Button
             onClick={onAutofillAll}
             disabled={isVaultLoading || !hasVaultData}
-            className="h-7 px-3 gap-1.5 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-medium relative overflow-hidden group shadow-sm hover:shadow-md transition-all"
+            className="h-7 px-3 gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-medium shadow-sm transition-all"
           >
             {isVaultLoading ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={2} />
@@ -158,12 +158,10 @@ export const ControlToolbar = ({
             )}
             <span>AI Fill</span>
             {hasVaultData && !isVaultLoading && autofillableCount > 0 && (
-              <Badge variant="secondary" className="ml-0.5 h-4 px-1 bg-white/20 text-[9px] font-bold">
+              <Badge variant="secondary" className="ml-0.5 h-4 px-1 bg-primary-foreground/20 text-[9px] font-bold">
                 {autofillableCount}
               </Badge>
             )}
-            {/* Iridescent shimmer effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
           </Button>
         </TooltipTrigger>
         <TooltipContent side="bottom">

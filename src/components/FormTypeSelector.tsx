@@ -38,7 +38,7 @@ const FORM_METADATA: Record<FormType, FormMetadata> = {
     formName: 'Responsive Declaration to Request for Order',
     description: 'Used to respond to a Request for Order (FL-300) in family law cases',
     pages: 4,
-    fields: 64,
+    fields: 52,
     estimatedMinutes: 45,
     complexity: 'moderate',
     status: 'production',

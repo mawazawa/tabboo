@@ -74,7 +74,7 @@ export const FieldNavigationItem = ({
   return (
     <div
       ref={isActive ? activeFieldRef : null}
-      className={`relative space-y-1 p-2 rounded-md border transition-all duration-200 cursor-pointer ${
+      className={`relative space-y-2 p-3 rounded-md border transition-all duration-200 cursor-pointer ${
         isActive
           ? 'border-primary bg-primary/5 shadow-sm scale-[1.01]'
           : isSelected
@@ -103,8 +103,8 @@ export const FieldNavigationItem = ({
       <div className="flex items-center justify-between gap-1">
         <Label
           htmlFor={config.field}
-          className={`text-[11px] font-medium transition-colors duration-200 ${
-            isActive ? 'text-primary' : isSelected ? 'text-blue-600' : hasErrors ? 'text-destructive' : 'text-muted-foreground'
+          className={`text-[13px] font-medium transition-colors duration-200 ${
+            isActive ? 'text-primary' : isSelected ? 'text-blue-600' : hasErrors ? 'text-destructive' : 'text-foreground'
           }`}
         >
           {originalIndex + 1}. {config.label}
