@@ -89,6 +89,7 @@ export interface DV100PixelPerfectData {
   // Signature
   signatureDate: string;
   signatureCity: string;
+  lawyerSignatureDate: string;
 }
 
 interface DV100PixelPerfectProps {
@@ -166,6 +167,7 @@ const defaultData: DV100PixelPerfectData = {
   abuseDescription: '',
   signatureDate: '',
   signatureCity: '',
+  lawyerSignatureDate: '',
 };
 
 export const DV100PixelPerfect: React.FC<DV100PixelPerfectProps> = ({
@@ -558,7 +560,7 @@ export const DV100PixelPerfect: React.FC<DV100PixelPerfectProps> = ({
             <div className="row mt12">
               <div className="w-50">
                 <label className="small">Date</label>
-                <input type="date" readOnly={readOnly} />
+                <input type="date" name="lawyerSignatureDate" value={formData.lawyerSignatureDate} onChange={handleInputChange} readOnly={readOnly} />
               </div>
             </div>
             <div className="mt18">
