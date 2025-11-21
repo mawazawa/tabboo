@@ -111,14 +111,21 @@ function SyntaxHighlightedLine({ content, lineNumber }: SyntaxHighlightedLinePro
   };
 
   return (
-    <div className="table-row group/line">
+    <div
+      className={cn(
+        "table-row group/line",
+        "hover:bg-[#2a2d2e]",
+        "transition-colors duration-75"
+      )}
+    >
       {/* Line number */}
       <span
         className={cn(
           "table-cell pr-4 text-right select-none",
           "text-[#6e6e6e] text-xs",
           "group-hover/line:text-[#808080]",
-          "transition-colors duration-150"
+          "transition-colors duration-150",
+          "sticky left-0 bg-inherit"
         )}
         style={{ minWidth: "2.5rem" }}
       >
@@ -144,7 +151,10 @@ export function JSONPreview({
 }: JSONPreviewProps) {
   const [copied, setCopied] = React.useState(false);
   const [isHovering, setIsHovering] = React.useState(false);
+  const [copyRipple, setCopyRipple] = React.useState(false);
   const copyTimeoutRef = React.useRef<NodeJS.Timeout>();
+  const prevFieldCount = React.useRef(fields.length);
+  const [countChanged, setCountChanged] = React.useState(false);
 
   // Cleanup timeout on unmount
   React.useEffect(() => {
@@ -154,6 +164,16 @@ export function JSONPreview({
       }
     };
   }, []);
+
+  // Detect field count changes for animation
+  React.useEffect(() => {
+    if (fields.length !== prevFieldCount.current) {
+      setCountChanged(true);
+      const timer = setTimeout(() => setCountChanged(false), 600);
+      prevFieldCount.current = fields.length;
+      return () => clearTimeout(timer);
+    }
+  }, [fields.length]);
 
   // Format JSON with 2-space indentation
   const jsonString = React.useMemo(() => {
@@ -169,8 +189,12 @@ export function JSONPreview({
     try {
       await navigator.clipboard.writeText(jsonString);
       setCopied(true);
+      setCopyRipple(true);
 
-      // Reset after 2 seconds
+      // Reset ripple after animation
+      setTimeout(() => setCopyRipple(false), 400);
+
+      // Reset copied state after 2 seconds
       if (copyTimeoutRef.current) {
         clearTimeout(copyTimeoutRef.current);
       }
@@ -208,7 +232,14 @@ export function JSONPreview({
           <span className="text-xs font-medium text-[#cccccc]">
             {title}
           </span>
-          <span className="text-[10px] text-[#6e6e6e] font-mono">
+          <span
+            className={cn(
+              "text-[10px] font-mono transition-all duration-300",
+              countChanged
+                ? "text-[#4fc3f7] scale-110"
+                : "text-[#6e6e6e] scale-100"
+            )}
+          >
             ({fields.length} {fields.length === 1 ? 'field' : 'fields'})
           </span>
         </div>
@@ -217,9 +248,10 @@ export function JSONPreview({
         <button
           onClick={handleCopy}
           className={cn(
-            "flex items-center gap-1.5 px-2.5 py-1.5 rounded-md",
+            "relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-md",
             "text-xs font-medium",
             "transition-all duration-200",
+            "overflow-hidden",
             copied
               ? [
                   "bg-emerald-500/20 text-emerald-400",
@@ -234,11 +266,21 @@ export function JSONPreview({
             "focus:outline-none focus:ring-2 focus:ring-[#007acc]/30"
           )}
         >
+          {/* Ripple effect */}
+          {copyRipple && (
+            <span
+              className={cn(
+                "absolute inset-0",
+                "bg-emerald-400/30",
+                "animate-ping"
+              )}
+            />
+          )}
           <span
             className={cn(
               "relative h-3.5 w-3.5",
-              "transition-transform duration-200",
-              copied && "scale-110"
+              "transition-all duration-300",
+              copied && "scale-110 rotate-12"
             )}
           >
             {copied ? (
@@ -247,7 +289,7 @@ export function JSONPreview({
               <Copy className="h-3.5 w-3.5" />
             )}
           </span>
-          <span>{copied ? "Copied!" : "Copy"}</span>
+          <span className="relative">{copied ? "Copied!" : "Copy"}</span>
         </button>
       </div>
 

@@ -115,9 +115,12 @@ export function FieldInspector({
 }: FieldInspectorProps) {
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [confirmDelete, setConfirmDelete] = React.useState(false);
+  const [deleteProgress, setDeleteProgress] = React.useState(0);
   const deleteTimeoutRef = React.useRef<NodeJS.Timeout>();
+  const deleteAnimationRef = React.useRef<number>();
   const prevFieldIdRef = React.useRef<string | null>(null);
   const [isTransitioning, setIsTransitioning] = React.useState(false);
+  const [focusedControl, setFocusedControl] = React.useState<string | null>(null);
 
   // Handle field transition animations
   React.useEffect(() => {
@@ -133,8 +136,12 @@ export function FieldInspector({
   React.useEffect(() => {
     setConfirmDelete(false);
     setIsDeleting(false);
+    setDeleteProgress(0);
     if (deleteTimeoutRef.current) {
       clearTimeout(deleteTimeoutRef.current);
+    }
+    if (deleteAnimationRef.current) {
+      cancelAnimationFrame(deleteAnimationRef.current);
     }
   }, [selectedField?.id]);
 
@@ -144,8 +151,39 @@ export function FieldInspector({
       if (deleteTimeoutRef.current) {
         clearTimeout(deleteTimeoutRef.current);
       }
+      if (deleteAnimationRef.current) {
+        cancelAnimationFrame(deleteAnimationRef.current);
+      }
     };
   }, []);
+
+  // Animate delete progress
+  React.useEffect(() => {
+    if (confirmDelete) {
+      const startTime = performance.now();
+      const duration = 3000; // 3 seconds
+
+      const animate = (currentTime: number) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        setDeleteProgress(progress * 100);
+
+        if (progress < 1) {
+          deleteAnimationRef.current = requestAnimationFrame(animate);
+        }
+      };
+
+      deleteAnimationRef.current = requestAnimationFrame(animate);
+
+      return () => {
+        if (deleteAnimationRef.current) {
+          cancelAnimationFrame(deleteAnimationRef.current);
+        }
+      };
+    } else {
+      setDeleteProgress(0);
+    }
+  }, [confirmDelete]);
 
   const handleDelete = () => {
     if (!selectedField) return;
@@ -273,27 +311,44 @@ export function FieldInspector({
         <div className="space-y-1.5">
           <Label
             htmlFor="field-key"
-            className="text-xs text-[#cccccc] font-medium"
+            className={cn(
+              "text-xs font-medium transition-colors duration-150",
+              focusedControl === 'key' ? "text-[#4fc3f7]" : "text-[#cccccc]"
+            )}
           >
             Key ID
             <span className="ml-1.5 text-[#808080] font-normal">
               (variable name)
             </span>
           </Label>
-          <Input
-            id="field-key"
-            value={selectedField.key}
-            onChange={(e) => handleKeyChange(e.target.value)}
-            placeholder="field_name"
-            className={cn(
-              "h-9 text-sm font-mono",
-              "bg-[#252525] border-[#3c3c3c]",
-              "text-[#d4d4d4] placeholder:text-[#4a4a4a]",
-              "focus:border-[#007acc] focus:ring-1 focus:ring-[#007acc]/30",
-              "hover:border-[#4a4a4a]",
-              "transition-colors duration-150"
+          <div className="relative">
+            <Input
+              id="field-key"
+              value={selectedField.key}
+              onChange={(e) => handleKeyChange(e.target.value)}
+              onFocus={() => setFocusedControl('key')}
+              onBlur={() => setFocusedControl(null)}
+              placeholder="field_name"
+              className={cn(
+                "h-9 text-sm font-mono",
+                "bg-[#252525] border-[#3c3c3c]",
+                "text-[#d4d4d4] placeholder:text-[#4a4a4a]",
+                "focus:border-[#007acc] focus:ring-1 focus:ring-[#007acc]/30",
+                "hover:border-[#4a4a4a]",
+                "transition-all duration-150"
+              )}
+            />
+            {/* Focus glow effect */}
+            {focusedControl === 'key' && (
+              <div
+                className={cn(
+                  "absolute inset-0 -z-10 rounded-md",
+                  "bg-[#007acc]/10 blur-md",
+                  "animate-pulse"
+                )}
+              />
             )}
-          />
+          </div>
           <p className="text-[10px] text-[#6e6e6e] leading-tight">
             Used by AI to identify this field. Use snake_case.
           </p>
@@ -403,42 +458,57 @@ export function FieldInspector({
 
       {/* Delete Action */}
       <div className="px-4 py-3 border-t border-[#3c3c3c]">
-        <button
-          onClick={handleDelete}
-          disabled={isDeleting}
-          className={cn(
-            "w-full h-9 px-3 rounded-md",
-            "text-sm font-medium",
-            "flex items-center justify-center gap-2",
-            "transition-all duration-200",
-            confirmDelete
-              ? [
-                  "bg-red-500/20 border border-red-500/50",
-                  "text-red-400",
-                  "hover:bg-red-500/30",
-                  "animate-pulse",
-                ]
-              : [
-                  "bg-[#252525] border border-[#3c3c3c]",
-                  "text-[#d4d4d4]",
-                  "hover:bg-[#2d2d2d] hover:border-red-500/50 hover:text-red-400",
-                ],
-            "disabled:opacity-50 disabled:cursor-not-allowed",
-            "focus:outline-none focus:ring-2 focus:ring-red-500/30"
-          )}
-        >
-          {confirmDelete ? (
-            <>
-              <AlertTriangle className="h-4 w-4" />
-              <span>Click again to confirm</span>
-            </>
-          ) : (
-            <>
-              <Trash2 className="h-4 w-4" />
-              <span>Delete Field</span>
-            </>
-          )}
-        </button>
+        <div className="relative">
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className={cn(
+              "w-full h-9 px-3 rounded-md",
+              "text-sm font-medium",
+              "flex items-center justify-center gap-2",
+              "transition-all duration-200",
+              "overflow-hidden relative",
+              confirmDelete
+                ? [
+                    "bg-red-500/20 border border-red-500/50",
+                    "text-red-400",
+                    "hover:bg-red-500/30",
+                  ]
+                : [
+                    "bg-[#252525] border border-[#3c3c3c]",
+                    "text-[#d4d4d4]",
+                    "hover:bg-[#2d2d2d] hover:border-red-500/50 hover:text-red-400",
+                  ],
+              "disabled:opacity-50 disabled:cursor-not-allowed",
+              "focus:outline-none focus:ring-2 focus:ring-red-500/30"
+            )}
+          >
+            {/* Progress bar overlay for delete confirmation */}
+            {confirmDelete && (
+              <div
+                className="absolute inset-0 bg-red-500/10 transition-all duration-100"
+                style={{ width: `${100 - deleteProgress}%` }}
+              />
+            )}
+            <span className="relative z-10 flex items-center gap-2">
+              {confirmDelete ? (
+                <>
+                  <AlertTriangle className="h-4 w-4 animate-bounce" />
+                  <span>Click to confirm ({Math.ceil((100 - deleteProgress) / 33.3)}s)</span>
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4" />
+                  <span>Delete Field</span>
+                </>
+              )}
+            </span>
+          </button>
+        </div>
+        {/* Keyboard shortcut hint */}
+        <p className="mt-2 text-[10px] text-[#4a4a4a] text-center">
+          Press <kbd className="px-1 py-0.5 rounded bg-[#2d2d2d] border border-[#3c3c3c] text-[#808080]">⌫</kbd> to delete
+        </p>
       </div>
     </div>
   );
