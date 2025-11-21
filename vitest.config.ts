@@ -15,6 +15,8 @@ export default defineConfig({
       '**/*.e2e.test.ts',
       '**/*.e2e.test.tsx',
       '**/tests/**', // Exclude Playwright tests directory
+      '**/smoke.test.ts', // Exclude Playwright smoke tests
+      '**/workflows.test.ts', // Exclude Playwright workflow tests
     ],
     coverage: {
       provider: 'v8',
