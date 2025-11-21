@@ -33,7 +33,19 @@ export const useFormAutoSave = ({
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
+  const retryTimeoutRef = useRef<NodeJS.Timeout>();
   const lastSaveRef = useRef<{ formData: FormData; fieldPositions: FieldPositions }>();
+  const retryCountRef = useRef(0);
+  const MAX_RETRIES = 5;
+  const isSavingRef = useRef(false);
+  const latestDocumentIdRef = useRef(documentId);
+  const hasUnsavedChangesRef = useRef(hasUnsavedChanges);
+  const performSaveRef = useRef<() => void>();
+
+  const resetSavingState = useCallback(() => {
+    isSavingRef.current = false;
+    setIsSaving(false);
+  }, []);
 
   // Mark as having unsaved changes whenever data changes
   useEffect(() => {
@@ -52,11 +64,13 @@ export const useFormAutoSave = ({
   }, [formData, fieldPositions]);
 
   const performSave = useCallback(async () => {
-    if (!documentId || !hasUnsavedChanges || isSaving) {
+    if (!documentId || !hasUnsavedChanges || isSavingRef.current) {
       return;
     }
 
+    isSavingRef.current = true;
     setIsSaving(true);
+    let retryScheduled = false;
 
     try {
       // Skip validation during auto-save for better performance
@@ -81,6 +95,7 @@ export const useFormAutoSave = ({
         setHasUnsavedChanges(false);
 
         // Saved offline - will sync when online
+        resetSavingState();
         return;
       }
 
@@ -118,25 +133,40 @@ export const useFormAutoSave = ({
 
         lastSaveRef.current = { formData, fieldPositions };
         setHasUnsavedChanges(false);
+        retryCountRef.current = 0; // Reset retry count on offline
+        resetSavingState();
         return;
       }
 
-      toast({
-        title: "Auto-save failed",
-        description: "Your changes could not be saved. Please try again.",
-        variant: "destructive",
-      });
+      // Check if we should retry
+      if (retryCountRef.current < MAX_RETRIES) {
+        retryCountRef.current += 1;
+        const delayMs = Math.min(5000 * Math.pow(2, retryCountRef.current - 1), 60000); // Exponential backoff, max 60s
 
-      // Retry after 5 seconds
-      setTimeout(() => {
-        setIsSaving(false);
-        performSave();
-      }, 5000);
-      return;
+        // Schedule retry with exponential backoff
+        retryScheduled = true;
+        retryTimeoutRef.current = setTimeout(() => {
+          // Release guard, but keep UI spinner active until retry finishes
+          isSavingRef.current = false;
+          performSave();
+        }, delayMs);
+        return;
+      } else {
+        // Max retries exceeded - show error to user
+        toast({
+          title: "Auto-save failed",
+          description: "Your changes could not be saved after multiple attempts. Please check your connection and try saving manually.",
+          variant: "destructive",
+        });
+        retryCountRef.current = 0; // Reset for next attempt
+        resetSavingState();
+      }
     } finally {
-      setIsSaving(false);
+      if (!retryScheduled) {
+        resetSavingState();
+      }
     }
-  }, [documentId, formData, fieldPositions, toast, hasUnsavedChanges, isSaving]);
+  }, [documentId, formData, fieldPositions, toast, hasUnsavedChanges, resetSavingState]);
 
   // Debounced auto-save
   useEffect(() => {
@@ -159,15 +189,31 @@ export const useFormAutoSave = ({
     };
   }, [formData, fieldPositions, enabled, debounceMs, performSave, hasUnsavedChanges]);
 
-  // Save on unmount if there are unsaved changes
+  // Save on unmount if there are unsaved changes, and cleanup retry timeout
+  useEffect(() => {
+    latestDocumentIdRef.current = documentId;
+  }, [documentId]);
+
+  useEffect(() => {
+    hasUnsavedChangesRef.current = hasUnsavedChanges;
+  }, [hasUnsavedChanges]);
+
+  useEffect(() => {
+    performSaveRef.current = performSave;
+  }, [performSave]);
+
   useEffect(() => {
     return () => {
-      if (hasUnsavedChanges && documentId) {
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
+
+      if (hasUnsavedChangesRef.current && latestDocumentIdRef.current) {
         // Fire-and-forget save on unmount
-        performSave();
+        performSaveRef.current?.();
       }
     };
-  }, [documentId, performSave, hasUnsavedChanges]);
+  }, []);
 
   // Manual save function (with validation)
   const saveNow = useCallback(async () => {

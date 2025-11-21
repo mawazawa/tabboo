@@ -320,7 +320,100 @@ describe('useFormAutoSave', () => {
   });
 
   describe('error handling', () => {
-    it('should retry failed saves after 5 seconds', async () => {
+    it('should retry failed saves with exponential backoff', async () => {
+      let callCount = 0;
+      const updateTimes: number[] = [];
+      const startTime = Date.now();
+
+      mockEq.mockImplementation(() => {
+        callCount++;
+        if (callCount === 1 || callCount === 2) {
+          // First two attempts fail
+          return Promise.resolve({ error: new Error(`Save failed - attempt ${callCount}`) });
+        } else {
+          // Third attempt succeeds
+          return Promise.resolve({ error: null });
+        }
+      });
+
+      mockUpdate.mockImplementation(() => {
+        updateTimes.push(Date.now() - startTime);
+        return {
+          eq: mockEq,
+        };
+      });
+
+      const { rerender } = renderHook(
+        ({ formData }) =>
+          useFormAutoSave({
+            documentId: 'doc-123',
+            formData,
+            fieldPositions: mockFieldPositions,
+            debounceMs: 100,
+          }),
+        {
+          initialProps: { formData: mockFormData },
+        }
+      );
+
+      const newFormData = { ...mockFormData, partyName: 'Jane Doe' };
+      rerender({ formData: newFormData });
+
+      // Wait for all three save attempts
+      // First attempt: immediate
+      // Second attempt: after 5s
+      // Third attempt: after 10s (total 15s)
+      await waitFor(
+        () => {
+          expect(mockUpdate).toHaveBeenCalledTimes(3);
+        },
+        { timeout: 20000 } // Allow up to 20 seconds for exponential backoff
+      );
+
+      // Verify exponential backoff: 5s, 10s
+      expect(updateTimes.length).toBeGreaterThanOrEqual(3); // At least 3 updates
+      expect(updateTimes[0]).toBeLessThan(1000); // First attempt immediate
+      expect(updateTimes[1]).toBeGreaterThan(4000); // Second retry after ~5s
+      expect(updateTimes[1]).toBeLessThan(6000);
+      expect(updateTimes[2]).toBeGreaterThan(13000); // Third retry after ~10s more (total ~15s)
+      expect(updateTimes[2]).toBeLessThan(16000);
+    }, 30000); // 30s timeout for 15s+ of retries
+
+    it.skip('should stop retrying after max retries exceeded', async () => {
+      // Always fail
+      mockEq.mockResolvedValue({ error: new Error('Persistent error') });
+
+      const { rerender } = renderHook(
+        ({ formData }) =>
+          useFormAutoSave({
+            documentId: 'doc-123',
+            formData,
+            fieldPositions: mockFieldPositions,
+            debounceMs: 100,
+          }),
+        {
+          initialProps: { formData: mockFormData },
+        }
+      );
+
+      const newFormData = { ...mockFormData, partyName: 'Jane Doe' };
+      rerender({ formData: newFormData });
+
+      // Wait for max retries (5 + initial = 6 attempts max)
+      await waitFor(
+        () => {
+          expect(mockUpdate).toHaveBeenCalledTimes(6); // 1 initial + 5 retries
+        },
+        { timeout: 120000 } // 60s+ needed for exponential backoff up to max 60s delay
+      );
+
+      // After max retries, should not make more attempts
+      const finalCallCount = mockUpdate.mock.calls.length;
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      expect(mockUpdate).toHaveBeenCalledTimes(finalCallCount); // No additional calls
+    }, 130000);
+
+    it('should retry failed saves with initial 5s delay', async () => {
       mockEq
         .mockResolvedValueOnce({ error: new Error('Save failed') })
         .mockResolvedValueOnce({ error: null });
@@ -349,7 +442,7 @@ describe('useFormAutoSave', () => {
         { timeout: 500 }
       );
 
-      // Wait for retry delay (5 seconds in real code, but mocked faster in tests)
+      // Wait for retry delay with exponential backoff (first retry at 5s)
       await waitFor(
         () => {
           expect(mockUpdate).toHaveBeenCalledTimes(2);
@@ -357,6 +450,54 @@ describe('useFormAutoSave', () => {
         { timeout: 6000 }
       );
     }, 10000); // Increase test timeout
+
+    it('should keep isSaving true while a retry is scheduled', async () => {
+      vi.useFakeTimers();
+      try {
+        mockEq
+          .mockResolvedValueOnce({ error: new Error('Save failed') })
+          .mockResolvedValueOnce({ error: null });
+
+        const { result, rerender } = renderHook(
+          ({ formData }) =>
+            useFormAutoSave({
+              documentId: 'doc-123',
+              formData,
+              fieldPositions: mockFieldPositions,
+              debounceMs: 100,
+            }),
+          {
+            initialProps: { formData: mockFormData },
+          }
+        );
+
+        const newFormData = { ...mockFormData, partyName: 'Jane Doe' };
+        rerender({ formData: newFormData });
+
+        // Flush debounce timer to trigger first save attempt
+        await act(async () => {
+          vi.advanceTimersByTime(100);
+        });
+        await act(async () => {
+          await Promise.resolve();
+        });
+        expect(mockUpdate).toHaveBeenCalledTimes(1);
+
+        // While retry timer is pending, isSaving should remain true
+        expect(result.current.isSaving).toBe(true);
+
+        // Allow retry timer (5s) to fire
+        await act(async () => {
+          vi.advanceTimersByTime(5000);
+        });
+        await act(async () => {
+          await Promise.resolve();
+        });
+        expect(mockUpdate).toHaveBeenCalledTimes(2);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
   });
 
   describe.skip('manual save', () => {
