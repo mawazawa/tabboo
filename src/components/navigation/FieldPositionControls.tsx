@@ -65,6 +65,7 @@ export const FieldPositionControls = ({
             size="sm"
             variant="outline"
             onClick={() => adjustPosition('up')}
+            aria-label="Move field up"
             className={`h-7 px-1.5 transition-all duration-75 hover:bg-primary/20 hover:border-primary ${
               pressedKey === 'up' ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 shadow-lg scale-95' : ''
             }`}
@@ -76,6 +77,7 @@ export const FieldPositionControls = ({
             size="sm"
             variant="outline"
             onClick={() => adjustPosition('left')}
+            aria-label="Move field left"
             className={`h-7 px-1.5 transition-all duration-75 hover:bg-primary/20 hover:border-primary ${
               pressedKey === 'left' ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 shadow-lg scale-95' : ''
             }`}
@@ -89,6 +91,7 @@ export const FieldPositionControls = ({
             size="sm"
             variant="outline"
             onClick={() => adjustPosition('right')}
+            aria-label="Move field right"
             className={`h-7 px-1.5 transition-all duration-75 hover:bg-primary/20 hover:border-primary ${
               pressedKey === 'right' ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 shadow-lg scale-95' : ''
             }`}
@@ -100,6 +103,7 @@ export const FieldPositionControls = ({
             size="sm"
             variant="outline"
             onClick={() => adjustPosition('down')}
+            aria-label="Move field down"
             className={`h-7 px-1.5 transition-all duration-75 hover:bg-primary/20 hover:border-primary ${
               pressedKey === 'down' ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 shadow-lg scale-95' : ''
             }`}
