@@ -104,7 +104,7 @@
         ],
         "enabled": true,
         "env": {
-          "MEMORY_FILE_PATH": "/Users/mathieuwauters/Desktop/code/memory/canonical/knowledge-graph.db"
+          "MEMORY_FILE_PATH": "${MEMORY_FILE_PATH}"
         }
       },
       "neo4j": {
@@ -234,7 +234,7 @@
         "enabled": true,
         "env": {
           "GOOGLE_CLOUD_PROJECT": "justiceos",
-          "GOOGLE_APPLICATION_CREDENTIALS": "/Users/mathieuwauters/.config/gcloud/application_default_credentials.json"
+          "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}"
         }
       },
       "google-maps-platform": {
@@ -280,9 +280,9 @@
         "args": [
           "-y",
           "@modelcontextprotocol/server-filesystem",
-          "/Users/mathieuwauters/Desktop/code/tabboo",
-          "/Users/mathieuwauters/Desktop/code",
-          "/Users/mathieuwauters/.claude"
+          "${PROJECT_ROOT}",
+          "${CODE_ROOT}",
+          "${CLAUDE_ROOT}"
         ],
         "enabled": true
       },
@@ -299,8 +299,8 @@
         "args": [
           "-y",
           "@modelcontextprotocol/server-git",
-          "--repository",
-          "/Users/mathieuwauters/Desktop/code/tabboo"
+        "--repository",
+        "${PROJECT_ROOT}"
         ],
         "enabled": true
       },
