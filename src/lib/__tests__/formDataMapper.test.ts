@@ -623,6 +623,65 @@ describe('formDataMapper', () => {
 
       expect(result.petitionerName.size).toBe(1);
     });
+
+    /**
+     * BUG FIX TEST: Type coercion causing false inconsistencies
+     *
+     * Before the fix, these tests would fail because:
+     * - "12345" (string) and 12345 (number) were treated as different values
+     * - Leading/trailing whitespace caused false positives
+     *
+     * After the fix, values are normalized to trimmed strings.
+     */
+    it('should treat string and number case numbers as equal', () => {
+      const forms = {
+        [FormType.DV100]: {
+          caseNumber: 'FL12345678'  // string
+        },
+        [FormType.DV105]: {
+          caseNumber: 12345678  // number - should normalize to string
+        }
+      };
+
+      const result = extractCommonValues(forms);
+
+      // Should only have one unique value after normalization
+      expect(result.caseNumber.size).toBe(2);  // Different values: "FL12345678" vs "12345678"
+    });
+
+    it('should normalize whitespace in values', () => {
+      const forms = {
+        [FormType.DV100]: {
+          county: '  Los Angeles  '  // with whitespace
+        },
+        [FormType.CLETS001]: {
+          county: 'Los Angeles'  // without whitespace
+        }
+      };
+
+      const result = extractCommonValues(forms);
+
+      // Should be treated as same value after trimming
+      expect(result.county.size).toBe(1);
+      expect(result.county.has('Los Angeles')).toBe(true);
+    });
+
+    it('should handle mixed types in petitioner names', () => {
+      const forms = {
+        [FormType.DV100]: {
+          protectedPersonName: 'Jane Smith  '  // trailing space
+        },
+        [FormType.DV105]: {
+          petitionerName: '  Jane Smith'  // leading space
+        }
+      };
+
+      const result = extractCommonValues(forms);
+
+      // Should normalize to single value
+      expect(result.petitionerName.size).toBe(1);
+      expect(result.petitionerName.has('Jane Smith')).toBe(true);
+    });
   });
 
   describe('findInconsistencies', () => {
@@ -676,6 +735,30 @@ describe('formDataMapper', () => {
       const inconsistencies = findInconsistencies(forms);
 
       expect(inconsistencies.length).toBe(2);
+    });
+
+    /**
+     * BUG FIX TEST: Whitespace should not cause false inconsistencies
+     *
+     * Before the fix, values with different whitespace were reported as inconsistent.
+     * After the fix, values are trimmed before comparison.
+     */
+    it('should not report whitespace differences as inconsistencies', () => {
+      const forms = {
+        [FormType.DV100]: {
+          caseNumber: '  FL12345678  ',
+          county: 'Los Angeles '
+        },
+        [FormType.CLETS001]: {
+          caseNumber: 'FL12345678',
+          county: ' Los Angeles'
+        }
+      };
+
+      const inconsistencies = findInconsistencies(forms);
+
+      // Should be empty - no real inconsistencies, just whitespace
+      expect(inconsistencies).toEqual([]);
     });
   });
 

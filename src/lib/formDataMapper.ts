@@ -557,8 +557,8 @@ export function autofillFromBoth(
  */
 export function extractCommonValues(
   forms: Record<string, Record<string, unknown>>
-): Record<string, Set<unknown>> {
-  const commonValues: Record<string, Set<unknown>> = {
+): Record<string, Set<string>> {
+  const commonValues: Record<string, Set<string>> = {
     caseNumber: new Set(),
     county: new Set(),
     petitionerName: new Set(),
@@ -567,19 +567,20 @@ export function extractCommonValues(
 
   for (const formData of Object.values(forms)) {
     if (formData.caseNumber) {
-      commonValues.caseNumber.add(formData.caseNumber);
+      // Normalize to string to prevent false inconsistencies from type differences
+      commonValues.caseNumber.add(String(formData.caseNumber).trim());
     }
     if (formData.county) {
-      commonValues.county.add(formData.county);
+      commonValues.county.add(String(formData.county).trim());
     }
     if (formData.petitionerName || formData.protectedPersonName) {
       commonValues.petitionerName.add(
-        formData.petitionerName || formData.protectedPersonName
+        String(formData.petitionerName || formData.protectedPersonName).trim()
       );
     }
     if (formData.respondentName || formData.restrainedPersonName) {
       commonValues.respondentName.add(
-        formData.respondentName || formData.restrainedPersonName
+        String(formData.respondentName || formData.restrainedPersonName).trim()
       );
     }
   }
