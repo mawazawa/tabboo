@@ -9,3 +9,9 @@ export type { CLETS001FormData } from './CLETS001FormTemplate';
 
 export { DV109FormTemplate } from './DV109FormTemplate';
 export type { DV109FormData } from './DV109FormTemplate';
+
+export { DV110FormTemplate } from './DV110FormTemplate';
+export type { DV110FormData } from './DV110FormTemplate';
+
+export { DV101FormTemplate } from './DV101FormTemplate';
+export type { DV101FormData } from './DV101FormTemplate';
