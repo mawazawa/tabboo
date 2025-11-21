@@ -21,3 +21,6 @@ export type { DV140FormData } from './DV140FormTemplate';
 
 export { DV200FormTemplate } from './DV200FormTemplate';
 export type { DV200FormData } from './DV200FormTemplate';
+
+export { DV100PixelPerfect } from './DV100PixelPerfect';
+export type { DV100PixelPerfectData } from './DV100PixelPerfect';
