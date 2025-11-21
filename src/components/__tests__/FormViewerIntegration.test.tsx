@@ -414,7 +414,8 @@ describe('FormViewer Integration Tests', () => {
       throw new Error('Expected partyName input field to render');
     }
     // Verify fontSize is applied to the Input element (not the container)
-    expect(input.style.fontSize).toBe('14pt');
+    // Note: FieldOverlay applies fieldFontSize * 0.75, so 14 * 0.75 = 10.5pt
+    expect(input.style.fontSize).toBe('10.5pt');
   });
 
   /**

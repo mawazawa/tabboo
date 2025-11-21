@@ -13,6 +13,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const DistributionCalculator = lazy(() => import("./pages/DistributionCalculator"));
 const HapticTest = lazy(() => import("./pages/HapticTest"));
 const ExParteRFO = lazy(() => import("./pages/ExParteRFO"));
+const MapperPage = lazy(() => import("./pages/MapperPage"));
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/distribution-calculator" element={<DistributionCalculator />} />
               <Route path="/haptic-test" element={<HapticTest />} />
               <Route path="/ex-parte-rfo" element={<ExParteRFO />} />
+              <Route path="/mapper" element={<MapperPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
