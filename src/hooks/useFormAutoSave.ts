@@ -41,6 +41,12 @@ export const useFormAutoSave = ({
   const latestDocumentIdRef = useRef(documentId);
   const hasUnsavedChangesRef = useRef(hasUnsavedChanges);
   const performSaveRef = useRef<() => void>();
+  // Store the data that failed to save for retry attempts
+  const pendingRetryDataRef = useRef<{
+    documentId: string;
+    formData: FormData;
+    fieldPositions: FieldPositions;
+  } | null>(null);
 
   const resetSavingState = useCallback(() => {
     isSavingRef.current = false;
@@ -64,7 +70,13 @@ export const useFormAutoSave = ({
   }, [formData, fieldPositions]);
 
   const performSave = useCallback(async () => {
-    if (!documentId || !hasUnsavedChanges || isSavingRef.current) {
+    // Check if this is a retry attempt with pending data
+    const isRetry = pendingRetryDataRef.current !== null;
+    const saveDocumentId = isRetry ? pendingRetryDataRef.current!.documentId : documentId;
+    const saveFormData = isRetry ? pendingRetryDataRef.current!.formData : formData;
+    const saveFieldPositions = isRetry ? pendingRetryDataRef.current!.fieldPositions : fieldPositions;
+
+    if (!saveDocumentId || (!isRetry && !hasUnsavedChanges) || isSavingRef.current) {
       return;
     }
 
@@ -81,18 +93,19 @@ export const useFormAutoSave = ({
       if (!navigator.onLine) {
         // Queue for offline sync
         await offlineSyncManager.queueUpdate({
-          documentId,
-          formData,
-          fieldPositions,
-          url: `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/legal_documents?id=eq.${documentId}`,
+          documentId: saveDocumentId,
+          formData: saveFormData,
+          fieldPositions: saveFieldPositions,
+          url: `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/legal_documents?id=eq.${saveDocumentId}`,
           headers: {
             'Content-Type': 'application/json',
             'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
           },
         });
 
-        lastSaveRef.current = { formData, fieldPositions };
+        lastSaveRef.current = { formData: saveFormData, fieldPositions: saveFieldPositions };
         setHasUnsavedChanges(false);
+        pendingRetryDataRef.current = null; // Clear retry data on success
 
         // Saved offline - will sync when online
         resetSavingState();
@@ -102,17 +115,19 @@ export const useFormAutoSave = ({
       const { error } = await supabase
         .from('legal_documents')
         .update({
-          content: formData, // Trust the UI - no validation during auto-save
-          metadata: { fieldPositions },
+          content: saveFormData, // Trust the UI - no validation during auto-save
+          metadata: { fieldPositions: saveFieldPositions },
           updated_at: new Date().toISOString()
         })
-        .eq('id', documentId);
+        .eq('id', saveDocumentId);
 
       if (error) throw error;
 
       // Update last save reference
-      lastSaveRef.current = { formData, fieldPositions };
+      lastSaveRef.current = { formData: saveFormData, fieldPositions: saveFieldPositions };
       setHasUnsavedChanges(false);
+      pendingRetryDataRef.current = null; // Clear retry data on success
+      retryCountRef.current = 0; // Reset retry count on success
 
       // Auto-save successful (silently handled)
     } catch (error) {
@@ -121,19 +136,20 @@ export const useFormAutoSave = ({
       // If network error, queue offline
       if (!navigator.onLine) {
         await offlineSyncManager.queueUpdate({
-          documentId,
-          formData,
-          fieldPositions,
-          url: `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/legal_documents?id=eq.${documentId}`,
+          documentId: saveDocumentId,
+          formData: saveFormData,
+          fieldPositions: saveFieldPositions,
+          url: `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/legal_documents?id=eq.${saveDocumentId}`,
           headers: {
             'Content-Type': 'application/json',
             'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
           },
         });
 
-        lastSaveRef.current = { formData, fieldPositions };
+        lastSaveRef.current = { formData: saveFormData, fieldPositions: saveFieldPositions };
         setHasUnsavedChanges(false);
         retryCountRef.current = 0; // Reset retry count on offline
+        pendingRetryDataRef.current = null; // Clear retry data
         resetSavingState();
         return;
       }
@@ -142,6 +158,16 @@ export const useFormAutoSave = ({
       if (retryCountRef.current < MAX_RETRIES) {
         retryCountRef.current += 1;
         const delayMs = Math.min(5000 * Math.pow(2, retryCountRef.current - 1), 60000); // Exponential backoff, max 60s
+
+        // Store the failed data for retry - this prevents closure issues where
+        // the retry would otherwise capture new/changed data instead of the original failed data
+        if (!isRetry) {
+          pendingRetryDataRef.current = {
+            documentId: saveDocumentId,
+            formData: saveFormData,
+            fieldPositions: saveFieldPositions,
+          };
+        }
 
         // Schedule retry with exponential backoff
         retryScheduled = true;
@@ -159,6 +185,7 @@ export const useFormAutoSave = ({
           variant: "destructive",
         });
         retryCountRef.current = 0; // Reset for next attempt
+        pendingRetryDataRef.current = null; // Clear retry data
         resetSavingState();
       }
     } finally {
@@ -206,6 +233,7 @@ export const useFormAutoSave = ({
     return () => {
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current);
+        pendingRetryDataRef.current = null; // Clear pending retry on unmount
       }
 
       if (hasUnsavedChangesRef.current && latestDocumentIdRef.current) {
