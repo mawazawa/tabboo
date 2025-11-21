@@ -43,15 +43,17 @@ export const createRelativePositions = (
     }
   });
   
-  // Create relative positions
-  return selectedFields.map(fieldName => {
-    const pos = fieldPositions[fieldName];
-    return {
-      fieldName,
-      relativeTop: pos.top - minTop,
-      relativeLeft: pos.left - minLeft,
-    };
-  });
+  // Create relative positions (filter out fields with missing positions)
+  return selectedFields
+    .filter(fieldName => fieldPositions[fieldName] != null)
+    .map(fieldName => {
+      const pos = fieldPositions[fieldName];
+      return {
+        fieldName,
+        relativeTop: pos.top - minTop,
+        relativeLeft: pos.left - minLeft,
+      };
+    });
 };
 
 /**
