@@ -28,6 +28,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FieldNavigationPanel } from '../FieldNavigationPanel';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import type { FormData, FieldPosition, ValidationRules, ValidationErrors } from '@/types/FormData';
 
 // Mock Supabase client
@@ -147,7 +148,9 @@ describe('FieldNavigationPanel - UX Critical Tests', () => {
   const renderPanel = (props = {}) => {
     return render(
       <QueryClientProvider client={queryClient}>
-        <FieldNavigationPanel {...defaultProps} {...props} />
+        <TooltipProvider>
+          <FieldNavigationPanel {...defaultProps} {...props} />
+        </TooltipProvider>
       </QueryClientProvider>
     );
   };
@@ -831,14 +834,17 @@ describe('FieldNavigationPanel - UX Critical Tests', () => {
 
       render(
         <QueryClientProvider client={queryClient}>
-          <TestWrapper {...defaultProps} />
+          <TooltipProvider>
+            <TestWrapper {...defaultProps} />
+          </TooltipProvider>
         </QueryClientProvider>
       );
 
       const initialRenderCount = renderSpy.mock.calls.length;
       renderSpy.mockClear();
 
-      const input = screen.queryByDisplayValue('Jane Smith');
+      const inputs = screen.queryAllByDisplayValue('Jane Smith');
+      const input = inputs[0]; // Get first match if multiple
 
       if (input) {
         await user.type(input, 'X');
