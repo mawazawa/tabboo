@@ -37,3 +37,6 @@ playwright/.auth
 
 *storybook.log
 storybook-static
+
+# Claude Code MCP Configuration (contains sensitive credentials)
+.claude/mcp.json

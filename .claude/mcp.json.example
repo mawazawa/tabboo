@@ -7,7 +7,7 @@
         "@modelcontextprotocol/server-memory"
       ],
       "env": {
-        "MEMORY_FILE_PATH": "/Users/mathieuwauters/Desktop/code/memory/canonical/knowledge-graph.db"
+        "MEMORY_FILE_PATH": "${MEMORY_FILE_PATH}"
       }
     },
     "neo4j-alanse": {
@@ -17,10 +17,10 @@
         "@alanse/mcp-neo4j-server@latest"
       ],
       "env": {
-        "NEO4J_URI": "neo4j+s://3884f0bc.databases.neo4j.io",
-        "NEO4J_USERNAME": "neo4j",
-        "NEO4J_PASSWORD": "cSYHw9FBEXzaa4PcFZgF",
-        "NEO4J_DATABASE": "neo4j"
+        "NEO4J_URI": "${NEO4J_URI}",
+        "NEO4J_USERNAME": "${NEO4J_USERNAME}",
+        "NEO4J_PASSWORD": "${NEO4J_PASSWORD}",
+        "NEO4J_DATABASE": "${NEO4J_DATABASE:-neo4j}"
       }
     },
     "linear": {
@@ -38,7 +38,7 @@
         "server-perplexity-ask"
       ],
       "env": {
-        "PERPLEXITY_API_KEY": ""
+        "PERPLEXITY_API_KEY": "${PERPLEXITY_API_KEY}"
       }
     },
     "github": {
@@ -48,11 +48,11 @@
         "@modelcontextprotocol/server-github@latest"
       ],
       "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": ""
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
       }
     },
     "supabase": {
-      "url": "https://mcp.supabase.com/mcp?project_ref=rgrgfcesahcgxpuobbqq"
+      "url": "https://mcp.supabase.com/mcp?project_ref=${SUPABASE_PROJECT_REF}"
     },
     "playwright": {
       "command": "/opt/homebrew/bin/pnpm",
@@ -82,7 +82,7 @@
         "@notionhq/notion-mcp-server"
       ],
       "env": {
-        "NOTION_API_KEY": ""
+        "NOTION_API_KEY": "${NOTION_API_KEY}"
       }
     },
     "bigquery": {
@@ -92,8 +92,8 @@
         "@google-cloud/mcp-server-bigquery@latest"
       ],
       "env": {
-        "GOOGLE_CLOUD_PROJECT": "justiceos",
-        "GOOGLE_APPLICATION_CREDENTIALS": "/Users/mathieuwauters/.config/gcloud/application_default_credentials.json"
+        "GOOGLE_CLOUD_PROJECT": "${GOOGLE_CLOUD_PROJECT}",
+        "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}"
       }
     },
     "google-maps-platform": {
@@ -103,7 +103,7 @@
         "@googlemaps/code-assist-mcp@latest"
       ],
       "env": {
-        "GOOGLE_MAPS_API_KEY": ""
+        "GOOGLE_MAPS_API_KEY": "${GOOGLE_MAPS_API_KEY}"
       }
     },
     "firebase": {
@@ -114,7 +114,7 @@
         "mcp"
       ],
       "env": {
-        "FIREBASE_PROJECT": "justiceos"
+        "FIREBASE_PROJECT": "${FIREBASE_PROJECT}"
       }
     },
     "filesystem": {
@@ -123,9 +123,9 @@
         "dlx",
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "/Users/mathieuwauters/Desktop/code/tabboo",
-        "/Users/mathieuwauters/Desktop/code",
-        "/Users/mathieuwauters/.claude"
+        "${PROJECT_ROOT}",
+        "${CODE_ROOT}",
+        "${CLAUDE_ROOT}"
       ]
     },
     "sequential-thinking": {
@@ -142,7 +142,7 @@
         "-y",
         "@modelcontextprotocol/server-git",
         "--repository",
-        "/Users/mathieuwauters/Desktop/code/tabboo"
+        "${PROJECT_ROOT}"
       ]
     },
     "desktop-commander": {
@@ -180,7 +180,7 @@
         "@21st-dev/magic@latest"
       ],
       "env": {
-        "API_KEY": ""
+        "API_KEY": "${MAGIC_API_KEY}"
       }
     },
     "redis": {
@@ -190,7 +190,7 @@
         "@modelcontextprotocol/server-redis"
       ],
       "env": {
-        "REDIS_URL": "rediss://default:AWKwAAIjcDE4ZGU0OWQ4NWFmZjg0MmI0Yjk4YTIxZDNhMGY2YzQwZnAxMA@bright-snipe-25264.upstash.io:6379"
+        "REDIS_URL": "${REDIS_URL}"
       }
     },
     "exa": {
@@ -200,7 +200,7 @@
         "exa-mcp-server"
       ],
       "env": {
-        "EXA_API_KEY": "c3206133-e55a-4859-8510-c5884dbe900d"
+        "EXA_API_KEY": "${EXA_API_KEY}"
       }
     },
     "Figma": {
@@ -208,7 +208,7 @@
     },
     "knowledge-graph": {
       "type": "sse",
-      "url": "http://localhost:27495/mcp/sse",
+      "url": "${KNOWLEDGE_GRAPH_URL:-http://localhost:27495/mcp/sse}",
       "approvedTools": true
     },
     "github-source-control": {
@@ -234,3 +234,4 @@
     }
   }
 }
+
