@@ -1,0 +1,247 @@
+/* FL-320 Form Template Styles */
+/* California Court Form CSS - React Component Version */
+
+:root {
+  --fl320-page-w: 8.5in;
+  --fl320-page-h: 11in;
+  --fl320-m: 0.5in;
+  --fl320-font: 'Times New Roman', Times, serif;
+  --fl320-font-sans: Arial, Helvetica, sans-serif;
+  --fl320-fs: 11pt;
+  --fl320-lh: 1.25;
+  --fl320-border: 1px solid #000;
+  --fl320-gray: #f7f7f7;
+}
+
+.fl320-form-container {
+  width: 100%;
+  max-width: 8.5in;
+  margin: 0 auto;
+  background: #eee;
+  padding: 0.25in;
+}
+
+.fl320-form {
+  box-sizing: border-box;
+}
+
+.fl320-form * {
+  box-sizing: border-box;
+}
+
+.fl320-page {
+  width: var(--fl320-page-w);
+  min-height: var(--fl320-page-h);
+  margin: 0.25in auto;
+  background: #fff;
+  color: #000;
+  font-family: var(--fl320-font);
+  font-size: var(--fl320-fs);
+  line-height: var(--fl320-lh);
+  position: relative;
+  box-shadow: 0 0 0.1in rgba(0, 0, 0, 0.2);
+  padding: var(--fl320-m);
+}
+
+/* Grid and Layout */
+.fl320-row {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.fl320-w-25 { flex: 0 0 25%; }
+.fl320-w-30 { flex: 0 0 30%; }
+.fl320-w-33 { flex: 0 0 33.333%; }
+.fl320-w-40 { flex: 0 0 40%; }
+.fl320-w-50 { flex: 0 0 50%; }
+.fl320-w-60 { flex: 0 0 60%; }
+.fl320-w-70 { flex: 0 0 70%; }
+.fl320-w-75 { flex: 0 0 75%; }
+.fl320-w-100 { flex: 0 0 100%; }
+
+/* Box and Label Styles */
+.fl320-box {
+  border: var(--fl320-border);
+  padding: 6px;
+}
+
+.fl320-box-label {
+  font-family: var(--fl320-font-sans);
+  font-size: 10pt;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+.fl320-title {
+  font-family: var(--fl320-font-sans);
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.fl320-small {
+  font-size: 9pt;
+}
+
+/* Input Styles */
+.fl320-form input[type="text"],
+.fl320-form input[type="date"],
+.fl320-form input[type="time"],
+.fl320-form input[type="email"],
+.fl320-form input[type="tel"],
+.fl320-form textarea {
+  width: 100%;
+  border: var(--fl320-border);
+  padding: 4px;
+  font: inherit;
+  background: #fff;
+}
+
+.fl320-form input:focus,
+.fl320-form textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  background-color: #f0f7ff;
+}
+
+.fl320-form input:read-only,
+.fl320-form textarea:read-only {
+  background-color: #f5f5f5;
+}
+
+.fl320-form textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+/* Checkbox Styles */
+.fl320-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.fl320-checkbox input {
+  width: 13px;
+  height: 13px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+/* Header Styles */
+.fl320-header-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.fl320-judicial {
+  font-family: var(--fl320-font-sans);
+  font-size: 10pt;
+}
+
+.fl320-code {
+  font-family: var(--fl320-font-sans);
+  font-weight: bold;
+  font-size: 14pt;
+}
+
+.fl320-form-id-small {
+  font-family: var(--fl320-font-sans);
+  font-weight: bold;
+}
+
+/* Court Use Box */
+.fl320-courtuse {
+  border: var(--fl320-border);
+  padding: 6px;
+  min-height: 90px;
+}
+
+/* Spacing */
+.fl320-mt6 { margin-top: 6px; }
+.fl320-mt12 { margin-top: 12px; }
+.fl320-mt18 { margin-top: 18px; }
+
+/* Note Box */
+.fl320-note {
+  background: var(--fl320-gray);
+  padding: 6px;
+  border: var(--fl320-border);
+  font-family: var(--fl320-font-sans);
+  font-size: 10pt;
+}
+
+/* Footer */
+.fl320-footer {
+  position: absolute;
+  left: var(--fl320-m);
+  right: var(--fl320-m);
+  bottom: 0.45in;
+  font-family: var(--fl320-font-sans);
+  font-size: 9pt;
+  display: flex;
+  justify-content: space-between;
+}
+
+.fl320-pageno {
+  position: absolute;
+  right: var(--fl320-m);
+  bottom: 0.2in;
+  font-family: var(--fl320-font-sans);
+  font-size: 9pt;
+}
+
+/* Print Styles */
+@media print {
+  .fl320-form-container {
+    background: #fff;
+    padding: 0;
+  }
+
+  .fl320-page {
+    margin: 0;
+    box-shadow: none;
+    page-break-after: always;
+  }
+
+  .fl320-form input:focus,
+  .fl320-form textarea:focus {
+    background-color: transparent;
+  }
+}
+
+/* Responsive Styles */
+@media screen and (max-width: 9in) {
+  .fl320-form-container {
+    max-width: 100%;
+    padding: 10px;
+  }
+
+  .fl320-page {
+    width: 100%;
+    padding: 20px;
+    min-height: auto;
+  }
+
+  .fl320-row {
+    flex-wrap: wrap;
+  }
+
+  .fl320-w-25,
+  .fl320-w-30,
+  .fl320-w-33,
+  .fl320-w-40,
+  .fl320-w-50,
+  .fl320-w-60 {
+    flex: 0 0 100%;
+  }
+
+  .fl320-header-line {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

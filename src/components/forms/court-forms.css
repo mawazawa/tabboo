@@ -1,0 +1,295 @@
+/* Shared CSS for California Judicial Council Court Forms
+ * Based on pixel-perfect FL-320 replica pattern
+ * Provides consistent visual fidelity across all form templates
+ */
+
+:root {
+  --page-w: 8.5in;
+  --page-h: 11in;
+  --m: 0.5in;
+  --font: 'Times New Roman', Times, serif;
+  --font-sans: Arial, Helvetica, sans-serif;
+  --fs: 11pt;
+  --lh: 1.25;
+  --border: 1px solid #000;
+  --gray: #f7f7f7;
+}
+
+* { box-sizing: border-box; }
+
+/* Container */
+.court-form-container {
+  width: 100%;
+  background: #eee;
+  padding: 0.25in;
+}
+
+/* Page */
+.court-form .page {
+  width: var(--page-w);
+  min-height: var(--page-h);
+  margin: 0 auto 0.25in;
+  background: #fff;
+  color: #000;
+  font-family: var(--font);
+  font-size: var(--fs);
+  line-height: var(--lh);
+  position: relative;
+  box-shadow: 0 0 0.1in rgba(0,0,0,.2);
+  padding: var(--m);
+}
+
+/* Layout */
+.court-form .grid { display: grid; gap: 6px; }
+.court-form .row { display: flex; gap: 6px; align-items: stretch; }
+
+/* Width classes */
+.court-form .w-20 { flex: 0 0 20%; }
+.court-form .w-25 { flex: 0 0 25%; }
+.court-form .w-30 { flex: 0 0 30%; }
+.court-form .w-33 { flex: 0 0 33.333%; }
+.court-form .w-40 { flex: 0 0 40%; }
+.court-form .w-50 { flex: 0 0 50%; }
+.court-form .w-60 { flex: 0 0 60%; }
+.court-form .w-70 { flex: 0 0 70%; }
+.court-form .w-75 { flex: 0 0 75%; }
+.court-form .w-80 { flex: 0 0 80%; }
+.court-form .w-100 { flex: 0 0 100%; }
+
+/* Box */
+.court-form .box { border: var(--border); padding: 6px; }
+.court-form .box-none { border: none; padding: 6px; }
+
+/* Typography */
+.court-form .label { font-family: var(--font-sans); font-size: 10pt; text-transform: uppercase; letter-spacing: .2px; }
+.court-form .title { font-family: var(--font-sans); font-weight: bold; text-transform: uppercase; }
+.court-form .small { font-size: 9pt; }
+.court-form .bold { font-weight: bold; }
+
+/* Form elements */
+.court-form input[type="text"],
+.court-form input[type="date"],
+.court-form input[type="time"],
+.court-form input[type="email"],
+.court-form input[type="tel"],
+.court-form input[type="number"],
+.court-form textarea,
+.court-form select {
+  width: 100%;
+  border: var(--border);
+  padding: 4px;
+  font: inherit;
+  background: #fff;
+}
+
+.court-form input:focus,
+.court-form textarea:focus,
+.court-form select:focus {
+  outline: none;
+  border-color: #2563eb;
+  background-color: #f0f7ff;
+}
+
+.court-form textarea { min-height: 90px; resize: vertical; }
+.court-form textarea.short { min-height: 45px; }
+
+/* Checkboxes and radios */
+.court-form .checkbox,
+.court-form .radio {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.court-form .checkbox input,
+.court-form .radio input {
+  width: 13px;
+  height: 13px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+/* Utilities */
+.court-form .right { float: right; }
+.court-form .center { text-align: center; }
+.court-form .hr { border-top: var(--border); margin: 8px 0; }
+.court-form .indent { margin-left: 20px; }
+
+/* Spacing */
+.court-form .mt4 { margin-top: 4px; }
+.court-form .mt6 { margin-top: 6px; }
+.court-form .mt8 { margin-top: 8px; }
+.court-form .mt12 { margin-top: 12px; }
+.court-form .mt18 { margin-top: 18px; }
+.court-form .mb6 { margin-bottom: 6px; }
+.court-form .mb12 { margin-bottom: 12px; }
+
+/* Header */
+.court-form .header-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.court-form .code {
+  font-family: var(--font-sans);
+  font-weight: bold;
+  font-size: 14pt;
+}
+
+.court-form .judicial {
+  font-family: var(--font-sans);
+  font-size: 10pt;
+}
+
+.court-form .form-id {
+  font-family: var(--font-sans);
+  font-weight: bold;
+}
+
+/* Special elements */
+.court-form .courtuse {
+  border: var(--border);
+  padding: 6px;
+  min-height: 90px;
+}
+
+.court-form .note {
+  background: var(--gray);
+  padding: 6px;
+  border: var(--border);
+  font-family: var(--font-sans);
+  font-size: 10pt;
+}
+
+.court-form .warning {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  padding: 6px;
+  font-family: var(--font-sans);
+  font-size: 10pt;
+}
+
+.court-form .confidential {
+  background: #ffebee;
+  border: 2px solid #f44336;
+  padding: 8px;
+  font-family: var(--font-sans);
+  font-size: 11pt;
+  font-weight: bold;
+  color: #c62828;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* Footer */
+.court-form .footer {
+  position: absolute;
+  left: var(--m);
+  right: var(--m);
+  bottom: 0.45in;
+  font-family: var(--font-sans);
+  font-size: 9pt;
+  display: flex;
+  justify-content: space-between;
+}
+
+.court-form .pageno {
+  position: absolute;
+  right: var(--m);
+  bottom: 0.2in;
+  font-family: var(--font-sans);
+  font-size: 9pt;
+}
+
+/* Columns */
+.court-form .two-col { columns: 2; column-gap: 14px; }
+.court-form .three-col { columns: 3; column-gap: 10px; }
+
+/* Inline inputs */
+.court-form .inline { display: inline-block; vertical-align: middle; }
+.court-form .inline-input {
+  display: inline-block;
+  width: auto;
+  min-width: 100px;
+  border: var(--border);
+  padding: 2px 4px;
+  font: inherit;
+}
+
+/* Tables */
+.court-form table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.court-form th,
+.court-form td {
+  border: var(--border);
+  padding: 4px 6px;
+  text-align: left;
+}
+
+.court-form th {
+  background: var(--gray);
+  font-family: var(--font-sans);
+  font-size: 9pt;
+  font-weight: bold;
+}
+
+.court-form td input {
+  border: none;
+  padding: 2px;
+  width: 100%;
+  background: transparent;
+}
+
+/* Signature lines */
+.court-form .signature-line {
+  border-bottom: var(--border);
+  height: 30px;
+  margin-top: 20px;
+}
+
+.court-form .signature-label {
+  font-family: var(--font-sans);
+  font-size: 8pt;
+  margin-top: 2px;
+}
+
+/* Print styles */
+@media print {
+  .court-form-container { background: #fff; padding: 0; }
+  .court-form .page { margin: 0; box-shadow: none; page-break-after: always; }
+  .court-form .no-print { display: none !important; }
+}
+
+/* Responsive */
+@media screen and (max-width: 9in) {
+  .court-form-container { padding: 10px; }
+  .court-form .page {
+    width: 100%;
+    padding: 15px;
+    min-height: auto;
+  }
+  .court-form .row { flex-direction: column; }
+  .court-form .w-20,
+  .court-form .w-25,
+  .court-form .w-30,
+  .court-form .w-33,
+  .court-form .w-40,
+  .court-form .w-50,
+  .court-form .w-60,
+  .court-form .w-70,
+  .court-form .w-75,
+  .court-form .w-80 {
+    flex: 0 0 100%;
+  }
+  .court-form .two-col,
+  .court-form .three-col {
+    columns: 1;
+  }
+}
