@@ -151,7 +151,7 @@ export async function saveValidatedAddress(
     const vaultAddress: VaultAddress = {
       street: address.streetNumber && address.route
         ? `${address.streetNumber} ${address.route}`
-        : address.formattedAddress.split(',')[0],
+        : (address.formattedAddress?.split(',')[0] || ''),
       city: address.city,
       state: address.state,
       zipCode: address.zipCode,
@@ -290,33 +290,33 @@ export async function savePlaidFinancialData(
         })),
       },
       assets: {
-        checking: financialData.checkingAccounts.map(acc => ({
+        checking: (financialData.checkingAccounts || []).map(acc => ({
           name: acc.name,
-          balance: acc.balances.current || 0,
+          balance: acc.balances?.current || 0,
           mask: acc.mask,
         })),
-        savings: financialData.savingsAccounts.map(acc => ({
+        savings: (financialData.savingsAccounts || []).map(acc => ({
           name: acc.name,
-          balance: acc.balances.current || 0,
+          balance: acc.balances?.current || 0,
           mask: acc.mask,
         })),
-        totalLiquid: financialData.totalLiquidAssets,
+        totalLiquid: financialData.totalLiquidAssets || 0,
       },
       liabilities: {
-        creditCards: financialData.creditCards.map(cc => ({
+        creditCards: (financialData.creditCards || []).map(cc => ({
           name: cc.name,
           balance: cc.balance,
           limit: cc.limit,
           minimumPayment: cc.minimumPayment,
         })),
-        loans: financialData.loans.map(loan => ({
+        loans: (financialData.loans || []).map(loan => ({
           name: loan.name,
           type: loan.type,
           balance: loan.balance,
           monthlyPayment: loan.monthlyPayment,
         })),
-        totalDebt: financialData.totalDebt,
-        totalMonthlyDebtPayments: financialData.totalMonthlyDebtPayments,
+        totalDebt: financialData.totalDebt || 0,
+        totalMonthlyDebtPayments: financialData.totalMonthlyDebtPayments || 0,
       },
       lastSyncedAt: new Date().toISOString(),
       source: 'plaid',

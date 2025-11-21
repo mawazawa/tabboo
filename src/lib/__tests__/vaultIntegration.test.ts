@@ -188,6 +188,43 @@ describe('vaultIntegration', () => {
       expect(result.success).toBe(true);
       expect(result.updated).toContain('contact_info.mailingAddress');
     });
+
+    it('should handle undefined formattedAddress without crashing (Bug #2 fix)', async () => {
+      const addressWithoutFormatted: AddressResult = {
+        formattedAddress: undefined as unknown as string,
+        streetNumber: undefined,
+        route: undefined,
+        city: 'Los Angeles',
+        state: 'CA',
+        zipCode: '90001',
+        county: 'Los Angeles',
+        country: 'US',
+        placeId: 'ChIJ123abc',
+        coordinates: { lat: 34.05, lng: -118.24 },
+      };
+
+      const mockSelect = vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({
+            data: { contact_info: {}, data_provenance: {} },
+            error: null,
+          }),
+        }),
+      });
+
+      const mockUpsert = vi.fn().mockResolvedValue({ error: null });
+
+      (supabase.from as ReturnType<typeof vi.fn>).mockReturnValue({
+        select: mockSelect,
+        upsert: mockUpsert,
+      });
+
+      // Before fix: would throw TypeError: Cannot read properties of undefined
+      // After fix: handles gracefully with empty string fallback
+      const result = await saveValidatedAddress('user-123', addressWithoutFormatted);
+
+      expect(result.success).toBe(true);
+    });
   });
 
   describe('getValidatedAddress', () => {
@@ -336,6 +373,60 @@ describe('vaultIntegration', () => {
 
       // Should have 3 entries in history
       expect(savedData.financial.syncHistory).toHaveLength(3);
+    });
+
+    it('should handle undefined array properties without crashing (Bug #3 fix)', async () => {
+      // Minimal FL150Data with undefined arrays
+      const minimalData: FL150FinancialData = {
+        expenses: [
+          { category: 'rent_mortgage', label: 'Rent', amount: 2000, transactions: [] },
+        ],
+        income: {
+          total: 5000,
+          sources: [{ source: 'Employer Inc', amount: 5000 }],
+        },
+        // All these are undefined - before fix would crash
+        checkingAccounts: undefined as any,
+        savingsAccounts: undefined as any,
+        creditCards: undefined as any,
+        loans: undefined as any,
+        totalLiquidAssets: undefined as any,
+        totalDebt: undefined as any,
+        totalMonthlyDebtPayments: undefined as any,
+      };
+
+      let savedData: any = null;
+
+      const mockSelect = vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({
+            data: { financial: {}, data_provenance: {} },
+            error: null,
+          }),
+        }),
+      });
+
+      const mockUpsert = vi.fn().mockImplementation((data) => {
+        savedData = data;
+        return Promise.resolve({ error: null });
+      });
+
+      (supabase.from as ReturnType<typeof vi.fn>).mockReturnValue({
+        select: mockSelect,
+        upsert: mockUpsert,
+      });
+
+      // Before fix: would throw TypeError: Cannot read properties of undefined (reading 'map')
+      // After fix: handles gracefully with empty array defaults
+      const result = await savePlaidFinancialData('user-123', minimalData);
+
+      expect(result.success).toBe(true);
+      expect(savedData.financial.assets.checking).toEqual([]);
+      expect(savedData.financial.assets.savings).toEqual([]);
+      expect(savedData.financial.liabilities.creditCards).toEqual([]);
+      expect(savedData.financial.liabilities.loans).toEqual([]);
+      expect(savedData.financial.assets.totalLiquid).toBe(0);
+      expect(savedData.financial.liabilities.totalDebt).toBe(0);
     });
   });
 
