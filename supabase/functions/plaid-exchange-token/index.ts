@@ -188,18 +188,23 @@ serve(async (req) => {
       );
     }
 
-    // Log for audit
-    await adminClient.from('financial_access_log').insert({
-      user_id: user.id,
-      action: 'plaid_connect',
-      resource_type: 'plaid_connection',
-      metadata: {
-        institution_id: institutionId,
-        institution_name: institutionName,
-        accounts_connected: accounts.length,
-        environment: PLAID_ENV,
-      },
-    });
+    // Log for audit (non-critical - don't fail on audit log errors)
+    try {
+      await adminClient.from('financial_access_log').insert({
+        user_id: user.id,
+        action: 'plaid_connect',
+        resource_type: 'plaid_connection',
+        metadata: {
+          institution_id: institutionId,
+          institution_name: institutionName,
+          accounts_connected: accounts.length,
+          environment: PLAID_ENV,
+        },
+      });
+    } catch (auditError) {
+      // Log error but don't fail the request - audit is non-critical
+      console.error('Audit log error (non-critical):', auditError);
+    }
 
     // Get account balances
     const balancesResponse = await fetch(`${PLAID_BASE_URL}/accounts/balance/get`, {
