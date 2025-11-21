@@ -33,7 +33,25 @@ export const useFormAutoSave = ({
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
+  const retryTimeoutRef = useRef<NodeJS.Timeout>();
   const lastSaveRef = useRef<{ formData: FormData; fieldPositions: FieldPositions }>();
+  const retryCountRef = useRef(0);
+  const MAX_RETRIES = 5;
+  const isSavingRef = useRef(false);
+  const latestDocumentIdRef = useRef(documentId);
+  const hasUnsavedChangesRef = useRef(hasUnsavedChanges);
+  const performSaveRef = useRef<() => void>();
+  // Store the data that failed to save for retry attempts
+  const pendingRetryDataRef = useRef<{
+    documentId: string;
+    formData: FormData;
+    fieldPositions: FieldPositions;
+  } | null>(null);
+
+  const resetSavingState = useCallback(() => {
+    isSavingRef.current = false;
+    setIsSaving(false);
+  }, []);
 
   // Mark as having unsaved changes whenever data changes
   useEffect(() => {
@@ -52,11 +70,19 @@ export const useFormAutoSave = ({
   }, [formData, fieldPositions]);
 
   const performSave = useCallback(async () => {
-    if (!documentId || !hasUnsavedChanges || isSaving) {
+    // Check if this is a retry attempt with pending data
+    const isRetry = pendingRetryDataRef.current !== null;
+    const saveDocumentId = isRetry ? pendingRetryDataRef.current!.documentId : documentId;
+    const saveFormData = isRetry ? pendingRetryDataRef.current!.formData : formData;
+    const saveFieldPositions = isRetry ? pendingRetryDataRef.current!.fieldPositions : fieldPositions;
+
+    if (!saveDocumentId || (!isRetry && !hasUnsavedChanges) || isSavingRef.current) {
       return;
     }
 
+    isSavingRef.current = true;
     setIsSaving(true);
+    let retryScheduled = false;
 
     try {
       // Skip validation during auto-save for better performance
@@ -67,37 +93,41 @@ export const useFormAutoSave = ({
       if (!navigator.onLine) {
         // Queue for offline sync
         await offlineSyncManager.queueUpdate({
-          documentId,
-          formData,
-          fieldPositions,
-          url: `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/legal_documents?id=eq.${documentId}`,
+          documentId: saveDocumentId,
+          formData: saveFormData,
+          fieldPositions: saveFieldPositions,
+          url: `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/legal_documents?id=eq.${saveDocumentId}`,
           headers: {
             'Content-Type': 'application/json',
             'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
           },
         });
 
-        lastSaveRef.current = { formData, fieldPositions };
+        lastSaveRef.current = { formData: saveFormData, fieldPositions: saveFieldPositions };
         setHasUnsavedChanges(false);
+        pendingRetryDataRef.current = null; // Clear retry data on success
 
         // Saved offline - will sync when online
+        resetSavingState();
         return;
       }
 
       const { error } = await supabase
         .from('legal_documents')
         .update({
-          content: formData, // Trust the UI - no validation during auto-save
-          metadata: { fieldPositions },
+          content: saveFormData, // Trust the UI - no validation during auto-save
+          metadata: { fieldPositions: saveFieldPositions },
           updated_at: new Date().toISOString()
         })
-        .eq('id', documentId);
+        .eq('id', saveDocumentId);
 
       if (error) throw error;
 
       // Update last save reference
-      lastSaveRef.current = { formData, fieldPositions };
+      lastSaveRef.current = { formData: saveFormData, fieldPositions: saveFieldPositions };
       setHasUnsavedChanges(false);
+      pendingRetryDataRef.current = null; // Clear retry data on success
+      retryCountRef.current = 0; // Reset retry count on success
 
       // Auto-save successful (silently handled)
     } catch (error) {
@@ -106,37 +136,64 @@ export const useFormAutoSave = ({
       // If network error, queue offline
       if (!navigator.onLine) {
         await offlineSyncManager.queueUpdate({
-          documentId,
-          formData,
-          fieldPositions,
-          url: `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/legal_documents?id=eq.${documentId}`,
+          documentId: saveDocumentId,
+          formData: saveFormData,
+          fieldPositions: saveFieldPositions,
+          url: `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/legal_documents?id=eq.${saveDocumentId}`,
           headers: {
             'Content-Type': 'application/json',
             'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
           },
         });
 
-        lastSaveRef.current = { formData, fieldPositions };
+        lastSaveRef.current = { formData: saveFormData, fieldPositions: saveFieldPositions };
         setHasUnsavedChanges(false);
+        retryCountRef.current = 0; // Reset retry count on offline
+        pendingRetryDataRef.current = null; // Clear retry data
+        resetSavingState();
         return;
       }
 
-      toast({
-        title: "Auto-save failed",
-        description: "Your changes could not be saved. Please try again.",
-        variant: "destructive",
-      });
+      // Check if we should retry
+      if (retryCountRef.current < MAX_RETRIES) {
+        retryCountRef.current += 1;
+        const delayMs = Math.min(5000 * Math.pow(2, retryCountRef.current - 1), 60000); // Exponential backoff, max 60s
 
-      // Retry after 5 seconds
-      setTimeout(() => {
-        setIsSaving(false);
-        performSave();
-      }, 5000);
-      return;
+        // Store the failed data for retry - this prevents closure issues where
+        // the retry would otherwise capture new/changed data instead of the original failed data
+        if (!isRetry) {
+          pendingRetryDataRef.current = {
+            documentId: saveDocumentId,
+            formData: saveFormData,
+            fieldPositions: saveFieldPositions,
+          };
+        }
+
+        // Schedule retry with exponential backoff
+        retryScheduled = true;
+        retryTimeoutRef.current = setTimeout(() => {
+          // Release guard, but keep UI spinner active until retry finishes
+          isSavingRef.current = false;
+          performSave();
+        }, delayMs);
+        return;
+      } else {
+        // Max retries exceeded - show error to user
+        toast({
+          title: "Auto-save failed",
+          description: "Your changes could not be saved after multiple attempts. Please check your connection and try saving manually.",
+          variant: "destructive",
+        });
+        retryCountRef.current = 0; // Reset for next attempt
+        pendingRetryDataRef.current = null; // Clear retry data
+        resetSavingState();
+      }
     } finally {
-      setIsSaving(false);
+      if (!retryScheduled) {
+        resetSavingState();
+      }
     }
-  }, [documentId, formData, fieldPositions, toast, hasUnsavedChanges, isSaving]);
+  }, [documentId, formData, fieldPositions, toast, hasUnsavedChanges, resetSavingState]);
 
   // Debounced auto-save
   useEffect(() => {
@@ -159,15 +216,32 @@ export const useFormAutoSave = ({
     };
   }, [formData, fieldPositions, enabled, debounceMs, performSave, hasUnsavedChanges]);
 
-  // Save on unmount if there are unsaved changes
+  // Save on unmount if there are unsaved changes, and cleanup retry timeout
+  useEffect(() => {
+    latestDocumentIdRef.current = documentId;
+  }, [documentId]);
+
+  useEffect(() => {
+    hasUnsavedChangesRef.current = hasUnsavedChanges;
+  }, [hasUnsavedChanges]);
+
+  useEffect(() => {
+    performSaveRef.current = performSave;
+  }, [performSave]);
+
   useEffect(() => {
     return () => {
-      if (hasUnsavedChanges && documentId) {
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        pendingRetryDataRef.current = null; // Clear pending retry on unmount
+      }
+
+      if (hasUnsavedChangesRef.current && latestDocumentIdRef.current) {
         // Fire-and-forget save on unmount
-        performSave();
+        performSaveRef.current?.();
       }
     };
-  }, [documentId, performSave, hasUnsavedChanges]);
+  }, []);
 
   // Manual save function (with validation)
   const saveNow = useCallback(async () => {
