@@ -10,22 +10,19 @@
  * pdf-lib is needed for PDF manipulation (combining, page numbers, metadata)
  */
 
-import type {
-  TROPacket,
-  PacketForm,
-  PacketMetadata,
-  AssemblyOptions,
-  AssemblyResult,
-  AssemblyStatus,
-  FormType,
-  FormOrder,
-  PacketType,
-} from '@/types/PacketTypes';
-
 import {
   DV_INITIAL_REQUEST_FORM_ORDER,
   DV_RESPONSE_FORM_ORDER,
   LA_SUPERIOR_COURT_REQUIREMENTS,
+  AssemblyStatus,
+  PacketType,
+  type TROPacket,
+  type PacketForm,
+  type PacketMetadata,
+  type AssemblyOptions,
+  type AssemblyResult,
+  type FormType,
+  type FormOrder,
 } from '@/types/PacketTypes';
 
 // PDF manipulation library (must be installed)
