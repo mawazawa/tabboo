@@ -15,3 +15,9 @@ export type { DV110FormData } from './DV110FormTemplate';
 
 export { DV101FormTemplate } from './DV101FormTemplate';
 export type { DV101FormData } from './DV101FormTemplate';
+
+export { DV140FormTemplate } from './DV140FormTemplate';
+export type { DV140FormData } from './DV140FormTemplate';
+
+export { DV200FormTemplate } from './DV200FormTemplate';
+export type { DV200FormData } from './DV200FormTemplate';

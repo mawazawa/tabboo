@@ -1,0 +1,213 @@
+/* DV-140 Child Custody and Visitation Order Styles */
+
+.dv140-form-container {
+  width: 100%;
+  max-width: 8.5in;
+  margin: 0 auto;
+  background: #f5f5f5;
+  padding: 0.25in;
+}
+
+.dv140-form {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 11pt;
+  line-height: 1.3;
+  color: black;
+}
+
+.dv140-page {
+  width: 8.5in;
+  min-height: 11in;
+  background: white;
+  padding: 0.5in;
+  box-shadow: 0 0 0.1in rgba(0, 0, 0, 0.2);
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Header */
+.dv140-header {
+  text-align: center;
+  margin-bottom: 15pt;
+}
+
+.dv140-judicial-info {
+  font-family: Arial, sans-serif;
+  font-size: 9pt;
+  margin-bottom: 10pt;
+}
+
+.dv140-form-title {
+  font-size: 14pt;
+  font-weight: bold;
+  margin: 10pt 0;
+}
+
+.dv140-form-id {
+  font-family: Arial, sans-serif;
+  font-size: 16pt;
+  font-weight: bold;
+}
+
+/* Sections */
+.dv140-section {
+  border: 1pt solid #000;
+  padding: 10pt;
+  margin: 10pt 0;
+}
+
+.dv140-section-title {
+  font-weight: bold;
+  font-size: 11pt;
+  margin-bottom: 8pt;
+}
+
+.dv140-note {
+  font-size: 9pt;
+  font-style: italic;
+  margin-bottom: 8pt;
+  color: #666;
+}
+
+/* Row and Field Layout */
+.dv140-row {
+  display: flex;
+  gap: 8pt;
+  margin: 6pt 0;
+}
+
+.dv140-field {
+  flex: 1;
+}
+
+.dv140-field label {
+  display: block;
+  font-size: 9pt;
+  margin-bottom: 2pt;
+}
+
+.dv140-field input,
+.dv140-field textarea {
+  width: 100%;
+  border: 1pt solid #000;
+  padding: 4pt;
+  font: inherit;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.dv140-field input:focus,
+.dv140-field textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  background-color: #f0f7ff;
+}
+
+/* Width Classes */
+.dv140-w-25 { flex: 0 0 25%; }
+.dv140-w-50 { flex: 0 0 50%; }
+
+/* Children Table */
+.dv140-children-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8pt 0;
+}
+
+.dv140-children-table th,
+.dv140-children-table td {
+  border: 1pt solid #000;
+  padding: 6pt;
+  text-align: left;
+}
+
+.dv140-children-table th {
+  background: #f0f0f0;
+  font-size: 9pt;
+  font-weight: bold;
+}
+
+.dv140-children-table input {
+  width: 100%;
+  border: none;
+  padding: 2pt;
+  font: inherit;
+  background: transparent;
+}
+
+.dv140-children-table input:focus {
+  outline: none;
+  background-color: #f0f7ff;
+}
+
+/* Checkbox Groups */
+.dv140-checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6pt;
+}
+
+.dv140-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6pt;
+  cursor: pointer;
+  font-size: 10pt;
+}
+
+.dv140-checkbox input[type="checkbox"] {
+  width: 12pt;
+  height: 12pt;
+  margin: 0;
+}
+
+/* Inline Input */
+.dv140-inline-input {
+  width: 200pt !important;
+  display: inline-block;
+  border: 1pt solid #000;
+  padding: 2pt 4pt;
+  font: inherit;
+  margin-left: 4pt;
+}
+
+/* Schedule Section */
+.dv140-schedule {
+  margin-top: 10pt;
+  padding: 10pt;
+  background: #f9f9f9;
+  border: 1pt dashed #ccc;
+}
+
+/* Signature */
+.dv140-signature {
+  margin-top: 20pt;
+  padding-top: 15pt;
+  border-top: 1pt solid #000;
+}
+
+/* Footer */
+.dv140-footer {
+  position: absolute;
+  left: 0.5in;
+  right: 0.5in;
+  bottom: 0.5in;
+  font-family: Arial, sans-serif;
+  font-size: 9pt;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Print */
+@media print {
+  .dv140-form-container { background: white; padding: 0; }
+  .dv140-page { box-shadow: none; }
+}
+
+/* Responsive */
+@media screen and (max-width: 9in) {
+  .dv140-form-container { max-width: 100%; padding: 10px; }
+  .dv140-page { width: 100%; padding: 20px; min-height: auto; }
+  .dv140-w-25, .dv140-w-50 { flex: 0 0 100%; }
+  .dv140-row { flex-direction: column; }
+}
