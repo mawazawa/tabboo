@@ -15,6 +15,7 @@ const HapticTest = lazy(() => import("./pages/HapticTest"));
 const ExParteRFO = lazy(() => import("./pages/ExParteRFO"));
 const MapperPage = lazy(() => import("./pages/MapperPage"));
 const TROFilingPage = lazy(() => import("./pages/TROFilingPage"));
+const FormComparisonDemo = lazy(() => import("./pages/FormComparisonDemo"));
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
               <Route path="/ex-parte-rfo" element={<ExParteRFO />} />
               <Route path="/mapper" element={<MapperPage />} />
               <Route path="/file-tro" element={<TROFilingPage />} />
+              <Route path="/form-comparison" element={<FormComparisonDemo />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
