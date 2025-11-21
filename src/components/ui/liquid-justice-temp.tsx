@@ -11,4 +11,4 @@ export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./tool
 
 // Temporary replacements for specialized liquid-justice components
 export { Accordion as LiquidGlassAccordion, AccordionContent, AccordionItem, AccordionTrigger } from "./accordion";
-export { LiquidSlider } from "./liquid-slider";
+export { LiquidSlider } from "../liquid-slider/LiquidSlider";

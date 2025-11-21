@@ -1,0 +1,349 @@
+/* Liquid Slider - Jhey Tompkins CodePen conversion */
+/* Original: https://codepen.io/jh3y */
+
+@property --slider-complete {
+  initial-value: 0;
+  inherits: true;
+  syntax: '<integer>';
+}
+
+@property --slider-liquid {
+  initial-value: 0;
+  inherits: true;
+  syntax: '<integer>';
+}
+
+/* Base slider */
+.liquid-slider {
+  --width: 300;
+  --height: 42;
+  --border: 0px;
+  --checked: #007AFF;
+  --unchecked: hsl(218, 8%, 81%);
+  --transition: 0.12s;
+  --ease: ease-out;
+
+  display: flex;
+  position: relative;
+  container-type: inline-size;
+  width: calc(var(--width) * 1px);
+  max-width: calc(100% - 2rem);
+  align-items: center;
+  border-radius: 12px;
+}
+
+.liquid-slider--disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Bounce transition */
+.liquid-slider[data-active='true'],
+.liquid-slider:active {
+  --transition: 0.6s;
+  --ease: linear(
+    0 0%,
+    0.6091 3.69%,
+    1.0259 7.24%,
+    1.1733 9.05%,
+    1.283 10.92%,
+    1.3562 12.87%,
+    1.3948 14.95%,
+    1.4014 16.03%,
+    1.3999 17.16%,
+    1.3731 19.64%,
+    1.3202 22.27%,
+    1.1394 29.39%,
+    1.0582 33.17%,
+    0.9943 37.45%,
+    0.9734 39.64%,
+    0.9593 41.92%,
+    0.9505 45.08%,
+    0.9517 48.7%,
+    0.9924 63.02%,
+    1.0046 71.2%,
+    1.0061 78.24%,
+    1 100%
+  );
+}
+
+/* Track */
+.slider__track {
+  flex: 1;
+  height: calc(var(--height) * 1px);
+  position: relative;
+  container-type: inline-size;
+}
+
+/* Fill */
+.slider__fill {
+  height: 30%;
+  border-radius: 12px;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: 50%;
+  translate: 0 -50%;
+  clip-path: inset(0 0 0 0 round 12px);
+  pointer-events: none;
+  background: color-mix(in oklch, canvas, canvasText 15%);
+}
+
+.slider__fill::after {
+  content: '';
+  width: 120%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: var(--checked);
+  clip-path: inset(0 0 0 0 round 12px);
+  transform: translateX(-100%);
+  translate: calc(var(--slider-complete) * 1cqi) 0%;
+  transition: translate 0.12s ease-out;
+}
+
+/* Input */
+.liquid-slider input[type='range'] {
+  width: 100%;
+  height: calc(var(--height) * 1px);
+  position: absolute;
+  left: 50%;
+  translate: -50% 0;
+  opacity: 0;
+  z-index: 99999;
+  cursor: grab;
+}
+
+.liquid-slider input[type='range']:active {
+  cursor: grabbing;
+}
+
+.liquid-slider:has(:focus-visible) {
+  outline: 2px solid var(--checked);
+  outline-offset: 4px;
+}
+
+/* Knockout */
+.knockout {
+  height: calc(var(--height) * 1px);
+  width: calc(var(--width) * 1px);
+  border-radius: 100px;
+  position: absolute;
+  inset: 0;
+  will-change: filter, scale;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Indicator masked */
+.indicator--masked {
+  background: transparent;
+  z-index: 12;
+  height: 100%;
+  width: 100%;
+  translate: -50% -50%;
+  container-type: inline-size;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+
+.indicator--masked .mask {
+  position: absolute;
+  height: calc(100% - (2 * var(--border)));
+  width: 62px;
+  top: 50%;
+  background: #000;
+  left: var(--border);
+  border-radius: 100px;
+  translate: calc((var(--slider-complete) / 100) * (100cqi - 100%)) -50%;
+  transition-property: scale, translate;
+  transition-duration: var(--transition), 0.12s;
+  transition-timing-function: var(--ease), ease-out;
+}
+
+/* Scale mask on active */
+.liquid-slider[data-active='true'] .indicator--masked .mask,
+.liquid-slider:active .indicator--masked .mask {
+  scale: calc(1.4 + (var(--delta, 0) * 0.05)) calc(1.4 - (var(--delta, 0) * 0.05));
+}
+
+/* Indicator liquid */
+.indicator__liquid {
+  position: absolute;
+  height: 100%;
+  width: 62px;
+  container-type: inline-size;
+  top: 50%;
+  background: transparent;
+  left: var(--border);
+  border-radius: 100px;
+  translate: calc(((var(--slider-complete) / 100) * (100cqi - 100%))) -50%;
+  transition-property: scale, translate;
+  transition-duration: var(--transition), 0.12s;
+  transition-timing-function: var(--ease), ease-out;
+  box-shadow:
+    inset 1px -1px 2px rgba(255, 255, 255, 0.5),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.5),
+    inset -1px -1px 2px rgba(255, 255, 255, 0.5),
+    inset 1px 1px 2px rgba(77, 77, 77, 0.5),
+    inset -8px 4px 10px -6px rgba(77, 77, 77, 0.25),
+    inset -1px 1px 6px rgba(77, 77, 77, 0.25),
+    -1px -1px 8px rgba(153, 153, 153, 0.15),
+    1px 1px 2px rgba(77, 77, 77, 0.15),
+    2px 2px 6px rgba(77, 77, 77, 0.15),
+    inset -2px -1px 2px rgba(255, 255, 255, 0.25),
+    3px 6px 16px -6px rgba(77, 77, 77, 0.5);
+}
+
+.liquid-slider[data-active='true'] .indicator__liquid,
+.liquid-slider:active .indicator__liquid {
+  scale: calc(1.4 + (var(--delta, 0) * 0.05)) calc(1.4 - (var(--delta, 0) * 0.05));
+}
+
+/* Shadow */
+.indicator__liquid .shadow {
+  opacity: 0;
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 100px;
+  box-shadow:
+    1px -1px 2px rgba(255, 255, 255, 0.5) inset,
+    0px -1px 2px rgba(255, 255, 255, 0.5) inset,
+    -1px -1px 2px rgba(255, 255, 255, 0.5) inset,
+    1px 1px 2px rgba(77, 77, 77, 0.5) inset,
+    -8px 4px 10px -6px rgba(77, 77, 77, 0.25) inset,
+    -1px 1px 6px rgba(77, 77, 77, 0.25) inset,
+    -1px -1px 8px rgba(153, 153, 153, 0.15),
+    1px 1px 2px rgba(77, 77, 77, 0.15),
+    2px 2px 6px rgba(77, 77, 77, 0.15),
+    -2px -1px 2px rgba(255, 255, 255, 0.25) inset,
+    3px 6px 16px -6px rgba(77, 77, 77, 0.5);
+  z-index: 20;
+  transition: opacity var(--transition) var(--ease);
+}
+
+/* Cover */
+.indicator__liquid .cover {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: white;
+  border-radius: 100px;
+  transition: opacity var(--transition) var(--ease);
+}
+
+@media (prefers-color-scheme: dark) {
+  .indicator__liquid .cover {
+    background: hsl(0 0% 80%);
+  }
+}
+
+.liquid-slider:active .indicator__liquid .shadow,
+.liquid-slider[data-active='true'] .indicator__liquid .shadow {
+  opacity: 1;
+}
+
+.liquid-slider:active .indicator__liquid .cover,
+.liquid-slider[data-active='true'] .indicator__liquid .cover {
+  opacity: 0;
+}
+
+/* Wrapper */
+.wrapper {
+  position: absolute;
+  inset: 0;
+  border-radius: 100px;
+  clip-path: inset(0 0 0 0 round 100px);
+  filter: blur(6px);
+  transition: filter var(--transition) var(--ease);
+}
+
+.liquid-slider:active .wrapper,
+.liquid-slider[data-active='true'] .wrapper {
+  filter: blur(0px);
+}
+
+/* Liquids */
+.liquids {
+  position: absolute;
+  inset: 0;
+  transform: translate3d(0, 0, 0);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.liquids--track {
+  --liquid-color: color-mix(in oklch, canvas, canvasText 15%);
+}
+
+.liquids--fill {
+  z-index: 20;
+}
+
+.liquids .liquid__shadow {
+  position: absolute;
+  inset: 0;
+  border-radius: 100px;
+  box-shadow:
+    inset 0px 0px 3px 4px var(--checked),
+    inset calc(((var(--slider-liquid) / 100) * 2px) + (2px - (var(--slider-liquid) / 100) * 4px)) 0px
+    calc(2px + (var(--slider-liquid) / 100) * 1px)
+    calc(1px + ((var(--slider-liquid) / 100) * 1px)) var(--checked);
+}
+
+.liquids--fill .liquid__shadow {
+  opacity: calc(var(--slider-liquid) / 50);
+}
+
+.liquids .liquid__track {
+  content: '';
+  height: calc((var(--height) * 1px) - (0 * var(--border)));
+  width: calc((var(--width) * 1px) - (0 * var(--border)));
+  background: var(--checked);
+  border-radius: 100px;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  translate: calc(-100% + (var(--slider-liquid) / 100) * (100cqi)) -50%;
+  transition-property: height, width, filter, left, translate;
+  transition-duration: var(--transition), var(--transition), var(--transition), var(--transition), 0.12s;
+  transition-timing-function: var(--ease), var(--ease), var(--ease), var(--ease), ease-out;
+}
+
+.liquids--track .liquid__track {
+  translate: 8cqi -50%;
+  background: color-mix(in oklch, canvas, canvasText 15%);
+}
+
+.liquid-slider[data-active='true'] .indicator__liquid .liquid__track,
+.liquid-slider:active .indicator__liquid .liquid__track {
+  left: 0;
+  height: calc((var(--height) * 0.25px));
+  min-height: calc((var(--height) * 0.25px));
+}
+
+/* Bounce keyframes */
+@keyframes bounce {
+  0%, 100% {
+    scale: 1;
+  }
+  50% {
+    animation-timing-function: cubic-bezier(.64, 1.01, .7, 1.27);
+    scale: 1.25;
+  }
+}
+
+/* Screen reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
