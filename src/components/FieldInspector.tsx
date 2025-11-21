@@ -32,7 +32,95 @@ import {
   Trash2,
   AlertTriangle,
   Sparkles,
+  Copy,
 } from "@/icons";
+
+// ============================================================================
+// Custom Styles with Spring Physics
+// ============================================================================
+
+const inspectorStyles = `
+  .field-inspector-spring-enter {
+    animation: fieldEnter 400ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  .field-inspector-spring-exit {
+    animation: fieldExit 200ms cubic-bezier(0.4, 0, 1, 1) forwards;
+  }
+
+  @keyframes fieldEnter {
+    0% {
+      opacity: 0;
+      transform: translateY(8px) scale(0.98);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes fieldExit {
+    0% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-4px) scale(0.98);
+    }
+  }
+
+  .field-badge-glow {
+    box-shadow:
+      0 0 0 1px currentColor,
+      0 0 8px -2px currentColor;
+  }
+
+  .field-input-glow:focus {
+    box-shadow:
+      0 0 0 1px #007acc,
+      0 0 12px -4px #007acc;
+  }
+
+  .delete-progress-bar {
+    background: linear-gradient(90deg,
+      rgba(239, 68, 68, 0.3) 0%,
+      rgba(239, 68, 68, 0.1) 100%
+    );
+  }
+
+  .inspector-section {
+    position: relative;
+  }
+
+  .inspector-section::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2px;
+    height: 0;
+    background: #007acc;
+    border-radius: 1px;
+    transition: height 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .inspector-section:focus-within::before {
+    height: 100%;
+  }
+`;
+
+// Inject styles once
+if (typeof document !== 'undefined') {
+  const styleId = 'field-inspector-styles';
+  if (!document.getElementById(styleId)) {
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = inspectorStyles;
+    document.head.appendChild(style);
+  }
+}
 
 // ============================================================================
 // Types
@@ -121,16 +209,31 @@ export function FieldInspector({
   const prevFieldIdRef = React.useRef<string | null>(null);
   const [isTransitioning, setIsTransitioning] = React.useState(false);
   const [focusedControl, setFocusedControl] = React.useState<string | null>(null);
+  const [copiedId, setCopiedId] = React.useState(false);
+  const [animationKey, setAnimationKey] = React.useState(0);
 
   // Handle field transition animations
   React.useEffect(() => {
     if (selectedField?.id !== prevFieldIdRef.current) {
       setIsTransitioning(true);
+      setAnimationKey(prev => prev + 1);
       const timer = setTimeout(() => setIsTransitioning(false), 150);
       prevFieldIdRef.current = selectedField?.id ?? null;
       return () => clearTimeout(timer);
     }
   }, [selectedField?.id]);
+
+  // Copy field ID to clipboard
+  const handleCopyId = async () => {
+    if (!selectedField) return;
+    try {
+      await navigator.clipboard.writeText(selectedField.id);
+      setCopiedId(true);
+      setTimeout(() => setCopiedId(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
 
   // Reset delete confirmation when field changes
   React.useEffect(() => {
@@ -284,10 +387,10 @@ export function FieldInspector({
 
       {/* Property Form */}
       <div
+        key={animationKey}
         className={cn(
           "flex-1 overflow-y-auto px-4 py-4 space-y-5",
-          isTransitioning && "opacity-0 translate-y-1",
-          "transition-all duration-150 ease-out"
+          "field-inspector-spring-enter"
         )}
       >
         {/* Field ID (read-only reference) */}
@@ -297,18 +400,36 @@ export function FieldInspector({
           </Label>
           <div
             className={cn(
-              "h-9 px-3 flex items-center",
+              "h-9 px-3 flex items-center justify-between",
               "rounded-md text-xs font-mono",
               "bg-[#252525] border border-[#3c3c3c]",
-              "text-[#808080]"
+              "text-[#808080]",
+              "group/id"
             )}
           >
-            <span className="truncate">{selectedField.id}</span>
+            <span className="truncate flex-1">{selectedField.id}</span>
+            <button
+              onClick={handleCopyId}
+              className={cn(
+                "ml-2 p-1 rounded",
+                "opacity-0 group-hover/id:opacity-100",
+                "hover:bg-[#3c3c3c]",
+                "transition-all duration-150",
+                copiedId && "text-emerald-400 opacity-100"
+              )}
+              title="Copy ID"
+            >
+              {copiedId ? (
+                <Check className="h-3 w-3" />
+              ) : (
+                <Copy className="h-3 w-3" />
+              )}
+            </button>
           </div>
         </div>
 
         {/* Key ID */}
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 inspector-section pl-3">
           <Label
             htmlFor="field-key"
             className={cn(
@@ -330,24 +451,14 @@ export function FieldInspector({
               onBlur={() => setFocusedControl(null)}
               placeholder="field_name"
               className={cn(
-                "h-9 text-sm font-mono",
+                "h-9 text-sm font-mono field-input-glow",
                 "bg-[#252525] border-[#3c3c3c]",
                 "text-[#d4d4d4] placeholder:text-[#4a4a4a]",
-                "focus:border-[#007acc] focus:ring-1 focus:ring-[#007acc]/30",
+                "focus:border-[#007acc]",
                 "hover:border-[#4a4a4a]",
                 "transition-all duration-150"
               )}
             />
-            {/* Focus glow effect */}
-            {focusedControl === 'key' && (
-              <div
-                className={cn(
-                  "absolute inset-0 -z-10 rounded-md",
-                  "bg-[#007acc]/10 blur-md",
-                  "animate-pulse"
-                )}
-              />
-            )}
           </div>
           <p className="text-[10px] text-[#6e6e6e] leading-tight">
             Used by AI to identify this field. Use snake_case.
