@@ -15,17 +15,10 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Copy, Check, FileJson } from "@/icons";
+import { Field } from "@/types/FieldTypes";
 
-// ============================================================================
-// Types
-// ============================================================================
-
-export interface Field {
-  id: string;
-  key: string;
-  type: 'text' | 'checkbox' | 'date';
-  required: boolean;
-}
+// Re-export Field type for consumers
+export type { Field } from "@/types/FieldTypes";
 
 export interface JSONPreviewProps {
   fields: Field[];
@@ -246,6 +239,7 @@ export function JSONPreview({
 
         {/* Copy button */}
         <button
+          type="button"
           onClick={handleCopy}
           className={cn(
             "relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-md",

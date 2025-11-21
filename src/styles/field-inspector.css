@@ -1,0 +1,85 @@
+/**
+ * Field Inspector Styles
+ *
+ * Spring physics animations and custom effects for the FieldInspector component.
+ * Extracted from runtime injection for SSR compatibility.
+ *
+ * @author Claude Code
+ * @since November 2025
+ */
+
+/* Spring physics entry animation */
+.field-inspector-spring-enter {
+  animation: fieldEnter 400ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Exit animation */
+.field-inspector-spring-exit {
+  animation: fieldExit 200ms cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes fieldEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fieldExit {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+
+/* Badge glow effect */
+.field-badge-glow {
+  box-shadow:
+    0 0 0 1px currentColor,
+    0 0 8px -2px currentColor;
+}
+
+/* Input focus glow */
+.field-input-glow:focus {
+  box-shadow:
+    0 0 0 1px #007acc,
+    0 0 12px -4px #007acc;
+}
+
+/* Delete confirmation progress bar */
+.delete-progress-bar {
+  background: linear-gradient(90deg,
+    rgba(239, 68, 68, 0.3) 0%,
+    rgba(239, 68, 68, 0.1) 100%
+  );
+}
+
+/* Inspector section with focus indicator */
+.inspector-section {
+  position: relative;
+}
+
+.inspector-section::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 0;
+  background: #007acc;
+  border-radius: 1px;
+  transition: height 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.inspector-section:focus-within::before {
+  height: 100%;
+}

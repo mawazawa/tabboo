@@ -34,104 +34,13 @@ import {
   Sparkles,
   Copy,
 } from "@/icons";
+import { Field } from "@/types/FieldTypes";
 
-// ============================================================================
-// Custom Styles with Spring Physics
-// ============================================================================
+// Import styles (SSR-safe)
+import "@/styles/field-inspector.css";
 
-const inspectorStyles = `
-  .field-inspector-spring-enter {
-    animation: fieldEnter 400ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  }
-
-  .field-inspector-spring-exit {
-    animation: fieldExit 200ms cubic-bezier(0.4, 0, 1, 1) forwards;
-  }
-
-  @keyframes fieldEnter {
-    0% {
-      opacity: 0;
-      transform: translateY(8px) scale(0.98);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
-
-  @keyframes fieldExit {
-    0% {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-    100% {
-      opacity: 0;
-      transform: translateY(-4px) scale(0.98);
-    }
-  }
-
-  .field-badge-glow {
-    box-shadow:
-      0 0 0 1px currentColor,
-      0 0 8px -2px currentColor;
-  }
-
-  .field-input-glow:focus {
-    box-shadow:
-      0 0 0 1px #007acc,
-      0 0 12px -4px #007acc;
-  }
-
-  .delete-progress-bar {
-    background: linear-gradient(90deg,
-      rgba(239, 68, 68, 0.3) 0%,
-      rgba(239, 68, 68, 0.1) 100%
-    );
-  }
-
-  .inspector-section {
-    position: relative;
-  }
-
-  .inspector-section::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 2px;
-    height: 0;
-    background: #007acc;
-    border-radius: 1px;
-    transition: height 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  .inspector-section:focus-within::before {
-    height: 100%;
-  }
-`;
-
-// Inject styles once
-if (typeof document !== 'undefined') {
-  const styleId = 'field-inspector-styles';
-  if (!document.getElementById(styleId)) {
-    const style = document.createElement('style');
-    style.id = styleId;
-    style.textContent = inspectorStyles;
-    document.head.appendChild(style);
-  }
-}
-
-// ============================================================================
-// Types
-// ============================================================================
-
-export interface Field {
-  id: string;
-  key: string;
-  type: 'text' | 'checkbox' | 'date';
-  required: boolean;
-}
+// Re-export Field type for consumers
+export type { Field } from "@/types/FieldTypes";
 
 export interface FieldInspectorProps {
   selectedField: Field | null;
@@ -409,6 +318,7 @@ export function FieldInspector({
           >
             <span className="truncate flex-1">{selectedField.id}</span>
             <button
+              type="button"
               onClick={handleCopyId}
               className={cn(
                 "ml-2 p-1 rounded",
@@ -571,6 +481,7 @@ export function FieldInspector({
       <div className="px-4 py-3 border-t border-[#3c3c3c]">
         <div className="relative">
           <button
+            type="button"
             onClick={handleDelete}
             disabled={isDeleting}
             className={cn(
