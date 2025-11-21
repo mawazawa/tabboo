@@ -78,6 +78,11 @@ export default defineConfig(({ mode }) => ({
             return 'dnd-kit';
           }
 
+          // Canvas zoom/pan library
+          if (id.includes('react-zoom-pan-pinch')) {
+            return 'canvas-zoom';
+          }
+
           // Charts
           if (id.includes('recharts')) {
             return 'charts';
