@@ -134,29 +134,27 @@ export const Canvas: React.FC<CanvasProps> = ({ children }) => {
         onZoomStart={handleInteractionStart}
         onZoomStop={handleInteractionEnd}
       >
-        {({ state }) => (
-          <TransformComponent
-            wrapperStyle={{
-              width: '100%',
-              height: '100%',
-              cursor: 'grab',
-            }}
-            contentStyle={{
-              // GPU-accelerated transforms
-              willChange: isInteracting ? 'transform' : 'auto',
+        <TransformComponent
+          wrapperStyle={{
+            width: '100%',
+            height: '100%',
+            cursor: 'grab',
+          }}
+          contentStyle={{
+            // GPU-accelerated transforms
+            willChange: isInteracting ? 'transform' : 'auto',
+          }}
+        >
+          <div
+            className="w-full h-full"
+            style={{
+              // Ensure GPU layer promotion for children
+              transform: 'translateZ(0)',
             }}
           >
-            <div
-              className="w-full h-full"
-              style={{
-                // Ensure GPU layer promotion for children
-                transform: 'translateZ(0)',
-              }}
-            >
-              {children}
-            </div>
-          </TransformComponent>
-        )}
+            {children}
+          </div>
+        </TransformComponent>
       </TransformWrapper>
 
       {/* Navigation Controls Overlay */}

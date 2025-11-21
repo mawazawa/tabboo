@@ -112,7 +112,7 @@ const CONDITIONAL_REQUIREMENTS: Record<FormType, ConditionalRequirement[]> = {
       message: 'Child names are required when children are involved'
     },
     {
-      field: 'childSupport Amount',
+      field: 'childSupportAmount',
       condition: (data) => data.requestingChildSupport === true,
       message: 'Child support amount is required when requesting child support'
     },

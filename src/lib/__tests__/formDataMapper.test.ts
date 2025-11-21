@@ -633,20 +633,21 @@ describe('formDataMapper', () => {
      *
      * After the fix, values are normalized to trimmed strings.
      */
-    it('should treat string and number case numbers as equal', () => {
+    it('should normalize number values to strings', () => {
       const forms = {
         [FormType.DV100]: {
-          caseNumber: 'FL12345678'  // string
+          caseNumber: '12345678'  // string
         },
         [FormType.DV105]: {
-          caseNumber: 12345678  // number - should normalize to string
+          caseNumber: 12345678  // number - should normalize to same string
         }
       };
 
       const result = extractCommonValues(forms);
 
-      // Should only have one unique value after normalization
-      expect(result.caseNumber.size).toBe(2);  // Different values: "FL12345678" vs "12345678"
+      // Same value in different types should normalize to single string
+      expect(result.caseNumber.size).toBe(1);
+      expect(result.caseNumber.has('12345678')).toBe(true);
     });
 
     it('should normalize whitespace in values', () => {

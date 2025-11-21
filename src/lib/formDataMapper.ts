@@ -566,21 +566,21 @@ export function extractCommonValues(
   };
 
   for (const formData of Object.values(forms)) {
-    if (formData.caseNumber) {
+    if (formData.caseNumber != null) {
       // Normalize to string to prevent false inconsistencies from type differences
       commonValues.caseNumber.add(String(formData.caseNumber).trim());
     }
-    if (formData.county) {
+    if (formData.county != null) {
       commonValues.county.add(String(formData.county).trim());
     }
-    if (formData.petitionerName || formData.protectedPersonName) {
+    if (formData.petitionerName != null || formData.protectedPersonName != null) {
       commonValues.petitionerName.add(
-        String(formData.petitionerName || formData.protectedPersonName).trim()
+        String(formData.petitionerName ?? formData.protectedPersonName).trim()
       );
     }
-    if (formData.respondentName || formData.restrainedPersonName) {
+    if (formData.respondentName != null || formData.restrainedPersonName != null) {
       commonValues.respondentName.add(
-        String(formData.respondentName || formData.restrainedPersonName).trim()
+        String(formData.respondentName ?? formData.restrainedPersonName).trim()
       );
     }
   }

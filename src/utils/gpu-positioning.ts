@@ -93,7 +93,7 @@ export function getGPUAcceleratedClasses(isDragging: boolean): string {
 export function createFPSTracker() {
   let lastTime = performance.now();
   let frames = 0;
-  let fps = 60;
+  let fps: number | null = null; // Don't assume 60 FPS until measured
 
   return {
     tick() {
@@ -108,13 +108,13 @@ export function createFPSTracker() {
         lastTime = currentTime;
       }
     },
-    getFPS() {
+    getFPS(): number | null {
       return fps;
     },
     reset() {
       lastTime = performance.now();
       frames = 0;
-      fps = 60;
+      fps = null;
     },
   };
 }

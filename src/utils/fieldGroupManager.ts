@@ -44,16 +44,21 @@ export const createRelativePositions = (
   });
   
   // Create relative positions (filter out fields with missing positions)
-  return selectedFields
-    .filter(fieldName => fieldPositions[fieldName] != null)
-    .map(fieldName => {
-      const pos = fieldPositions[fieldName];
-      return {
-        fieldName,
-        relativeTop: pos.top - minTop,
-        relativeLeft: pos.left - minLeft,
-      };
-    });
+  const validFields = selectedFields.filter(fieldName => fieldPositions[fieldName] != null);
+
+  // Handle edge case where no fields have valid positions
+  if (validFields.length === 0 || minTop === Infinity || minLeft === Infinity) {
+    return [];
+  }
+
+  return validFields.map(fieldName => {
+    const pos = fieldPositions[fieldName];
+    return {
+      fieldName,
+      relativeTop: pos.top - minTop,
+      relativeLeft: pos.left - minLeft,
+    };
+  });
 };
 
 /**
