@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FL-100 Petition—Marriage/Domestic Partnership</title>
+    <style>
+        /* California Court Form CSS - FL-100 */
+        @page {
+            size: 8.5in 11in;
+            margin: 1in 0.5in 1in 1in;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            line-height: 1.2;
+            color: black;
+            background: white;
+            width: 8.5in;
+            margin: 0 auto;
+            padding: 1in 0.5in 1in 1in;
+        }
+        
+        .form-container {
+            width: 100%;
+            position: relative;
+        }
+        
+        /* Header Section */
+        .header {
+            display: grid;
+            grid-template-columns: 2.5in 3in 2.5in;
+            grid-template-rows: auto;
+            height: 3.5in;
+            margin-bottom: 20pt;
+        }
+        
+        .attorney-info {
+            grid-column: 1;
+            font-size: 10pt;
+            line-height: 1.1;
+        }
+        
+        .court-use-only {
+            grid-column: 3;
+            border: 2pt solid black;
+            text-align: center;
+            font-weight: bold;
+            padding: 8pt;
+            font-size: 11pt;
+        }
+        
+        .court-info {
+            grid-column: 1 / -1;
+            grid-row: 2;
+            text-align: center;
+            margin-top: 20pt;
+            font-size: 11pt;
+        }
+        
+        .input-line {
+            border-bottom: 1pt solid black;
+            display: inline-block;
+            min-width: 2in;
+            height: 14pt;
+            margin: 0 2pt;
+        }
+        
+        .short-line {
+            min-width: 1in;
+        }
+        
+        .medium-line {
+            min-width: 1.5in;
+        }
+        
+        .long-line {
+            min-width: 3in;
+        }
+        
+        /* Case Caption Box */
+        .case-caption {
+            border: 2pt solid black;
+            padding: 8pt;
+            margin: 20pt 0;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10pt;
+        }
+        
+        .case-parties {
+            font-size: 11pt;
+            line-height: 1.3;
+        }
+        
+        .case-number-section {
+            text-align: center;
+            border-left: 1pt solid black;
+            padding-left: 10pt;
+            font-size: 11pt;
+        }
+        
+        /* Form Title */
+        .form-title {
+            text-align: center;
+            margin: 15pt 0;
+            font-weight: bold;
+            font-size: 14pt;
+        }
+        
+        .petition-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10pt;
+            margin: 10pt 0;
+        }
+        
+        /* Checkbox styling */
+        .checkbox {
+            width: 12pt;
+            height: 12pt;
+            border: 1pt solid black;
+            display: inline-block;
+            margin-right: 5pt;
+            vertical-align: baseline;
+            position: relative;
+        }
+        
+        .checkbox.checked::after {
+            content: "✓";
+            position: absolute;
+            top: -2pt;
+            left: 1pt;
+            font-size: 10pt;
+            font-weight: bold;
+        }
+        
+        /* Form Sections */
+        .section {
+            margin: 15pt 0;
+        }
+        
+        .section-number {
+            font-weight: bold;
+            margin-right: 5pt;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 8pt;
+        }
+        
+        .subsection {
+            margin: 8pt 0 8pt 20pt;
+            line-height: 1.4;
+        }
+        
+        .subsection-letter {
+            font-weight: bold;
+            margin-right: 5pt;
+        }
+        
+        /* Table styling for child information */
+        .child-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10pt 0;
+            font-size: 11pt;
+        }
+        
+        .child-table th,
+        .child-table td {
+            border: 1pt solid black;
+            padding: 5pt;
+            text-align: left;
+        }
+        
+        .child-table th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        
+        /* Footer */
+        .footer {
+            position: fixed;
+            bottom: 0.5in;
+            left: 1in;
+            right: 0.5in;
+            font-size: 10pt;
+            text-align: center;
+            border-top: 1pt solid black;
+            padding-top: 5pt;
+        }
+        
+        .page-number {
+            text-align: center;
+            margin: 10pt 0;
+            font-size: 10pt;
+        }
+        
+        /* Signature section */
+        .signature-section {
+            margin-top: 30pt;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20pt;
+        }
+        
+        .signature-line {
+            border-bottom: 1pt solid black;
+            height: 20pt;
+            margin-bottom: 5pt;
+        }
+        
+        /* Print-specific styles */
+        @media print {
+            body {
+                margin: 0;
+                padding: 1in 0.5in 1in 1in;
+            }
+            
+            .page-break {
+                page-break-before: always;
+            }
+            
+            .no-break {
+                page-break-inside: avoid;
+            }
+        }
+        
+        /* Form fields styling */
+        .form-field {
+            display: inline-block;
+            position: relative;
+        }
+        
+        .form-field input[type="text"] {
+            border: none;
+            border-bottom: 1pt solid black;
+            background: transparent;
+            font-family: inherit;
+            font-size: inherit;
+            padding: 0 2pt;
+            width: 100%;
+        }
+        
+        .form-field input[type="checkbox"] {
+            width: 12pt;
+            height: 12pt;
+            margin-right: 5pt;
+        }
+        
+        /* Specific positioning for court form layout */
+        .line-1 { margin-top: 0; }
+        .line-8 { margin-top: 140pt; }
+        .line-11 { margin-top: 180pt; }
+        
+        .attorney-line {
+            margin-bottom: 8pt;
+            font-size: 10pt;
+        }
+        
+        .court-name-line {
+            text-align: center;
+            font-weight: bold;
+            font-size: 12pt;
+            margin: 10pt 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <!-- Header Section -->
+        <div class="header">
+            <div class="attorney-info line-1">
+                <div class="attorney-line">PARTY WITHOUT ATTORNEY OR ATTORNEY</div>
+                <div class="attorney-line">NAME: <span class="input-line long-line"></span></div>
+                <div class="attorney-line">FIRM NAME: <span class="input-line long-line"></span></div>
+                <div class="attorney-line">STREET ADDRESS: <span class="input-line long-line"></span></div>
+                <div class="attorney-line">CITY: <span class="input-line medium-line"></span> STATE: <span class="input-line short-line"></span></div>
+                <div class="attorney-line">ZIP CODE: <span class="input-line short-line"></span></div>
+                <div class="attorney-line">TELEPHONE NO.: <span class="input-line medium-line"></span></div>
+                <div class="attorney-line">FAX NO.: <span class="input-line medium-line"></span></div>
+                <div class="attorney-line">E-MAIL ADDRESS: <span class="input-line long-line"></span></div>
+                <div class="attorney-line">ATTORNEY FOR (name): <span class="input-line long-line"></span></div>
+                <div class="attorney-line">STATE BAR NUMBER: <span class="input-line medium-line"></span></div>
+            </div>
+            
+            <div class="court-use-only">
+                FOR COURT USE ONLY
+            </div>
+        </div>
+        
+        <!-- Court Information -->
+        <div class="court-info line-8">
+            <div class="court-name-line">SUPERIOR COURT OF CALIFORNIA, COUNTY OF <span class="input-line long-line"></span></div>
+            <div>STREET ADDRESS: <span class="input-line long-line"></span></div>
+            <div>MAILING ADDRESS: <span class="input-line long-line"></span></div>
+            <div>CITY AND ZIP CODE: <span class="input-line long-line"></span></div>
+            <div>BRANCH NAME: <span class="input-line long-line"></span></div>
+        </div>
+        
+        <!-- Case Caption -->
+        <div class="case-caption line-11">
+            <div class="case-parties">
+                <div>PETITIONER: <span class="input-line long-line"></span></div>
+                <div style="margin-top: 10pt;">RESPONDENT: <span class="input-line long-line"></span></div>
+            </div>
+            <div class="case-number-section">
+                <div>CASE NUMBER:</div>
+                <div style="margin-top: 10pt;"><span class="input-line medium-line"></span></div>
+                <div style="margin-top: 20pt; font-weight: bold;">FL-100</div>
+            </div>
+        </div>
+        
+        <!-- Form Title and Options -->
+        <div class="form-title">
+            <div>PETITION FOR</div>
+            <div class="petition-options">
+                <div>
+                    <div><span class="checkbox"></span> Dissolution (Divorce) of:</div>
+                    <div style="margin-left: 20pt;"><span class="checkbox"></span> Marriage</div>
+                    <div style="margin-left: 20pt;"><span class="checkbox"></span> Domestic Partnership</div>
+                    <div style="margin-top: 10pt;"><span class="checkbox"></span> Nullity of:</div>
+                    <div style="margin-left: 20pt;"><span class="checkbox"></span> Marriage</div>
+                    <div style="margin-left: 20pt;"><span class="checkbox"></span> Domestic Partnership</div>
+                    <div style="margin-top: 10pt;"><span class="checkbox"></span> Legal Separation of:</div>
+                    <div style="margin-left: 20pt;"><span class="checkbox"></span> Marriage</div>
+                    <div style="margin-left: 20pt;"><span class="checkbox"></span> Domestic Partnership</div>
+                </div>
+                <div style="text-align: right; font-size: 10pt; margin-top: 20pt;">
+                    <span class="checkbox"></span> AMENDED
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 1: Legal Relationship -->
+        <div class="section">
+            <div class="section-title">
+                <span class="section-number">1.</span> LEGAL RELATIONSHIP (check all that apply):
+            </div>
+            <div class="subsection">
+                <span class="subsection-letter">a.</span> <span class="checkbox"></span> We are married.
+            </div>
+            <div class="subsection">
+                <span class="subsection-letter">b.</span> <span class="checkbox"></span> We are domestic partners and our domestic partnership was established in California.
+            </div>
+            <div class="subsection">
+                <span class="subsection-letter">c.</span> <span class="checkbox"></span> We are domestic partners and our domestic partnership was NOT established in California.
+            </div>
+        </div>
+        
+        <!-- Section 2: Residence Requirements -->
+        <div class="section">
+            <div class="section-title">
+                <span class="section-number">2.</span> RESIDENCE REQUIREMENTS (check all that apply):
+            </div>
+            <div class="subsection">
+                <span class="checkbox"></span> Petitioner <span class="checkbox"></span> Respondent has been a resident of this state for at least six months and of this county for at least three months immediately preceding the filing of this Petition. (For a divorce, unless you are in the legal relationship described in 1b., at least one of you must comply with this requirement.)
+            </div>
+            <div class="subsection">
+                <span class="subsection-letter">a.</span> <span class="checkbox"></span> Our domestic partnership was established in California. Neither of us has to be a resident or have a domicile in California to dissolve our partnership here.
+            </div>
+            <div class="subsection">
+                <span class="subsection-letter">b.</span> <span class="checkbox"></span> We are the same sex, were married in California, but currently live in a jurisdiction that does not recognize, and will not dissolve, our marriage. This Petition is filed in the county where we married.
+            </div>
+            <div class="subsection">
+                <span class="subsection-letter">c.</span> Petitioner lives in (specify): <span class="input-line long-line"></span>
+            </div>
+            <div class="subsection" style="margin-left: 20pt;">
+                Respondent lives in (specify): <span class="input-line long-line"></span>
+            </div>
+        </div>
+        
+        <!-- Section 3: Statistical Facts -->
+        <div class="section">
+            <div class="section-title">
+                <span class="section-number">3.</span> STATISTICAL FACTS
+            </div>
+            <div class="subsection">
+                <span class="subsection-letter">a.</span> Date of marriage (specify): <span class="input-line medium-line"></span>
+            </div>
+            <div class="subsection">
+                <span class="subsection-letter">b.</span> Date of separation (specify): <span class="input-line medium-line"></span>
+            </div>
+            <div class="subsection">
+                Time from date of marriage to date of separation (specify): <span class="input-line short-line"></span> Years <span class="input-line short-line"></span> Months
+            </div>
+            <div class="subsection">
+                <span class="subsection-letter">c.</span> Registration date of domestic partnership with the California Secretary of State or other state equivalent (specify below): <span class="input-line long-line"></span>
+            </div>
+            <div class="subsection">
+                Time from date of registration of domestic partnership to date of separation (specify): <span class="input-line short-line"></span> Years <span class="input-line short-line"></span> Months
+            </div>
+        </div>
+        
+        <!-- Section 4: Minor Children -->
+        <div class="section">
+            <div class="section-title">
+                <span class="section-number">4.</span> MINOR CHILDREN
+            </div>
+            <div style="font-size: 10pt; margin-bottom: 10pt;">
+                If there are minor children of Petitioner and Respondent, a completed Declaration Under Uniform Child Custody Jurisdiction and Enforcement Act (UCCJEA) (form FL-105) must be attached.
+            </div>
+            <div class="subsection">
+                <span class="subsection-letter">a.</span> <span class="checkbox"></span> There are no minor children.
+            </div>
+            <div class="subsection">
+                <span class="subsection-letter">b.</span> <span class="checkbox"></span> The minor children are:
+            </div>
+            <table class="child-table">
+                <thead>
+                    <tr>
+                        <th>Child's name</th>
+                        <th>Birthdate</th>
+                        <th>Age</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="input-line long-line"></span></td>
+                        <td><span class="input-line medium-line"></span></td>
+                        <td><span class="input-line short-line"></span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="input-line long-line"></span></td>
+                        <td><span class="input-line medium-line"></span></td>
+                        <td><span class="input-line short-line"></span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="input-line long-line"></span></td>
+                        <td><span class="input-line medium-line"></span></td>
+                        <td><span class="input-line short-line"></span></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="subsection">
+                <span class="checkbox"></span> continued on Attachment 4b. <span class="checkbox"></span> a child who is not yet born.
+            </div>
+            <div class="subsection">
+                <span class="subsection-letter">c.</span> If any children listed above were born before the marriage or domestic partnership, the court has the authority to determine those children to be children of the marriage or domestic partnership.
+            </div>
+        </div>
+        
+        <!-- Page Break for Page 2 -->
+        <div class="page-break"></div>
+        
+        <!-- Page 2 Content -->
+        <div class="case-caption">
+            <div class="case-parties">
+                <div>PETITIONER: <span class="input-line long-line"></span></div>
+                <div style="margin-top: 10pt;">RESPONDENT: <span class="input-line long-line"></span></div>
+            </div>
+            <div class="case-number-section">
+                <div>CASE NUMBER:</div>
+                <div style="margin-top: 10pt;"><span class="input-line medium-line"></span></div>
+                <div style="margin-top: 20pt; font-weight: bold;">FL-100</div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin: 10pt 0;">
+            Petitioner requests that the court make the following orders:
+        </div>
+        
+        <!-- Section 5: Legal Grounds -->
+        <div class="section">
+            <div class="section-title">
+                <span class="section-number">5.</span> LEGAL GROUNDS (Family Code sections 2200–2210, 2310–2312)
+            </div>
+            <div class="subsection">
+                <span class="subsection-letter">a.</span> <span class="checkbox"></span> Divorce or <span class="checkbox"></span> Legal separation of the marriage or domestic partnership based on (check one):
+                <div style="margin-left: 20pt;">
+                    <div><span class="checkbox"></span> (1) irreconcilable differences.</div>
+                    <div><span class="checkbox"></span> (2) permanent legal incapacity to make decisions.</div>
+                </div>
+            </div>
+            <div class="subsection">
+                <span class="subsection-letter">b.</span> <span class="checkbox"></span> Nullity of void marriage or domestic partnership based on
+                <div style="margin-left: 20pt;">
+                    <div><span class="checkbox"></span> (1) incest.</div>
+                    <div><span class="checkbox"></span> (2) bigamy.</div>
+                </div>
+            </div>
+            <div class="subsection">
+                <span class="subsection-letter">c.</span> <span class="checkbox"></span> Nullity of voidable marriage or domestic partnership based on
+                <div style="margin-left: 20pt;">
+                    <div><span class="checkbox"></span> (1) petitioner's age at time of registration of domestic partnership or marriage.</div>
+                    <div><span class="checkbox"></span> (2) prior existing marriage or domestic partnership.</div>
+                    <div><span class="checkbox"></span> (3) unsound mind.</div>
+                    <div><span class="checkbox"></span> (4) fraud.</div>
+                    <div><span class="checkbox"></span> (5) force.</div>
+                    <div><span class="checkbox"></span> (6) physical incapacity.</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Signature Section -->
+        <div class="signature-section">
+            <div>
+                <div style="margin-bottom: 30pt;">Date: <span class="input-line medium-line"></span></div>
+                <div class="signature-line"></div>
+                <div style="text-align: center; font-size: 10pt;">(SIGNATURE OF PETITIONER)</div>
+                <div style="margin-top: 10pt; text-align: center;">
+                    <span class="input-line long-line"></span>
+                </div>
+                <div style="text-align: center; font-size: 10pt;">(TYPE OR PRINT NAME)</div>
+            </div>
+            <div>
+                <div style="margin-bottom: 30pt;">Date: <span class="input-line medium-line"></span></div>
+                <div class="signature-line"></div>
+                <div style="text-align: center; font-size: 10pt;">(SIGNATURE OF ATTORNEY FOR PETITIONER)</div>
+                <div style="margin-top: 10pt; text-align: center;">
+                    <span class="input-line long-line"></span>
+                </div>
+                <div style="text-align: center; font-size: 10pt;">(TYPE OR PRINT NAME)</div>
+            </div>
+        </div>
+        
+        <!-- Footer Information -->
+        <div style="font-size: 10pt; margin-top: 30pt; border-top: 1pt solid black; padding-top: 10pt;">
+            <div style="margin-bottom: 10pt;">
+                <strong>12. I HAVE READ THE RESTRAINING ORDERS ON THE BACK OF THE SUMMONS, AND I UNDERSTAND THAT THEY APPLY TO ME WHEN THIS PETITION IS FILED.</strong>
+            </div>
+            
+            <div style="margin-bottom: 10pt;">
+                <strong>NOTICE—CANCELLATION OF RIGHTS:</strong> Dissolution or legal separation may automatically cancel the rights of a domestic partner or spouse under the other domestic partner's or spouse's will, trust, retirement plan, power of attorney, pay-on-death bank account, survivorship rights to any property owned in joint tenancy, and any other similar thing. It does not automatically cancel the right of a domestic partner or spouse as beneficiary of the other partner's or spouse's life insurance policy. You should review these matters, as well as any credit cards, other credit accounts, insurance policies, retirement plans, and credit reports, to determine whether they should be changed or whether you should take any other actions. Some changes may require the agreement of your partner or spouse or a court order.
+            </div>
+            
+            <div style="margin-bottom: 10pt;">
+                <strong>NOTICE:</strong> You may redact (black out) social security numbers from any written material filed with the court in this case other than a form used to collect child, spousal or partner support.
+            </div>
+        </div>
+        
+        <!-- Form Footer -->
+        <div style="text-align: center; font-size: 10pt; margin-top: 20pt; border-top: 1pt solid black; padding-top: 5pt;">
+            <div>Page 1 of 3</div>
+            <div>Form Adopted for Mandatory Use</div>
+            <div>Judicial Council of California</div>
+            <div>FL-100 [Rev. January 1, 2020]</div>
+            <div>PETITION—MARRIAGE/DOMESTIC PARTNERSHIP (Family Law)</div>
+            <div>Family Code, §§ 297, 299, 2320, 2330, 3409</div>
+            <div>www.courts.ca.gov</div>
+        </div>
+    </div>
+</body>
+</html>

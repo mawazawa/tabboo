@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DV-100 Request for Domestic Violence Restraining Order</title>
+    <style>
+        /* California Court Form CSS - DV-100 */
+        @page {
+            size: 8.5in 11in;
+            margin: 1in 0.5in 1in 1in;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            line-height: 1.3;
+            color: black;
+            background: white;
+            width: 8.5in;
+            margin: 0 auto;
+            padding: 1in 0.5in 1in 1in;
+        }
+        
+        .form-container {
+            width: 100%;
+            position: relative;
+        }
+        
+        /* Header Section */
+        .header {
+            text-align: center;
+            margin-bottom: 20pt;
+        }
+        
+        .judicial-council-info {
+            font-size: 10pt;
+            text-align: left;
+            margin-bottom: 15pt;
+        }
+        
+        .form-title {
+            font-size: 16pt;
+            font-weight: bold;
+            margin: 10pt 0;
+        }
+        
+        .form-subtitle {
+            font-size: 12pt;
+            font-weight: bold;
+            margin-bottom: 5pt;
+        }
+        
+        .form-id {
+            font-size: 18pt;
+            font-weight: bold;
+            margin: 10pt 0;
+        }
+        
+        .clerk-stamp-area {
+            border: 2pt solid black;
+            padding: 15pt;
+            margin: 15pt 0;
+            text-align: center;
+            font-size: 11pt;
+        }
+        
+        .court-info-section {
+            margin: 15pt 0;
+            text-align: left;
+        }
+        
+        .input-line {
+            border-bottom: 1pt solid black;
+            display: inline-block;
+            min-width: 2in;
+            height: 14pt;
+            margin: 0 2pt;
+        }
+        
+        .short-line {
+            min-width: 1in;
+        }
+        
+        .medium-line {
+            min-width: 1.5in;
+        }
+        
+        .long-line {
+            min-width: 3in;
+        }
+        
+        .extra-long-line {
+            min-width: 4in;
+        }
+        
+        /* Checkbox styling */
+        .checkbox {
+            width: 12pt;
+            height: 12pt;
+            border: 1pt solid black;
+            display: inline-block;
+            margin-right: 5pt;
+            vertical-align: baseline;
+            position: relative;
+        }
+        
+        .checkbox.checked::after {
+            content: "✓";
+            position: absolute;
+            top: -2pt;
+            left: 1pt;
+            font-size: 10pt;
+            font-weight: bold;
+        }
+        
+        /* Form Sections */
+        .section {
+            margin: 20pt 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-number {
+            font-size: 16pt;
+            font-weight: bold;
+            margin-right: 10pt;
+            display: inline-block;
+            vertical-align: top;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            font-size: 12pt;
+            margin-bottom: 10pt;
+            display: inline-block;
+            width: calc(100% - 30pt);
+        }
+        
+        .section-content {
+            margin-left: 30pt;
+        }
+        
+        .subsection {
+            margin: 8pt 0;
+            line-height: 1.4;
+        }
+        
+        .subsection-letter {
+            font-weight: bold;
+            margin-right: 5pt;
+        }
+        
+        .instructions-box {
+            border: 1pt solid black;
+            padding: 10pt;
+            margin: 15pt 0;
+            background-color: #f9f9f9;
+            font-size: 11pt;
+        }
+        
+        /* Grid layouts for form fields */
+        .form-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 10pt;
+            align-items: start;
+            margin: 8pt 0;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 5pt;
+            margin: 5pt 0;
+            align-items: baseline;
+        }
+        
+        .label {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        
+        .field {
+            border-bottom: 1pt solid black;
+            min-height: 14pt;
+            padding: 0 2pt;
+        }
+        
+        /* Multi-checkbox groups */
+        .checkbox-group {
+            margin: 5pt 0;
+        }
+        
+        .checkbox-item {
+            margin: 3pt 0;
+            display: block;
+        }
+        
+        /* Address section styling */
+        .address-section {
+            border: 1pt solid black;
+            padding: 10pt;
+            margin: 10pt 0;
+        }
+        
+        .address-note {
+            font-size: 10pt;
+            font-style: italic;
+            color: #666;
+            margin-bottom: 8pt;
+        }
+        
+        /* Table for other protected people */
+        .protected-people-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10pt 0;
+            font-size: 11pt;
+        }
+        
+        .protected-people-table th,
+        .protected-people-table td {
+            border: 1pt solid black;
+            padding: 5pt;
+            text-align: left;
+            vertical-align: top;
+        }
+        
+        .protected-people-table th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        
+        /* Firearms table */
+        .firearms-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10pt 0;
+            font-size: 11pt;
+        }
+        
+        .firearms-table th,
+        .firearms-table td {
+            border: 1pt solid black;
+            padding: 5pt;
+            text-align: left;
+            vertical-align: top;
+        }
+        
+        .firearms-table th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        
+        /* Orders section styling */
+        .orders-intro {
+            background-color: #f0f0f0;
+            padding: 10pt;
+            margin: 15pt 0;
+            border: 1pt solid black;
+            font-size: 11pt;
+        }
+        
+        .order-section {
+            margin: 15pt 0;
+            padding: 10pt;
+            border-left: 3pt solid #ccc;
+        }
+        
+        .order-title {
+            font-weight: bold;
+            font-size: 12pt;
+            margin-bottom: 8pt;
+        }
+        
+        /* Signature section */
+        .signature-section {
+            margin-top: 30pt;
+            page-break-inside: avoid;
+        }
+        
+        .signature-line {
+            border-bottom: 1pt solid black;
+            height: 20pt;
+            margin: 10pt 0;
+        }
+        
+        .signature-label {
+            font-size: 10pt;
+            text-align: center;
+            margin-top: 5pt;
+        }
+        
+        /* Next steps section */
+        .next-steps {
+            border: 2pt solid black;
+            padding: 15pt;
+            margin: 20pt 0;
+            background-color: #f9f9f9;
+        }
+        
+        .next-steps-title {
+            font-weight: bold;
+            font-size: 14pt;
+            margin-bottom: 10pt;
+            text-align: center;
+        }
+        
+        .step {
+            margin: 8pt 0;
+            font-size: 11pt;
+        }
+        
+        .step-letter {
+            font-weight: bold;
+            margin-right: 5pt;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            font-size: 10pt;
+            margin-top: 20pt;
+            border-top: 1pt solid black;
+            padding-top: 5pt;
+        }
+        
+        .page-number {
+            text-align: center;
+            margin: 10pt 0;
+            font-size: 10pt;
+        }
+        
+        /* Warning notices */
+        .warning-notice {
+            background-color: #fff3cd;
+            border: 1pt solid #ffeaa7;
+            padding: 10pt;
+            margin: 10pt 0;
+            font-size: 11pt;
+        }
+        
+        /* Print-specific styles */
+        @media print {
+            body {
+                margin: 0;
+                padding: 1in 0.5in 1in 1in;
+            }
+            
+            .page-break {
+                page-break-before: always;
+            }
+            
+            .no-break {
+                page-break-inside: avoid;
+            }
+            
+            .checkbox {
+                print-color-adjust: exact;
+            }
+        }
+        
+        /* Form field styling */
+        .form-field {
+            display: inline-block;
+            position: relative;
+        }
+        
+        .form-field input[type="text"] {
+            border: none;
+            border-bottom: 1pt solid black;
+            background: transparent;
+            font-family: inherit;
+            font-size: inherit;
+            padding: 0 2pt;
+            width: 100%;
+        }
+        
+        .form-field input[type="checkbox"] {
+            width: 12pt;
+            height: 12pt;
+            margin-right: 5pt;
+        }
+        
+        /* Multi-line text areas */
+        .text-area {
+            border: 1pt solid black;
+            min-height: 60pt;
+            padding: 5pt;
+            margin: 5pt 0;
+            width: 100%;
+        }
+        
+        /* Emphasis styling */
+        .bold {
+            font-weight: bold;
+        }
+        
+        .italic {
+            font-style: italic;
+        }
+        
+        .underline {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <!-- Header with Judicial Council Information -->
+        <div class="judicial-council-info">
+            Judicial Council of California,<br>
+            www.courts.ca.gov<br>
+            Rev. January 1, 2025, Mandatory Form<br>
+            Family Code, § 6200 et seq.
+        </div>
+        
+        <!-- Form Title Section -->
+        <div class="header">
+            <div class="form-title">Request for Domestic Violence Restraining Order</div>
+            <div class="form-subtitle">(Domestic Violence Prevention)</div>
+        </div>
+        
+        <!-- Warning Notice -->
+        <div class="warning-notice">
+            <strong>This is not a Court Order.</strong>
+        </div>
+        
+        <!-- Form ID and Clerk Section -->
+        <div style="display: grid; grid-template-columns: 1fr auto; gap: 20pt; margin: 20pt 0;">
+            <div>
+                <div class="form-id">Request for Domestic Violence Restraining Order</div>
+                <div class="form-id">DV-100</div>
+            </div>
+            <div class="clerk-stamp-area">
+                Clerk stamps date here when form is filed.
+            </div>
+        </div>
+        
+        <!-- Court Information Section -->
+        <div class="court-info-section">
+            <div style="margin-bottom: 10pt;">
+                <strong>Fill in court name and street address:</strong><br>
+                Superior Court of California, County of <span class="input-line long-line"></span>
+            </div>
+            <div style="margin-bottom: 10pt;">
+                <strong>Court fills in case number when form is filed.</strong><br>
+                Case Number: <span class="input-line medium-line"></span>
+            </div>
+        </div>
+        
+        <!-- Instructions -->
+        <div class="instructions-box">
+            <strong>Instructions</strong><br>
+            To ask for a domestic violence restraining order, you will need to complete this form and other forms (see page 13 for list of forms). If this case includes sensitive information about a minor child (under 18 years old), see form DV-160-INFO, Privacy Protection for a Minor (Person Under 18 Years Old), for more information on how to protect the child's information.
+        </div>
+        
+        <!-- Section 1: Person Asking for Protection -->
+        <div class="section">
+            <div style="display: flex; align-items: flex-start;">
+                <div class="section-number">1</div>
+                <div style="flex: 1;">
+                    <div class="section-title">Person Asking for Protection</div>
+                    <div class="section-content">
+                        <div class="form-row">
+                            <span class="label">a. Your name:</span>
+                            <span class="input-line extra-long-line"></span>
+                        </div>
+                        <div class="form-row">
+                            <span class="label">b. Your age:</span>
+                            <span class="input-line short-line"></span>
+                        </div>
+                        <div class="subsection">
+                            <div class="label">c. Address where you can receive court papers</div>
+                            <div class="address-note">
+                                (This address will be used by the court and by the person in <strong>2</strong> to send you official court dates, orders, and papers. For privacy, you may use another address like a post office box, a Safe at Home address, or another person's address, if you have their permission and can get your mail regularly. If you have a lawyer, give their information.)
+                            </div>
+                            <div class="form-row">
+                                <span class="label">Address:</span>
+                                <span class="input-line extra-long-line"></span>
+                            </div>
+                            <div class="form-row">
+                                <span class="label">City:</span>
+                                <span class="input-line medium-line"></span>
+                                <span class="label">State:</span>
+                                <span class="input-line short-line"></span>
+                                <span class="label">Zip:</span>
+                                <span class="input-line short-line"></span>
+                            </div>
+                        </div>
+                        <div class="subsection">
+                            <div class="label">d. Your contact information (optional)</div>
+                            <div class="address-note">
+                                (The court could use this information to contact you. If you don't want the person in <strong>2</strong> to have this information, leave it blank or provide a safe phone number or email address. If you have a lawyer, give their information.)
+                            </div>
+                            <div class="form-row">
+                                <span class="label">Telephone:</span>
+                                <span class="input-line medium-line"></span>
+                                <span class="label">Fax:</span>
+                                <span class="input-line medium-line"></span>
+                            </div>
+                            <div class="form-row">
+                                <span class="label">Email Address:</span>
+                                <span class="input-line extra-long-line"></span>
+                            </div>
+                        </div>
+                        <div class="subsection">
+                            <div class="label">e. Your lawyer's information (if you have one)</div>
+                            <div class="form-row">
+                                <span class="label">Name:</span>
+                                <span class="input-line long-line"></span>
+                                <span class="label">State Bar No.:</span>
+                                <span class="input-line medium-line"></span>
+                            </div>
+                            <div class="form-row">
+                                <span class="label">Firm Name:</span>
+                                <span class="input-line extra-long-line"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 2: Person You Want Protection From -->
+        <div class="section">
+            <div style="display: flex; align-items: flex-start;">
+                <div class="section-number">2</div>
+                <div style="flex: 1;">
+                    <div class="section-title">Person You Want Protection From</div>
+                    <div class="section-content">
+                        <div class="form-row">
+                            <span class="label">a. Full name:</span>
+                            <span class="input-line extra-long-line"></span>
+                        </div>
+                        <div class="form-row">
+                            <span class="label">b. Age (give estimate if you do not know exact age):</span>
+                            <span class="input-line short-line"></span>
+                        </div>
+                        <div class="form-row">
+                            <span class="label">c. Date of birth (if known):</span>
+                            <span class="input-line medium-line"></span>
+                        </div>
+                        <div class="form-row">
+                            <span class="label">d. Gender:</span>
+                            <span class="checkbox"></span> M
+                            <span class="checkbox"></span> F
+                            <span class="checkbox"></span> Nonbinary
+                        </div>
+                        <div class="form-row">
+                            <span class="label">e. Race:</span>
+                            <span class="input-line long-line"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 3: Your Relationship -->
+        <div class="section">
+            <div style="display: flex; align-items: flex-start;">
+                <div class="section-number">3</div>
+                <div style="flex: 1;">
+                    <div class="section-title">Your Relationship to the Person in <strong>2</strong></div>
+                    <div class="address-note" style="margin-bottom: 10pt;">
+                        (If you do not have one of these relationships with the person in <strong>2</strong>, do not complete the rest of this form. You may be eligible for another type of restraining order. Learn more at https://selfhelp.courts.ca.gov/restraining-orders.)
+                    </div>
+                    <div class="address-note" style="margin-bottom: 10pt;">
+                        <strong>(Check all that apply)</strong>
+                    </div>
+                    <div class="section-content">
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <span class="checkbox"></span> <strong>a.</strong> We have a child or children together (names of children): <span class="input-line long-line"></span>
+                            </div>
+                            <div class="checkbox-item">
+                                <span class="checkbox"></span> <strong>b.</strong> We are married or registered domestic partners.
+                            </div>
+                            <div class="checkbox-item">
+                                <span class="checkbox"></span> <strong>c.</strong> We used to be married or registered domestic partners.
+                            </div>
+                            <div class="checkbox-item">
+                                <span class="checkbox"></span> <strong>d.</strong> We are dating or used to date.
+                            </div>
+                            <div class="checkbox-item">
+                                <span class="checkbox"></span> <strong>e.</strong> We are or used to be engaged to be married.
+                            </div>
+                            <div class="checkbox-item">
+                                <span class="checkbox"></span> <strong>f.</strong> We are related. The person in <strong>2</strong> is my (check all that apply):
+                                <div style="margin-left: 20pt; margin-top: 5pt;">
+                                    <div><span class="checkbox"></span> Parent, stepparent, or parent-in-law</div>
+                                    <div><span class="checkbox"></span> Brother, sister, sibling, stepsibling, or sibling in-law</div>
+                                    <div><span class="checkbox"></span> Child, stepchild, or legally adopted child</div>
+                                    <div><span class="checkbox"></span> Grandparent, step-grandparent, or grandparent-in-law</div>
+                                    <div><span class="checkbox"></span> Child's spouse</div>
+                                    <div><span class="checkbox"></span> Grandchild, step-grandchild, or grandchild-in-law</div>
+                                </div>
+                            </div>
+                            <div class="checkbox-item">
+                                <span class="checkbox"></span> <strong>g.</strong> We live together or used to live together. (If checked, answer question below):
+                                <div style="margin-left: 20pt; margin-top: 5pt;">
+                                    Have you lived together with the person in <strong>2</strong> as a family or household (more than just roommates)?
+                                    <span class="checkbox"></span> Yes <span class="checkbox"></span> No
+                                    <div style="font-size: 10pt; margin-top: 5pt;">
+                                        (If no, you do not qualify for this kind of restraining order unless you checked one of the other relationships listed above.)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Page Break -->
+        <div class="page-break"></div>
+        
+        <!-- Section 4: Other Restraining Orders -->
+        <div class="section">
+            <div style="display: flex; align-items: flex-start;">
+                <div class="section-number">4</div>
+                <div style="flex: 1;">
+                    <div class="section-title">Other Restraining Orders and Court Cases</div>
+                    <div class="section-content">
+                        <div class="subsection">
+                            <strong>a.</strong> Are there any restraining orders currently in place or that have expired in the last six months (examples: Did the police give you a restraining order that lasts a few days? Do you have one from the criminal court?)
+                            <div style="margin-left: 20pt;">
+                                <div><span class="checkbox"></span> No</div>
+                                <div><span class="checkbox"></span> Yes (If yes, give information below and attach a copy if you have one.)</div>
+                                <div style="margin-top: 10pt;">
+                                    (1) <span class="input-line medium-line"></span> (date of order): <span class="input-line medium-line"></span> (date it expires):
+                                </div>
+                                <div style="margin-top: 5pt;">
+                                    (2) <span class="input-line medium-line"></span> (date of order): <span class="input-line medium-line"></span> (date it expires):
+                                </div>
+                            </div>
+                        </div>
+                        <div class="subsection">
+                            <strong>b.</strong> Are you involved in any other court case with the person in <strong>2</strong>?
+                            <div style="margin-left: 20pt;">
+                                <div><span class="checkbox"></span> No</div>
+                                <div><span class="checkbox"></span> Yes (If you know, list where the case was filed (city, state, or tribe), the year it was filed, and case number.)</div>
+                                <div style="margin-top: 10pt;">
+                                    <div><span class="checkbox"></span> Custody</div>
+                                    <div><span class="checkbox"></span> Divorce</div>
+                                    <div><span class="checkbox"></span> Juvenile (child welfare or juvenile justice):</div>
+                                    <div><span class="checkbox"></span> Guardianship</div>
+                                    <div><span class="checkbox"></span> Criminal</div>
+                                    <div><span class="checkbox"></span> Other (what kind of case?): <span class="input-line long-line"></span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 5: Describe Abuse -->
+        <div class="section">
+            <div style="display: flex; align-items: flex-start;">
+                <div class="section-number">5</div>
+                <div style="flex: 1;">
+                    <div class="section-title">Describe Abuse</div>
+                    <div class="instructions-box">
+                        In this section, explain how the person in <strong>2</strong> has been abusive. The judge will use this information to decide your request. Listed below are some examples of what "abuse" means under the law. It is not a complete list of all examples of abuse. Give information on any incident that you believe was abusive.
+                    </div>
+                    <div class="section-content">
+                        <!-- Abuse examples in grid format -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10pt; font-size: 10pt; margin: 10pt 0;">
+                            <div>
+                                • made repeated unwanted contact with you<br>
+                                • tracked, controlled, or blocked your movements<br>
+                                • kept you from getting food or basic needs<br>
+                                • isolated you from friends, family, or other support<br>
+                                • made threats based on actual or suspected immigration status<br>
+                                • made you do something by force, threat, or intimidation<br>
+                                • stopped you from accessing or earning money
+                            </div>
+                            <div>
+                                • tried to control/interfere with your contraception, birth control, pregnancy, or access to health information<br>
+                                • harassed you<br>
+                                • hit, kicked, pushed, or bit you<br>
+                                • injured you or tried to<br>
+                                • threatened to hurt or kill you<br>
+                                • sexually abused you<br>
+                                • abused a pet or animal<br>
+                                • destroyed your property<br>
+                                • choked or strangled you<br>
+                                • abused your children
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Most Recent Abuse Section -->
+        <div class="section">
+            <div class="section-title">Most Recent Abuse</div>
+            <div class="section-content">
+                <div class="form-row">
+                    <span class="label">a. Date of abuse (give an estimate if you don't know the exact date):</span>
+                    <span class="input-line medium-line"></span>
+                </div>
+                <div class="subsection">
+                    <strong>b.</strong> Did anyone else hear or see what happened on this day?
+                    <span class="checkbox"></span> I don't know
+                    <span class="checkbox"></span> No
+                    <span class="checkbox"></span> Yes (If yes, give names): <span class="input-line long-line"></span>
+                </div>
+                <div class="subsection">
+                    <strong>c.</strong> Did the person in <strong>2</strong> use or threaten to use a gun or other weapon?
+                    <span class="checkbox"></span> No
+                    <span class="checkbox"></span> Yes (If yes, describe gun or weapon): <span class="input-line long-line"></span>
+                </div>
+                <div class="subsection">
+                    <strong>d.</strong> Did the person in <strong>2</strong> cause you any emotional or physical harm?
+                    <span class="checkbox"></span> No
+                    <span class="checkbox"></span> Yes (If yes, describe harm): <span class="input-line long-line"></span>
+                </div>
+                <div class="subsection">
+                    <strong>e.</strong> Did the police come?
+                    <span class="checkbox"></span> I don't know
+                    <span class="checkbox"></span> No
+                    <span class="checkbox"></span> Yes (If the police gave you a restraining order, list it in <strong>4</strong>.)
+                </div>
+                <div class="subsection">
+                    <strong>f.</strong> Give more details about how the person in <strong>2</strong> was abusive on this day. Details can include what was said, done, or sent to you (examples: text messages, emails, or pictures), how often something happened, etc.
+                    <div class="text-area"></div>
+                </div>
+                <div class="subsection">
+                    <strong>g.</strong> How often has the person in <strong>2</strong> abused you like this?
+                    <div style="margin-left: 20pt;">
+                        <span class="checkbox"></span> Just this once
+                        <span class="checkbox"></span> 2–5 times
+                        <span class="checkbox"></span> Weekly
+                        <span class="checkbox"></span> Other: <span class="input-line medium-line"></span>
+                    </div>
+                    <div style="margin-top: 10pt;">
+                        Give dates or estimates of when it happened, if known: <span class="input-line extra-long-line"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Signature Section -->
+        <div class="signature-section">
+            <div class="section-title">Your Signature</div>
+            <div style="margin: 20pt 0;">
+                I declare under penalty of perjury under the laws of the State of California that the information above is true and correct.
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30pt;">
+                <div>
+                    <div>Date: <span class="input-line medium-line"></span></div>
+                    <div class="signature-line" style="margin-top: 20pt;"></div>
+                    <div class="signature-label">Sign your name</div>
+                </div>
+                <div>
+                    <div style="margin-top: 50pt;">
+                        <span class="input-line extra-long-line"></span>
+                    </div>
+                    <div class="signature-label">Type or print your name</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Next Steps Section -->
+        <div class="next-steps">
+            <div class="next-steps-title">Your Next Steps</div>
+            <div class="step">
+                <span class="step-letter">u</span> You must complete at least three additional forms:
+                <div style="margin-left: 15pt;">
+                    Form <strong>DV-110</strong>, Temporary Restraining Order (only items 1, 2 and 3)<br>
+                    Form <strong>DV-109</strong>, Notice of Court Hearing (only items 1 and 2)<br>
+                    Form <strong>CLETS-001</strong>, Confidential Information for Law Enforcement
+                </div>
+            </div>
+            <div class="step">
+                <span class="step-letter">v</span> Turn in your completed forms to the court. Find out when your forms will be ready for you.
+            </div>
+            <div class="step">
+                <span class="step-letter">w</span> Once you get your forms back from the court, have someone "serve" a copy of all forms on the person in <strong>2</strong>. The sheriff or marshal can do this for free. See form <strong>SER-001</strong>, Request for Sheriff to Serve Court Papers. Learn more about service at https://selfhelp.courts.ca.gov/sheriff-serves-your-request-restraining-order.
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div>DV-100, Page 1 of 13</div>
+            <div style="margin-top: 10pt;">
+                <button onclick="window.print()" style="margin-right: 10pt;">Print this form</button>
+                <button onclick="document.querySelectorAll('input').forEach(i => i.value = '')" style="margin-right: 10pt;">Clear this form</button>
+                <button>Save this form</button>
+            </div>
+            <div style="margin-top: 10pt; font-size: 9pt;">
+                For your protection and privacy, please press the Clear This Form button after you have printed the form.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

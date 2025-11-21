@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FL-320 — Responsive Declaration to Request for Order (Replica)</title>
+<link rel="stylesheet" href="fl320_replica.css">
+</head>
+<body>
+<form id="fl320" data-form="FL-320" data-rev="2025-07-01">
+  <section class="page" data-page="1">
+    <div class="header-line">
+      <div class="judicial">
+        <div>Form Adopted for Mandatory Use<br>Judicial Council of California</div>
+        <div class="form-id">FL-320 [Rev. July 1, 2025]</div>
+        <div>RESPONSIVE DECLARATION TO REQUEST FOR ORDER</div>
+        <div class="small">Code of Civil Procedure, § 1005 · Cal. Rules of Court, rule 5.92 · courts.ca.gov</div>
+      </div>
+      <div class="code">FL-320</div>
+    </div>
+    <div class="row">
+      <div class="w-60 box">
+        <div class="label">Party Without Attorney or Attorney</div>
+        <div class="row mt6">
+          <div class="w-60">
+            <label class="small">Name</label>
+            <input name="attorney_name" type="text" autocomplete="name" />
+          </div>
+          <div class="w-40">
+            <label class="small">State Bar Number</label>
+            <input name="attorney_bar" type="text" inputmode="numeric"/>
+          </div>
+        </div>
+        <div class="row mt6">
+          <div class="w-100">
+            <label class="small">Firm Name</label>
+            <input name="firm_name" type="text"/>
+          </div>
+        </div>
+        <div class="row mt6">
+          <div class="w-60">
+            <label class="small">Street Address</label>
+            <input name="address_street" type="text" autocomplete="street-address"/>
+          </div>
+          <div class="w-40">
+            <label class="small">City</label>
+            <input name="address_city" type="text" autocomplete="address-level2"/>
+          </div>
+        </div>
+        <div class="row mt6">
+          <div class="w-30">
+            <label class="small">State</label>
+            <input name="address_state" type="text" maxlength="2" autocomplete="address-level1"/>
+          </div>
+          <div class="w-30">
+            <label class="small">ZIP Code</label>
+            <input name="address_zip" type="text" inputmode="numeric" autocomplete="postal-code"/>
+          </div>
+          <div class="w-40">
+            <label class="small">Telephone</label>
+            <input name="phone" type="tel" autocomplete="tel"/>
+          </div>
+        </div>
+        <div class="row mt6">
+          <div class="w-50">
+            <label class="small">Fax</label>
+            <input name="fax" type="tel"/>
+          </div>
+          <div class="w-50">
+            <label class="small">Email</label>
+            <input name="email" type="email" autocomplete="email"/>
+          </div>
+        </div>
+        <div class="row mt6">
+          <div class="w-100">
+            <label class="small">Attorney For (name)</label>
+            <input name="attorney_for" type="text"/>
+          </div>
+        </div>
+      </div>
+      <div class="w-40 box">
+        <div class="label">For Court Use Only</div>
+        <div class="courtuse" aria-label="Court Use Only"></div>
+      </div>
+    </div>
+
+    <div class="box mt12">
+      <div class="label">Superior Court of California, County of</div>
+      <div class="row mt6">
+        <div class="w-60">
+          <label class="small">Street Address</label>
+          <input name="court_street" type="text"/>
+        </div>
+        <div class="w-40">
+          <label class="small">Mailing Address</label>
+          <input name="court_mailing" type="text"/>
+        </div>
+      </div>
+      <div class="row mt6">
+        <div class="w-60">
+          <label class="small">City and ZIP Code</label>
+          <input name="court_cityzip" type="text"/>
+        </div>
+        <div class="w-40">
+          <label class="small">Branch Name</label>
+          <input name="court_branch" type="text"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt12">
+      <div class="w-50 box">
+        <label class="small">Petitioner</label>
+        <input name="petitioner" type="text"/>
+      </div>
+      <div class="w-50 box">
+        <label class="small">Respondent</label>
+        <input name="respondent" type="text"/>
+      </div>
+    </div>
+    <div class="row mt6">
+      <div class="w-50 box">
+        <label class="small">Other Parent/Party</label>
+        <input name="other_party" type="text"/>
+      </div>
+      <div class="w-25 box">
+        <label class="small">Case Number</label>
+        <input name="case_number" type="text"/>
+      </div>
+      <div class="w-25 box">
+        <label class="small">Form Code</label>
+        <input name="form_code" type="text" value="FL-320"/>
+      </div>
+    </div>
+
+    <div class="box mt12">
+      <div class="title">Responsive Declaration to Request for Order</div>
+      <div class="row mt6">
+        <div class="w-33">
+          <label class="small">Hearing Date</label>
+          <input name="hearing_date" type="date"/>
+        </div>
+        <div class="w-33">
+          <label class="small">Time</label>
+          <input name="hearing_time" type="time"/>
+        </div>
+        <div class="w-33">
+          <label class="small">Dept. / Room</label>
+          <input name="hearing_dept" type="text"/>
+        </div>
+      </div>
+      <div class="note mt12 small">
+        Read Information Sheet: Responsive Declaration to Request for Order (form FL-320-INFO) for more information about this form.
+      </div>
+    </div>
+
+    <div class="box mt12" id="sec-1">
+      <div class="title">1. Restraining Order Information</div>
+      <label class="checkbox mt6"><input type="checkbox" name="dv_none"> No domestic violence restraining/protective orders are now in effect between the parties in this case.</label>
+      <label class="checkbox mt6"><input type="checkbox" name="dv_in_effect"> I agree that one or more domestic violence restraining/protective orders are now in effect between the parties in this case.</label>
+    </div>
+
+    <div class="box mt12" id="sec-2">
+      <div class="title">2. Child Custody / Visitation (Parenting Time)</div>
+      <label class="checkbox mt6"><input type="checkbox" name="custody_consent"> I consent to the order requested for child custody (legal and physical custody).</label>
+      <label class="checkbox mt6"><input type="checkbox" name="visitation_consent"> I consent to the order requested for visitation (parenting time).</label>
+      <label class="checkbox mt6"><input type="checkbox" name="custody_do_not_consent"> I do not consent to the order requested for child custody / visitation (parenting time) but I consent to the following order:</label>
+      <textarea name="custody_alt"></textarea>
+    </div>
+
+    <div class="box mt12" id="sec-3">
+      <div class="title">3. Child Support</div>
+      <label class="checkbox mt6"><input type="checkbox" name="cs_decl"> I have completed and filed a current Income and Expense Declaration (FL-150) or, if eligible, a current Financial Statement (Simplified) (FL-155) to support my responsive declaration.</label>
+      <label class="checkbox mt6"><input type="checkbox" name="cs_consent"> I consent to the order requested.</label>
+      <label class="checkbox mt6"><input type="checkbox" name="cs_guideline"> I consent to guideline support.</label>
+      <label class="checkbox mt6"><input type="checkbox" name="cs_do_not_consent"> I do not consent to the order requested but I consent to the following order:</label>
+      <textarea name="cs_alt"></textarea>
+    </div>
+
+    <div class="box mt12" id="sec-4">
+      <div class="title">4. Spousal or Domestic Partner Support</div>
+      <label class="checkbox mt6"><input type="checkbox" name="ss_decl"> I have completed and filed a current Income and Expense Declaration (FL-150) to support my responsive declaration.</label>
+      <label class="checkbox mt6"><input type="checkbox" name="ss_consent"> I consent to the order requested.</label>
+      <label class="checkbox mt6"><input type="checkbox" name="ss_do_not_consent"> I do not consent to the order requested but I consent to the following order:</label>
+      <textarea name="ss_alt"></textarea>
+    </div>
+
+    <div class="footer">
+      <div>FL-320 [Rev. July 1, 2025] Responsive Declaration to Request for Order</div>
+      <div class="code">FL-320</div>
+    </div>
+    <div class="pageno">Page 1 of 2</div>
+  </section>
+
+  <section class="page" data-page="2">
+    <div class="row">
+      <div class="w-50 box">
+        <label class="small">Petitioner</label>
+        <input name="petitioner_p2" type="text"/>
+      </div>
+      <div class="w-50 box">
+        <label class="small">Respondent</label>
+        <input name="respondent_p2" type="text"/>
+      </div>
+    </div>
+    <div class="row mt6">
+      <div class="w-50 box">
+        <label class="small">Other Parent/Party</label>
+        <input name="other_party_p2" type="text"/>
+      </div>
+      <div class="w-50 box">
+        <label class="small">Case Number</label>
+        <input name="case_number_p2" type="text"/>
+      </div>
+    </div>
+
+    <div class="box mt12" id="sec-5">
+      <div class="title">5. Property Control</div>
+      <label class="checkbox mt6"><input type="checkbox" name="pc_consent"> I consent to the order requested.</label>
+      <label class="checkbox mt6"><input type="checkbox" name="pc_do_not_consent"> I do not consent to the order requested but I consent to the following order:</label>
+      <textarea name="pc_alt"></textarea>
+    </div>
+
+    <div class="box mt12" id="sec-6">
+      <div class="title">6. Attorney’s Fees and Costs</div>
+      <label class="checkbox mt6"><input type="checkbox" name="af_decl"> I have completed and filed a current Income and Expense Declaration (FL-150) to support my responsive declaration.</label>
+      <label class="checkbox mt6"><input type="checkbox" name="af_attach"> I have completed and filed with this form a Supporting Declaration for Attorney’s Fees and Costs Attachment (FL-158) or a declaration that addresses the factors covered in that form.</label>
+      <label class="checkbox mt6"><input type="checkbox" name="af_consent"> I consent to the order requested.</label>
+      <label class="checkbox mt6"><input type="checkbox" name="af_do_not_consent"> I do not consent to the order requested but I consent to the following order:</label>
+      <textarea name="af_alt"></textarea>
+    </div>
+
+    <div class="box mt12" id="sec-7">
+      <div class="title">7. Other Orders Requested</div>
+      <label class="checkbox mt6"><input type="checkbox" name="oo_consent"> I consent to the order requested.</label>
+      <label class="checkbox mt6"><input type="checkbox" name="oo_do_not_consent"> I do not consent to the order requested but I consent to the following order:</label>
+      <textarea name="oo_alt"></textarea>
+    </div>
+
+    <div class="box mt12" id="sec-8">
+      <div class="title">8. Time for Service / Time Until Hearing</div>
+      <label class="checkbox mt6"><input type="checkbox" name="ts_consent"> I consent to the order requested.</label>
+      <label class="checkbox mt6"><input type="checkbox" name="ts_do_not_consent"> I do not consent to the order requested but I consent to the following order:</label>
+      <textarea name="ts_alt"></textarea>
+    </div>
+
+    <div class="box mt12" id="sec-9">
+      <div class="title">9. Facts to Support Responsive Declaration</div>
+      <div class="small">The facts that I write and attach to this form cannot be longer than 10 pages, unless the court gives me permission.</div>
+      <label class="checkbox mt6"><input type="checkbox" name="attach_9" checked> Attachment 9.</label>
+      <textarea name="facts"></textarea>
+    </div>
+
+    <div class="row mt18">
+      <div class="w-60"></div>
+      <div class="w-40">
+        <div class="small">Date</div>
+        <input name="sign_date" type="date"/>
+        <div class="mt6 small">Type or Print Name</div>
+        <input name="sign_name" type="text"/>
+        <div class="mt6 small">Signature of Declarant</div>
+        <input name="sign_signature" type="text" placeholder="(wet or digital signature)"/>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div>FL-320 [Rev. July 1, 2025] Responsive Declaration to Request for Order</div>
+      <div class="code">FL-320</div>
+    </div>
+    <div class="pageno">Page 2 of 2</div>
+  </section>
+
+  <div class="page no-print" aria-hidden="true" style="min-height:auto">
+    <div class="row">
+      <button type="button" onclick="window.print()">Print</button>
+      <button type="button" onclick="exportJSON()">Export JSON</button>
+      <button type="button" onclick="importJSON()">Import JSON</button>
+      <button type="reset">Clear</button>
+    </div>
+    <pre id="out" style="white-space:pre-wrap;margin-top:10px;"></pre>
+  </div>
+</form>
+
+<script>
+function formToJSON(form){
+  const data = {};
+  const els = form.querySelectorAll('input, textarea, select');
+  els.forEach(el => {
+    if(el.type === 'checkbox'){ data[el.name] = el.checked; }
+    else { data[el.name] = el.value; }
+  });
+  return data;
+}
+function JSONToForm(form, obj){
+  const els = form.querySelectorAll('input, textarea, select');
+  els.forEach(el => {
+    if(!(el.name in obj)) return;
+    if(el.type === 'checkbox'){ el.checked = !!obj[el.name]; }
+    else { el.value = obj[el.name] ?? ''; }
+  });
+}
+function exportJSON(){
+  const data = formToJSON(document.getElementById('fl320'));
+  const txt = JSON.stringify(data, null, 2);
+  document.getElementById('out').textContent = txt;
+}
+function importJSON(){
+  const txt = prompt('Paste JSON to import:');
+  if(!txt) return;
+  try{
+    const obj = JSON.parse(txt);
+    JSONToForm(document.getElementById('fl320'), obj);
+  }catch(e){ alert('Invalid JSON'); }
+}
+</script>
+
+<script type="application/json" id="fl320-schema">
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FL-320 Responsive Declaration (Replica)",
+  "type": "object",
+  "properties": {
+    "attorney_name": {"type":"string"},
+    "attorney_bar": {"type":"string"},
+    "firm_name": {"type":"string"},
+    "address_street": {"type":"string"},
+    "address_city": {"type":"string"},
+    "address_state": {"type":"string", "maxLength": 2},
+    "address_zip": {"type":"string"},
+    "phone": {"type":"string"},
+    "fax": {"type":"string"},
+    "email": {"type":"string", "format":"email"},
+    "attorney_for": {"type":"string"},
+    "court_street": {"type":"string"},
+    "court_mailing": {"type":"string"},
+    "court_cityzip": {"type":"string"},
+    "court_branch": {"type":"string"},
+    "petitioner": {"type":"string"},
+    "respondent": {"type":"string"},
+    "other_party": {"type":"string"},
+    "case_number": {"type":"string"},
+    "form_code": {"type":"string", "const":"FL-320"},
+    "hearing_date": {"type":"string", "format":"date"},
+    "hearing_time": {"type":"string"},
+    "hearing_dept": {"type":"string"},
+    "dv_none": {"type":"boolean"},
+    "dv_in_effect": {"type":"boolean"},
+    "custody_consent": {"type":"boolean"},
+    "visitation_consent": {"type":"boolean"},
+    "custody_do_not_consent": {"type":"boolean"},
+    "custody_alt": {"type":"string"},
+    "cs_decl": {"type":"boolean"},
+    "cs_consent": {"type":"boolean"},
+    "cs_guideline": {"type":"boolean"},
+    "cs_do_not_consent": {"type":"boolean"},
+    "cs_alt": {"type":"string"},
+    "ss_decl": {"type":"boolean"},
+    "ss_consent": {"type":"boolean"},
+    "ss_do_not_consent": {"type":"boolean"},
+    "ss_alt": {"type":"string"},
+    "petitioner_p2": {"type":"string"},
+    "respondent_p2": {"type":"string"},
+    "other_party_p2": {"type":"string"},
+    "case_number_p2": {"type":"string"},
+    "pc_consent": {"type":"boolean"},
+    "pc_do_not_consent": {"type":"boolean"},
+    "pc_alt": {"type":"string"},
+    "af_decl": {"type":"boolean"},
+    "af_attach": {"type":"boolean"},
+    "af_consent": {"type":"boolean"},
+    "af_do_not_consent": {"type":"boolean"},
+    "af_alt": {"type":"string"},
+    "oo_consent": {"type":"boolean"},
+    "oo_do_not_consent": {"type":"boolean"},
+    "oo_alt": {"type":"string"},
+    "ts_consent": {"type":"boolean"},
+    "ts_do_not_consent": {"type":"boolean"},
+    "ts_alt": {"type":"string"},
+    "attach_9": {"type":"boolean"},
+    "facts": {"type":"string"},
+    "sign_date": {"type":"string", "format":"date"},
+    "sign_name": {"type":"string"},
+    "sign_signature": {"type":"string"}
+  },
+  "required": ["case_number","form_code"]
+}
+</script>
+</body>
+</html>

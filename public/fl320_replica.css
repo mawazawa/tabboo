@@ -1,0 +1,60 @@
+
+:root{
+  --page-w: 8.5in;
+  --page-h: 11in;
+  --m: 0.5in;
+  --font: 'Times New Roman', Times, serif;
+  --font-sans: Arial, Helvetica, sans-serif;
+  --fs: 11pt;
+  --lh: 1.25;
+  --border: 1px solid #000;
+  --gray: #f7f7f7;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:#eee;}
+.page{
+  width: var(--page-w);
+  min-height: var(--page-h);
+  margin: 0.25in auto;
+  background: #fff;
+  color:#000;
+  font-family: var(--font);
+  font-size: var(--fs);
+  line-height: var(--lh);
+  position: relative;
+  box-shadow: 0 0 0.1in rgba(0,0,0,.2);
+  padding: var(--m);
+}
+.grid{display:grid;gap:6px;}
+.row{display:flex;gap:6px;align-items:stretch;}
+.w-25{flex:0 0 25%;} .w-30{flex:0 0 30%;} .w-33{flex:0 0 33.333%;}
+.w-40{flex:0 0 40%;} .w-50{flex:0 0 50%;} .w-60{flex:0 0 60%;}
+.w-70{flex:0 0 70%;} .w-75{flex:0 0 75%;} .w-100{flex:0 0 100%;}
+.box{border:var(--border);padding:6px;}
+.label{font-family:var(--font-sans);font-size:10pt;text-transform:uppercase;letter-spacing:.2px;}
+.title{font-family:var(--font-sans);font-weight:bold;text-transform:uppercase;}
+.small{font-size:9pt;}
+input[type="text"], input[type="date"], input[type="time"], input[type="email"], input[type="tel"], textarea{
+  width:100%;border:var(--border);padding:4px;font: inherit;background:#fff;
+}
+textarea{min-height:90px;resize:vertical;}
+.checkbox{display:flex;align-items:center;gap:6px;}
+.right{float:right;}
+.hr{border-top:var(--border);margin:8px 0;}
+.header-line{display:flex;justify-content:space-between;align-items:flex-end;gap:8px;margin-bottom:6px;}
+.code{font-family:var(--font-sans);font-weight:bold;}
+.judicial{font-family:var(--font-sans);font-size:10pt;}
+.courtuse{border:var(--border);padding:6px;min-height:90px;}
+.mt6{margin-top:6px;} .mt12{margin-top:12px;} .mt18{margin-top:18px;}
+.note{background:var(--gray);padding:6px;border:var(--border);font-family:var(--font-sans);font-size:10pt;}
+.footer{position:absolute;left:var(--m);right:var(--m);bottom:0.45in;font-family:var(--font-sans);font-size:9pt;display:flex;justify-content:space-between;}
+.pageno{position:absolute;right:var(--m);bottom:0.2in;font-family:var(--font-sans);font-size:9pt;}
+.form-id,.logo{font-family:var(--font-sans);font-weight:bold;}
+.two-col{columns:2;column-gap:14px;}
+.checkbox input{width:13px;height:13px;}
+.inline{display:inline-block;vertical-align:middle;}
+@media print{
+  html,body{background:#fff;}
+  .page{margin:0;box-shadow:none;page-break-after:always;}
+  .no-print{display:none!important;}
+}
