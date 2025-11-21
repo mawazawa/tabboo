@@ -152,6 +152,14 @@
           "GITHUB_PERSONAL_ACCESS_TOKEN": ""
         }
       },
+      "github-source-control": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-github@latest"
+        ],
+        "enabled": true
+      },
       "supabase": {
         "command": "npx",
         "args": [
@@ -263,6 +271,10 @@
           "EXA_API_KEY": "c3206133-e55a-4859-8510-c5884dbe900d"
         }
       },
+      "Figma": {
+        "url": "https://mcp.figma.com/mcp",
+        "enabled": true
+      },
       "filesystem": {
         "command": "npx",
         "args": [
@@ -345,6 +357,28 @@
         "env": {
           "REDIS_URL": "rediss://default:AWKwAAIjcDE4ZGU0OWQ4NWFmZjg0MmI0Yjk4YTIxZDNhMGY2YzQwZnAxMA@bright-snipe-25264.upstash.io:6379"
         }
+      },
+      "knowledge-graph": {
+        "type": "sse",
+        "url": "http://localhost:27495/mcp/sse",
+        "approvedTools": true,
+        "enabled": true
+      },
+      "looker": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@google-cloud/mcp-server-looker@latest"
+        ],
+        "enabled": true
+      },
+      "perplexity-ai-research": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@perplexity-ai/mcp-server"
+        ],
+        "enabled": true
       }
     },
     "environmentVariables": {
