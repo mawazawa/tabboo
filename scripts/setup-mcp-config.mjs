@@ -19,7 +19,10 @@
  *   - CODE_ROOT
  *   - CLAUDE_ROOT
  *   - SUPABASE_PROJECT_REF
- *   - KNOWLEDGE_GRAPH_URL (optional)
+ *
+ * Optional Environment Variables:
+ *   - KNOWLEDGE_GRAPH_URL (defaults to local SSE URL)
+ *   - GOOGLE_APPLICATION_CREDENTIALS (only required for BigQuery MCP)
  */
 
 import { readFileSync, writeFileSync } from 'fs';
@@ -51,9 +54,16 @@ const requiredVars = {
   GOOGLE_APPLICATION_CREDENTIALS: process.env.GOOGLE_APPLICATION_CREDENTIALS,
 };
 
+const optionalEnvVars = new Set([
+  'NEO4J_USERNAME',
+  'NEO4J_DATABASE',
+  'KNOWLEDGE_GRAPH_URL',
+  'GOOGLE_APPLICATION_CREDENTIALS',
+]);
+
 // Check for missing required variables
 const missingVars = Object.entries(requiredVars)
-  .filter(([key, value]) => !value && !['NEO4J_USERNAME', 'NEO4J_DATABASE', 'KNOWLEDGE_GRAPH_URL'].includes(key))
+  .filter(([key, value]) => !value && !optionalEnvVars.has(key))
   .map(([key]) => key);
 
 if (missingVars.length > 0) {
