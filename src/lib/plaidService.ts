@@ -413,9 +413,12 @@ export function aggregateExpenses(
   transactions: PlaidTransaction[],
   months: number = 1
 ): FL150ExpenseCategory[] {
+  // Validate months to prevent division by zero
+  const validMonths = Math.max(1, months);
+
   // Filter to last N months and non-pending
   const cutoffDate = new Date();
-  cutoffDate.setMonth(cutoffDate.getMonth() - months);
+  cutoffDate.setMonth(cutoffDate.getMonth() - validMonths);
 
   const relevantTransactions = transactions.filter(
     t => !t.pending && new Date(t.date) >= cutoffDate && t.amount > 0
@@ -444,7 +447,7 @@ export function aggregateExpenses(
     expenses.push({
       category,
       label: FL150_CATEGORY_LABELS[category] || category,
-      amount: Math.round((data.amount / months) * 100) / 100,
+      amount: Math.round((data.amount / validMonths) * 100) / 100,
       transactions: data.transactions,
     });
   }
@@ -466,8 +469,11 @@ export function calculateMonthlyIncome(
   transactions: PlaidTransaction[],
   months: number = 3
 ): { total: number; sources: Array<{ source: string; amount: number }> } {
+  // Validate months to prevent division by zero
+  const validMonths = Math.max(1, months);
+
   const cutoffDate = new Date();
-  cutoffDate.setMonth(cutoffDate.getMonth() - months);
+  cutoffDate.setMonth(cutoffDate.getMonth() - validMonths);
 
   // Income = negative amounts (deposits) in certain categories
   const incomeCategories = [
@@ -502,7 +508,7 @@ export function calculateMonthlyIncome(
   // Calculate totals
   const sources = Array.from(sourceMap.entries()).map(([source, total]) => ({
     source,
-    amount: Math.round((total / months) * 100) / 100,
+    amount: Math.round((total / validMonths) * 100) / 100,
   }));
 
   const totalMonthlyIncome = sources.reduce((sum, s) => sum + s.amount, 0);

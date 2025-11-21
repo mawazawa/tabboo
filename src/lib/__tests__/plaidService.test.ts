@@ -202,6 +202,33 @@ describe('aggregateExpenses', () => {
     expect(other).toBeTruthy();
     expect(other?.amount).toBe(50);
   });
+
+  it('should handle months = 0 without division by zero (Bug #1 fix)', () => {
+    const transactions: PlaidTransaction[] = [
+      createTransaction({ amount: 100 }),
+    ];
+
+    // Before fix: would return Infinity or NaN
+    // After fix: treats 0 months as 1 month
+    const expenses = aggregateExpenses(transactions, 0);
+    const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+
+    expect(total).toBe(100);
+    expect(Number.isFinite(total)).toBe(true);
+    expect(Number.isNaN(total)).toBe(false);
+  });
+
+  it('should handle negative months by treating as 1 month', () => {
+    const transactions: PlaidTransaction[] = [
+      createTransaction({ amount: 100 }),
+    ];
+
+    const expenses = aggregateExpenses(transactions, -5);
+    const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+
+    expect(total).toBe(100);
+    expect(Number.isFinite(total)).toBe(true);
+  });
 });
 
 // ============================================================================
@@ -311,6 +338,31 @@ describe('calculateMonthlyIncome', () => {
 
     // Check that it's properly rounded
     expect(Number.isInteger(income.total * 100)).toBe(true);
+  });
+
+  it('should handle months = 0 without division by zero (Bug #1 fix)', () => {
+    const transactions: PlaidTransaction[] = [
+      createIncomeTransaction(3000),
+    ];
+
+    // Before fix: would return Infinity or NaN
+    // After fix: treats 0 months as 1 month
+    const income = calculateMonthlyIncome(transactions, 0);
+
+    expect(income.total).toBe(3000);
+    expect(Number.isFinite(income.total)).toBe(true);
+    expect(Number.isNaN(income.total)).toBe(false);
+  });
+
+  it('should handle negative months by treating as 1 month', () => {
+    const transactions: PlaidTransaction[] = [
+      createIncomeTransaction(3000),
+    ];
+
+    const income = calculateMonthlyIncome(transactions, -5);
+
+    expect(income.total).toBe(3000);
+    expect(Number.isFinite(income.total)).toBe(true);
   });
 });
 
