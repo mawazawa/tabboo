@@ -251,15 +251,119 @@ Neighborhood Legal Services provides self-help services and DVRO clinics at:
 
 ---
 
-## Districts Still To Complete
+## Complete Courthouse Directory (All 36 Locations)
 
-- [ ] North Valley District - Lancaster
-- [ ] North Valley District - San Fernando
-- [ ] South Valley District - Van Nuys West
-- [ ] Southeast District - Norwalk
-- [ ] Southeast District - Downey
-- [ ] West District - Santa Monica
-- [ ] Additional Central District departments
+### Central District
+
+| Courthouse | Address | Phone |
+|------------|---------|-------|
+| Stanley Mosk | 111 N. Hill Street, LA 90012 | (213) 633-0252 |
+| Clara Shortridge Foltz (Criminal Justice) | 210 W. Temple St., LA 90012 | (213) 628-7777 |
+| Hall of Justice | 211 W. Temple St., LA 90012 | (213) 974-6141 |
+| East Los Angeles | 4848 E. Civic Center Way, LA 90022 | (323) 780-2025 |
+
+### North Central District
+
+| Courthouse | Address | Phone |
+|------------|---------|-------|
+| Burbank | 300 E. Olive Avenue, Burbank 91502 | (818) 260-8498 |
+| Glendale | 600 E. Broadway, Glendale 91206 | (818) 265-6400 |
+
+### Northeast District
+
+| Courthouse | Address | Phone |
+|------------|---------|-------|
+| Alhambra | 150 W. Commonwealth Avenue, Alhambra 91801 | (626) 293-2100 |
+| Pasadena | 300 E. Walnut Avenue, Pasadena 91101 | (626) 396-3284 |
+| El Monte | 11234 E. Valley Blvd., El Monte 91731 | (626) 401-2200 |
+
+### Northwest District (San Fernando Valley)
+
+| Courthouse | Address | Phone |
+|------------|---------|-------|
+| Van Nuys East | 6230 Sylmar Avenue, Van Nuys 91401 | (818) 374-2208 |
+| Van Nuys West | 14400 Erwin St Mall, Van Nuys 91401 | (818) 374-2211 |
+| Chatsworth | 9425 Penfield Avenue, Chatsworth 91311 | (818) 407-2271 |
+| San Fernando | 900 3rd Street, San Fernando 91340 | (818) 898-2461 |
+
+### North Valley District
+
+| Courthouse | Address | Phone |
+|------------|---------|-------|
+| Lancaster (Antelope Valley) | 42011 4th St West, Lancaster 93534 | (661) 483-5500 |
+
+### East District
+
+| Courthouse | Address | Phone |
+|------------|---------|-------|
+| Pomona South | 400 Civic Center Plaza, Pomona 91766 | (909) 620-3023 |
+| West Covina | 1427 W. Covina Parkway, West Covina 91790 | (626) 430-2600 |
+
+### Southeast District
+
+| Courthouse | Address | Phone |
+|------------|---------|-------|
+| Norwalk | 12720 Norwalk Blvd., Norwalk 90650 | (562) 345-0895 |
+| Downey | 7500 E. Imperial Highway, Downey 90242 | (562) 803-7050 |
+| Whittier | 7339 S. Painter Avenue, Whittier 90602 | (562) 907-3100 |
+| Bellflower | 10025 E. Flower Street, Bellflower 90706 | (562) 345-3300 |
+
+### South District
+
+| Courthouse | Address | Phone |
+|------------|---------|-------|
+| Long Beach (Deukmejian) | 275 Magnolia Avenue, Long Beach 90802 | (562) 256-2310 |
+| Inglewood | One Regent Street, Inglewood 90301 | (310) 419-1396 |
+| Compton | 200 W. Compton Blvd., Compton 90220 | (310) 605-4065 |
+
+### Southwest District
+
+| Courthouse | Address | Phone |
+|------------|---------|-------|
+| Torrance | 825 Maple Avenue, Torrance 90503 | (310) 222-8808 |
+
+### West District
+
+| Courthouse | Address | Phone |
+|------------|---------|-------|
+| Santa Monica | 1725 Main Street, Santa Monica 90401 | (310) 255-0813 |
+| Airport | 11701 S. La Cienega Blvd., LA 90045 | (310) 725-3000 |
+| Beverly Hills | 9355 Burton Way, Beverly Hills 90210 | (310) 281-2499 |
+| Malibu | 23525 Civic Center Way, Malibu 90265 | (310) 317-1359 |
+
+### Catalina District
+
+| Courthouse | Address | Phone |
+|------------|---------|-------|
+| Catalina | 215 Sumner Avenue, Avalon 90704 | (310) 510-0994 |
+
+### Specialized Courthouses
+
+| Courthouse | Address | Purpose |
+|------------|---------|---------|
+| Edmund D. Edelman Children's Court | 201 Centre Plaza Dr., Monterey Park | Juvenile |
+| Metropolitan | 1945 S. Hill Street, LA 90007 | Traffic |
+| Hollywood | 5925 Hollywood Blvd., LA 90028 | Traffic/Small Claims |
+
+---
+
+## Family Law Courthouse Summary
+
+**Courthouses with Family Law Departments:**
+
+1. Stanley Mosk (Central) - Main family law hub
+2. Van Nuys East (Northwest)
+3. Torrance (Southwest)
+4. Long Beach (South)
+5. Pomona (East)
+6. Pasadena (Northeast)
+7. Norwalk (Southeast)
+8. Santa Monica (West)
+9. Lancaster (North Valley)
+10. San Fernando (North Valley)
+11. Chatsworth (Northwest)
+12. Compton (South)
+13. Inglewood (South)
 
 ---
 
