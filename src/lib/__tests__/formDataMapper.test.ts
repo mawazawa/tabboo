@@ -251,7 +251,7 @@ describe('formDataMapper', () => {
       expect(result.county).toBe('Los Angeles');
     });
 
-    it('should map attorney information', () => {
+    it('should map attorney information to attorneyFor field, not partyName', () => {
       const dv120Data = {
         attorneyName: 'Robert Attorney',
         firmName: 'Smith & Associates',
@@ -260,9 +260,52 @@ describe('formDataMapper', () => {
 
       const result = mapDV120ToFL320(dv120Data);
 
-      expect(result.partyName).toBe('Robert Attorney');
+      // Attorney name should go to attorneyFor, NOT partyName
+      // partyName must always be the actual party (respondent)
+      expect(result.attorneyFor).toBe('Robert Attorney');
+      expect(result.partyName).toBeUndefined(); // No partyName without respondentName
       expect(result.firmName).toBe('Smith & Associates');
       expect(result.stateBarNumber).toBe('123456');
+    });
+
+    /**
+     * REGRESSION TEST: Attorney name must NOT overwrite party name
+     *
+     * BUG DESCRIPTION (November 2025):
+     * The mapDV120ToFL320 function incorrectly mapped attorneyName to partyName,
+     * overwriting the respondent's name. In legal forms, partyName must always be
+     * the actual litigant (petitioner/respondent), never their attorney.
+     *
+     * IMPACT:
+     * - FL-320 forms would show attorney name instead of respondent name
+     * - Could invalidate court filings
+     * - Caused confusion for self-represented litigants
+     *
+     * THE FIX:
+     * Changed `mapped.partyName = dv120Data.attorneyName` to
+     * `mapped.attorneyFor = dv120Data.attorneyName`
+     */
+    it('REGRESSION: should preserve partyName as respondent when attorney is present', () => {
+      const dv120Data = {
+        respondentName: 'John Doe',
+        attorneyName: 'Robert Attorney',
+        firmName: 'Smith & Associates',
+        stateBarNumber: '123456'
+      };
+
+      const result = mapDV120ToFL320(dv120Data);
+
+      // partyName MUST be the respondent, not the attorney
+      expect(result.partyName).toBe('John Doe');
+      expect(result.respondent).toBe('John Doe');
+
+      // Attorney info should be in separate fields
+      expect(result.attorneyFor).toBe('Robert Attorney');
+      expect(result.firmName).toBe('Smith & Associates');
+      expect(result.stateBarNumber).toBe('123456');
+
+      // Verify the attorney name did NOT overwrite partyName
+      expect(result.partyName).not.toBe('Robert Attorney');
     });
 
     it('should map contact information', () => {

@@ -217,20 +217,6 @@
         "dlx",
         "@modelcontextprotocol/server-github@latest"
       ]
-    },
-    "perplexity-ai-research": {
-      "command": "/opt/homebrew/bin/pnpm",
-      "args": [
-        "dlx",
-        "@perplexity-ai/mcp-server"
-      ]
-    },
-    "looker": {
-      "command": "/opt/homebrew/bin/pnpm",
-      "args": [
-        "dlx",
-        "@google-cloud/mcp-server-looker@latest"
-      ]
     }
   }
 }

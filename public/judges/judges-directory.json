@@ -1,0 +1,147 @@
+{
+  "court": "San Francisco Superior Court",
+  "lastUpdated": "2025-11-21",
+  "totalJudges": 5,
+  "judges": [
+    {
+      "id": "judge_001",
+      "name": "Rochelle C. East",
+      "title": "Presiding Judge",
+      "department": "206",
+      "designation": "Presiding Judge & Civil Master Calendar / Settlements",
+      "location": "Civic Center Courthouse, Room 206",
+      "phone": "415-551-3705",
+      "photo": "pending",
+      "photoStatus": "Searching for official portrait",
+      "bio": "Former top administrator in the California Attorney General's Office and wartime Naval officer. First female Presiding Judge of Hispanic/Native American descent. Appointed by Gov. Jerry Brown in 2013.",
+      "education": {
+        "undergraduate": "Stanford University (B.A.)",
+        "law": "University of San Francisco School of Law (J.D.)"
+      },
+      "appointedBy": "Gov. Jerry Brown",
+      "appointmentDate": "2013-05-21",
+      "barNumber": "183792",
+      "barAdmissionYear": 1996,
+      "clerks": [
+        {
+          "name": "Jhulie Roque",
+          "role": "Clerk",
+          "phone": "415-551-3705"
+        },
+        {
+          "name": "Robert Woods",
+          "role": "Clerk",
+          "phone": "415-551-3705"
+        },
+        {
+          "name": "Vanessa Wu",
+          "role": "Clerk",
+          "phone": "415-551-3705"
+        }
+      ]
+    },
+    {
+      "id": "judge_002",
+      "name": "Charles F. Haines",
+      "title": "Judge",
+      "department": "501",
+      "designation": "Housing / Evictions",
+      "location": "Real Property Court",
+      "phone": "415-551-3762",
+      "photo": "pending",
+      "photoStatus": "Searching for judicial profile photo",
+      "bio": "Judge presiding over housing and evictions cases. Known for rulings on eviction moratoriums and vacant property taxes.",
+      "education": {
+        "undergraduate": "Villanova University",
+        "law": "Tulane University School of Law"
+      },
+      "appointmentDate": "2001",
+      "tenure": "2001 - Present",
+      "barNumber": "CA Bar"
+    },
+    {
+      "id": "judge_003",
+      "name": "Richard B. Ulmer Jr.",
+      "title": "Judge",
+      "department": "302",
+      "designation": "Discovery / Law & Motion",
+      "location": "Civic Center Courthouse",
+      "phone": "415-551-3723 / 415-551-3823",
+      "photo": "richard-b-ulmer.jpg",
+      "photoStatus": "Downloaded - 7.4 MB",
+      "photoSource": "Daily Journal Judicial Profile (2021)",
+      "bio": "Former newspaper reporter who became a judge. Known for spare writing style and not frequently changing tentative rulings. Appointed by Gov. Arnold Schwarzenegger in 2009.",
+      "education": {
+        "undergraduate": "University of Nebraska at Omaha (1977)",
+        "law": "Stanford University School of Law"
+      },
+      "appointedBy": "Gov. Arnold Schwarzenegger",
+      "appointmentDate": "2009",
+      "clerks": [
+        {
+          "name": "Mars Goodman",
+          "role": "Clerk"
+        },
+        {
+          "name": "Madelle Macadangdang",
+          "role": "Clerk"
+        }
+      ]
+    },
+    {
+      "id": "judge_004",
+      "name": "Monica F. Wiley",
+      "title": "Judge",
+      "department": "403/405",
+      "designation": "Family Law / Unified Family Court Supervising Judge",
+      "location": "Civic Center Courthouse",
+      "phone": "415-551-3741 / 415-551-3747",
+      "photo": "monica-f-wiley.jpg",
+      "photoStatus": "Downloaded - 812 KB",
+      "photoSource": "SF.gov Official Profile Image",
+      "bio": "Second African American female judge appointed to the San Francisco bench. Appointed by Gov. Arnold Schwarzenegger in 2009. Supervising Judge of the Unified Family Court since 2018.",
+      "education": {
+        "undergraduate": "UC Berkeley (B.A., 1992)",
+        "law": "Howard University School of Law (J.D., Cum Laude, 1995)"
+      },
+      "appointedBy": "Gov. Arnold Schwarzenegger",
+      "appointmentDate": "2009-09-01",
+      "barNumber": "California",
+      "clerks": [
+        {
+          "name": "Tyler Gutierrez",
+          "role": "Clerk"
+        },
+        {
+          "name": "Josh Mandapat",
+          "role": "Clerk"
+        },
+        {
+          "name": "Sylvia Tam",
+          "role": "Clerk"
+        }
+      ]
+    },
+    {
+      "id": "judge_005",
+      "name": "Victor M. Hwang",
+      "title": "Judge",
+      "department": "502",
+      "designation": "Criminal Trial Court / Civil Trials",
+      "location": "Hall of Justice",
+      "phone": "415-551-3768",
+      "photo": "pending",
+      "photoStatus": "Searching for official portrait",
+      "bio": "Civil rights attorney with 25 years of experience before joining the bench. Known for expertise in hate crimes and human trafficking cases. Elected in 2016, took office January 2017.",
+      "education": {
+        "undergraduate": "UC Berkeley (B.A. in English, 1989)",
+        "law": "USC Gould School of Law (J.D., 1992)"
+      },
+      "electedYear": 2016,
+      "appointmentDate": "2017-01-01",
+      "barNumber": "162467",
+      "barAdmissionYear": 1992
+    }
+  ],
+  "notes": "This directory contains basic information about San Francisco Superior Court judges from the Constants data found in the repository. Photos are being systematically collected and organized in the /public/judges directory."
+}

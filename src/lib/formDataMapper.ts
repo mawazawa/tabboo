@@ -283,8 +283,10 @@ export function mapDV120ToFL320(dv120Data: Record<string, unknown>): Record<stri
   }
 
   // Attorney information (if responding with attorney)
+  // Note: attorneyName goes to attorneyFor field, NOT partyName
+  // partyName must always be the actual party (respondent), not their attorney
   if (dv120Data.attorneyName) {
-    mapped.partyName = dv120Data.attorneyName;
+    mapped.attorneyFor = dv120Data.attorneyName;
   }
   if (dv120Data.firmName) {
     mapped.firmName = dv120Data.firmName;
