@@ -317,20 +317,33 @@ export async function syncTransactions(
  * Get all transactions (handles pagination automatically)
  *
  * @param institutionId - Institution ID
+ * @param maxPages - Maximum number of pages to fetch (default 20, ~10k transactions)
  * @returns All transactions
  */
 export async function getAllTransactions(
-  institutionId: string
+  institutionId: string,
+  maxPages: number = 20
 ): Promise<PlaidTransaction[]> {
   const allTransactions: PlaidTransaction[] = [];
   let cursor: string | undefined;
   let hasMore = true;
+  let pageCount = 0;
 
-  while (hasMore) {
+  while (hasMore && pageCount < maxPages) {
     const response = await syncTransactions(institutionId, cursor);
     allTransactions.push(...response.added);
     cursor = response.nextCursor;
     hasMore = response.hasMore;
+    pageCount++;
+
+    // Safety check: if we're getting empty responses, stop
+    if (response.added.length === 0 && response.modified.length === 0) {
+      break;
+    }
+  }
+
+  if (pageCount >= maxPages && hasMore) {
+    console.warn(`Transaction sync stopped at ${maxPages} pages. More data may be available.`);
   }
 
   return allTransactions;

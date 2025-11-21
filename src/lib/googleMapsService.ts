@@ -339,12 +339,9 @@ export async function validateAddress(
   }
 
   // Build address object
-  let addressObj: Record<string, string>;
+  let addressLines: string[];
   if (typeof address === 'string') {
-    addressObj = {
-      addressLines: [address],
-      regionCode: 'US',
-    };
+    addressLines = [address];
   } else {
     const lines: string[] = [];
     if (address.streetAddress) lines.push(address.streetAddress);
@@ -357,11 +354,13 @@ export async function validateAddress(
 
     if (cityStateZip) lines.push(cityStateZip);
 
-    addressObj = {
-      addressLines: lines,
-      regionCode: 'US',
-    };
+    addressLines = lines;
   }
+
+  const addressObj = {
+    addressLines,
+    regionCode: 'US',
+  };
 
   try {
     const response = await fetch(`${ADDRESS_VALIDATION_URL}?key=${API_KEY}`, {
@@ -382,7 +381,7 @@ export async function validateAddress(
     }
 
     const data = await response.json();
-    return parseValidationResponse(data, typeof address === 'string' ? address : addressObj.addressLines.join(', '));
+    return parseValidationResponse(data, typeof address === 'string' ? address : addressLines.join(', '));
   } catch (error) {
     console.error('Address validation request failed:', error);
     return createInvalidResult('Network error during validation');

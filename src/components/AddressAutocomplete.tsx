@@ -30,7 +30,7 @@
  * />
  */
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useId } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
@@ -118,7 +118,12 @@ export function AddressAutocomplete({
   // Refs
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Generate unique IDs for accessibility
+  const uniqueId = useId();
+  const inputId = `address-input-${uniqueId}`;
+  const listboxId = `address-predictions-${uniqueId}`;
 
   // ============================================================================
   // Effects
@@ -271,7 +276,7 @@ export function AddressAutocomplete({
     <div className={cn('relative', className)}>
       {/* Label */}
       {label && (
-        <Label htmlFor="address-input" className="mb-2 block">
+        <Label htmlFor={inputId} className="mb-2 block">
           {label}
           {required && <span className="text-destructive ml-1">*</span>}
         </Label>
@@ -285,7 +290,7 @@ export function AddressAutocomplete({
 
         <Input
           ref={inputRef}
-          id="address-input"
+          id={inputId}
           type="text"
           value={value}
           onChange={handleInputChange}
@@ -301,7 +306,8 @@ export function AddressAutocomplete({
           autoComplete="off"
           aria-expanded={showDropdown}
           aria-haspopup="listbox"
-          aria-controls="address-predictions"
+          aria-controls={listboxId}
+          aria-activedescendant={selectedIndex >= 0 ? `${listboxId}-option-${selectedIndex}` : undefined}
         />
 
         {/* Status Icons */}
@@ -320,13 +326,15 @@ export function AddressAutocomplete({
       {showDropdown && predictions.length > 0 && (
         <div
           ref={dropdownRef}
-          id="address-predictions"
+          id={listboxId}
           role="listbox"
-          className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-lg"
+          aria-label="Address suggestions"
+          className="absolute z-50 mt-1 w-full max-h-60 overflow-y-auto rounded-md border bg-popover shadow-lg animate-in fade-in-0 zoom-in-95 duration-100"
         >
           {predictions.map((prediction, index) => (
             <div
               key={prediction.placeId}
+              id={`${listboxId}-option-${index}`}
               role="option"
               aria-selected={index === selectedIndex}
               className={cn(
