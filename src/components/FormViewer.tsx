@@ -13,6 +13,7 @@ import { EditModeBanner } from "@/components/pdf/EditModeBanner";
 import { PDFPageRenderer } from "@/components/pdf/PDFPageRenderer";
 import { MappingHUD } from "@/components/pdf/MappingHUD";
 import { useFieldMapping } from "@/hooks/use-field-mapping";
+import { useSaveFormField } from "@/hooks/use-save-form-field";
 import { Button } from "@/components/ui/button";
 import { Rocket } from "lucide-react";
 
@@ -41,6 +42,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { mutateAsync: saveField, isPending: isSaving } = useSaveFormField();
   
   // Auto-Pilot Mapping Hook
   const { 
@@ -163,34 +165,32 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     const { page } = rectToUse as any; // Type cast for now
     const { name, type, rect } = data;
     
-    const payload = {
-      form_field_name: name,
-      page_number: page,
-      position_top: Number(rect.top.toFixed(4)),
-      position_left: Number(rect.left.toFixed(4)),
-      field_width: Number(rect.width.toFixed(4)),
-      field_height: Number(rect.height.toFixed(4)),
-      canonical_field: {
-        field_type: type
-      }
-    };
+    try {
+        await saveField({
+            formNumber: formType,
+            name,
+            type,
+            rect: { ...rect, page }
+        });
 
-    console.log('JSON for Field Mapping:', JSON.stringify(payload, null, 2));
-
-    toast({
-      title: isMappingMode ? `Mapped: ${name}` : "Field JSON Generated",
-      description: isMappingMode 
-        ? `Auto-advancing to next field...` 
-        : `Check console for JSON to add to database. Field: ${name}`,
-      duration: isMappingMode ? 1000 : 3000,
-    });
-    
-    // If in mapping mode, advance
-    if (isMappingMode) {
-        nextField();
+        toast({
+          title: isMappingMode ? `Mapped: ${name}` : "Field Saved",
+          description: isMappingMode 
+            ? `Saved to database. Advancing...` 
+            : `Successfully saved ${name} to database.`,
+          duration: isMappingMode ? 1000 : 3000,
+        });
+        
+        // If in mapping mode, advance
+        if (isMappingMode) {
+            nextField();
+        }
+    } catch (error) {
+        // Error handled by hook's onError, but we should ensure we don't advance if error
+        console.error("Save failed in FormViewer handler", error);
     }
     
-  }, [newFieldDialog.rect, formType, toast, isMappingMode, nextField]);
+  }, [newFieldDialog.rect, formType, toast, isMappingMode, nextField, saveField]);
 
   const handleDrawComplete = useCallback((page: number, rect: DrawnRect) => {
     if (isMappingMode && currentField) {
