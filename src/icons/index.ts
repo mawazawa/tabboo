@@ -54,6 +54,7 @@ export {
   Grid3x3,
   GripVertical,
   HelpCircle,
+  Home,
   Info,
   Keyboard,
   Layers,

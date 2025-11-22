@@ -7,7 +7,7 @@ import { LiquidAssistant } from '@/components/canvas/LiquidAssistant';
 import { IngestionReview } from '@/components/canvas/IngestionReview';
 import { OrgChart } from '@/components/canvas/OrgChart';
 import { PROCEDURAL_FLOWS, FORM_NAME_TO_TYPE, ORG_DATA } from '@/components/canvas/constants';
-import { Search, Database, Users, Layers, CloudUpload, CheckCircle, FileText, ChevronRight, MapPin } from '@/icons';
+import { Search, Database, Users, Layers, CloudUpload, CheckCircle, FileText, ChevronRight, MapPin, User, Mail, Phone, Home, Shield, Loader2, Sparkles } from '@/icons';
 import { useNavigate } from 'react-router-dom';
 import { useDocumentPersistence } from '@/hooks/use-document-persistence';
 import { useVaultData } from '@/hooks/use-vault-data';
@@ -447,12 +447,139 @@ export default function CanvasView() {
             />
           )}
           {viewMode === 'VAULT' && (
-            <div className="flex items-center justify-center h-full w-full">
-              <div className="text-center text-slate-400 bg-white/50 p-12 rounded-3xl backdrop-blur-sm border border-white/50">
-                <Database size={48} className="mx-auto mb-4 opacity-50" />
-                <h2 className="text-xl font-bold text-slate-600">Canonical Data Vault</h2>
-                <p className="text-sm">Encrypted graph storage for client identity</p>
-              </div>
+            <div className="flex items-center justify-center h-full w-full p-8">
+              {isVaultLoading ? (
+                <div className="text-center text-slate-400 bg-white/50 p-12 rounded-3xl backdrop-blur-sm border border-white/50">
+                  <Loader2 size={48} className="mx-auto mb-4 opacity-50 animate-spin" />
+                  <h2 className="text-xl font-bold text-slate-600">Loading Vault...</h2>
+                </div>
+              ) : !hasVaultData ? (
+                <div className="text-center text-slate-400 bg-white/50 p-12 rounded-3xl backdrop-blur-sm border border-white/50">
+                  <Database size={48} className="mx-auto mb-4 opacity-50" />
+                  <h2 className="text-xl font-bold text-slate-600 mb-2">Data Vault Empty</h2>
+                  <p className="text-sm mb-4">Your personal data vault is empty. Add your information to enable auto-fill across all forms.</p>
+                  <button
+                    onClick={() => navigate('/')}
+                    className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors"
+                  >
+                    Set Up Vault
+                  </button>
+                </div>
+              ) : (
+                <div className="w-full max-w-4xl">
+                  {/* Vault Header */}
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white shadow-lg">
+                        <Shield size={24} />
+                      </div>
+                      <div>
+                        <h2 className="text-2xl font-bold text-slate-800">Canonical Data Vault</h2>
+                        <p className="text-sm text-slate-500">AES-256 encrypted personal data</p>
+                      </div>
+                    </div>
+                    {activeForms.length > 0 && (
+                      <button
+                        onClick={() => {
+                          // Autofill active form from vault
+                          const activeFormId = activeForms[0]?.id;
+                          if (activeFormId && vaultData) {
+                            const autofillData: Record<string, string> = {};
+                            if (vaultData.full_name) autofillData.partyName = vaultData.full_name;
+                            if (vaultData.street_address) autofillData.streetAddress = vaultData.street_address;
+                            if (vaultData.city) autofillData.city = vaultData.city;
+                            if (vaultData.state) autofillData.state = vaultData.state;
+                            if (vaultData.zip_code) autofillData.zipCode = vaultData.zip_code;
+                            if (vaultData.phone) autofillData.telephoneNo = vaultData.phone;
+                            if (vaultData.email) autofillData.email = vaultData.email;
+
+                            setFormDataMap(prev => ({
+                              ...prev,
+                              [activeFormId]: { ...prev[activeFormId], ...autofillData }
+                            }));
+                            setAssistantContext(`Auto-filled ${Object.keys(autofillData).length} fields from vault`);
+                          }
+                        }}
+                        className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-medium hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl hover:scale-105"
+                      >
+                        <Sparkles size={18} />
+                        Autofill Active Form
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Vault Data Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Personal Info Card */}
+                    <div className="liquid-glass rounded-2xl p-6 shadow-[var(--shadow-elevated)]">
+                      <div className="flex items-center gap-2 mb-4">
+                        <User size={18} className="text-blue-600" />
+                        <h3 className="font-semibold text-slate-700">Personal Information</h3>
+                      </div>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-xs text-slate-500 uppercase tracking-wider">Full Name</label>
+                          <p className="text-slate-800 font-medium">{vaultData?.full_name || '—'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs text-slate-500 uppercase tracking-wider">Date of Birth</label>
+                          <p className="text-slate-800 font-medium">{vaultData?.date_of_birth || '—'}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Contact Card */}
+                    <div className="liquid-glass rounded-2xl p-6 shadow-[var(--shadow-elevated)]">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Mail size={18} className="text-purple-600" />
+                        <h3 className="font-semibold text-slate-700">Contact Details</h3>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <Phone size={14} className="text-slate-400" />
+                          <p className="text-slate-800">{vaultData?.phone || '—'}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Mail size={14} className="text-slate-400" />
+                          <p className="text-slate-800">{vaultData?.email || '—'}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Address Card */}
+                    <div className="liquid-glass rounded-2xl p-6 shadow-[var(--shadow-elevated)] md:col-span-2">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Home size={18} className="text-emerald-600" />
+                        <h3 className="font-semibold text-slate-700">Address</h3>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs text-slate-500 uppercase tracking-wider">Street Address</label>
+                          <p className="text-slate-800 font-medium">{vaultData?.street_address || '—'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs text-slate-500 uppercase tracking-wider">City</label>
+                          <p className="text-slate-800 font-medium">{vaultData?.city || '—'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs text-slate-500 uppercase tracking-wider">State</label>
+                          <p className="text-slate-800 font-medium">{vaultData?.state || '—'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs text-slate-500 uppercase tracking-wider">ZIP Code</label>
+                          <p className="text-slate-800 font-medium">{vaultData?.zip_code || '—'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Autofill Stats */}
+                  <div className="mt-6 flex items-center justify-center gap-2 text-sm text-slate-500">
+                    <CheckCircle size={16} className="text-emerald-500" />
+                    <span>{autofillableCount} fields available for autofill</span>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </Canvas>
