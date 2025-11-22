@@ -80,11 +80,15 @@ export const PDFPageRenderer: React.FC<PDFPageRendererProps> = ({
       onPointerDown={handleDrawStart}
       onPointerMove={(e) => {
         handleDrawMove(e);
-        handlePointerMove(e);
+        if (!isDrawing) {
+          handlePointerMove(e);
+        }
       }}
       onPointerUp={(e) => {
         handleDrawEnd(e);
-        handlePointerUp(e);
+        if (!isDrawing) {
+          handlePointerUp(e);
+        }
       }}
     >
       <Page

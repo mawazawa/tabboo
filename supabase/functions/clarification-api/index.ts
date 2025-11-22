@@ -34,13 +34,18 @@ serve(async (req) => {
 
     if (req.method === 'GET') {
       // --- Fetch Clarification Candidates ---
-      const engine = new ClarificationEngine(userId, neo4jDriver.session());
-      const candidates = await engine.generateCandidates();
-      
-      return new Response(JSON.stringify(candidates), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      });
+      const session = neo4jDriver.session();
+      try {
+        const engine = new ClarificationEngine(userId, session);
+        const candidates = await engine.generateCandidates();
+        
+        return new Response(JSON.stringify(candidates), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        });
+      } finally {
+        await session.close();
+      }
 
     } else if (req.method === 'POST') {
       // --- Submit an Answer ---
