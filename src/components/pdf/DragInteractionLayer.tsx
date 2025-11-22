@@ -89,7 +89,7 @@ export const DragInteractionLayer: React.FC<DragInteractionLayerProps> = ({
         return (
             <div
                 key={`drag-handle-${field.field}`}
-                className="absolute cursor-move z-20"
+                className="absolute cursor-move z-40"
                 style={{
                 top: `${position.top}%`,
                 left: `${position.left}%`,
