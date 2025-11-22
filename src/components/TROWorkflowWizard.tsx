@@ -5,36 +5,49 @@
  * workflow. Provides step-by-step navigation, progress tracking, validation feedback,
  * and form transitions.
  *
- * @version 1.1
- * @date November 21, 2025
+ * Now features a fully integrated workspace layout with PDF Thumbnails,
+ * Field Navigation, and Edit Mode capabilities.
+ *
+ * @version 2.0
+ * @date November 22, 2025
  * @author Gemini 3 Pro & Agent 2
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Loader2, AlertCircle, Building, MapPin, Hash } from '@/icons';
+import { useNavigate } from 'react-router-dom';
+import { 
+  Loader2, AlertCircle, Building, MapPin, Hash, 
+  ChevronLeft, ChevronRight, Upload, Edit, Settings,
+  FileText, Layout
+} from '@/icons';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { useToast } from '@/hooks/use-toast';
 import { useTROWorkflow } from '@/hooks/useTROWorkflow';
-import { FormViewer } from '@/components/FormViewer'; // Integrated FormViewer
+import { useFieldOperations } from '@/hooks/use-field-operations';
+import { usePersonalVault } from '@/hooks/use-personal-vault';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { getPdfPath } from '@/hooks/use-pdf-loading';
+import { FormViewer } from '@/components/FormViewer';
 import { PacketProgressPanel } from '@/components/PacketProgressPanel';
-import { FormData, FieldPosition } from '@/types/FormData';
+import { PDFThumbnailSidebar } from '@/components/PDFThumbnailSidebar';
+import { FieldNavigationPanel } from '@/components/FieldNavigationPanel';
+import { FormData, FieldPosition, ValidationRules, ValidationErrors } from '@/types/FormData';
 import {
   PacketType,
   FormStatus,
   WorkflowState,
   FormType,
-  type TROWorkflowWizardProps
+  type TROWorkflowWizardProps,
+  FORM_ORDER
 } from '@/types/WorkflowTypes';
 
 // Extracted components
-import {
-  PacketTypeSelector,
-  WorkflowProgressBar,
-  FormStepIndicator,
-  WorkflowNavigationButtons
-} from '@/components/workflow';
+import { PacketTypeSelector } from '@/components/workflow';
 
 /**
  * Main TRO Workflow Wizard Component
@@ -46,19 +59,33 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
   initialPacketType,
   existingWorkflowId
 }) => {
+  const navigate = useNavigate();
   const { toast } = useToast();
+  
+  // -- STATE --
   const [showPacketSelector, setShowPacketSelector] = useState(!initialPacketType && !existingWorkflowId);
   const [isInitializing, setIsInitializing] = useState(false);
   
-  // Local state for the form viewer
+  // Form Data State
   const [currentFormData, setCurrentFormData] = useState<FormData>({});
   const [isLoadingFormData, setIsLoadingFormData] = useState(false);
   const [currentFieldIndex, setCurrentFieldIndex] = useState<number>(0);
-  // Placeholder for field positions - normally loaded from DB or config
-  // For now, we'll let FormViewer handle the initial load from DB
   const [fieldPositions, setFieldPositions] = useState<Record<string, FieldPosition>>({});
+  
+  // Workspace State
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [validationRules, setValidationRules] = useState<ValidationRules>({});
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+  const [selectedFields, setSelectedFields] = useState<string[]>([]);
+  const [copiedFieldPositions, setCopiedFieldPositions] = useState<Record<string, FieldPosition> | null>(null);
+  const [highlightedField, setHighlightedField] = useState<string | null>(null);
+  const [settingsSheetOpen, setSettingsSheetOpen] = useState(false);
+  const hasUnsavedChanges = useRef(false);
 
-  // Use the workflow hook
+  // Panels State
+  const [activeLeftTab, setActiveLeftTab] = useState<string>("progress");
+
+  // -- HOOKS --
   const {
     workflow,
     loading,
@@ -74,29 +101,83 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
     getNextForm,
     getPreviousForm,
     getPacketCompletionPercentage,
-    getEstimatedTimeRemaining,
-    getFormSteps,
-    updateFormStatus,
+    jumpToForm,
     getFormData,
-    saveFormData,
-    jumpToForm
+    saveFormData
   } = useTROWorkflow(userId, existingWorkflowId);
+
+  const { vaultData } = usePersonalVault(userId);
+
+  // Field Operations Hook
+  const {
+    updateField,
+    updateFieldPosition,
+    handleSnapToGrid,
+    handleAlignHorizontal,
+    handleAlignVertical,
+    handleDistribute,
+    handleCopyPositions,
+    handlePastePositions,
+    handleTransformPositions,
+    handleApplyGroup,
+    handleApplyTemplate,
+    handleSaveValidationRules,
+  } = useFieldOperations({
+    formData: currentFormData,
+    setFormData: setCurrentFormData,
+    fieldPositions,
+    setFieldPositions,
+    validationRules,
+    setValidationRules,
+    setValidationErrors,
+    selectedFields,
+    copiedFieldPositions,
+    setCopiedFieldPositions,
+    vaultData,
+    hasUnsavedChanges,
+  });
+
+  // Keyboard Shortcuts
+  useKeyboardShortcuts([
+    {
+      key: 'e',
+      action: () => setIsEditMode(prev => !prev),
+      description: 'Toggle Edit Mode'
+    },
+    {
+      key: 'Escape',
+      action: () => {
+        if (isEditMode) setIsEditMode(false);
+        setSelectedFields([]);
+      },
+      description: 'Exit Edit Mode / Deselect'
+    },
+    {
+      key: 's',
+      ctrlKey: true,
+      action: () => {
+        if (currentForm) saveFormData(currentForm, currentFormData);
+        toast({ title: 'Saved', description: 'Form progress saved' });
+      },
+      description: 'Save Progress'
+    }
+  ]);
+
+  // -- EFFECTS --
 
   // Handle errors
   useEffect(() => {
-    if (error && onError) {
-      onError(error);
-    }
+    if (error && onError) onError(error);
   }, [error, onError]);
 
-  // Load existing workflow if provided
+  // Load existing workflow
   useEffect(() => {
     if (existingWorkflowId && !workflow && !loading) {
       loadWorkflow(existingWorkflowId);
     }
   }, [existingWorkflowId, workflow, loading, loadWorkflow]);
 
-  // Load form data when the current form changes
+  // Load form data when current form changes
   const currentForm = getCurrentForm();
   
   useEffect(() => {
@@ -126,40 +207,27 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
     loadData();
   }, [currentForm, getFormData, toast]);
 
-  // Debounced save helper
-  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Auto-save effect (replacing the old handleFieldUpdate wrapper)
+  useEffect(() => {
+    if (!currentForm || !hasUnsavedChanges.current) return;
 
-  const handleFieldUpdate = useCallback((field: string, value: string | boolean) => {
-    setCurrentFormData(prev => {
-      const newData = { ...prev, [field]: value };
-      
-      // Debounced save to Supabase
-      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-      
-      if (currentForm) {
-        saveTimeoutRef.current = setTimeout(() => {
-          saveFormData(currentForm, newData as unknown as Record<string, unknown>)
-            .catch(err => console.error("Auto-save failed:", err));
-        }, 1000); // Auto-save after 1 second of inactivity
-      }
-      
-      return newData;
-    });
-  }, [currentForm, saveFormData]);
+    const timeoutId = setTimeout(() => {
+      saveFormData(currentForm, currentFormData)
+        .then(() => {
+          hasUnsavedChanges.current = false;
+        })
+        .catch(console.error);
+    }, 1000);
 
-  const handleFieldPositionUpdate = useCallback((field: string, position: FieldPosition) => {
-    setFieldPositions(prev => ({ ...prev, [field]: position }));
-    // Note: In a real implementation, we'd want to save these positions too if user is admin
-  }, []);
+    return () => clearTimeout(timeoutId);
+  }, [currentFormData, currentForm, saveFormData]);
 
-  /**
-   * Handle packet type selection
-   */
+  // -- HANDLERS --
+
   const handlePacketTypeSelect = useCallback(
     async (packetType: PacketType) => {
       setIsInitializing(true);
       try {
-        // Default packet configuration
         const config = {
           hasChildren: packetType === PacketType.INITIATING_WITH_CHILDREN,
           requestingChildSupport: false,
@@ -167,20 +235,11 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
           needMoreSpace: false,
           hasExistingCaseNumber: false
         };
-
         await startWorkflow(packetType, config);
         setShowPacketSelector(false);
-
-        toast({
-          title: 'Workflow Started',
-          description: 'Your TRO packet workflow has been created. Let\'s get started!'
-        });
+        toast({ title: 'Workflow Started', description: 'Your TRO packet workflow has been created.' });
       } catch (err) {
-        toast({
-          title: 'Error Starting Workflow',
-          description: err instanceof Error ? err.message : 'Unknown error occurred',
-          variant: 'destructive'
-        });
+        toast({ title: 'Error', description: err instanceof Error ? err.message : 'Unknown error', variant: 'destructive' });
       } finally {
         setIsInitializing(false);
       }
@@ -188,220 +247,245 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
     [startWorkflow, toast]
   );
 
-  /**
-   * Handle next button click
-   */
   const handleNext = useCallback(async () => {
-    // Validate current form first
     const validation = await validateCurrentForm();
-
     if (!validation.valid) {
-      // Show errors
-      const errorMessages = validation.errors.map(e => e.message).join('\n');
-      toast({
-        title: 'Validation Errors',
-        description: errorMessages,
-        variant: 'destructive'
-      });
+      toast({ title: 'Validation Errors', description: validation.errors.map(e => e.message).join('\n'), variant: 'destructive' });
       return;
     }
-
-    // Show warnings if any
-    if (validation.warnings.length > 0) {
-      const warningMessages = validation.warnings.map(w => w.message).join('\n');
-      toast({
-        title: 'Please Review',
-        description: warningMessages,
-        variant: 'default'
-      });
-    }
-
-    // Mark current form as complete
-    if (currentForm) {
-      await updateFormStatus(currentForm, FormStatus.COMPLETE);
-    }
-
-    // Transition to next form
     await transitionToNextForm();
+    if (workflow?.currentState === WorkflowState.READY_TO_FILE && onComplete) onComplete();
+  }, [validateCurrentForm, transitionToNextForm, workflow, onComplete, toast]);
 
-    // Check if workflow is complete
-    if (workflow?.currentState === WorkflowState.READY_TO_FILE) {
-      if (onComplete) {
-        onComplete();
-      }
+  const handleFormSelect = (value: string) => {
+    if (value === 'upload_custom') {
+      navigate('/');
+    } else {
+      jumpToForm(value as FormType);
     }
-  }, [validateCurrentForm, currentForm, updateFormStatus, transitionToNextForm, workflow, onComplete, toast]);
+  };
 
-  /**
-   * Handle previous button click
-   */
-  const handlePrevious = useCallback(async () => {
-    await transitionToPreviousForm();
-  }, [transitionToPreviousForm]);
+  const handleFileDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Redirect to main canvas for file handling
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      navigate('/');
+    }
+  };
 
-  // Show packet selector if needed
+  // -- RENDER --
+
   if (showPacketSelector) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <PacketTypeSelector
-          onSelect={handlePacketTypeSelect}
-          onCancel={() => {
-            // Handle cancel - maybe navigate away
-          }}
-        />
+        <PacketTypeSelector onSelect={handlePacketTypeSelect} onCancel={() => {}} />
       </div>
     );
   }
 
-  // Show loading state
   if (loading || isInitializing) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center space-y-4">
           <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
-          <p className="text-muted-foreground">
-            {isInitializing ? 'Initializing workflow...' : 'Loading workflow...'}
-          </p>
+          <p className="text-muted-foreground">{isInitializing ? 'Initializing...' : 'Loading...'}</p>
         </div>
       </div>
     );
   }
 
-  // Show error state
-  if (error && !workflow) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error Loading Workflow</AlertTitle>
-          <AlertDescription>{error.message}</AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
+  if (!workflow) return null;
 
-  // No workflow yet
-  if (!workflow) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>No Active Workflow</AlertTitle>
-          <AlertDescription>
-            Please select a packet type to begin your TRO workflow.
-          </AlertDescription>
-        </Alert>
-        <div className="mt-4">
-          <Button onClick={() => setShowPacketSelector(true)}>
-            Select Packet Type
+  // Calculate derived values
+  const formList = workflow.packetType && FORM_ORDER[workflow.packetType] ? FORM_ORDER[workflow.packetType] : [];
+  const pdfUrl = currentForm ? getPdfPath(currentForm) : undefined;
+
+  return (
+    <div 
+      className="flex flex-col h-screen bg-background"
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={handleFileDrop}
+    >
+      {/* -- HEADER -- */}
+      <div className="h-14 border-b flex items-center px-4 gap-4 bg-card shadow-sm z-10 flex-none">
+        <div className="flex items-center gap-2 mr-4">
+          <Building className="w-5 h-5 text-primary" />
+          <span className="font-semibold hidden md:inline">SwiftFill Wizard</span>
+        </div>
+
+        {/* Form Switcher */}
+        <div className="flex-1 max-w-md">
+          <Select value={currentForm || ''} onValueChange={handleFormSelect}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select Form" />
+            </SelectTrigger>
+            <SelectContent>
+              {formList.map(f => (
+                <SelectItem key={f} value={f}>{f} - {workflow.formStatuses[f] || 'Pending'}</SelectItem>
+              ))}
+              <div className="border-t my-1" />
+              <SelectItem value="upload_custom" className="text-primary font-medium">
+                <div className="flex items-center gap-2">
+                  <Upload className="w-4 h-4" /> Upload Your Own
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-2 ml-auto">
+          <Button 
+            variant={isEditMode ? "secondary" : "ghost"} 
+            size="sm" 
+            onClick={() => setIsEditMode(!isEditMode)}
+            title="Toggle Edit Mode (E)"
+          >
+            <Edit className="w-4 h-4 mr-2" />
+            {isEditMode ? 'Editing' : 'View'}
+          </Button>
+          <div className="h-6 w-px bg-border mx-2" />
+          <Button variant="ghost" size="icon" disabled={!canTransitionToPreviousForm()} onClick={transitionToPreviousForm}>
+            <ChevronLeft className="w-5 h-5" />
+          </Button>
+          <Button variant="default" size="sm" disabled={!canTransitionToNextForm()} onClick={handleNext}>
+            Next <ChevronRight className="w-4 h-4 ml-1" />
           </Button>
         </div>
       </div>
-    );
-  }
 
-  // Get workflow data
-  const nextForm = getNextForm();
-  const previousForm = getPreviousForm();
-  const completionPercentage = getPacketCompletionPercentage();
-  const estimatedTime = getEstimatedTimeRemaining();
-  const formSteps = getFormSteps();
+      {/* -- WORKSPACE LAYOUT -- */}
+      <div className="flex-grow overflow-hidden">
+        <ResizablePanelGroup direction="horizontal">
+          
+          {/* LEFT PANEL: Steps & Thumbnails */}
+          <ResizablePanel defaultSize={20} minSize={15} maxSize={30} collapsible>
+            <Tabs value={activeLeftTab} onValueChange={setActiveLeftTab} className="h-full flex flex-col">
+              <div className="px-2 pt-2">
+                <TabsList className="w-full grid grid-cols-2">
+                  <TabsTrigger value="progress">Progress</TabsTrigger>
+                  <TabsTrigger value="pages">Pages</TabsTrigger>
+                </TabsList>
+              </div>
+              
+              <div className="flex-grow overflow-hidden relative mt-2">
+                <TabsContent value="progress" className="h-full absolute inset-0 overflow-y-auto p-2 m-0 data-[state=inactive]:hidden">
+                  <div className="space-y-4">
+                    {/* Court Info */}
+                    <Card className="border-dashed">
+                      <CardHeader className="pb-2 pt-4">
+                        <CardTitle className="text-xs uppercase text-muted-foreground tracking-wider">Filing At</CardTitle>
+                      </CardHeader>
+                      <CardContent className="text-sm space-y-2 pb-4">
+                        <div className="flex items-start gap-2">
+                          <MapPin className="w-4 h-4 text-primary mt-0.5" />
+                          <div className="font-medium">
+                            {(currentFormData['county'] as string) || 'Los Angeles'} Superior Court
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Hash className="w-4 h-4 text-primary" />
+                          <span className="font-mono bg-muted px-1.5 rounded">
+                            {(currentFormData['caseNumber'] as string) || 'PENDING'}
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
 
-  return (
-    <div className="container mx-auto px-4 py-6 space-y-6 h-screen flex flex-col">
-      {/* Header with Progress */}
-      <div className="flex-none">
-        <WorkflowProgressBar
-          packetType={workflow.packetType}
-          completionPercentage={completionPercentage}
-          estimatedTime={estimatedTime}
-        />
-      </div>
+                    {/* Packet Progress */}
+                    <PacketProgressPanel 
+                      workflow={workflow}
+                      onFormSelect={(f) => jumpToForm(f)}
+                      compact={true}
+                    />
+                  </div>
+                </TabsContent>
 
-      {/* Main Content Area - Flex Grow to fill space */}
-      <div className="flex-grow flex flex-col md:flex-row gap-6 overflow-hidden">
-        
-        {/* Sidebar - Progress & Court Info */}
-        <div className="w-full md:w-72 flex-none overflow-y-auto hidden md:block space-y-4 pr-1">
-          {/* Court Information Card */}
-          <Card>
-            <CardHeader className="pb-2 pt-4">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <Building className="w-4 h-4 text-primary" />
-                Court Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm space-y-3 pb-4">
-              <div className="flex items-start gap-2">
-                <MapPin className="w-3 h-3 mt-1 text-muted-foreground flex-shrink-0" />
-                <div>
-                  <div className="font-medium">{(currentFormData['county'] as string) || 'Los Angeles'} Superior Court</div>
-                  {(currentFormData['courtStreetAddress'] as string) && (
-                    <div className="text-xs text-muted-foreground mt-0.5">
-                      {currentFormData['courtStreetAddress'] as string}
-                    </div>
-                  )}
+                <TabsContent value="pages" className="h-full absolute inset-0 m-0 data-[state=inactive]:hidden">
+                  <PDFThumbnailSidebar 
+                    pdfUrl={pdfUrl}
+                    panelWidth={250} // approx
+                    currentPage={1} // TODO: Track current page in wizard state
+                    onPageClick={() => {}} // TODO: Implement page jump
+                  />
+                </TabsContent>
+              </div>
+            </Tabs>
+          </ResizablePanel>
+
+          <ResizableHandle />
+
+          {/* MIDDLE PANEL: Viewer */}
+          <ResizablePanel defaultSize={60} minSize={40}>
+            <div className="h-full w-full relative bg-slate-100/50">
+              {currentForm ? (
+                isLoadingFormData ? (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  </div>
+                ) : (
+                  <FormViewer 
+                    formData={currentFormData}
+                    updateField={updateField}
+                    currentFieldIndex={currentFieldIndex}
+                    setCurrentFieldIndex={setCurrentFieldIndex}
+                    fieldPositions={fieldPositions}
+                    updateFieldPosition={updateFieldPosition}
+                    formType={currentForm}
+                    isEditMode={isEditMode}
+                    zoom={1}
+                    fieldFontSize={12}
+                    validationErrors={validationErrors}
+                    vaultData={vaultData}
+                    highlightedField={highlightedField}
+                    handleFieldClick={() => {}}
+                  />
+                )
+              ) : (
+                <div className="flex items-center justify-center h-full text-muted-foreground">
+                  Select a form to begin
                 </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Hash className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                <div>
-                  <span className="text-muted-foreground text-xs uppercase tracking-wider mr-2">Case #:</span>
-                  <span className="font-mono bg-muted px-1.5 py-0.5 rounded text-xs text-foreground">
-                    {(currentFormData['caseNumber'] as string) || 'PENDING'}
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              )}
+            </div>
+          </ResizablePanel>
 
-          {/* Progress Panel */}
-          <PacketProgressPanel 
-            workflow={workflow}
-            onFormSelect={(form) => jumpToForm(form)}
-            compact={true}
-          />
-        </div>
+          <ResizableHandle />
 
-        {/* Form Area */}
-        <div className="flex-grow flex flex-col min-w-0 border rounded-lg bg-background shadow-sm overflow-hidden relative">
-          {currentForm ? (
-            isLoadingFormData ? (
-              <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-50">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-              </div>
-            ) : (
-              <FormViewer 
+          {/* RIGHT PANEL: Field Navigation */}
+          <ResizablePanel defaultSize={20} minSize={15} maxSize={30} collapsible>
+            <div className="h-full overflow-hidden">
+              <FieldNavigationPanel
                 formData={currentFormData}
-                updateField={handleFieldUpdate}
+                updateField={updateField}
                 currentFieldIndex={currentFieldIndex}
                 setCurrentFieldIndex={setCurrentFieldIndex}
                 fieldPositions={fieldPositions}
-                updateFieldPosition={handleFieldPositionUpdate}
-                formType={currentForm}
-                // Optional: pass validation errors here
+                updateFieldPosition={updateFieldPosition}
+                selectedFields={selectedFields}
+                setSelectedFields={setSelectedFields}
+                // Pass Layout Handlers
+                onSnapToGrid={handleSnapToGrid}
+                onAlignHorizontal={handleAlignHorizontal}
+                onAlignVertical={handleAlignVertical}
+                onDistribute={handleDistribute}
+                onCopyPositions={handleCopyPositions}
+                onPastePositions={handlePastePositions}
+                onTransformPositions={handleTransformPositions}
+                hasCopiedPositions={!!copiedFieldPositions}
+                onFieldHover={setHighlightedField}
+                validationRules={validationRules}
+                validationErrors={validationErrors}
+                onSaveValidationRules={handleSaveValidationRules}
+                settingsSheetOpen={settingsSheetOpen}
+                onSettingsSheetChange={setSettingsSheetOpen}
+                onApplyTemplate={handleApplyTemplate}
+                onApplyGroup={handleApplyGroup}
               />
-            )
-          ) : (
-            <div className="flex items-center justify-center h-full text-muted-foreground">
-              Select a form to begin
             </div>
-          )}
-        </div>
-      </div>
+          </ResizablePanel>
 
-      {/* Footer Navigation */}
-      <div className="flex-none pt-4 border-t bg-background sticky bottom-0">
-        <WorkflowNavigationButtons
-          currentForm={currentForm}
-          nextForm={nextForm}
-          previousForm={previousForm}
-          formSteps={formSteps}
-          canGoNext={canTransitionToNextForm()}
-          canGoPrevious={canTransitionToPreviousForm()}
-          onNext={handleNext}
-          onPrevious={handlePrevious}
-        />
+        </ResizablePanelGroup>
       </div>
     </div>
   );

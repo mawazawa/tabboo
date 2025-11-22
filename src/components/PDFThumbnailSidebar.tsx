@@ -14,6 +14,7 @@ export interface ThumbnailSidebarProps {
   currentFieldPositions?: { top: number; left: number }[];
   showFieldIndicator?: boolean;
   panelWidth?: number;
+  pdfUrl?: string;
 }
 
 export const PDFThumbnailSidebar = ({ 
@@ -21,7 +22,8 @@ export const PDFThumbnailSidebar = ({
   onPageClick, 
   currentFieldPositions = [],
   showFieldIndicator = false,
-  panelWidth = 200
+  panelWidth = 200,
+  pdfUrl = '/fl320.pdf'
 }: ThumbnailSidebarProps) => {
   const [numPages, setNumPages] = useState<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -67,7 +69,7 @@ export const PDFThumbnailSidebar = ({
             </div>
           )}
           <Document
-            file="/fl320.pdf"
+            file={pdfUrl}
             onLoadSuccess={onDocumentLoadSuccess}
             className="flex flex-col"
             loading=""
