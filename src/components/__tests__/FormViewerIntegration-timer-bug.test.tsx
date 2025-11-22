@@ -24,6 +24,16 @@ import { render } from '@testing-library/react';
 import { FormViewer } from '../FormViewer';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import type { FormData, FieldPosition } from '@/types/FormData';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
 
 // Mock PDF.js worker
 vi.mock('@/lib/pdfConfig', () => ({}));
@@ -99,9 +109,11 @@ describe('FormViewer Timer Cleanup Bug Regression Test', () => {
   test('does not throw "window is not defined" error after test completion', async () => {
     // Render the component - this triggers the mocked setTimeout callbacks
     const { unmount } = render(
-      <TooltipProvider>
-        <FormViewer {...defaultProps} />
-      </TooltipProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <FormViewer {...defaultProps} />
+        </TooltipProvider>
+      </QueryClientProvider>
     );
 
     // Immediately unmount (simulating fast test completion)
@@ -123,9 +135,11 @@ describe('FormViewer Timer Cleanup Bug Regression Test', () => {
     // Render and unmount multiple times in quick succession
     for (let i = 0; i < 3; i++) {
       const { unmount } = render(
-        <TooltipProvider>
-          <FormViewer {...defaultProps} />
-        </TooltipProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <FormViewer {...defaultProps} />
+          </TooltipProvider>
+        </QueryClientProvider>
       );
       unmount();
     }
@@ -140,9 +154,11 @@ describe('FormViewer Timer Cleanup Bug Regression Test', () => {
   test('cleans up timers that exceed 100ms delay', async () => {
     // The afterEach hook waits 200ms, which covers the 100ms timer in the mock
     const { unmount } = render(
-      <TooltipProvider>
-        <FormViewer {...defaultProps} />
-      </TooltipProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <FormViewer {...defaultProps} />
+        </TooltipProvider>
+      </QueryClientProvider>
     );
 
     unmount();

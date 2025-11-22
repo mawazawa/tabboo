@@ -13,6 +13,16 @@ import userEvent from '@testing-library/user-event';
 import { FormViewer } from '../FormViewer';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import type { FormData, FieldPosition } from '@/types/FormData';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
 
 // Mock PDF.js worker
 vi.mock('@/lib/pdfConfig', () => ({}));
@@ -161,9 +171,11 @@ describe('FormViewer Integration Tests', () => {
   // Helper to render FormViewer with required providers
   const renderFormViewer = (props = defaultProps) => {
     return render(
-      <TooltipProvider>
-        <FormViewer {...props} />
-      </TooltipProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <FormViewer {...props} />
+        </TooltipProvider>
+      </QueryClientProvider>
     );
   };
 
