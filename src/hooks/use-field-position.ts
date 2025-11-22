@@ -25,7 +25,7 @@ export const useFieldPosition = (
   const safeFieldName = currentFieldName || '';
   const currentPosition = safeFieldName ? (fieldPositions[safeFieldName] || getDefaultPosition(safeFieldName)) : { top: 0, left: 0 };
 
-  const adjustPosition = useCallback((direction: 'up' | 'down' | 'left' | 'right', fieldName?: string) => {
+  const adjustPosition = useCallback((direction: 'up' | 'down' | 'left' | 'right', fieldName?: string, customStep?: number) => {
     const targetField = fieldName || safeFieldName;
     
     // Prevent adjusting position for invalid/empty field names
@@ -34,7 +34,7 @@ export const useFieldPosition = (
     }
     
     const position = fieldPositions[targetField] || getDefaultPosition(targetField);
-    const step = 1.0;
+    const step = customStep || 1.0;
     const newPosition = { ...position };
 
     switch (direction) {
