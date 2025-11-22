@@ -43,6 +43,8 @@ export const usePdfLoading = (formType: FormType) => {
 
     const loadPdf = async () => {
       try {
+        if (typeof window === 'undefined') return;
+
         const pdfPath = getPdfPath(formType);
         const fullUrl = window.location.origin + pdfPath;
         const blob = await pdfCache.get(fullUrl);
