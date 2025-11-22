@@ -37,3 +37,7 @@ playwright/.auth
 
 *storybook.log
 storybook-static
+
+# MCP Configuration (contains API keys)
+.mcp.json
+.claude/
