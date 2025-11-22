@@ -4,7 +4,7 @@ import { FL_320_FIELD_CONFIG } from "@/config/field-config";
 interface UseFieldNavigationKeyboardProps {
   currentFieldIndex: number;
   setCurrentFieldIndex: (index: number) => void;
-  adjustPosition: (direction: 'up' | 'down' | 'left' | 'right') => void;
+  adjustPosition: (direction: 'up' | 'down' | 'left' | 'right', fieldName?: string, customStep?: number) => void;
   showSearch: boolean;
   setShowSearch: (show: boolean) => void;
   showPositionControl: boolean;
@@ -26,8 +26,8 @@ export const useFieldNavigationKeyboard = ({
   // Track timeout ID for cleanup to prevent memory leaks
   const focusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const adjustPositionCallback = useCallback((direction: 'up' | 'down' | 'left' | 'right') => {
-    adjustPosition(direction);
+  const adjustPositionCallback = useCallback((direction: 'up' | 'down' | 'left' | 'right', fieldName?: string, customStep?: number) => {
+    adjustPosition(direction, fieldName, customStep);
   }, [adjustPosition]);
 
   useEffect(() => {
@@ -91,7 +91,11 @@ export const useFieldNavigationKeyboard = ({
         }[e.key] as 'up' | 'down' | 'left' | 'right';
 
         requestAnimationFrame(() => setPressedKey(direction));
-        adjustPositionCallback(direction);
+        
+        // Shift key for coarse movement (1.0), default to fine movement (0.1)
+        // This provides precise control for pixel-perfect positioning
+        const step = e.shiftKey ? 1.0 : 0.1;
+        adjustPositionCallback(direction, undefined, step);
       }
 
       if (e.key === 'Escape') {
