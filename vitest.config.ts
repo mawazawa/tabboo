@@ -17,6 +17,8 @@ export default defineConfig({
       '**/tests/**', // Exclude Playwright tests directory
       '**/smoke.test.ts', // Exclude Playwright smoke tests
       '**/workflows.test.ts', // Exclude Playwright workflow tests
+      '**/src/__tests__/**', // Exclude Playwright E2E tests directory
+      '**/tests/visual-regression/**', // Exclude Playwright visual regression tests
     ],
     coverage: {
       provider: 'v8',
