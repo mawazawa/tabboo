@@ -514,7 +514,7 @@ BEGIN
   INSERT INTO form_field_mappings (form_id, field_id, form_field_name, item_number, page_number, position_top, position_left, field_width, is_required)
   SELECT v_form_id, (SELECT id FROM canonical_fields WHERE field_key = 'item8b1_person2LivesNo'), 'item8b1_person2LivesNo', '8b(1)', 6, 12.0, 85.0, 3.0, FALSE;
 
-  -- Person 3 and 4 (abbreviated for brevity - same pattern)
+  -- Person 3
   INSERT INTO canonical_fields (field_key, field_label, field_type, category, subcategory, semantic_type, description, is_pii)
   VALUES ('item8b1_person3Name', 'Person 3 name', 'input', 'protected_persons', 'person_3', 'name', 'Full name of third protected person', TRUE)
   ON CONFLICT (field_key) DO NOTHING;
@@ -523,11 +523,68 @@ BEGIN
   SELECT v_form_id, (SELECT id FROM canonical_fields WHERE field_key = 'item8b1_person3Name'), 'item8b1_person3Name', '8b(1)', 6, 14.0, 5.0, 30.0, FALSE;
 
   INSERT INTO canonical_fields (field_key, field_label, field_type, category, subcategory, semantic_type, description, is_pii)
+  VALUES ('item8b1_person3Age', 'Person 3 age', 'input', 'protected_persons', 'person_3', 'age', 'Age of third protected person', FALSE)
+  ON CONFLICT (field_key) DO NOTHING;
+
+  INSERT INTO form_field_mappings (form_id, field_id, form_field_name, item_number, page_number, position_top, position_left, field_width, is_required)
+  SELECT v_form_id, (SELECT id FROM canonical_fields WHERE field_key = 'item8b1_person3Age'), 'item8b1_person3Age', '8b(1)', 6, 14.0, 38.0, 8.0, FALSE;
+
+  INSERT INTO canonical_fields (field_key, field_label, field_type, category, subcategory, semantic_type, description, is_pii)
+  VALUES ('item8b1_person3Relationship', 'Person 3 relationship', 'input', 'protected_persons', 'person_3', 'text', 'Relationship to petitioner', FALSE)
+  ON CONFLICT (field_key) DO NOTHING;
+
+  INSERT INTO form_field_mappings (form_id, field_id, form_field_name, item_number, page_number, position_top, position_left, field_width, is_required)
+  SELECT v_form_id, (SELECT id FROM canonical_fields WHERE field_key = 'item8b1_person3Relationship'), 'item8b1_person3Relationship', '8b(1)', 6, 14.0, 50.0, 20.0, FALSE;
+
+  INSERT INTO canonical_fields (field_key, field_label, field_type, category, subcategory, semantic_type, description, is_pii)
+  VALUES ('item8b1_person3LivesYes', 'Person 3 lives with you - Yes', 'checkbox', 'protected_persons', 'person_3', 'boolean', 'Person lives with petitioner', FALSE)
+  ON CONFLICT (field_key) DO NOTHING;
+
+  INSERT INTO form_field_mappings (form_id, field_id, form_field_name, item_number, page_number, position_top, position_left, field_width, is_required)
+  SELECT v_form_id, (SELECT id FROM canonical_fields WHERE field_key = 'item8b1_person3LivesYes'), 'item8b1_person3LivesYes', '8b(1)', 6, 14.0, 75.0, 3.0, FALSE;
+
+  INSERT INTO canonical_fields (field_key, field_label, field_type, category, subcategory, semantic_type, description, is_pii)
+  VALUES ('item8b1_person3LivesNo', 'Person 3 lives with you - No', 'checkbox', 'protected_persons', 'person_3', 'boolean', 'Person does not live with petitioner', FALSE)
+  ON CONFLICT (field_key) DO NOTHING;
+
+  INSERT INTO form_field_mappings (form_id, field_id, form_field_name, item_number, page_number, position_top, position_left, field_width, is_required)
+  SELECT v_form_id, (SELECT id FROM canonical_fields WHERE field_key = 'item8b1_person3LivesNo'), 'item8b1_person3LivesNo', '8b(1)', 6, 14.0, 85.0, 3.0, FALSE;
+
+  -- Person 4
+  INSERT INTO canonical_fields (field_key, field_label, field_type, category, subcategory, semantic_type, description, is_pii)
   VALUES ('item8b1_person4Name', 'Person 4 name', 'input', 'protected_persons', 'person_4', 'name', 'Full name of fourth protected person', TRUE)
   ON CONFLICT (field_key) DO NOTHING;
 
   INSERT INTO form_field_mappings (form_id, field_id, form_field_name, item_number, page_number, position_top, position_left, field_width, is_required)
   SELECT v_form_id, (SELECT id FROM canonical_fields WHERE field_key = 'item8b1_person4Name'), 'item8b1_person4Name', '8b(1)', 6, 16.0, 5.0, 30.0, FALSE;
+
+  INSERT INTO canonical_fields (field_key, field_label, field_type, category, subcategory, semantic_type, description, is_pii)
+  VALUES ('item8b1_person4Age', 'Person 4 age', 'input', 'protected_persons', 'person_4', 'age', 'Age of fourth protected person', FALSE)
+  ON CONFLICT (field_key) DO NOTHING;
+
+  INSERT INTO form_field_mappings (form_id, field_id, form_field_name, item_number, page_number, position_top, position_left, field_width, is_required)
+  SELECT v_form_id, (SELECT id FROM canonical_fields WHERE field_key = 'item8b1_person4Age'), 'item8b1_person4Age', '8b(1)', 6, 16.0, 38.0, 8.0, FALSE;
+
+  INSERT INTO canonical_fields (field_key, field_label, field_type, category, subcategory, semantic_type, description, is_pii)
+  VALUES ('item8b1_person4Relationship', 'Person 4 relationship', 'input', 'protected_persons', 'person_4', 'text', 'Relationship to petitioner', FALSE)
+  ON CONFLICT (field_key) DO NOTHING;
+
+  INSERT INTO form_field_mappings (form_id, field_id, form_field_name, item_number, page_number, position_top, position_left, field_width, is_required)
+  SELECT v_form_id, (SELECT id FROM canonical_fields WHERE field_key = 'item8b1_person4Relationship'), 'item8b1_person4Relationship', '8b(1)', 6, 16.0, 50.0, 20.0, FALSE;
+
+  INSERT INTO canonical_fields (field_key, field_label, field_type, category, subcategory, semantic_type, description, is_pii)
+  VALUES ('item8b1_person4LivesYes', 'Person 4 lives with you - Yes', 'checkbox', 'protected_persons', 'person_4', 'boolean', 'Person lives with petitioner', FALSE)
+  ON CONFLICT (field_key) DO NOTHING;
+
+  INSERT INTO form_field_mappings (form_id, field_id, form_field_name, item_number, page_number, position_top, position_left, field_width, is_required)
+  SELECT v_form_id, (SELECT id FROM canonical_fields WHERE field_key = 'item8b1_person4LivesYes'), 'item8b1_person4LivesYes', '8b(1)', 6, 16.0, 75.0, 3.0, FALSE;
+
+  INSERT INTO canonical_fields (field_key, field_label, field_type, category, subcategory, semantic_type, description, is_pii)
+  VALUES ('item8b1_person4LivesNo', 'Person 4 lives with you - No', 'checkbox', 'protected_persons', 'person_4', 'boolean', 'Person does not live with petitioner', FALSE)
+  ON CONFLICT (field_key) DO NOTHING;
+
+  INSERT INTO form_field_mappings (form_id, field_id, form_field_name, item_number, page_number, position_top, position_left, field_width, is_required)
+  SELECT v_form_id, (SELECT id FROM canonical_fields WHERE field_key = 'item8b1_person4LivesNo'), 'item8b1_person4LivesNo', '8b(1)', 6, 16.0, 85.0, 3.0, FALSE;
 
   -- Need more people checkbox
   INSERT INTO canonical_fields (field_key, field_label, field_type, category, subcategory, semantic_type, description, is_pii)
