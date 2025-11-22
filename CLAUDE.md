@@ -113,6 +113,49 @@ Always have recent documentation ready in your back pocket:
 
 **Never claim "production ready" until verification complete.**
 
+### API Key Management: The Goldilocks Principle
+
+**CRITICAL SECURITY RULE: API keys require precise balance - not too exposed, not too hidden.**
+
+**The Balance:**
+- ✅ **Store real keys in**: `.gitignore`d files (`.mcp.json`, `.env`, `.env.local`)
+- ✅ **Document in reports**: Status + redacted values (`ghp_****`)
+- ❌ **Never commit**: Actual key values to Git
+- ❌ **Don't over-redact**: Make docs useless
+
+**Quick Rule**: If file going to Git → redact keys. If file staying local → real keys OK.
+
+**Pre-Commit Checklist:**
+1. Is file in `.gitignore`? → OK for real keys
+2. Am I committing to Git? → MUST redact keys
+3. Does doc show WHAT configured? (useful ✅)
+4. Does doc show HOW to use? (useful ✅)
+5. Does doc hide VALUES? (secure ✅)
+
+**Example - Configuration File** (`.mcp.json` - gitignored):
+```json
+{
+  "github": {
+    "env": {"GITHUB_TOKEN": "ghp_YOUR_ACTUAL_TOKEN_HERE"}
+  }
+}
+```
+
+**Example - Documentation** (report.md - committed):
+```markdown
+- GitHub: ✅ Configured (ghp_****)
+- Functionality: Full repo integration
+- Location: .mcp.json (gitignored)
+```
+
+**Meta-Lesson Learned**: Even docs ABOUT not exposing keys can accidentally expose keys in examples. Use placeholders like `YOUR_TOKEN_HERE` everywhere.
+
+**Related**: 
+- [JUSTICE-316](https://linear.app/empathylabs/issue/JUSTICE-316)
+- `docs/reports/2025/11/20251121_api-key-management-lessons.md`
+- Memory MCP: "API Key Management Best Practices"
+- Neo4j: Node #69
+
 ## Constitutional Design Principles
 
 **These principles apply across ALL SwiftFill projects and all legal tech applications built under the Modern Justice Design System.**
