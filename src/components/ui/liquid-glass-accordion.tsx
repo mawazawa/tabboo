@@ -24,9 +24,8 @@
  */
 
 import * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
-import { ChevronDown } from "@/icons";
+import { ChevronDown } from "lucide-react";
 
 /* ============================================================================
    TYPE DEFINITIONS
@@ -199,12 +198,12 @@ const LIQUID_GLASS_STYLES = `
   display: none;
 }
 
-/* Open state - fade out summary */
+/* Open state - summary stays visible and clickable */
 .liquid-glass-accordion[open] summary {
-  opacity: 0;
-  pointer-events: none;
+  background: inherit;
+  border-radius: calc(var(--liquid-glass-sizing) * 0.5) calc(var(--liquid-glass-sizing) * 0.5) 0 0;
   transition-delay: 0s;
-  width: var(--liquid-glass-width);
+  width: 100%;
 }
 
 /* Chevron rotation */

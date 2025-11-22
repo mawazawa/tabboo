@@ -197,13 +197,22 @@ describe('FormViewer - UX Critical Tests', () => {
     queryClient.clear();
   });
 
-  const renderFormViewer = (props = {}) => {
-    return render(
-      <QueryClientProvider client={queryClient}>
-        <FormViewer {...defaultProps} {...props} />
-      </QueryClientProvider>
-    );
-  };
+  const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+    },
+  });
+  return (
+    <QueryClientProvider client={queryClient}>
+      {children}
+    </QueryClientProvider>
+  );
+};
+
+const renderFormViewer = (props = {}) => {
+  return render(<FormViewer {...defaultProps} {...props} />, { wrapper: AllTheProviders });
+};
 
   describe('PDF Rendering & Loading', () => {
     test('should render PDF document successfully', async () => {

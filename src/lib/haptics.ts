@@ -32,6 +32,14 @@ const PATTERNS: Record<HapticPattern, number | number[]> = {
 let supportsVibration: boolean | null = null;
 
 /**
+ * Reset haptics cache (for testing only)
+ * @internal
+ */
+export function __resetHapticsCache(): void {
+  supportsVibration = null;
+}
+
+/**
  * Check if device supports Vibration API
  */
 function checkVibrationSupport(): boolean {

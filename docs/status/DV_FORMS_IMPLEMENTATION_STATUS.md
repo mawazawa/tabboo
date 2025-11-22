@@ -165,7 +165,7 @@ Two possible approaches:
 
 **Estimate**: 3-4 hours
 
-### 4. Create Database Field Position Mappings (Critical Blocker)
+### 4. Create Database Field Position Mappings (Unblocked!)
 **Database**: Supabase `form_fields` table
 
 **Current Status:**
@@ -173,27 +173,19 @@ Two possible approaches:
 - DV-100: **No database field mappings yet** ⚠️
 - DV-105: **No database field mappings yet** ⚠️
 
+**Update (Nov 22, 2025): Glass Layer Field Mapper Implemented**
+We have implemented the "Glass Layer Field Mapper" to solve this.
+- **Draw Mode**: Users/Devs can draw fields directly on the PDF.
+- **Neon Orange Guidelines**: High-visibility visual feedback.
+- **JSON Export**: Generates the exact JSON needed for the database.
+
 **What Needs to Be Done:**
-This is the **critical blocker** for validation and FieldNavigationPanel updates.
+For **DV-100** (837 fields across 13 pages) and **DV-105** (466 fields):
+1.  Use the new Field Mapper to draw all fields.
+2.  Copy the generated JSON from the console.
+3.  Insert into Supabase `form_fields` table (or create a bulk import script).
 
-For **DV-100** (837 fields across 13 pages):
-- Map each field to PDF coordinates (top, left, page)
-- Create field type mappings (input, textarea, checkbox)
-- Insert into Supabase `form_fields` table
-- Test field overlay positioning
-
-For **DV-105** (466 fields across 6 pages):
-- Map each field to PDF coordinates
-- Create field type mappings
-- Insert into Supabase `form_fields` table
-- Test field overlay positioning
-
-**Tools Needed:**
-- PDF coordinate extraction tool
-- Manual visual positioning (drag-and-drop in edit mode)
-- field-position-validator.mjs for quality checks
-
-**Estimate**: 12-18 hours (this is the most time-consuming task)
+**Estimate**: 6-8 hours (significantly faster with the new tool)
 
 **Priority**: HIGH - This blocks both validation and FieldNavigationPanel
 

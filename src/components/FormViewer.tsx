@@ -1,5 +1,9 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Document } from 'react-pdf';
+import { useFormFields } from "@/hooks/use-form-fields";
+import { useLiveRegion } from "@/hooks/use-live-region";
+import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "@/icons";
 import { getVaultValueForField } from "@/utils/vaultFieldMatcher";
 import { TutorialTooltips } from "@/components/TutorialTooltips";
@@ -7,21 +11,10 @@ import { PDFLoadingState } from "@/components/pdf/PDFLoadingState";
 import { PDFErrorState } from "@/components/pdf/PDFErrorState";
 import { EditModeBanner } from "@/components/pdf/EditModeBanner";
 import { PDFPageRenderer } from "@/components/pdf/PDFPageRenderer";
-import { useFormFields, convertToFieldOverlays } from "@/hooks/use-form-fields";
-import { useLiveRegion } from "@/hooks/use-live-region";
-import { useKeyboardNavigation } from "@/hooks/use-keyboard-navigation";
-import { useDragAndDrop } from "@/hooks/use-drag-and-drop";
-import { usePdfLoading, getPdfPath } from "@/hooks/use-pdf-loading";
-import { mergeFieldNameToIndex } from "@/lib/field-name-index-utils";
-import { legacyFieldNameToIndex } from "@/lib/legacy-field-name-map";
-import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
-import 'react-pdf/dist/esm/Page/TextLayer.css';
-
-import type { FormData, FieldPosition, ValidationErrors, PersonalVaultData } from "@/types/FormData";
-import { FormType } from "@/types/WorkflowTypes";
-
-// Import centralized PDF.js configuration
-import '@/lib/pdfConfig';
+import { MappingHUD } from "@/components/pdf/MappingHUD";
+import { useFieldMapping } from "@/hooks/use-field-mapping";
+import { Button } from "@/components/ui/button";
+import { Rocket } from "lucide-react";
 
 interface Props {
   formData: FormData;
@@ -44,7 +37,25 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
   const { announce, LiveRegionComponent } = useLiveRegion({
     clearAfter: 2000, // Clear announcements after 2 seconds
     debounce: 300, // Debounce rapid announcements (e.g., during dragging)
-  });
+    });
+  
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  // Auto-Pilot Mapping Hook
+  const { 
+    isMappingMode, 
+    setIsMappingMode, 
+    currentField, 
+    currentIndex, 
+    totalFields, 
+    nextField, 
+    skipField, 
+    prevField 
+  } = useFieldMapping(formType);
+
+  // State for new field dialog
+  const [newFieldDialog, setNewFieldDialog] = useState<{ open: boolean; rect: DrawnRect & { page: number } | null }>({ open: false, rect: null });
 
   // Fetch form fields from database based on formType
   const { data: fieldMappings, isLoading: isLoadingFields, error: fieldsError } = useFormFields(formType);
@@ -134,6 +145,68 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     announce(isEditMode ? 'Edit mode activated. You can now drag fields to reposition them.' : 'Edit mode deactivated. Fields are now locked.');
   }, [isEditMode, announce]);
 
+  // Auto-Save Handler
+  const handleSaveField = useCallback(async (data: { name: string; type: string; rect: DrawnRect }) => {
+    if (!newFieldDialog.rect && !isMappingMode) return;
+    
+    // In mapping mode, we might not have newFieldDialog.rect if we bypassed it?
+    // No, onDrawComplete sets it.
+    
+    const rectToUse = newFieldDialog.rect || (isMappingMode ? data.rect : null); // Fallback if needed
+    
+    if (!rectToUse) {
+        // Should be unreachable if flow is correct
+        console.error("No rect available for save");
+        return;
+    }
+
+    const { page } = rectToUse as any; // Type cast for now
+    const { name, type, rect } = data;
+    
+    const payload = {
+      form_field_name: name,
+      page_number: page,
+      position_top: Number(rect.top.toFixed(4)),
+      position_left: Number(rect.left.toFixed(4)),
+      field_width: Number(rect.width.toFixed(4)),
+      field_height: Number(rect.height.toFixed(4)),
+      canonical_field: {
+        field_type: type
+      }
+    };
+
+    console.log('JSON for Field Mapping:', JSON.stringify(payload, null, 2));
+
+    toast({
+      title: isMappingMode ? `Mapped: ${name}` : "Field JSON Generated",
+      description: isMappingMode 
+        ? `Auto-advancing to next field...` 
+        : `Check console for JSON to add to database. Field: ${name}`,
+      duration: isMappingMode ? 1000 : 3000,
+    });
+    
+    // If in mapping mode, advance
+    if (isMappingMode) {
+        nextField();
+    }
+    
+  }, [newFieldDialog.rect, formType, toast, isMappingMode, nextField]);
+
+  const handleDrawComplete = useCallback((page: number, rect: DrawnRect) => {
+    if (isMappingMode && currentField) {
+        // Auto-pilot: Immediately save with current target field
+        handleSaveField({
+            name: currentField.name,
+            type: currentField.type,
+            rect: { ...rect, page } as any // Pass page through
+        });
+        // Note: handleSaveField will call nextField()
+    } else {
+        // Manual mode: Open dialog
+        setNewFieldDialog({ open: true, rect: { ...rect, page } });
+    }
+  }, [isMappingMode, currentField, handleSaveField]);
+
   const handleFieldClick = useCallback((field: string, e: React.MouseEvent) => {
     // Check if clicking on form element OR any parent up to the container
     const target = e.target as HTMLElement;
@@ -209,6 +282,42 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
 
         <TutorialTooltips />
 
+        <NewFieldDialog 
+          open={newFieldDialog.open} 
+          onOpenChange={(open) => setNewFieldDialog(prev => ({ ...prev, open }))}
+          rect={newFieldDialog.rect}
+          onSave={handleSaveField}
+        />
+
+        {isMappingMode && currentField && (
+            <MappingHUD 
+                field={currentField} 
+                index={currentIndex} 
+                total={totalFields} 
+                onSkip={skipField}
+                onPrev={prevField}
+            />
+        )}
+
+        {isEditMode && (
+            <div className="fixed top-4 right-4 z-50 flex gap-2">
+                <Button 
+                    variant={isMappingMode ? "destructive" : "default"}
+                    className={isMappingMode ? "animate-pulse shadow-[0_0_15px_rgba(255,95,31,0.5)] border-neon-orange" : ""}
+                    onClick={() => setIsMappingMode(!isMappingMode)}
+                >
+                    {isMappingMode ? (
+                        <>Stop Auto-Pilot</>
+                    ) : (
+                        <>
+                            <Rocket className="mr-2 h-4 w-4" />
+                            Start Auto-Pilot
+                        </>
+                    )}
+                </Button>
+            </div>
+        )}
+
         {isEditMode && <EditModeBanner />}
 
         <div className="relative min-h-full w-full flex flex-col items-center justify-center p-4">
@@ -253,6 +362,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
                     handlePointerUp={handlePointerUp}
                     handlePDFClick={handlePDFClick}
                     handlePointerDown={handlePointerDown}
+                    onDrawComplete={handleDrawComplete}
                   />
                 );
               })}

@@ -1,0 +1,2401 @@
+{
+  "DV-100": [
+    {
+      "name": "courtCounty",
+      "label": "Superior Court of California, County of",
+      "type": "input"
+    },
+    {
+      "name": "courtStreetAddress",
+      "label": "Court street address",
+      "type": "input"
+    },
+    {
+      "name": "caseNumber",
+      "label": "Court case number (filled by clerk)",
+      "type": "input"
+    },
+    {
+      "name": "item1a_yourName",
+      "label": "Item 1a: Your name",
+      "type": "input"
+    },
+    {
+      "name": "item1b_yourAge",
+      "label": "Item 1b: Your age",
+      "type": "input"
+    },
+    {
+      "name": "item1c_address",
+      "label": "Item 1c: Address where you can receive court papers",
+      "type": "input"
+    },
+    {
+      "name": "item1c_city",
+      "label": "Item 1c: City",
+      "type": "input"
+    },
+    {
+      "name": "item1c_state",
+      "label": "Item 1c: State",
+      "type": "input"
+    },
+    {
+      "name": "item1c_zip",
+      "label": "Item 1c: Zip",
+      "type": "input"
+    },
+    {
+      "name": "item1d_telephone",
+      "label": "Item 1d: Telephone (optional)",
+      "type": "input"
+    },
+    {
+      "name": "item1d_fax",
+      "label": "Item 1d: Fax (optional)",
+      "type": "input"
+    },
+    {
+      "name": "item1d_email",
+      "label": "Item 1d: Email Address (optional)",
+      "type": "input"
+    },
+    {
+      "name": "item1e_lawyerName",
+      "label": "Item 1e: Your lawyer's Name",
+      "type": "input"
+    },
+    {
+      "name": "item1e_stateBarNo",
+      "label": "Item 1e: State Bar No.",
+      "type": "input"
+    },
+    {
+      "name": "item1e_firmName",
+      "label": "Item 1e: Firm Name",
+      "type": "input"
+    },
+    {
+      "name": "item2a_fullName",
+      "label": "Item 2a: Full name",
+      "type": "input"
+    },
+    {
+      "name": "item2b_age",
+      "label": "Item 2b: Age (estimate if unknown)",
+      "type": "input"
+    },
+    {
+      "name": "item2c_dateOfBirth",
+      "label": "Item 2c: Date of birth",
+      "type": "date"
+    },
+    {
+      "name": "item2d_genderM",
+      "label": "Item 2d: Gender - M",
+      "type": "checkbox"
+    },
+    {
+      "name": "item2d_genderF",
+      "label": "Item 2d: Gender - F",
+      "type": "checkbox"
+    },
+    {
+      "name": "item2d_genderNonbinary",
+      "label": "Item 2d: Gender - Nonbinary",
+      "type": "checkbox"
+    },
+    {
+      "name": "item2e_race",
+      "label": "Item 2e: Race",
+      "type": "input"
+    },
+    {
+      "name": "item3a_haveChildren",
+      "label": "Item 3a: We have a child or children together",
+      "type": "checkbox"
+    },
+    {
+      "name": "item3a_childrenNames",
+      "label": "Item 3a: Names of children",
+      "type": "input"
+    },
+    {
+      "name": "item3b_married",
+      "label": "Item 3b: We are married or registered domestic partners",
+      "type": "checkbox"
+    },
+    {
+      "name": "item3c_usedToBeMarried",
+      "label": "Item 3c: We used to be married or registered domestic partners",
+      "type": "checkbox"
+    },
+    {
+      "name": "item3d_dating",
+      "label": "Item 3d: We are dating or used to date",
+      "type": "date"
+    },
+    {
+      "name": "item3e_engaged",
+      "label": "Item 3e: We are or used to be engaged to be married",
+      "type": "checkbox"
+    },
+    {
+      "name": "item3f_related",
+      "label": "Item 3f: We are related",
+      "type": "checkbox"
+    },
+    {
+      "name": "item3f_parent",
+      "label": "Item 3f: Parent, stepparent, or parent-in-law",
+      "type": "checkbox"
+    },
+    {
+      "name": "item3f_sibling",
+      "label": "Item 3f: Brother, sister, sibling, stepsibling, or sibling in-law",
+      "type": "checkbox"
+    },
+    {
+      "name": "item3f_child",
+      "label": "Item 3f: Child, stepchild, or legally adopted child",
+      "type": "checkbox"
+    },
+    {
+      "name": "item3f_grandparent",
+      "label": "Item 3f: Grandparent, step-grandparent, or grandparent-in-law",
+      "type": "checkbox"
+    },
+    {
+      "name": "item3f_childSpouse",
+      "label": "Item 3f: Child's spouse",
+      "type": "checkbox"
+    },
+    {
+      "name": "item3f_grandchild",
+      "label": "Item 3f: Grandchild, step-grandchild, or grandchild-in-law",
+      "type": "checkbox"
+    },
+    {
+      "name": "item3g_liveTogether",
+      "label": "Item 3g: We live together or used to live together",
+      "type": "checkbox"
+    },
+    {
+      "name": "item3g_asFamily",
+      "label": "Item 3g: Yes - lived as family/household",
+      "type": "checkbox"
+    },
+    {
+      "name": "item3g_justRoommates",
+      "label": "Item 3g: No - just roommates",
+      "type": "checkbox"
+    },
+    {
+      "name": "item4a_noOrders",
+      "label": "Item 4a: No existing restraining orders",
+      "type": "textarea"
+    },
+    {
+      "name": "item4a_yesOrders",
+      "label": "Item 4a: Yes, existing restraining orders",
+      "type": "textarea"
+    },
+    {
+      "name": "item4a1_dateOfOrder",
+      "label": "Item 4a(1): Date of first order",
+      "type": "date"
+    },
+    {
+      "name": "item4a1_dateExpires",
+      "label": "Item 4a(1): Date first order expires",
+      "type": "date"
+    },
+    {
+      "name": "item4a2_dateOfOrder",
+      "label": "Item 4a(2): Date of second order",
+      "type": "date"
+    },
+    {
+      "name": "item4a2_dateExpires",
+      "label": "Item 4a(2): Date second order expires",
+      "type": "date"
+    },
+    {
+      "name": "item4b_noOtherCases",
+      "label": "Item 4b: No other court cases",
+      "type": "checkbox"
+    },
+    {
+      "name": "item4b_yesOtherCases",
+      "label": "Item 4b: Yes, other court cases",
+      "type": "checkbox"
+    },
+    {
+      "name": "item4b_custody",
+      "label": "Item 4b: Custody case",
+      "type": "checkbox"
+    },
+    {
+      "name": "item4b_divorce",
+      "label": "Item 4b: Divorce case",
+      "type": "checkbox"
+    },
+    {
+      "name": "item4b_juvenile",
+      "label": "Item 4b: Juvenile case",
+      "type": "checkbox"
+    },
+    {
+      "name": "item4b_guardianship",
+      "label": "Item 4b: Guardianship case",
+      "type": "checkbox"
+    },
+    {
+      "name": "item4b_criminal",
+      "label": "Item 4b: Criminal case",
+      "type": "checkbox"
+    },
+    {
+      "name": "item4b_other",
+      "label": "Item 4b: Other type of case",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5a_dateOfAbuse",
+      "label": "Item 5a: Date of abuse",
+      "type": "date"
+    },
+    {
+      "name": "item5b_witnessDontKnow",
+      "label": "Item 5b: Did anyone else see/hear - I don't know",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5b_witnessNo",
+      "label": "Item 5b: Did anyone else see/hear - No",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5b_witnessYes",
+      "label": "Item 5b: Did anyone else see/hear - Yes",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5b_witnessNames",
+      "label": "Item 5b: If yes, give names",
+      "type": "input"
+    },
+    {
+      "name": "item5c_weaponNo",
+      "label": "Item 5c: Use/threaten gun or weapon - No",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5c_weaponYes",
+      "label": "Item 5c: Use/threaten gun or weapon - Yes",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5c_weaponDescribe",
+      "label": "Item 5c: If yes, describe weapon",
+      "type": "textarea"
+    },
+    {
+      "name": "item5d_harmNo",
+      "label": "Item 5d: Cause emotional/physical harm - No",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5d_harmYes",
+      "label": "Item 5d: Cause emotional/physical harm - Yes",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5d_harmDescribe",
+      "label": "Item 5d: If yes, describe harm",
+      "type": "textarea"
+    },
+    {
+      "name": "item5e_policeDontKnow",
+      "label": "Item 5e: Did police come - I don't know",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5e_policeNo",
+      "label": "Item 5e: Did police come - No",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5e_policeYes",
+      "label": "Item 5e: Did police come - Yes",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5f_details",
+      "label": "Item 5f: Details about abuse on this day",
+      "type": "input"
+    },
+    {
+      "name": "item5g_justOnce",
+      "label": "Item 5g: How often - Just this once",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5g_2to5times",
+      "label": "Item 5g: How often - 2-5 times",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5g_weekly",
+      "label": "Item 5g: How often - Weekly",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5g_other",
+      "label": "Item 5g: How often - Other",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5g_dates",
+      "label": "Item 5g: Dates or estimates",
+      "type": "date"
+    },
+    {
+      "name": "item6a_dateOfAbuse",
+      "label": "Item 6a: Date of abuse",
+      "type": "date"
+    },
+    {
+      "name": "item6b_witnessDontKnow",
+      "label": "Item 6b: Witness - I don't know",
+      "type": "checkbox"
+    },
+    {
+      "name": "item6b_witnessNo",
+      "label": "Item 6b: Witness - No",
+      "type": "checkbox"
+    },
+    {
+      "name": "item6b_witnessYes",
+      "label": "Item 6b: Witness - Yes",
+      "type": "checkbox"
+    },
+    {
+      "name": "item6b_witnessNames",
+      "label": "Item 6b: Witness names",
+      "type": "input"
+    },
+    {
+      "name": "item6c_weaponNo",
+      "label": "Item 6c: Weapon - No",
+      "type": "checkbox"
+    },
+    {
+      "name": "item6c_weaponYes",
+      "label": "Item 6c: Weapon - Yes",
+      "type": "checkbox"
+    },
+    {
+      "name": "item6c_weaponDescribe",
+      "label": "Item 6c: Weapon description",
+      "type": "textarea"
+    },
+    {
+      "name": "item6d_harmNo",
+      "label": "Item 6d: Harm - No",
+      "type": "checkbox"
+    },
+    {
+      "name": "item6d_harmYes",
+      "label": "Item 6d: Harm - Yes",
+      "type": "checkbox"
+    },
+    {
+      "name": "item6d_harmDescribe",
+      "label": "Item 6d: Harm description",
+      "type": "textarea"
+    },
+    {
+      "name": "item6e_policeDontKnow",
+      "label": "Item 6e: Police - I don't know",
+      "type": "checkbox"
+    },
+    {
+      "name": "item6e_policeNo",
+      "label": "Item 6e: Police - No",
+      "type": "checkbox"
+    },
+    {
+      "name": "item6e_policeYes",
+      "label": "Item 6e: Police - Yes",
+      "type": "checkbox"
+    },
+    {
+      "name": "item6f_details",
+      "label": "Item 6f: Details",
+      "type": "input"
+    },
+    {
+      "name": "item6g_justOnce",
+      "label": "Item 6g: How often - Just once",
+      "type": "checkbox"
+    },
+    {
+      "name": "item6g_2to5times",
+      "label": "Item 6g: How often - 2-5 times",
+      "type": "checkbox"
+    },
+    {
+      "name": "item6g_weekly",
+      "label": "Item 6g: How often - Weekly",
+      "type": "checkbox"
+    },
+    {
+      "name": "item6g_other",
+      "label": "Item 6g: How often - Other",
+      "type": "checkbox"
+    },
+    {
+      "name": "item6g_dates",
+      "label": "Item 6g: Dates",
+      "type": "date"
+    },
+    {
+      "name": "item7a_dateOfAbuse",
+      "label": "Item 7a: Date of abuse",
+      "type": "date"
+    },
+    {
+      "name": "item7b_witnessDontKnow",
+      "label": "Item 7b: Witness - I don't know",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7b_witnessNo",
+      "label": "Item 7b: Witness - No",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7b_witnessYes",
+      "label": "Item 7b: Witness - Yes",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7b_witnessNames",
+      "label": "Item 7b: Witness names",
+      "type": "input"
+    },
+    {
+      "name": "item7c_weaponNo",
+      "label": "Item 7c: Weapon - No",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7c_weaponYes",
+      "label": "Item 7c: Weapon - Yes",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7c_weaponDescribe",
+      "label": "Item 7c: Weapon description",
+      "type": "textarea"
+    },
+    {
+      "name": "item7d_harmNo",
+      "label": "Item 7d: Harm - No",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7d_harmYes",
+      "label": "Item 7d: Harm - Yes",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7d_harmDescribe",
+      "label": "Item 7d: Harm description",
+      "type": "textarea"
+    },
+    {
+      "name": "item7e_policeDontKnow",
+      "label": "Item 7e: Police - I don't know",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7e_policeNo",
+      "label": "Item 7e: Police - No",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7e_policeYes",
+      "label": "Item 7e: Police - Yes",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7f_details",
+      "label": "Item 7f: Details",
+      "type": "input"
+    },
+    {
+      "name": "item7g_justOnce",
+      "label": "Item 7g: How often - Just once",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7g_2to5times",
+      "label": "Item 7g: How often - 2-5 times",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7g_weekly",
+      "label": "Item 7g: How often - Weekly",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7g_other",
+      "label": "Item 7g: How often - Other",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7g_dates",
+      "label": "Item 7g: Dates",
+      "type": "date"
+    },
+    {
+      "name": "item7_needMoreSpace",
+      "label": "Item 7: Need more space checkbox",
+      "type": "checkbox"
+    },
+    {
+      "name": "item8a_no",
+      "label": "Item 8a: No other people need protection",
+      "type": "checkbox"
+    },
+    {
+      "name": "item8b_yes",
+      "label": "Item 8b: Yes, other people need protection",
+      "type": "checkbox"
+    },
+    {
+      "name": "item8b1_person1Name",
+      "label": "Item 8b(1): Person 1 full name",
+      "type": "input"
+    },
+    {
+      "name": "item8b1_person1Age",
+      "label": "Item 8b(1): Person 1 age",
+      "type": "input"
+    },
+    {
+      "name": "item8b1_person1Relationship",
+      "label": "Item 8b(1): Person 1 relationship",
+      "type": "input"
+    },
+    {
+      "name": "item8b1_person1LivesYes",
+      "label": "Item 8b(1): Person 1 lives with you - Yes",
+      "type": "checkbox"
+    },
+    {
+      "name": "item8b1_person1LivesNo",
+      "label": "Item 8b(1): Person 1 lives with you - No",
+      "type": "checkbox"
+    },
+    {
+      "name": "item8b1_person2Name",
+      "label": "Item 8b(1): Person 2 full name",
+      "type": "input"
+    },
+    {
+      "name": "item8b1_person2Age",
+      "label": "Item 8b(1): Person 2 age",
+      "type": "input"
+    },
+    {
+      "name": "item8b1_person2Relationship",
+      "label": "Item 8b(1): Person 2 relationship",
+      "type": "input"
+    },
+    {
+      "name": "item8b1_person2LivesYes",
+      "label": "Item 8b(1): Person 2 lives with you - Yes",
+      "type": "checkbox"
+    },
+    {
+      "name": "item8b1_person2LivesNo",
+      "label": "Item 8b(1): Person 2 lives with you - No",
+      "type": "checkbox"
+    },
+    {
+      "name": "item8b1_person3Name",
+      "label": "Item 8b(1): Person 3 full name",
+      "type": "input"
+    },
+    {
+      "name": "item8b1_person3Age",
+      "label": "Item 8b(1): Person 3 age",
+      "type": "input"
+    },
+    {
+      "name": "item8b1_person3Relationship",
+      "label": "Item 8b(1): Person 3 relationship",
+      "type": "input"
+    },
+    {
+      "name": "item8b1_person3LivesYes",
+      "label": "Item 8b(1): Person 3 lives with you - Yes",
+      "type": "checkbox"
+    },
+    {
+      "name": "item8b1_person3LivesNo",
+      "label": "Item 8b(1): Person 3 lives with you - No",
+      "type": "checkbox"
+    },
+    {
+      "name": "item8b1_person4Name",
+      "label": "Item 8b(1): Person 4 full name",
+      "type": "input"
+    },
+    {
+      "name": "item8b1_person4Age",
+      "label": "Item 8b(1): Person 4 age",
+      "type": "input"
+    },
+    {
+      "name": "item8b1_person4Relationship",
+      "label": "Item 8b(1): Person 4 relationship",
+      "type": "input"
+    },
+    {
+      "name": "item8b1_person4LivesYes",
+      "label": "Item 8b(1): Person 4 lives with you - Yes",
+      "type": "checkbox"
+    },
+    {
+      "name": "item8b1_person4LivesNo",
+      "label": "Item 8b(1): Person 4 lives with you - No",
+      "type": "checkbox"
+    },
+    {
+      "name": "item8b_needMorePeople",
+      "label": "Item 8b: Need more people",
+      "type": "checkbox"
+    },
+    {
+      "name": "item8b2_whyProtection",
+      "label": "Item 8b(2): Why do these people need protection",
+      "type": "input"
+    },
+    {
+      "name": "item9a_dontKnow",
+      "label": "Item 9a: I don't know about firearms",
+      "type": "checkbox"
+    },
+    {
+      "name": "item9b_no",
+      "label": "Item 9b: No firearms",
+      "type": "checkbox"
+    },
+    {
+      "name": "item9c_yes",
+      "label": "Item 9c: Yes, has firearms",
+      "type": "checkbox"
+    },
+    {
+      "name": "item9c1_describe",
+      "label": "Item 9c(1): Firearm 1 description",
+      "type": "textarea"
+    },
+    {
+      "name": "item9c1_number",
+      "label": "Item 9c(1): Firearm 1 number/amount",
+      "type": "input"
+    },
+    {
+      "name": "item9c1_location",
+      "label": "Item 9c(1): Firearm 1 location",
+      "type": "input"
+    },
+    {
+      "name": "item9c2_describe",
+      "label": "Item 9c(2): Firearm 2 description",
+      "type": "textarea"
+    },
+    {
+      "name": "item9c2_number",
+      "label": "Item 9c(2): Firearm 2 number/amount",
+      "type": "input"
+    },
+    {
+      "name": "item9c2_location",
+      "label": "Item 9c(2): Firearm 2 location",
+      "type": "input"
+    },
+    {
+      "name": "item9c3_describe",
+      "label": "Item 9c(3): Firearm 3 description",
+      "type": "textarea"
+    },
+    {
+      "name": "item9c3_number",
+      "label": "Item 9c(3): Firearm 3 number/amount",
+      "type": "input"
+    },
+    {
+      "name": "item9c3_location",
+      "label": "Item 9c(3): Firearm 3 location",
+      "type": "input"
+    },
+    {
+      "name": "item9c4_describe",
+      "label": "Item 9c(4): Firearm 4 description",
+      "type": "textarea"
+    },
+    {
+      "name": "item9c4_number",
+      "label": "Item 9c(4): Firearm 4 number/amount",
+      "type": "input"
+    },
+    {
+      "name": "item9c4_location",
+      "label": "Item 9c(4): Firearm 4 location",
+      "type": "input"
+    },
+    {
+      "name": "item9c5_describe",
+      "label": "Item 9c(5): Firearm 5 description",
+      "type": "textarea"
+    },
+    {
+      "name": "item9c5_number",
+      "label": "Item 9c(5): Firearm 5 number/amount",
+      "type": "input"
+    },
+    {
+      "name": "item9c5_location",
+      "label": "Item 9c(5): Firearm 5 location",
+      "type": "input"
+    },
+    {
+      "name": "item9c6_describe",
+      "label": "Item 9c(6): Firearm 6 description",
+      "type": "textarea"
+    },
+    {
+      "name": "item9c6_number",
+      "label": "Item 9c(6): Firearm 6 number/amount",
+      "type": "input"
+    },
+    {
+      "name": "item9c6_location",
+      "label": "Item 9c(6): Firearm 6 location",
+      "type": "input"
+    },
+    {
+      "name": "item10_orderToNotAbuse",
+      "label": "Item 10: Order to Not Abuse",
+      "type": "checkbox"
+    },
+    {
+      "name": "item11_noContact",
+      "label": "Item 11: No-Contact Order",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12_stayAway",
+      "label": "Item 12: Stay-Away Order",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12a_me",
+      "label": "Item 12a: Stay away from - Me",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12a_myHome",
+      "label": "Item 12a: Stay away from - My home",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12a_myJob",
+      "label": "Item 12a: Stay away from - My job or workplace",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12a_myVehicle",
+      "label": "Item 12a: Stay away from - My vehicle",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12a_mySchool",
+      "label": "Item 12a: Stay away from - My school",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12a_item8People",
+      "label": "Item 12a: Stay away from - Each person in 8",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12a_childrensSchool",
+      "label": "Item 12a: Stay away from - My children's school or childcare",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12a_other",
+      "label": "Item 12a: Stay away from - Other",
+      "type": "input"
+    },
+    {
+      "name": "item12b_100yards",
+      "label": "Item 12b: Distance - 100 yards (300 feet)",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12b_otherDistance",
+      "label": "Item 12b: Distance - Other",
+      "type": "input"
+    },
+    {
+      "name": "item12c_no",
+      "label": "Item 12c: Live together - No",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12c_yes",
+      "label": "Item 12c: Live together - Yes",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12c_liveTogether",
+      "label": "Item 12c: Live together",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12c_sameBuilding",
+      "label": "Item 12c: Live in same building",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12c_sameNeighborhood",
+      "label": "Item 12c: Live in same neighborhood",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12c_other",
+      "label": "Item 12c: Other",
+      "type": "input"
+    },
+    {
+      "name": "item12d_no",
+      "label": "Item 12d: Same workplace/school - No",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12d_yes",
+      "label": "Item 12d: Same workplace/school - Yes",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12d_workTogether",
+      "label": "Item 12d: Work together at",
+      "type": "input"
+    },
+    {
+      "name": "item12d_sameSchool",
+      "label": "Item 12d: Go to same school",
+      "type": "input"
+    },
+    {
+      "name": "item12d_other",
+      "label": "Item 12d: Other",
+      "type": "input"
+    },
+    {
+      "name": "item13_moveOut",
+      "label": "Item 13: Order to Move Out",
+      "type": "checkbox"
+    },
+    {
+      "name": "item13a_address",
+      "label": "Item 13a: Address to move out from",
+      "type": "input"
+    },
+    {
+      "name": "item13b_ownHome",
+      "label": "Item 13b: I own the home",
+      "type": "checkbox"
+    },
+    {
+      "name": "item13b_nameOnLease",
+      "label": "Item 13b: My name is on lease",
+      "type": "checkbox"
+    },
+    {
+      "name": "item13b_liveWithChildren",
+      "label": "Item 13b: I live at address with children",
+      "type": "checkbox"
+    },
+    {
+      "name": "item13b_livedYears",
+      "label": "Item 13b: Lived for years",
+      "type": "input"
+    },
+    {
+      "name": "item13b_livedMonths",
+      "label": "Item 13b: Lived for months",
+      "type": "input"
+    },
+    {
+      "name": "item13b_payRent",
+      "label": "Item 13b: I pay some/all rent or mortgage",
+      "type": "checkbox"
+    },
+    {
+      "name": "item13b_other",
+      "label": "Item 13b: Other reason",
+      "type": "input"
+    },
+    {
+      "name": "item14_otherOrders",
+      "label": "Item 14: Other Orders",
+      "type": "textarea"
+    },
+    {
+      "name": "item14_describe",
+      "label": "Item 14: Describe additional orders",
+      "type": "textarea"
+    },
+    {
+      "name": "item15_childCustody",
+      "label": "Item 15: Child Custody and Visitation (requires DV-105)",
+      "type": "checkbox"
+    },
+    {
+      "name": "item16_protectAnimals",
+      "label": "Item 16: Protect Animals",
+      "type": "checkbox"
+    },
+    {
+      "name": "item16a1_name",
+      "label": "Item 16a(1): Animal 1 name/ID",
+      "type": "input"
+    },
+    {
+      "name": "item16a1_type",
+      "label": "Item 16a(1): Animal 1 type",
+      "type": "input"
+    },
+    {
+      "name": "item16a1_breed",
+      "label": "Item 16a(1): Animal 1 breed",
+      "type": "input"
+    },
+    {
+      "name": "item16a1_color",
+      "label": "Item 16a(1): Animal 1 color",
+      "type": "input"
+    },
+    {
+      "name": "item16a2_name",
+      "label": "Item 16a(2): Animal 2 name/ID",
+      "type": "input"
+    },
+    {
+      "name": "item16a2_type",
+      "label": "Item 16a(2): Animal 2 type",
+      "type": "input"
+    },
+    {
+      "name": "item16a2_breed",
+      "label": "Item 16a(2): Animal 2 breed",
+      "type": "input"
+    },
+    {
+      "name": "item16a2_color",
+      "label": "Item 16a(2): Animal 2 color",
+      "type": "input"
+    },
+    {
+      "name": "item16a3_name",
+      "label": "Item 16a(3): Animal 3 name/ID",
+      "type": "input"
+    },
+    {
+      "name": "item16a3_type",
+      "label": "Item 16a(3): Animal 3 type",
+      "type": "input"
+    },
+    {
+      "name": "item16a3_breed",
+      "label": "Item 16a(3): Animal 3 breed",
+      "type": "input"
+    },
+    {
+      "name": "item16a3_color",
+      "label": "Item 16a(3): Animal 3 color",
+      "type": "input"
+    },
+    {
+      "name": "item16a4_name",
+      "label": "Item 16a(4): Animal 4 name/ID",
+      "type": "input"
+    },
+    {
+      "name": "item16a4_type",
+      "label": "Item 16a(4): Animal 4 type",
+      "type": "input"
+    },
+    {
+      "name": "item16a4_breed",
+      "label": "Item 16a(4): Animal 4 breed",
+      "type": "input"
+    },
+    {
+      "name": "item16a4_color",
+      "label": "Item 16a(4): Animal 4 color",
+      "type": "input"
+    },
+    {
+      "name": "item16b1_stayAway100",
+      "label": "Item 16b(1): Stay away from animals - 100 yards",
+      "type": "checkbox"
+    },
+    {
+      "name": "item16b1_stayAwayOther",
+      "label": "Item 16b(1): Stay away from animals - Other distance",
+      "type": "input"
+    },
+    {
+      "name": "item16b2_notTakeSellHarm",
+      "label": "Item 16b(2): Not take, sell, hide, harm animals",
+      "type": "checkbox"
+    },
+    {
+      "name": "item16b3_giveMePossession",
+      "label": "Item 16b(3): Give me sole possession",
+      "type": "checkbox"
+    },
+    {
+      "name": "item16b3_personAbuses",
+      "label": "Item 16b(3): Person abuses animals",
+      "type": "checkbox"
+    },
+    {
+      "name": "item16b3_iTakeCare",
+      "label": "Item 16b(3): I take care of animals",
+      "type": "checkbox"
+    },
+    {
+      "name": "item16b3_iPurchased",
+      "label": "Item 16b(3): I purchased animals",
+      "type": "checkbox"
+    },
+    {
+      "name": "item16b3_other",
+      "label": "Item 16b(3): Other reason",
+      "type": "input"
+    },
+    {
+      "name": "item17_controlProperty",
+      "label": "Item 17: Control of Property",
+      "type": "checkbox"
+    },
+    {
+      "name": "item17a_describe",
+      "label": "Item 17a: Describe property",
+      "type": "textarea"
+    },
+    {
+      "name": "item17b_why",
+      "label": "Item 17b: Why you want control",
+      "type": "input"
+    },
+    {
+      "name": "item18_insurance",
+      "label": "Item 18: Health and Other Insurance",
+      "type": "checkbox"
+    },
+    {
+      "name": "item19_recordCommunications",
+      "label": "Item 19: Record Communications",
+      "type": "checkbox"
+    },
+    {
+      "name": "item20_propertyRestraint",
+      "label": "Item 20: Property Restraint",
+      "type": "checkbox"
+    },
+    {
+      "name": "item21_extendDeadline",
+      "label": "Item 21: Extend Deadline to Serve",
+      "type": "checkbox"
+    },
+    {
+      "name": "item21_explain",
+      "label": "Item 21: Explain why need more time",
+      "type": "textarea"
+    },
+    {
+      "name": "item22_payDebts",
+      "label": "Item 22: Pay Debts",
+      "type": "checkbox"
+    },
+    {
+      "name": "item22a1_payTo",
+      "label": "Item 22a(1): Pay to",
+      "type": "input"
+    },
+    {
+      "name": "item22a1_for",
+      "label": "Item 22a(1): For",
+      "type": "input"
+    },
+    {
+      "name": "item22a1_amount",
+      "label": "Item 22a(1): Amount",
+      "type": "input"
+    },
+    {
+      "name": "item22a1_dueDate",
+      "label": "Item 22a(1): Due date",
+      "type": "date"
+    },
+    {
+      "name": "item22a2_payTo",
+      "label": "Item 22a(2): Pay to",
+      "type": "input"
+    },
+    {
+      "name": "item22a2_for",
+      "label": "Item 22a(2): For",
+      "type": "input"
+    },
+    {
+      "name": "item22a2_amount",
+      "label": "Item 22a(2): Amount",
+      "type": "input"
+    },
+    {
+      "name": "item22a2_dueDate",
+      "label": "Item 22a(2): Due date",
+      "type": "date"
+    },
+    {
+      "name": "item22a3_payTo",
+      "label": "Item 22a(3): Pay to",
+      "type": "input"
+    },
+    {
+      "name": "item22a3_for",
+      "label": "Item 22a(3): For",
+      "type": "input"
+    },
+    {
+      "name": "item22a3_amount",
+      "label": "Item 22a(3): Amount",
+      "type": "input"
+    },
+    {
+      "name": "item22a3_dueDate",
+      "label": "Item 22a(3): Due date",
+      "type": "date"
+    },
+    {
+      "name": "item22_explainWhy",
+      "label": "Item 22: Explain why",
+      "type": "textarea"
+    },
+    {
+      "name": "item22b_specialFindingNo",
+      "label": "Item 22b: Special finding - No",
+      "type": "checkbox"
+    },
+    {
+      "name": "item22b_specialFindingYes",
+      "label": "Item 22b: Special finding - Yes",
+      "type": "checkbox"
+    },
+    {
+      "name": "item22b1_a1",
+      "label": "Item 22b(1): Which debts - a(1)",
+      "type": "checkbox"
+    },
+    {
+      "name": "item22b1_a2",
+      "label": "Item 22b(1): Which debts - a(2)",
+      "type": "checkbox"
+    },
+    {
+      "name": "item22b1_a3",
+      "label": "Item 22b(1): Which debts - a(3)",
+      "type": "checkbox"
+    },
+    {
+      "name": "item22b2_knowNo",
+      "label": "Item 22b(2): Know how debt made - No",
+      "type": "checkbox"
+    },
+    {
+      "name": "item22b2_knowYes",
+      "label": "Item 22b(2): Know how debt made - Yes",
+      "type": "checkbox"
+    },
+    {
+      "name": "item22b2_explain",
+      "label": "Item 22b(2): Explanation",
+      "type": "textarea"
+    },
+    {
+      "name": "item23_payExpenses",
+      "label": "Item 23: Pay Expenses Caused by Abuse",
+      "type": "checkbox"
+    },
+    {
+      "name": "item24_childSupport",
+      "label": "Item 24: Child Support",
+      "type": "checkbox"
+    },
+    {
+      "name": "item24a_noOrder",
+      "label": "Item 24a: No child support order, want one",
+      "type": "checkbox"
+    },
+    {
+      "name": "item24b_haveOrder",
+      "label": "Item 24b: Have child support order, want changed",
+      "type": "checkbox"
+    },
+    {
+      "name": "item24c_tanf",
+      "label": "Item 24c: Receive/applied for TANF/Welfare/CalWORKS",
+      "type": "checkbox"
+    },
+    {
+      "name": "item25_spousalSupport",
+      "label": "Item 25: Spousal Support",
+      "type": "checkbox"
+    },
+    {
+      "name": "item26_lawyerFees",
+      "label": "Item 26: Lawyer's Fees and Costs",
+      "type": "checkbox"
+    },
+    {
+      "name": "item27_battererProgram",
+      "label": "Item 27: Batterer Intervention Program",
+      "type": "checkbox"
+    },
+    {
+      "name": "item28_wirelessTransfer",
+      "label": "Item 28: Transfer of Wireless Phone Account",
+      "type": "checkbox"
+    },
+    {
+      "name": "item28a_myNumber",
+      "label": "Item 28a: My number",
+      "type": "checkbox"
+    },
+    {
+      "name": "item28a_childNumber",
+      "label": "Item 28a: Number of child in my care",
+      "type": "input"
+    },
+    {
+      "name": "item28b_myNumber",
+      "label": "Item 28b: My number",
+      "type": "checkbox"
+    },
+    {
+      "name": "item28b_childNumber",
+      "label": "Item 28b: Number of child in my care",
+      "type": "input"
+    },
+    {
+      "name": "item28c_myNumber",
+      "label": "Item 28c: My number",
+      "type": "checkbox"
+    },
+    {
+      "name": "item28c_childNumber",
+      "label": "Item 28c: Number of child in my care",
+      "type": "input"
+    },
+    {
+      "name": "item28d_myNumber",
+      "label": "Item 28d: My number",
+      "type": "checkbox"
+    },
+    {
+      "name": "item28d_childNumber",
+      "label": "Item 28d: Number of child in my care",
+      "type": "input"
+    },
+    {
+      "name": "item32_additionalPages",
+      "label": "Item 32: Number of extra pages attached",
+      "type": "input"
+    },
+    {
+      "name": "item33_date",
+      "label": "Item 33: Date",
+      "type": "date"
+    },
+    {
+      "name": "item33_printName",
+      "label": "Item 33: Type or print your name",
+      "type": "input"
+    },
+    {
+      "name": "item33_signName",
+      "label": "Item 33: Sign your name",
+      "type": "signature"
+    },
+    {
+      "name": "item34_date",
+      "label": "Item 34: Date",
+      "type": "date"
+    },
+    {
+      "name": "item34_lawyerName",
+      "label": "Item 34: Lawyer's name",
+      "type": "input"
+    },
+    {
+      "name": "item34_lawyerSignature",
+      "label": "Item 34: Lawyer's signature",
+      "type": "signature"
+    }
+  ],
+  "DV-105": [
+    {
+      "name": "caseNumber",
+      "label": "Case Number (from DV-100)",
+      "type": "input"
+    },
+    {
+      "name": "item1_name",
+      "label": "Item 1: Name",
+      "type": "input"
+    },
+    {
+      "name": "item1_relationshipParent",
+      "label": "Item 1: Relationship - Parent",
+      "type": "checkbox"
+    },
+    {
+      "name": "item1_relationshipGuardian",
+      "label": "Item 1: Relationship - Legal Guardian",
+      "type": "checkbox"
+    },
+    {
+      "name": "item1_relationshipOther",
+      "label": "Item 1: Relationship - Other",
+      "type": "checkbox"
+    },
+    {
+      "name": "item1_relationshipOtherDescribe",
+      "label": "Item 1: Relationship - Other describe",
+      "type": "textarea"
+    },
+    {
+      "name": "item2_name",
+      "label": "Item 2: Name",
+      "type": "input"
+    },
+    {
+      "name": "item2_relationshipParent",
+      "label": "Item 2: Relationship - Parent",
+      "type": "checkbox"
+    },
+    {
+      "name": "item2_relationshipGuardian",
+      "label": "Item 2: Relationship - Legal Guardian",
+      "type": "checkbox"
+    },
+    {
+      "name": "item2_relationshipOther",
+      "label": "Item 2: Relationship - Other",
+      "type": "checkbox"
+    },
+    {
+      "name": "item2_relationshipOtherDescribe",
+      "label": "Item 2: Relationship - Other describe",
+      "type": "textarea"
+    },
+    {
+      "name": "item3a_name",
+      "label": "Item 3a: Child 1 name",
+      "type": "input"
+    },
+    {
+      "name": "item3a_dateOfBirth",
+      "label": "Item 3a: Child 1 date of birth",
+      "type": "date"
+    },
+    {
+      "name": "item3b_name",
+      "label": "Item 3b: Child 2 name",
+      "type": "input"
+    },
+    {
+      "name": "item3b_dateOfBirth",
+      "label": "Item 3b: Child 2 date of birth",
+      "type": "date"
+    },
+    {
+      "name": "item3c_name",
+      "label": "Item 3c: Child 3 name",
+      "type": "input"
+    },
+    {
+      "name": "item3c_dateOfBirth",
+      "label": "Item 3c: Child 3 date of birth",
+      "type": "date"
+    },
+    {
+      "name": "item3d_name",
+      "label": "Item 3d: Child 4 name",
+      "type": "input"
+    },
+    {
+      "name": "item3d_dateOfBirth",
+      "label": "Item 3d: Child 4 date of birth",
+      "type": "date"
+    },
+    {
+      "name": "item3_needMoreSpace",
+      "label": "Item 3: Need more space",
+      "type": "checkbox"
+    },
+    {
+      "name": "item4a_yes",
+      "label": "Item 4a: Children lived together - Yes",
+      "type": "checkbox"
+    },
+    {
+      "name": "item4a_no",
+      "label": "Item 4a: Children lived together - No",
+      "type": "checkbox"
+    },
+    {
+      "name": "item4b_row1_fromDate",
+      "label": "Item 4b: Row 1 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row1_toPresent",
+      "label": "Item 4b: Row 1 - To present",
+      "type": "checkbox"
+    },
+    {
+      "name": "item4b_row1_toDate",
+      "label": "Item 4b: Row 1 - Until date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row1_location",
+      "label": "Item 4b: Row 1 - Location",
+      "type": "input"
+    },
+    {
+      "name": "item4b_row1_keepPrivate",
+      "label": "Item 4b: Row 1 - Keep private",
+      "type": "checkbox"
+    },
+    {
+      "name": "item4b_row1_withMe",
+      "label": "Item 4b: Row 1 - With Me",
+      "type": "checkbox"
+    },
+    {
+      "name": "item4b_row1_withPerson2",
+      "label": "Item 4b: Row 1 - With Person in 2",
+      "type": "checkbox"
+    },
+    {
+      "name": "item4b_row1_withOther",
+      "label": "Item 4b: Row 1 - With Other",
+      "type": "checkbox"
+    },
+    {
+      "name": "item4b_row2_fromDate",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row2_toDate",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row2_location",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row2_withMe",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row2_withPerson2",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row2_withOther",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row3_fromDate",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row3_toDate",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row3_location",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row3_withMe",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row3_withPerson2",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row3_withOther",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row4_fromDate",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row4_toDate",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row4_location",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row4_withMe",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row4_withPerson2",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row4_withOther",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row5_fromDate",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row5_toDate",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row5_location",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row5_withMe",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row5_withPerson2",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row5_withOther",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row6_fromDate",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row6_toDate",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row6_location",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row6_withMe",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row6_withPerson2",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row6_withOther",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row7_fromDate",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row7_toDate",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row7_location",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row7_withMe",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row7_withPerson2",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_row7_withOther",
+      "label": "Item 4b: Row 2 - From date",
+      "type": "date"
+    },
+    {
+      "name": "item4b_otherRelationship",
+      "label": "Item 4b: Other relationship to child",
+      "type": "input"
+    },
+    {
+      "name": "item5a_no",
+      "label": "Item 5a: No other cases",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5a_yes",
+      "label": "Item 5a: Yes, other cases",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5a_custody",
+      "label": "Item 5a: Custody",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5a_divorce",
+      "label": "Item 5a: Divorce",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5a_juvenile",
+      "label": "Item 5a: Juvenile Court",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5a_guardianship",
+      "label": "Item 5a: Guardianship",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5a_criminal",
+      "label": "Item 5a: Criminal",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5a_other",
+      "label": "Item 5a: Other",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5b_no",
+      "label": "Item 5b: No current custody/visitation order",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5b_yes",
+      "label": "Item 5b: Yes, current order exists",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5b_currentOrder",
+      "label": "Item 5b: What did judge order",
+      "type": "input"
+    },
+    {
+      "name": "item5b_whyChange",
+      "label": "Item 5b: Why change order",
+      "type": "input"
+    },
+    {
+      "name": "item5c_name",
+      "label": "Item 5c: Other parent/guardian name",
+      "type": "input"
+    },
+    {
+      "name": "item5c_parent",
+      "label": "Item 5c: Parent",
+      "type": "checkbox"
+    },
+    {
+      "name": "item5c_legalGuardian",
+      "label": "Item 5c: Legal Guardian",
+      "type": "checkbox"
+    },
+    {
+      "name": "item6_no",
+      "label": "Item 6: No - don't limit travel",
+      "type": "checkbox"
+    },
+    {
+      "name": "item6_yes",
+      "label": "Item 6: Yes - limit travel",
+      "type": "checkbox"
+    },
+    {
+      "name": "item6_county",
+      "label": "Item 6: The county of",
+      "type": "checkbox"
+    },
+    {
+      "name": "item6_countyName",
+      "label": "Item 6: County name",
+      "type": "input"
+    },
+    {
+      "name": "item6_california",
+      "label": "Item 6: California",
+      "type": "checkbox"
+    },
+    {
+      "name": "item6_otherPlaces",
+      "label": "Item 6: Other places",
+      "type": "checkbox"
+    },
+    {
+      "name": "item6_otherPlacesDescribe",
+      "label": "Item 6: Other places describe",
+      "type": "textarea"
+    },
+    {
+      "name": "item7_yes",
+      "label": "Item 7: Yes - allow access",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7_no",
+      "label": "Item 7: No - do not allow access",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7a_allChildren",
+      "label": "Item 7a: All children",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7a_onlyThese",
+      "label": "Item 7a: Only these children",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7a_names",
+      "label": "Item 7a: Names",
+      "type": "input"
+    },
+    {
+      "name": "item7b_medical",
+      "label": "Item 7b: Medical, dental, mental health",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7b_school",
+      "label": "Item 7b: School and daycare",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7b_extracurricular",
+      "label": "Item 7b: Extracurricular activity",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7b_employment",
+      "label": "Item 7b: Child's employment",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7b_other",
+      "label": "Item 7b: Other",
+      "type": "checkbox"
+    },
+    {
+      "name": "item7b_otherDescribe",
+      "label": "Item 7b: Other describe",
+      "type": "textarea"
+    },
+    {
+      "name": "item8_no",
+      "label": "Item 8: No - no risk",
+      "type": "checkbox"
+    },
+    {
+      "name": "item8_yes",
+      "label": "Item 8: Yes - risk of abduction (requires DV-108)",
+      "type": "checkbox"
+    },
+    {
+      "name": "item9_no",
+      "label": "Item 9: No - don't want custody orders",
+      "type": "textarea"
+    },
+    {
+      "name": "item9_yes",
+      "label": "Item 9: Yes - want custody orders",
+      "type": "textarea"
+    },
+    {
+      "name": "item9_legalSoleToMe",
+      "label": "Item 9: Legal custody - Sole to me",
+      "type": "checkbox"
+    },
+    {
+      "name": "item9_legalSoleToPerson2",
+      "label": "Item 9: Legal custody - Sole to person in 2",
+      "type": "checkbox"
+    },
+    {
+      "name": "item9_legalJoint",
+      "label": "Item 9: Legal custody - Jointly",
+      "type": "checkbox"
+    },
+    {
+      "name": "item9_legalOther",
+      "label": "Item 9: Legal custody - Other",
+      "type": "checkbox"
+    },
+    {
+      "name": "item9_legalOtherDescribe",
+      "label": "Item 9: Legal custody - Other describe",
+      "type": "textarea"
+    },
+    {
+      "name": "item9_physicalSoleToMe",
+      "label": "Item 9: Physical custody - Sole to me",
+      "type": "checkbox"
+    },
+    {
+      "name": "item9_physicalSoleToPerson2",
+      "label": "Item 9: Physical custody - Sole to person in 2",
+      "type": "checkbox"
+    },
+    {
+      "name": "item9_physicalJoint",
+      "label": "Item 9: Physical custody - Jointly",
+      "type": "checkbox"
+    },
+    {
+      "name": "item9_physicalOther",
+      "label": "Item 9: Physical custody - Other",
+      "type": "checkbox"
+    },
+    {
+      "name": "item9_physicalOtherDescribe",
+      "label": "Item 9: Physical custody - Other describe",
+      "type": "textarea"
+    },
+    {
+      "name": "item10_no",
+      "label": "Item 10: No - no visits",
+      "type": "checkbox"
+    },
+    {
+      "name": "item10_yes",
+      "label": "Item 10: Yes - allow visits",
+      "type": "checkbox"
+    },
+    {
+      "name": "item11_yes",
+      "label": "Item 11: Yes - supervised visits",
+      "type": "checkbox"
+    },
+    {
+      "name": "item11_no",
+      "label": "Item 11: No - unsupervised visits",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12a_nonprofessional",
+      "label": "Item 12a: Nonprofessional supervisor",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12a_nonprofessionalName",
+      "label": "Item 12a: Nonprofessional name",
+      "type": "input"
+    },
+    {
+      "name": "item12a_professional",
+      "label": "Item 12a: Professional supervisor",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12a_professionalName",
+      "label": "Item 12a: Professional name",
+      "type": "input"
+    },
+    {
+      "name": "item12a_feesMe",
+      "label": "Item 12a: Professional fees - Me %",
+      "type": "input"
+    },
+    {
+      "name": "item12a_feesPerson2",
+      "label": "Item 12a: Professional fees - Person in 2 %",
+      "type": "input"
+    },
+    {
+      "name": "item12a_feesOther",
+      "label": "Item 12a: Professional fees - Other %",
+      "type": "input"
+    },
+    {
+      "name": "item12b_onceWeek",
+      "label": "Item 12b: Once a week",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12b_onceWeekHours",
+      "label": "Item 12b: Once a week hours",
+      "type": "input"
+    },
+    {
+      "name": "item12b_twiceWeek",
+      "label": "Item 12b: Twice a week",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12b_twiceWeekHours",
+      "label": "Item 12b: Twice a week hours",
+      "type": "input"
+    },
+    {
+      "name": "item12b_other",
+      "label": "Item 12b: Other",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12b_otherDescribe",
+      "label": "Item 12b: Other describe",
+      "type": "textarea"
+    },
+    {
+      "name": "item12b_useChart",
+      "label": "Item 12b: Use chart",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12_mondayStart",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_mondayEnd",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_mondayPerson",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_mondayLocation",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_tuesdayStart",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_tuesdayEnd",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_tuesdayPerson",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_tuesdayLocation",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_wednesdayStart",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_wednesdayEnd",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_wednesdayPerson",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_wednesdayLocation",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_thursdayStart",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_thursdayEnd",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_thursdayPerson",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_thursdayLocation",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_fridayStart",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_fridayEnd",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_fridayPerson",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_fridayLocation",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_saturdayStart",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_saturdayEnd",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_saturdayPerson",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_saturdayLocation",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_sundayStart",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_sundayEnd",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_sundayPerson",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_sundayLocation",
+      "label": "Item 12: Monday start",
+      "type": "input"
+    },
+    {
+      "name": "item12_everyWeek",
+      "label": "Item 12: Every week",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12_everyOtherWeek",
+      "label": "Item 12: Every other week",
+      "type": "checkbox"
+    },
+    {
+      "name": "item12_otherSchedule",
+      "label": "Item 12: Other schedule",
+      "type": "input"
+    },
+    {
+      "name": "item12_startDate",
+      "label": "Item 12: Start date",
+      "type": "date"
+    },
+    {
+      "name": "item13a_no",
+      "label": "Item 13a: No supervised exchanges",
+      "type": "checkbox"
+    },
+    {
+      "name": "item13a_yes",
+      "label": "Item 13a: Yes supervised exchanges",
+      "type": "checkbox"
+    },
+    {
+      "name": "item13a_nonprofessional",
+      "label": "Item 13a: Nonprofessional supervisor",
+      "type": "checkbox"
+    },
+    {
+      "name": "item13a_nonprofessionalName",
+      "label": "Item 13a: Nonprofessional name",
+      "type": "input"
+    },
+    {
+      "name": "item13a_professional",
+      "label": "Item 13a: Professional supervisor",
+      "type": "checkbox"
+    },
+    {
+      "name": "item13a_professionalName",
+      "label": "Item 13a: Professional name",
+      "type": "input"
+    },
+    {
+      "name": "item13a_feesMe",
+      "label": "Item 13a: Professional fees - Me %",
+      "type": "input"
+    },
+    {
+      "name": "item13a_feesPerson2",
+      "label": "Item 13a: Professional fees - Person in 2 %",
+      "type": "input"
+    },
+    {
+      "name": "item13a_feesOther",
+      "label": "Item 13a: Professional fees - Other %",
+      "type": "input"
+    },
+    {
+      "name": "item13b_describe",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_mondayStart",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_mondayEnd",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_mondayPerson",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_mondayLocation",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_tuesdayStart",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_tuesdayEnd",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_tuesdayPerson",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_tuesdayLocation",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_wednesdayStart",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_wednesdayEnd",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_wednesdayPerson",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_wednesdayLocation",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_thursdayStart",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_thursdayEnd",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_thursdayPerson",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_thursdayLocation",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_fridayStart",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_fridayEnd",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_fridayPerson",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_fridayLocation",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_saturdayStart",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_saturdayEnd",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_saturdayPerson",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_saturdayLocation",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_sundayStart",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_sundayEnd",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_sundayPerson",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_sundayLocation",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_everyWeek",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_everyOtherWeek",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_otherSchedule",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    },
+    {
+      "name": "item13_startDate",
+      "label": "Item 13b: Describe parenting time",
+      "type": "textarea"
+    }
+  ]
+}

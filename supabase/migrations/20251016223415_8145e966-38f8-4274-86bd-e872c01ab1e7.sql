@@ -1,7 +1,7 @@
 -- Create personal data vault table with encryption
 CREATE TABLE IF NOT EXISTS public.personal_info (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id TEXT NOT NULL,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   full_name TEXT,
   street_address TEXT,
   city TEXT,
@@ -24,22 +24,22 @@ ALTER TABLE public.personal_info ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view their own personal info" 
 ON public.personal_info 
 FOR SELECT 
-USING (auth.uid()::text = user_id);
+USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can insert their own personal info" 
 ON public.personal_info 
 FOR INSERT 
-WITH CHECK (auth.uid()::text = user_id);
+WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can update their own personal info" 
 ON public.personal_info 
 FOR UPDATE 
-USING (auth.uid()::text = user_id);
+USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can delete their own personal info" 
 ON public.personal_info 
 FOR DELETE 
-USING (auth.uid()::text = user_id);
+USING (auth.uid() = user_id);
 
 -- Create trigger for automatic timestamp updates
 CREATE OR REPLACE FUNCTION public.update_updated_at_column()

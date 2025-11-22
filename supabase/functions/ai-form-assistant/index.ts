@@ -34,7 +34,7 @@ serve(async (req) => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY')!;
+    const geminiApiKey = Deno.env.get('GEMINI_API_KEY')!;
     
     const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -117,27 +117,27 @@ Your role is to help users fill out California FL-320 Responsive Declaration to 
 
 When helping fill forms:
 1. Only request user's personal information when absolutely necessary for the specific form field
-2. Ask clarifying questions about case-specific details
+2. If you need to ask a clarifying question, wrap it in a [question] tag. For example: [question]What is your case number?[/question]
 3. Provide legal context about each section (without giving legal advice)
 4. Suggest appropriate responses based on common scenarios
 5. Help format responses properly for legal documents
 
 Always maintain professional tone and remind users to consult with an attorney for legal advice.`;
 
-    // Call Lovable AI Gateway with streaming
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    // Call Gemini API
+    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${lovableApiKey}`,
         'Content-Type': 'application/json',
+        'x-goog-api-key': geminiApiKey,
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...messages
-        ],
-        stream: true,
+        contents: [
+          {
+            role: 'user',
+            parts: [{ text: systemPrompt + messages.map(m => m.content).join('\n') }],
+          }
+        ]
       }),
     });
 
@@ -151,19 +151,30 @@ Always maintain professional tone and remind users to consult with an attorney f
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: 'AI credits exhausted. Please add credits to continue.' }), {
-          status: 402,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
       
       throw new Error(`AI gateway error: ${response.status}`);
     }
+    
+    const jsonResponse = await response.json();
+    const message = jsonResponse.candidates[0].content.parts[0].text;
 
-    // Stream the response back
-    return new Response(response.body, {
-      headers: { ...corsHeaders, 'Content-Type': 'text/event-stream' },
+    // Check for clarifying question
+    const questionMatch = message.match(/\[question\](.*?)\[\/question\]/);
+    if (questionMatch) {
+      return new Response(JSON.stringify({
+        status: 'question',
+        question: questionMatch[1],
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Return standard response
+    return new Response(JSON.stringify({
+      status: 'ok',
+      message: message,
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {

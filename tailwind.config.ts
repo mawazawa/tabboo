@@ -105,6 +105,7 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        "neon-orange": "#FF5F1F",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -150,11 +151,16 @@ export default {
             filter: "drop-shadow(0 0 11px hsl(var(--primary) / 0.38))",
           },
         },
+        "scan": {
+          "0%": { transform: "translateY(-100%)" },
+          "100%": { transform: "translateY(100%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "float": "float 120s cubic-bezier(0.4, 0.0, 0.2, 1) infinite",
+        "scan": "scan 2s linear infinite",
       },
     },
   },

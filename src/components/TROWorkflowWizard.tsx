@@ -8,7 +8,7 @@
  * Now features a fully integrated workspace layout with PDF Thumbnails,
  * Field Navigation, and Edit Mode capabilities.
  *
- * @version 2.0
+ * @version 2.1
  * @date November 22, 2025
  * @author Gemini 3 Pro & Agent 2
  */
@@ -46,6 +46,12 @@ import {
   FORM_ORDER
 } from '@/types/WorkflowTypes';
 
+// "Stolen" Premium Components
+import { ChamferedButton } from '@/components/ui/chamfered-button';
+import { LiquidGlassAccordion } from '@/components/ui/liquid-glass-accordion';
+import { NanoBanana } from '@/components/canvas/NanoBanana';
+import { cn } from '@/lib/utils';
+
 // Extracted components
 import { PacketTypeSelector } from '@/components/workflow';
 
@@ -81,6 +87,9 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
   const [highlightedField, setHighlightedField] = useState<string | null>(null);
   const [settingsSheetOpen, setSettingsSheetOpen] = useState(false);
   const hasUnsavedChanges = useRef(false);
+
+  // Ambient Background State
+  const [ambientMood, setAmbientMood] = useState<string>('neutral');
 
   // Panels State
   const [activeLeftTab, setActiveLeftTab] = useState<string>("progress");
@@ -274,6 +283,16 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
     }
   };
 
+  // Ambient Background Styles
+  const getAmbientBackground = () => {
+    switch (ambientMood) {
+      case 'focus': return 'bg-slate-900 text-slate-50 selection:bg-blue-500/30';
+      case 'urgent': return 'bg-rose-50/30 dark:bg-rose-950/20';
+      case 'calm': return 'bg-emerald-50/30 dark:bg-emerald-950/20';
+      default: return 'bg-background';
+    }
+  };
+
   // -- RENDER --
 
   if (showPacketSelector) {
@@ -303,21 +322,26 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
 
   return (
     <div 
-      className="flex flex-col h-screen bg-background"
+      className={cn(
+        "flex flex-col h-screen transition-colors duration-1000 ease-in-out",
+        getAmbientBackground()
+      )}
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleFileDrop}
     >
       {/* -- HEADER -- */}
-      <div className="h-14 border-b flex items-center px-4 gap-4 bg-card shadow-sm z-10 flex-none">
+      <div className="h-16 border-b flex items-center px-4 gap-4 bg-card/80 backdrop-blur-md shadow-sm z-10 flex-none sticky top-0">
         <div className="flex items-center gap-2 mr-4">
-          <Building className="w-5 h-5 text-primary" />
-          <span className="font-semibold hidden md:inline">SwiftFill Wizard</span>
+          <div className="bg-primary/10 p-2 rounded-lg">
+            <Building className="w-5 h-5 text-primary" />
+          </div>
+          <span className="font-bold text-lg hidden md:inline tracking-tight">SwiftFill</span>
         </div>
 
         {/* Form Switcher */}
         <div className="flex-1 max-w-md">
           <Select value={currentForm || ''} onValueChange={handleFormSelect}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full h-10">
               <SelectValue placeholder="Select Form" />
             </SelectTrigger>
             <SelectContent>
@@ -335,23 +359,41 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 ml-auto">
-          <Button 
-            variant={isEditMode ? "secondary" : "ghost"} 
+        <div className="flex items-center gap-3 ml-auto">
+          <ChamferedButton 
+            variant={isEditMode ? "primary" : "glass"} 
             size="sm" 
             onClick={() => setIsEditMode(!isEditMode)}
             title="Toggle Edit Mode (E)"
+            haptic="medium"
+            chamferDepth="subtle"
           >
             <Edit className="w-4 h-4 mr-2" />
             {isEditMode ? 'Editing' : 'View'}
-          </Button>
-          <div className="h-6 w-px bg-border mx-2" />
-          <Button variant="ghost" size="icon" disabled={!canTransitionToPreviousForm()} onClick={transitionToPreviousForm}>
+          </ChamferedButton>
+          
+          <div className="h-8 w-px bg-border/50 mx-1" />
+          
+          <ChamferedButton 
+            variant="glass" 
+            size="icon" 
+            disabled={!canTransitionToPreviousForm()} 
+            onClick={transitionToPreviousForm}
+            haptic="light"
+          >
             <ChevronLeft className="w-5 h-5" />
-          </Button>
-          <Button variant="default" size="sm" disabled={!canTransitionToNextForm()} onClick={handleNext}>
+          </ChamferedButton>
+          
+          <ChamferedButton 
+            variant="primary" 
+            size="default" 
+            disabled={!canTransitionToNextForm()} 
+            onClick={handleNext}
+            haptic="heavy"
+            glow
+          >
             Next <ChevronRight className="w-4 h-4 ml-1" />
-          </Button>
+          </ChamferedButton>
         </div>
       </div>
 
@@ -360,9 +402,9 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
         <ResizablePanelGroup direction="horizontal">
           
           {/* LEFT PANEL: Steps & Thumbnails */}
-          <ResizablePanel defaultSize={20} minSize={15} maxSize={30} collapsible>
+          <ResizablePanel defaultSize={20} minSize={15} maxSize={30} className="bg-muted/10">
             <Tabs value={activeLeftTab} onValueChange={setActiveLeftTab} className="h-full flex flex-col">
-              <div className="px-2 pt-2">
+              <div className="px-3 pt-3">
                 <TabsList className="w-full grid grid-cols-2">
                   <TabsTrigger value="progress">Progress</TabsTrigger>
                   <TabsTrigger value="pages">Pages</TabsTrigger>
@@ -370,36 +412,48 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
               </div>
               
               <div className="flex-grow overflow-hidden relative mt-2">
-                <TabsContent value="progress" className="h-full absolute inset-0 overflow-y-auto p-2 m-0 data-[state=inactive]:hidden">
-                  <div className="space-y-4">
-                    {/* Court Info */}
-                    <Card className="border-dashed">
-                      <CardHeader className="pb-2 pt-4">
-                        <CardTitle className="text-xs uppercase text-muted-foreground tracking-wider">Filing At</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-sm space-y-2 pb-4">
-                        <div className="flex items-start gap-2">
-                          <MapPin className="w-4 h-4 text-primary mt-0.5" />
-                          <div className="font-medium">
-                            {(currentFormData['county'] as string) || 'Los Angeles'} Superior Court
-                          </div>
+                <TabsContent value="progress" className="h-full absolute inset-0 overflow-y-auto p-3 m-0 data-[state=inactive]:hidden space-y-4">
+                  
+                  {/* Court Info Accordion */}
+                  <LiquidGlassAccordion
+                    summary="Filing Details"
+                    variant="field-group"
+                    width="100%"
+                    sizing="48px"
+                    icon={<Building className="w-4 h-4 text-primary" />}
+                  >
+                    <div className="text-sm space-y-3">
+                      <div className="flex items-start gap-2">
+                        <MapPin className="w-4 h-4 text-muted-foreground mt-0.5" />
+                        <div className="font-medium">
+                          {(currentFormData['county'] as string) || 'Los Angeles'} Superior Court
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Hash className="w-4 h-4 text-primary" />
-                          <span className="font-mono bg-muted px-1.5 rounded">
-                            {(currentFormData['caseNumber'] as string) || 'PENDING'}
-                          </span>
-                        </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Hash className="w-4 h-4 text-muted-foreground" />
+                        <span className="font-mono bg-muted/50 px-2 py-0.5 rounded border border-border/50">
+                          {(currentFormData['caseNumber'] as string) || 'PENDING'}
+                        </span>
+                      </div>
+                    </div>
+                  </LiquidGlassAccordion>
 
-                    {/* Packet Progress */}
+                  {/* Packet Progress Accordion */}
+                  <LiquidGlassAccordion
+                    summary="Workflow Status"
+                    variant="process-step"
+                    width="100%"
+                    sizing="48px"
+                    completionPercentage={getPacketCompletionPercentage()}
+                    badge={`${getPacketCompletionPercentage()}%`}
+                  >
                     <PacketProgressPanel 
                       workflow={workflow}
                       onFormSelect={(f) => jumpToForm(f)}
                       compact={true}
                     />
-                  </div>
+                  </LiquidGlassAccordion>
+
                 </TabsContent>
 
                 <TabsContent value="pages" className="h-full absolute inset-0 m-0 data-[state=inactive]:hidden">
@@ -414,11 +468,11 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
             </Tabs>
           </ResizablePanel>
 
-          <ResizableHandle />
+          <ResizableHandle className="bg-border/20 hover:bg-primary/50 transition-colors w-1.5" />
 
           {/* MIDDLE PANEL: Viewer */}
           <ResizablePanel defaultSize={60} minSize={40}>
-            <div className="h-full w-full relative bg-slate-100/50">
+            <div className="h-full w-full relative bg-slate-100/50 dark:bg-slate-900/50 backdrop-blur-sm">
               {currentForm ? (
                 isLoadingFormData ? (
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -450,10 +504,10 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
             </div>
           </ResizablePanel>
 
-          <ResizableHandle />
+          <ResizableHandle className="bg-border/20 hover:bg-primary/50 transition-colors w-1.5" />
 
           {/* RIGHT PANEL: Field Navigation */}
-          <ResizablePanel defaultSize={20} minSize={15} maxSize={30} collapsible>
+          <ResizablePanel defaultSize={20} minSize={15} maxSize={30} className="bg-muted/5">
             <div className="h-full overflow-hidden">
               <FieldNavigationPanel
                 formData={currentFormData}
@@ -487,6 +541,12 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
 
         </ResizablePanelGroup>
       </div>
+
+      {/* Nano Banana Sentinel (Bottom Right) */}
+      <NanoBanana 
+        context={currentForm || undefined} 
+        onMoodChange={setAmbientMood}
+      />
     </div>
   );
 };

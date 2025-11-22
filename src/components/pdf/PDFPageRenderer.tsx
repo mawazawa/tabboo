@@ -4,6 +4,7 @@ import { FieldOverlayLayer } from './FieldOverlayLayer';
 import { DragInteractionLayer } from './DragInteractionLayer';
 import { FieldPosition, FormData, PersonalVaultData, ValidationErrors } from "@/types/FormData";
 import { cn } from "@/lib/utils";
+import { useFieldDrawing, DrawnRect } from "@/hooks/use-field-drawing";
 
 interface PDFPageRendererProps {
   pageNum: number;
@@ -29,6 +30,7 @@ interface PDFPageRendererProps {
   handlePointerUp: (e: React.PointerEvent) => void;
   handlePDFClick: (e: React.MouseEvent) => void;
   handlePointerDown: (e: React.PointerEvent, field: string) => void;
+  onDrawComplete: (page: number, rect: DrawnRect) => void;
 }
 
 export const PDFPageRenderer: React.FC<PDFPageRendererProps> = ({
@@ -54,25 +56,36 @@ export const PDFPageRenderer: React.FC<PDFPageRendererProps> = ({
   handlePointerMove,
   handlePointerUp,
   handlePDFClick,
-  handlePointerDown
+  handlePointerDown,
+  onDrawComplete
 }) => {
-  // Only render the current page + neighbors for performance (virtualization)
-  // or render all if required by the specific form type logic. 
-  // For now, we follow the existing pattern of rendering all but hiding non-current?
-  // No, the existing code was mapping `numPages`. Let's render them all but styling controls visibility if needed,
-  // or rely on the parent to decide what to render.
-  // Actually, `FormViewer` rendered ALL pages in a list.
+  const { 
+    isDrawing, 
+    drawingRect, 
+    handlePointerDown: handleDrawStart, 
+    handlePointerMove: handleDrawMove, 
+    handlePointerUp: handleDrawEnd 
+  } = useFieldDrawing({
+    isEditMode,
+    onDrawComplete: (rect) => onDrawComplete(pageNum, rect)
+  });
   
   return (
     <div 
       className={cn(
         "relative mb-8 shadow-lg transition-opacity duration-200",
-        // Optional: hide pages that aren't current if we want single-page view?
-        // The original code didn't seem to hide them, it just rendered a vertical list.
-        // But `currentPDFPage` suggests we might want to scroll to it.
       )}
       style={{ width: pageWidth * zoom }}
       onClick={handlePDFClick}
+      onPointerDown={handleDrawStart}
+      onPointerMove={(e) => {
+        handleDrawMove(e);
+        handlePointerMove(e);
+      }}
+      onPointerUp={(e) => {
+        handleDrawEnd(e);
+        handlePointerUp(e);
+      }}
     >
       <Page
         pageNumber={pageNum}
@@ -109,6 +122,8 @@ export const PDFPageRenderer: React.FC<PDFPageRendererProps> = ({
         handlePointerUp={handlePointerUp}
         pageOverlays={pageOverlays || []}
         fieldPositions={fieldPositions}
+        isDrawing={isDrawing}
+        drawingRect={drawingRect}
       />
     </div>
   );

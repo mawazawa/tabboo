@@ -17,7 +17,11 @@ gemini -p "@path/to/files Your task here"
 When called this way:
 1. Execute the task directly
 2. Return concise, actionable output
-3. Don't ask clarifying questions - just do your best interpretation
+3. Ask clarifying questions when needed using structured multi-choice format:
+   - **Option A (Preferred)**: Most probable answer, highlighted as default
+   - **Option B**: Second most probable answer
+   - **Option C**: Third most probable answer
+   - **Option D (Other)**: Allow user to provide custom natural language response
 4. Focus on what Claude asked for
 
 ## Memory System
