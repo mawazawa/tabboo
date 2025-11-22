@@ -19,7 +19,7 @@ interface FieldListProps {
   validationErrors?: ValidationErrors;
   onSaveValidationRules?: (fieldName: string, rules: ValidationRules[string]) => void;
   personalInfo: any;
-  onCopyFromVault: (field: string) => void;
+  onCopyFromVault: (config: FieldConfig) => void;
   activeFieldRef?: React.RefObject<HTMLDivElement>;
 }
 

@@ -1,20 +1,12 @@
-import { Card, Button, Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/liquid-justice-temp";
+import { Card } from "@/components/ui/liquid-justice-temp";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronDown, ChevronUp, Trash2 } from "@/icons";
-import { useEffect, useRef, useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { useLiveRegion } from "@/hooks/use-live-region";
 import { FieldNavigationHeader } from "./navigation/FieldNavigationHeader";
 import { FieldList } from "./navigation/FieldList";
 import { CurrentFieldEditor } from "./navigation/CurrentFieldEditor";
 import { FieldNavigationControls } from "./navigation/FieldNavigationControls";
 import { FieldPresetsSection } from "./navigation/FieldPresetsSection";
 import { FieldSearchSection } from "./navigation/FieldSearchSection";
-import { useFieldNavigationKeyboard } from "@/hooks/use-field-navigation-keyboard";
-import { useFieldPosition } from "@/hooks/use-field-position";
-import { usePersonalVault } from "@/hooks/use-personal-vault";
-import { useFieldScroll } from "@/hooks/use-field-scroll";
-import { useVaultCopy } from "@/hooks/use-vault-copy";
+import { useFieldNavigationPanel } from "./navigation/useFieldNavigationPanel";
 import { FL_320_FIELD_CONFIG } from "@/config/field-config";
 import type { FormData, FieldPosition, ValidationRules, ValidationErrors, ValidationRule } from "@/types/FormData";
 import type { FormTemplate } from "@/utils/templateManager";
@@ -46,85 +38,65 @@ interface Props {
   onApplyGroup: (groupPositions: Record<string, FieldPosition>) => void;
 }
 
-export const FieldNavigationPanel = ({
-  formData,
-  updateField,
-  currentFieldIndex,
-  setCurrentFieldIndex,
-  fieldPositions,
-  updateFieldPosition,
-  selectedFields,
-  setSelectedFields,
-  onSnapToGrid,
-  onAlignHorizontal,
-  onAlignVertical,
-  onDistribute,
-  onCopyPositions,
-  onPastePositions,
-  onTransformPositions,
-  hasCopiedPositions,
-  onFieldHover,
-  validationRules = {},
-  validationErrors = {},
-  onSaveValidationRules,
-  settingsSheetOpen,
-  onSettingsSheetChange,
-  onApplyTemplate,
-  onApplyGroup,
-}: Props) => {
-  const { announce, LiveRegionComponent } = useLiveRegion({ clearAfter: 1500 });
-  const searchInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
-  const [showPositionControl, setShowPositionControl] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showSearch, setShowSearch] = useState(false);
-  const [showAISearch, setShowAISearch] = useState(false);
-
-  // Custom hooks
-  const { data: personalInfo } = usePersonalVault();
-  const { scrollViewportRef, activeFieldRef } = useFieldScroll(currentFieldIndex);
-  
-  // Guard against invalid currentFieldIndex to prevent undefined currentFieldName
-  const isValidIndex = currentFieldIndex >= 0 && currentFieldIndex < FL_320_FIELD_CONFIG.length;
-  const currentFieldName = isValidIndex ? FL_320_FIELD_CONFIG[currentFieldIndex]?.field : undefined;
-  const safeFieldName = currentFieldName || '';
-  const { currentPosition, adjustPosition } = useFieldPosition(safeFieldName, fieldPositions, updateFieldPosition);
-  const { copyFromVault } = useVaultCopy(personalInfo, updateField);
-
-  // Filter fields based on search query
-  const filteredFields = FL_320_FIELD_CONFIG.filter(config =>
-    config.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    config.field.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  // Announce current field to screen readers
-  useEffect(() => {
-    const currentField = FL_320_FIELD_CONFIG[currentFieldIndex];
-    if (currentField) {
-      announce(`Field ${currentFieldIndex + 1} of ${FL_320_FIELD_CONFIG.length}: ${currentField.label}`);
-    }
-  }, [currentFieldIndex, announce]);
-
-  const goToNextField = () => setCurrentFieldIndex(Math.min(FL_320_FIELD_CONFIG.length - 1, currentFieldIndex + 1));
-  const goToPrevField = () => setCurrentFieldIndex(Math.max(0, currentFieldIndex - 1));
-
-  const { pressedKey } = useFieldNavigationKeyboard({
+export const FieldNavigationPanel = (props: Props) => {
+  const {
+    formData,
+    updateField,
     currentFieldIndex,
     setCurrentFieldIndex,
-    adjustPosition,
-    showSearch,
-    setShowSearch,
-    showPositionControl,
-    setShowPositionControl,
-    searchInputRef
-  });
+    fieldPositions,
+    updateFieldPosition,
+    selectedFields,
+    setSelectedFields,
+    onSnapToGrid,
+    onAlignHorizontal,
+    onAlignVertical,
+    onDistribute,
+    onCopyPositions,
+    onPastePositions,
+    onTransformPositions,
+    hasCopiedPositions,
+    onFieldHover,
+    validationRules = {},
+    validationErrors = {},
+    onSaveValidationRules,
+    settingsSheetOpen,
+    onSettingsSheetChange,
+    onApplyTemplate,
+    onApplyGroup,
+  } = props;
 
-  const handleClearFields = () => {
-    if (confirm('Are you sure you want to clear all form fields? This action cannot be undone.')) {
-      FL_320_FIELD_CONFIG.forEach(config => updateField(config.field, config.type === 'checkbox' ? false : ''));
-      toast({ title: "Form cleared", description: "All form fields have been reset", variant: "default" });
-    }
-  };
+  const {
+    searchQuery,
+    setSearchQuery,
+    showSearch,
+    showAISearch,
+    setShowAISearch,
+    filteredFields,
+    pressedKey,
+    currentPosition,
+    personalInfo,
+    searchInputRef,
+    scrollViewportRef,
+    activeFieldRef,
+    LiveRegionComponent,
+    adjustPosition,
+    copyFromVault,
+    goToNextField,
+    goToPrevField,
+    handleClearFields,
+    handleAIQuery,
+    handleSettingsOpen,
+    handleSearchToggle,
+    safeFieldName
+  } = useFieldNavigationPanel({
+    currentFieldIndex,
+    setCurrentFieldIndex,
+    updateField,
+    fieldPositions,
+    updateFieldPosition,
+    onSettingsSheetChange
+  });
 
   return (
     <Card className="h-full border shadow-sm flex flex-col overflow-hidden">
@@ -136,8 +108,8 @@ export const FieldNavigationPanel = ({
         searchQuery={searchQuery}
         filteredFieldsCount={filteredFields.length}
         showAISearch={showAISearch}
-        onSearchToggle={() => setShowAISearch(!showAISearch)}
-        onSettingsOpen={() => onSettingsSheetChange(true)}
+        onSearchToggle={handleSearchToggle}
+        onSettingsOpen={handleSettingsOpen}
         onClearFields={handleClearFields}
         selectedFields={selectedFields}
         fieldPositions={fieldPositions}
@@ -156,10 +128,7 @@ export const FieldNavigationPanel = ({
           onSettingsSheetChange={onSettingsSheetChange}
           fieldPositions={fieldPositions}
           onApplyTemplate={onApplyTemplate}
-          onAIQuery={(query) => {
-            toast({ title: "AI Query Sent", description: query });
-            setShowAISearch(false);
-          }}
+          onAIQuery={handleAIQuery}
         />
 
         <FieldNavigationControls
