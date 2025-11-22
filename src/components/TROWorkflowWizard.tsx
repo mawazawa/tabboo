@@ -5,22 +5,25 @@
  * workflow. Provides step-by-step navigation, progress tracking, validation feedback,
  * and form transitions.
  *
- * @version 1.0
- * @date November 17, 2025
- * @author Agent 2 - Workflow Engine
+ * @version 1.1
+ * @date November 21, 2025
+ * @author Gemini 3 Pro & Agent 2
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Loader2, AlertCircle } from '@/icons';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { useTROWorkflow } from '@/hooks/useTROWorkflow';
+import { FormViewer } from '@/components/FormViewer'; // Integrated FormViewer
+import { FormData, FieldPosition } from '@/types/FormData';
 import {
   PacketType,
   FormStatus,
   WorkflowState,
+  FormType,
   type TROWorkflowWizardProps
 } from '@/types/WorkflowTypes';
 
@@ -45,6 +48,14 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
   const { toast } = useToast();
   const [showPacketSelector, setShowPacketSelector] = useState(!initialPacketType && !existingWorkflowId);
   const [isInitializing, setIsInitializing] = useState(false);
+  
+  // Local state for the form viewer
+  const [currentFormData, setCurrentFormData] = useState<FormData>({});
+  const [isLoadingFormData, setIsLoadingFormData] = useState(false);
+  const [currentFieldIndex, setCurrentFieldIndex] = useState<number>(0);
+  // Placeholder for field positions - normally loaded from DB or config
+  // For now, we'll let FormViewer handle the initial load from DB
+  const [fieldPositions, setFieldPositions] = useState<Record<string, FieldPosition>>({});
 
   // Use the workflow hook
   const {
@@ -64,7 +75,9 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
     getPacketCompletionPercentage,
     getEstimatedTimeRemaining,
     getFormSteps,
-    updateFormStatus
+    updateFormStatus,
+    getFormData,
+    saveFormData
   } = useTROWorkflow(userId, existingWorkflowId);
 
   // Handle errors
@@ -80,6 +93,62 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
       loadWorkflow(existingWorkflowId);
     }
   }, [existingWorkflowId, workflow, loading, loadWorkflow]);
+
+  // Load form data when the current form changes
+  const currentForm = getCurrentForm();
+  
+  useEffect(() => {
+    const loadData = async () => {
+      if (!currentForm) return;
+      
+      setIsLoadingFormData(true);
+      try {
+        const data = await getFormData(currentForm);
+        if (data) {
+          setCurrentFormData(data as unknown as FormData);
+        } else {
+          setCurrentFormData({});
+        }
+      } catch (err) {
+        console.error("Failed to load form data:", err);
+        toast({
+          title: "Error loading form data",
+          description: "Could not retrieve your saved progress.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoadingFormData(false);
+      }
+    };
+
+    loadData();
+  }, [currentForm, getFormData, toast]);
+
+  // Debounced save helper
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleFieldUpdate = useCallback((field: string, value: string | boolean) => {
+    setCurrentFormData(prev => {
+      const newData = { ...prev, [field]: value };
+      
+      // Debounced save to Supabase
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+      
+      if (currentForm) {
+        saveTimeoutRef.current = setTimeout(() => {
+          saveFormData(currentForm, newData as unknown as Record<string, unknown>)
+            .catch(err => console.error("Auto-save failed:", err));
+        }, 1000); // Auto-save after 1 second of inactivity
+      }
+      
+      return newData;
+    });
+  }, [currentForm, saveFormData]);
+
+  const handleFieldPositionUpdate = useCallback((field: string, position: FieldPosition) => {
+    setFieldPositions(prev => ({ ...prev, [field]: position }));
+    // Note: In a real implementation, we'd want to save these positions too if user is admin
+  }, []);
 
   /**
    * Handle packet type selection
@@ -146,7 +215,6 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
     }
 
     // Mark current form as complete
-    const currentForm = getCurrentForm();
     if (currentForm) {
       await updateFormStatus(currentForm, FormStatus.COMPLETE);
     }
@@ -160,7 +228,7 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
         onComplete();
       }
     }
-  }, [validateCurrentForm, getCurrentForm, updateFormStatus, transitionToNextForm, workflow, onComplete, toast]);
+  }, [validateCurrentForm, currentForm, updateFormStatus, transitionToNextForm, workflow, onComplete, toast]);
 
   /**
    * Handle previous button click
@@ -231,7 +299,6 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
   }
 
   // Get workflow data
-  const currentForm = getCurrentForm();
   const nextForm = getNextForm();
   const previousForm = getPreviousForm();
   const completionPercentage = getPacketCompletionPercentage();
@@ -239,69 +306,82 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
   const formSteps = getFormSteps();
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-6">
+    <div className="container mx-auto px-4 py-6 space-y-6 h-screen flex flex-col">
       {/* Header with Progress */}
-      <WorkflowProgressBar
-        packetType={workflow.packetType}
-        completionPercentage={completionPercentage}
-        estimatedTime={estimatedTime}
-      />
+      <div className="flex-none">
+        <WorkflowProgressBar
+          packetType={workflow.packetType}
+          completionPercentage={completionPercentage}
+          estimatedTime={estimatedTime}
+        />
+      </div>
 
-      {/* Form Steps */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Forms to Complete</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {formSteps.map((step) => {
-              const isCurrent = step.formType === currentForm;
+      {/* Main Content Area - Flex Grow to fill space */}
+      <div className="flex-grow flex flex-col md:flex-row gap-6 overflow-hidden">
+        
+        {/* Sidebar - Form Steps */}
+        <div className="w-full md:w-64 flex-none overflow-y-auto hidden md:block">
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle>Forms</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {formSteps.map((step) => {
+                  const isCurrent = step.formType === currentForm;
+                  return (
+                    <FormStepIndicator
+                      key={step.formType}
+                      step={step}
+                      isCurrent={isCurrent}
+                    />
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-              return (
-                <FormStepIndicator
-                  key={step.formType}
-                  step={step}
-                  isCurrent={isCurrent}
-                />
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+        {/* Form Area */}
+        <div className="flex-grow flex flex-col min-w-0 border rounded-lg bg-background shadow-sm overflow-hidden relative">
+          {currentForm ? (
+            isLoadingFormData ? (
+              <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-50">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              </div>
+            ) : (
+              <FormViewer 
+                formData={currentFormData}
+                updateField={handleFieldUpdate}
+                currentFieldIndex={currentFieldIndex}
+                setCurrentFieldIndex={setCurrentFieldIndex}
+                fieldPositions={fieldPositions}
+                updateFieldPosition={handleFieldPositionUpdate}
+                formType={currentForm}
+                // Optional: pass validation errors here
+              />
+            )
+          ) : (
+            <div className="flex items-center justify-center h-full text-muted-foreground">
+              Select a form to begin
+            </div>
+          )}
+        </div>
+      </div>
 
-      {/* Current Form Placeholder */}
-      {currentForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Current Form: {currentForm}</CardTitle>
-            <CardDescription>
-              Complete this form to continue with your TRO packet
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Alert>
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Form Component Integration Needed</AlertTitle>
-              <AlertDescription>
-                This is where the actual form component ({currentForm}) will be rendered.
-                Integration with Agent 1's form components pending.
-              </AlertDescription>
-            </Alert>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Navigation Controls */}
-      <WorkflowNavigationButtons
-        currentForm={currentForm}
-        nextForm={nextForm}
-        previousForm={previousForm}
-        formSteps={formSteps}
-        canGoNext={canTransitionToNextForm()}
-        canGoPrevious={canTransitionToPreviousForm()}
-        onNext={handleNext}
-        onPrevious={handlePrevious}
-      />
+      {/* Footer Navigation */}
+      <div className="flex-none pt-4 border-t bg-background sticky bottom-0">
+        <WorkflowNavigationButtons
+          currentForm={currentForm}
+          nextForm={nextForm}
+          previousForm={previousForm}
+          formSteps={formSteps}
+          canGoNext={canTransitionToNextForm()}
+          canGoPrevious={canTransitionToPreviousForm()}
+          onNext={handleNext}
+          onPrevious={handlePrevious}
+        />
+      </div>
     </div>
   );
 };

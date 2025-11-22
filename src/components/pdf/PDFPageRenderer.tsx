@@ -1,8 +1,9 @@
+import React from 'react';
 import { Page } from 'react-pdf';
-import { AlignmentGuides } from "./AlignmentGuides";
-import { FieldOverlay } from "./FieldOverlay";
-import { canAutofill } from "@/utils/vaultFieldMatcher";
-import type { FormData, FieldPosition, ValidationErrors, PersonalVaultData } from "@/types/FormData";
+import { FieldOverlayLayer } from './FieldOverlayLayer';
+import { DragInteractionLayer } from './DragInteractionLayer';
+import { FieldPosition, FormData, PersonalVaultData, ValidationErrors } from "@/types/FormData";
+import { cn } from "@/lib/utils";
 
 interface PDFPageRendererProps {
   pageNum: number;
@@ -11,9 +12,9 @@ interface PDFPageRendererProps {
   zoom: number;
   fieldFontSize: number;
   isEditMode: boolean;
-  isDragging: string | false;
-  alignmentGuides: Array<{ x: number; y: number; type: 'horizontal' | 'vertical' }>;
-  pageOverlays: { page: number; fields: Array<{ field: string; type: string; placeholder?: string; top: string; left: string }> } | undefined;
+  isDragging: boolean;
+  alignmentGuides: { x: number | null; y: number | null };
+  pageOverlays: any[];
   fieldPositions: Record<string, FieldPosition>;
   formData: FormData;
   currentFieldIndex: number;
@@ -27,10 +28,10 @@ interface PDFPageRendererProps {
   handlePointerMove: (e: React.PointerEvent) => void;
   handlePointerUp: (e: React.PointerEvent) => void;
   handlePDFClick: (e: React.MouseEvent) => void;
-  handlePointerDown: (e: React.PointerEvent, field: string, top: number, left: number) => void;
+  handlePointerDown: (e: React.PointerEvent, field: string) => void;
 }
 
-export const PDFPageRenderer = ({
+export const PDFPageRenderer: React.FC<PDFPageRendererProps> = ({
   pageNum,
   currentPDFPage,
   pageWidth,
@@ -54,78 +55,61 @@ export const PDFPageRenderer = ({
   handlePointerUp,
   handlePDFClick,
   handlePointerDown
-}: PDFPageRendererProps) => {
-  const pageBuffer = 1;
-  const shouldRenderPage = Math.abs(pageNum - currentPDFPage) <= pageBuffer;
-
+}) => {
+  // Only render the current page + neighbors for performance (virtualization)
+  // or render all if required by the specific form type logic. 
+  // For now, we follow the existing pattern of rendering all but hiding non-current?
+  // No, the existing code was mapping `numPages`. Let's render them all but styling controls visibility if needed,
+  // or rely on the parent to decide what to render.
+  // Actually, `FormViewer` rendered ALL pages in a list.
+  
   return (
-    <div
-      key={`page_${pageNum}`}
-      className={`relative mb-4 w-full ${isEditMode ? 'touch-none' : ''}`}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerLeave={handlePointerUp}
+    <div 
+      className={cn(
+        "relative mb-8 shadow-lg transition-opacity duration-200",
+        // Optional: hide pages that aren't current if we want single-page view?
+        // The original code didn't seem to hide them, it just rendered a vertical list.
+        // But `currentPDFPage` suggests we might want to scroll to it.
+      )}
+      style={{ width: pageWidth * zoom }}
       onClick={handlePDFClick}
     >
-      {shouldRenderPage ? (
-        <>
-          <Page
-            pageNumber={pageNum}
-            width={pageWidth * zoom}
-            renderTextLayer={false}
-            renderAnnotationLayer={false}
-            className="w-full"
-            loading=""
-          />
+      <Page
+        pageNumber={pageNum}
+        width={pageWidth * zoom}
+        className="bg-white"
+        renderTextLayer={true}
+        renderAnnotationLayer={true}
+      />
 
-          {pageOverlays && (
-            <div className="absolute inset-0 z-10">
-              {isDragging && <AlignmentGuides guides={alignmentGuides} />}
+      <FieldOverlayLayer
+        pageOverlays={pageOverlays || []}
+        fieldPositions={fieldPositions}
+        formData={formData}
+        currentFieldIndex={currentFieldIndex}
+        fieldNameToIndex={fieldNameToIndex}
+        highlightedField={highlightedField}
+        validationErrors={validationErrors}
+        fieldFontSize={fieldFontSize}
+        vaultData={vaultData}
+        isEditMode={isEditMode}
+        updateField={updateField}
+        handleFieldClick={handleFieldClick}
+        handleAutofillField={handleAutofillField}
+      />
 
-              {pageOverlays.fields.map((overlay, idx) => {
-                const position = fieldPositions[overlay.field] || {
-                  top: parseFloat(overlay.top),
-                  left: parseFloat(overlay.left)
-                };
-
-                const isCurrentField = fieldNameToIndex[overlay.field] === currentFieldIndex;
-                const canAutofillField = canAutofill(overlay.field, vaultData);
-                const hasValue = !!formData[overlay.field as keyof FormData];
-
-                return (
-                  <FieldOverlay
-                    key={idx}
-                    field={overlay.field}
-                    type={overlay.type}
-                    placeholder={overlay.placeholder}
-                    position={position}
-                    zoom={zoom}
-                    fieldFontSize={fieldFontSize}
-                    formData={formData}
-                    isEditMode={isEditMode}
-                    isCurrentField={isCurrentField}
-                    isDragging={isDragging === overlay.field}
-                    highlightedField={highlightedField}
-                    validationErrors={validationErrors}
-                    vaultData={vaultData}
-                    canAutofillField={canAutofillField}
-                    hasValue={hasValue}
-                    updateField={updateField}
-                    handleFieldClick={handleFieldClick}
-                    handleAutofillField={handleAutofillField}
-                    onPointerDown={isEditMode ? (e) => handlePointerDown(e, overlay.field, position.top, position.left) : undefined}
-                  />
-                );
-              })}
-            </div>
-          )}
-        </>
-      ) : (
-        <div className="w-full bg-muted/10 flex items-center justify-center" style={{ height: `${pageWidth * zoom * 1.294}px` }}>
-          <p className="text-muted-foreground text-sm">Page {pageNum}</p>
-        </div>
-      )}
+      <DragInteractionLayer
+        isEditMode={isEditMode}
+        isDragging={isDragging}
+        alignmentGuides={alignmentGuides}
+        pageWidth={pageWidth}
+        zoom={zoom}
+        handlePointerDown={handlePointerDown}
+        handlePointerMove={handlePointerMove}
+        handlePointerUp={handlePointerUp}
+        pageOverlays={pageOverlays || []}
+        fieldPositions={fieldPositions}
+      />
     </div>
   );
 };
-

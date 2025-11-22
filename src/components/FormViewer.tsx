@@ -18,11 +18,10 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 import type { FormData, FieldPosition, ValidationErrors, PersonalVaultData } from "@/types/FormData";
+import { FormType } from "@/types/WorkflowTypes";
 
 // Import centralized PDF.js configuration
 import '@/lib/pdfConfig';
-
-export type FormType = 'FL-320' | 'FL-300' | 'FL-303' | 'FL-305' | 'DV-100' | 'DV-105';
 
 interface Props {
   formData: FormData;
@@ -64,20 +63,20 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     onLoadProgress
   } = usePdfLoading(formType);
 
-// Convert database field mappings to field overlays (memoized for performance)
-const fieldOverlays = useMemo(() => {
-  if (!fieldMappings || fieldMappings.length === 0) {
-    // Fallback to empty array while loading or if no data
-    return [];
-  }
-  return convertToFieldOverlays(fieldMappings);
-}, [fieldMappings]);
+  // Convert database field mappings to field overlays (memoized for performance)
+  const fieldOverlays = useMemo(() => {
+    if (!fieldMappings || fieldMappings.length === 0) {
+      // Fallback to empty array while loading or if no data
+      return [];
+    }
+    return convertToFieldOverlays(fieldMappings);
+  }, [fieldMappings]);
 
-// Generate resilient field name to index mapping to keep keyboard navigation working
-const fieldNameToIndex: Record<string, number> = useMemo(() => {
-  const dbFieldNames = fieldMappings?.map(mapping => mapping.form_field_name) ?? [];
-  return mergeFieldNameToIndex(legacyFieldNameToIndex, dbFieldNames);
-}, [fieldMappings]);
+  // Generate resilient field name to index mapping to keep keyboard navigation working
+  const fieldNameToIndex: Record<string, number> = useMemo(() => {
+    const dbFieldNames = fieldMappings?.map(mapping => mapping.form_field_name) ?? [];
+    return mergeFieldNameToIndex(legacyFieldNameToIndex, dbFieldNames);
+  }, [fieldMappings]);
 
   /**
    * Adjust field position by moving it in the specified direction
@@ -181,17 +180,6 @@ const fieldNameToIndex: Record<string, number> = useMemo(() => {
     }
   }, [vaultData, updateField]);
 
-  // Page navigation handlers
-  const handlePreviousPage = useCallback(() => {
-    setCurrentPDFPage(prev => Math.max(1, prev - 1));
-    announce(`Navigated to page ${Math.max(1, currentPDFPage - 1)}`);
-  }, [currentPDFPage, announce]);
-
-  const handleNextPage = useCallback(() => {
-    setCurrentPDFPage(prev => Math.min(numPages, prev + 1));
-    announce(`Navigated to page ${Math.min(numPages, currentPDFPage + 1)}`);
-  }, [currentPDFPage, numPages, announce]);
-
   // Show loading state while fetching field data from database
   if (isLoadingFields) {
     return (
@@ -274,4 +262,3 @@ const fieldNameToIndex: Record<string, number> = useMemo(() => {
     </div>
   );
 };
-
