@@ -72,7 +72,7 @@ export const validateField = (
             isValid = regex.test(stringValue);
           } catch (e) {
             console.error('Invalid regex pattern:', rule.value);
-            isValid = true; // Don't fail validation for invalid regex
+            isValid = false; // Invalid regex patterns should fail validation
           }
         }
         break;

@@ -46,12 +46,8 @@ export default function CanvasView() {
   // Document persistence for each form
   const {
     user,
-    loading,
-    documentId,
-    handleLogout,
-    saveStatus,
-    lastSaved,
-    saveError,
+    // These values are available but not currently displayed in the UI
+    // loading, documentId, handleLogout, saveStatus, lastSaved, saveError
   } = useDocumentPersistence({
     formData: formDataMap[activeForms[0]?.id] || {},
     fieldPositions: fieldPositionsMap[activeForms[0]?.id] || {},
