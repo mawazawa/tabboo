@@ -1,0 +1,222 @@
+{
+  "mcpServers": {
+    "memory": {
+      "command": "/opt/homebrew/bin/pnpm",
+      "args": [
+        "dlx",
+        "@modelcontextprotocol/server-memory"
+      ],
+      "env": {
+        "MEMORY_FILE_PATH": "/Users/mathieuwauters/Desktop/code/memory/canonical/knowledge-graph.db"
+      }
+    },
+    "knowledge-graph": {
+      "type": "sse",
+      "url": "http://localhost:27495/mcp/sse",
+      "approvedTools": true
+    },
+    "neo4j-alanse": {
+      "command": "/opt/homebrew/bin/pnpm",
+      "args": [
+        "dlx",
+        "@alanse/mcp-neo4j-server@latest"
+      ],
+      "env": {
+        "NEO4J_URI": "neo4j+s://3884f0bc.databases.neo4j.io",
+        "NEO4J_USERNAME": "neo4j",
+        "NEO4J_PASSWORD": "cSYHw9FBEXzaa4PcFZgF",
+        "NEO4J_DATABASE": "neo4j"
+      }
+    },
+    "linear": {
+      "command": "/opt/homebrew/bin/pnpm",
+      "args": [
+        "dlx",
+        "mcp-remote",
+        "https://mcp.linear.app/sse"
+      ]
+    },
+    "github": {
+      "command": "/opt/homebrew/bin/pnpm",
+      "args": [
+        "dlx",
+        "@modelcontextprotocol/server-github@latest"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": ""
+      }
+    },
+    "git-official": {
+      "command": "/opt/homebrew/bin/pnpm",
+      "args": [
+        "dlx",
+        "-y",
+        "@modelcontextprotocol/server-git",
+        "--repository",
+        "/Users/mathieuwauters/Desktop/code/tabboo"
+      ]
+    },
+    "supabase": {
+      "url": "https://mcp.supabase.com/mcp?project_ref=rgrgfcesahcgxpuobbqq"
+    },
+    "playwright": {
+      "command": "/opt/homebrew/bin/pnpm",
+      "args": [
+        "dlx",
+        "@playwright/mcp@latest",
+        "--isolated"
+      ]
+    },
+    "stripe": {
+      "url": "https://mcp.stripe.com"
+    },
+    "vercel": {
+      "url": "https://mcp.vercel.com"
+    },
+    "Figma": {
+      "url": "https://mcp.figma.com/mcp"
+    },
+    "exa": {
+      "command": "/opt/homebrew/bin/pnpm",
+      "args": [
+        "dlx",
+        "exa-mcp-server"
+      ],
+      "env": {
+        "EXA_API_KEY": "c3206133-e55a-4859-8510-c5884dbe900d"
+      }
+    },
+    "context7": {
+      "command": "/opt/homebrew/bin/pnpm",
+      "args": [
+        "dlx",
+        "@upstash/context7-mcp@latest"
+      ]
+    },
+    "perplexity-official": {
+      "command": "/opt/homebrew/bin/pnpm",
+      "args": [
+        "dlx",
+        "@perplexity-ai/mcp-server"
+      ],
+      "env": {
+        "PERPLEXITY_API_KEY": ""
+      }
+    },
+    "notion": {
+      "command": "/opt/homebrew/bin/pnpm",
+      "args": [
+        "dlx",
+        "@notionhq/notion-mcp-server"
+      ],
+      "env": {
+        "NOTION_API_KEY": ""
+      }
+    },
+    "bigquery": {
+      "command": "/opt/homebrew/bin/pnpm",
+      "args": [
+        "dlx",
+        "@google-cloud/mcp-server-bigquery@latest"
+      ],
+      "env": {
+        "GOOGLE_CLOUD_PROJECT": "justiceos",
+        "GOOGLE_APPLICATION_CREDENTIALS": "/Users/mathieuwauters/.config/gcloud/application_default_credentials.json"
+      }
+    },
+    "google-maps-platform": {
+      "command": "/opt/homebrew/bin/pnpm",
+      "args": [
+        "dlx",
+        "@googlemaps/code-assist-mcp@latest"
+      ],
+      "env": {
+        "GOOGLE_MAPS_API_KEY": ""
+      }
+    },
+    "looker": {
+      "command": "/opt/homebrew/bin/pnpm",
+      "args": [
+        "dlx",
+        "@google-cloud/mcp-server-looker@latest"
+      ]
+    },
+    "firebase": {
+      "command": "/opt/homebrew/bin/pnpm",
+      "args": [
+        "dlx",
+        "firebase-tools@latest",
+        "mcp"
+      ],
+      "env": {
+        "FIREBASE_PROJECT": "justiceos"
+      }
+    },
+    "filesystem": {
+      "command": "/opt/homebrew/bin/pnpm",
+      "args": [
+        "dlx",
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/mathieuwauters/Desktop/code/tabboo",
+        "/Users/mathieuwauters/Desktop/code",
+        "/Users/mathieuwauters/.claude"
+      ]
+    },
+    "sequential-thinking": {
+      "command": "/opt/homebrew/bin/pnpm",
+      "args": [
+        "dlx",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    },
+    "desktop-commander": {
+      "command": "/opt/homebrew/bin/pnpm",
+      "args": [
+        "dlx",
+        "@wonderwhy-er/desktop-commander"
+      ]
+    },
+    "npm-helper": {
+      "command": "/opt/homebrew/bin/pnpm",
+      "args": [
+        "dlx",
+        "@pinkpixel/npm-helper-mcp"
+      ]
+    },
+    "package-version": {
+      "command": "/opt/homebrew/bin/pnpm",
+      "args": [
+        "dlx",
+        "mcp-package-version"
+      ]
+    },
+    "@magicuidesign/mcp": {
+      "command": "/opt/homebrew/bin/pnpm",
+      "args": [
+        "dlx",
+        "@magicuidesign/mcp@latest"
+      ]
+    },
+    "@21st-dev/magic": {
+      "command": "/opt/homebrew/bin/pnpm",
+      "args": [
+        "dlx",
+        "@21st-dev/magic@latest"
+      ],
+      "env": {
+        "API_KEY": ""
+      }
+    },
+    "redis": {
+      "command": "/opt/homebrew/bin/pnpm",
+      "args": [
+        "dlx",
+        "@modelcontextprotocol/server-redis"
+      ],
+      "env": {
+        "REDIS_URL": "rediss://default:AWKwAAIjcDE4ZGU0OWQ4NWFmZjg0MmI0Yjk4YTIxZDNhMGY2YzQwZnAxMA@bright-snipe-25264.upstash.io:6379"
+      }
+    }
+  }
+}
