@@ -2,8 +2,10 @@ import { useRef } from "react";
 import { Input, Button, Label } from "@/components/ui/liquid-justice-temp";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Copy, AlertCircle } from "@/icons";
+import { Copy, AlertCircle, Database } from "@/icons";
 import type { FieldConfig, FormData, ValidationRules, ValidationErrors } from "@/types/FormData";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { getVaultSourceLabel } from "@/utils/vault-lineage";
 
 interface FieldNavigationItemProps {
   config: FieldConfig;
@@ -111,7 +113,7 @@ export const FieldNavigationItem = ({
         </Label>
         <div className="flex items-center gap-1">
           {/* Copy from vault button */}
-          {config.vaultField && personalInfo && personalInfo[config.vaultField as keyof typeof personalInfo] && (
+          {config.vaultField && personalInfo && !!personalInfo[config.vaultField as keyof typeof personalInfo] && (
             <Button
               size="sm"
               variant="ghost"
@@ -134,11 +136,25 @@ export const FieldNavigationItem = ({
         </div>
       </div>
 
-      {/* Vault data preview */}
-      {config.vaultField && personalInfo && personalInfo[config.vaultField as keyof typeof personalInfo] && (
-        <div className="text-[10px] text-muted-foreground bg-muted/30 rounded-sm px-1.5 py-0.5 font-mono truncate">
-          Saved: {personalInfo[config.vaultField as keyof typeof personalInfo]}
-        </div>
+      {/* Vault data preview with Lineage Tooltip */}
+      {config.vaultField && personalInfo && !!personalInfo[config.vaultField as keyof typeof personalInfo] && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="group text-[10px] text-muted-foreground bg-muted/30 rounded-sm px-1.5 py-0.5 font-mono truncate flex items-center gap-1.5 cursor-help transition-colors hover:bg-muted/50 hover:text-primary max-w-full">
+              <Database className="h-3 w-3 opacity-60 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+              <span className="truncate">
+                {String(personalInfo[config.vaultField as keyof typeof personalInfo])}
+              </span>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" align="start" className="text-xs max-w-[250px]">
+            <div className="font-semibold mb-1">Data Source</div>
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <Database className="h-3 w-3" />
+              {getVaultSourceLabel(config.vaultField)}
+            </div>
+          </TooltipContent>
+        </Tooltip>
       )}
 
       {/* Validation Errors */}
