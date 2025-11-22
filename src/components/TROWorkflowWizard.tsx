@@ -11,13 +11,14 @@
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Loader2, AlertCircle } from '@/icons';
+import { Loader2, AlertCircle, Building, MapPin, Hash } from '@/icons';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { useTROWorkflow } from '@/hooks/useTROWorkflow';
 import { FormViewer } from '@/components/FormViewer'; // Integrated FormViewer
+import { PacketProgressPanel } from '@/components/PacketProgressPanel';
 import { FormData, FieldPosition } from '@/types/FormData';
 import {
   PacketType,
@@ -77,7 +78,8 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
     getFormSteps,
     updateFormStatus,
     getFormData,
-    saveFormData
+    saveFormData,
+    jumpToForm
   } = useTROWorkflow(userId, existingWorkflowId);
 
   // Handle errors
@@ -319,27 +321,46 @@ export const TROWorkflowWizard: React.FC<TROWorkflowWizardProps> = ({
       {/* Main Content Area - Flex Grow to fill space */}
       <div className="flex-grow flex flex-col md:flex-row gap-6 overflow-hidden">
         
-        {/* Sidebar - Form Steps */}
-        <div className="w-full md:w-64 flex-none overflow-y-auto hidden md:block">
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle>Forms</CardTitle>
+        {/* Sidebar - Progress & Court Info */}
+        <div className="w-full md:w-72 flex-none overflow-y-auto hidden md:block space-y-4 pr-1">
+          {/* Court Information Card */}
+          <Card>
+            <CardHeader className="pb-2 pt-4">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Building className="w-4 h-4 text-primary" />
+                Court Information
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {formSteps.map((step) => {
-                  const isCurrent = step.formType === currentForm;
-                  return (
-                    <FormStepIndicator
-                      key={step.formType}
-                      step={step}
-                      isCurrent={isCurrent}
-                    />
-                  );
-                })}
+            <CardContent className="text-sm space-y-3 pb-4">
+              <div className="flex items-start gap-2">
+                <MapPin className="w-3 h-3 mt-1 text-muted-foreground flex-shrink-0" />
+                <div>
+                  <div className="font-medium">{(currentFormData['county'] as string) || 'Los Angeles'} Superior Court</div>
+                  {(currentFormData['courtStreetAddress'] as string) && (
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      {currentFormData['courtStreetAddress'] as string}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Hash className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+                <div>
+                  <span className="text-muted-foreground text-xs uppercase tracking-wider mr-2">Case #:</span>
+                  <span className="font-mono bg-muted px-1.5 py-0.5 rounded text-xs text-foreground">
+                    {(currentFormData['caseNumber'] as string) || 'PENDING'}
+                  </span>
+                </div>
               </div>
             </CardContent>
           </Card>
+
+          {/* Progress Panel */}
+          <PacketProgressPanel 
+            workflow={workflow}
+            onFormSelect={(form) => jumpToForm(form)}
+            compact={true}
+          />
         </div>
 
         {/* Form Area */}
