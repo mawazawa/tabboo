@@ -1,11 +1,14 @@
-import { LogOut } from "@/icons";
-import type { FormType } from "@/components/FormViewer";
+import { LogOut, Database } from "@/icons";
+import type { FormType } from "@/types/WorkflowTypes";
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface IndexHeaderProps {
   onLogout: () => void;
   saveStatus: "idle" | "saving" | "saved" | "error" | "offline";
   currentFormType: FormType;
   onFormTypeChange: (newFormType: FormType) => void;
+  onOpenGraph?: () => void;
 }
 
 export const IndexHeader = ({
@@ -13,6 +16,7 @@ export const IndexHeader = ({
   saveStatus,
   currentFormType,
   onFormTypeChange,
+  onOpenGraph,
 }: IndexHeaderProps) => (
   <header className="border-b border-border/20 bg-background/95 backdrop-blur-sm z-50 flex-shrink-0">
     <div className="container mx-auto px-6 h-12 flex items-center justify-between">
@@ -35,6 +39,25 @@ export const IndexHeader = ({
 
       {/* Right: Status + Logout */}
       <div className="flex items-center gap-3">
+        {/* God Mode Trigger */}
+        {onOpenGraph && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-8 w-8 text-muted-foreground hover:text-primary"
+                onClick={onOpenGraph}
+              >
+                <Database className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Knowledge Graph (God Mode)</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
+
         {/* Save status dot */}
         <div
           className={`w-1.5 h-1.5 rounded-full transition-colors ${
@@ -60,4 +83,3 @@ export const IndexHeader = ({
     </div>
   </header>
 );
-

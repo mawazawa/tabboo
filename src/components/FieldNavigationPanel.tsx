@@ -16,13 +16,8 @@ import { usePersonalVault } from "@/hooks/use-personal-vault";
 import { useFieldScroll } from "@/hooks/use-field-scroll";
 import { useVaultCopy } from "@/hooks/use-vault-copy";
 import { FL_320_FIELD_CONFIG } from "@/config/field-config";
-import type { FormData, FieldPosition, ValidationRules, ValidationErrors } from "@/types/FormData";
-
-interface Template {
-  name: string;
-  formData: FormData;
-  fieldPositions: Record<string, FieldPosition>;
-}
+import type { FormData, FieldPosition, ValidationRules, ValidationErrors, ValidationRule } from "@/types/FormData";
+import type { FormTemplate } from "@/utils/templateManager";
 
 interface Props {
   formData: FormData;
@@ -44,10 +39,10 @@ interface Props {
   onFieldHover?: (fieldName: string | null) => void;
   validationRules?: ValidationRules;
   validationErrors?: ValidationErrors;
-  onSaveValidationRules?: (fieldName: string, rules: ValidationRules[string]) => void;
+  onSaveValidationRules?: (fieldName: string, rules: ValidationRule[]) => void;
   settingsSheetOpen: boolean;
   onSettingsSheetChange: (open: boolean) => void;
-  onApplyTemplate: (template: Template) => void;
+  onApplyTemplate: (template: FormTemplate) => void;
   onApplyGroup: (groupPositions: Record<string, FieldPosition>) => void;
 }
 

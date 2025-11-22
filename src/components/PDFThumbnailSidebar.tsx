@@ -8,7 +8,7 @@ import { FieldMinimapIndicator } from "./FieldMinimapIndicator";
 // Import centralized PDF.js configuration
 import '@/lib/pdfConfig';
 
-interface Props {
+export interface ThumbnailSidebarProps {
   currentPage?: number;
   onPageClick?: (pageNumber: number) => void;
   currentFieldPositions?: { top: number; left: number }[];
@@ -22,7 +22,7 @@ export const PDFThumbnailSidebar = ({
   currentFieldPositions = [],
   showFieldIndicator = false,
   panelWidth = 200
-}: Props) => {
+}: ThumbnailSidebarProps) => {
   const [numPages, setNumPages] = useState<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const [thumbnailWidth, setThumbnailWidth] = useState(200);

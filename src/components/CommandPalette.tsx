@@ -20,6 +20,7 @@ import {
   PanelLeftClose,
   PanelRightClose,
   Search,
+  Database,
 } from "@/icons";
 
 interface CommandPaletteProps {
@@ -31,6 +32,7 @@ interface CommandPaletteProps {
   onAutofillAll?: () => void;
   onLogout?: () => void;
   userId?: string;
+  onOpenGraph?: () => void;
 }
 
 export const CommandPalette = ({
@@ -42,6 +44,7 @@ export const CommandPalette = ({
   onAutofillAll,
   onLogout,
   userId,
+  onOpenGraph,
 }: CommandPaletteProps) => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
@@ -78,6 +81,17 @@ export const CommandPalette = ({
             <Calculator className="mr-2 h-4 w-4" />
             <span>Distribution Calculator</span>
           </CommandItem>
+        </CommandGroup>
+
+        <CommandSeparator />
+
+        <CommandGroup heading="Tools">
+          {onOpenGraph && (
+            <CommandItem onSelect={() => runCommand(onOpenGraph)}>
+              <Database className="mr-2 h-4 w-4" />
+              <span>Knowledge Graph Explorer</span>
+            </CommandItem>
+          )}
         </CommandGroup>
 
         <CommandSeparator />

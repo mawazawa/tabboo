@@ -15,7 +15,7 @@ import { ControlToolbar } from "./index/components/ControlToolbar";
 import { MobileFormViewerSection } from "./index/components/MobileFormViewerSection";
 import { DesktopWorkspace } from "./index/components/DesktopWorkspace";
 import { FormTypeSelector } from "@/components/FormTypeSelector";
-import type { FormType } from "@/components/FormViewer";
+import { FormType } from "@/types/WorkflowTypes";
 
 // Aggressive code splitting - lazy load all heavy components
 const FormViewer = lazy(() => import("@/components/FormViewer").then(m => ({ default: m.FormViewer })));
@@ -27,6 +27,8 @@ const FieldSearchBar = lazy(() => import("@/components/FieldSearchBar").then(m =
 const TemplateManager = lazy(() => import("@/components/TemplateManager").then(m => ({ default: m.TemplateManager })));
 const FieldGroupManager = lazy(() => import("@/components/FieldGroupManager").then(m => ({ default: m.FieldGroupManager })));
 const CommandPalette = lazy(() => import("@/components/CommandPalette").then(m => ({ default: m.CommandPalette })));
+const KnowledgeGraphExplorer = lazy(() => import("@/components/KnowledgeGraphExplorer").then(m => ({ default: m.KnowledgeGraphExplorer })));
+
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { AutoSaveIndicator } from "@/components/AutoSaveIndicator";
 import { WelcomeTour } from "@/components/WelcomeTour";
@@ -67,7 +69,7 @@ import type { FormData, ValidationRules, ValidationErrors, FieldPositions, Valid
 const Index = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [formType, setFormType] = useState<FormType>('FL-320');
+  const [formType, setFormType] = useState<FormType>(FormType.FL320);
   const [formData, setFormData] = useState<FormData>({});
   const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
   const [fieldPositions, setFieldPositions] = useState<FieldPositions>({});
@@ -82,6 +84,7 @@ const Index = () => {
   const { height } = useWindowSize(); // For mobile bottom sheet snap points
   const hasUnsavedChanges = useRef(false);
   const pdfPanelRef = useRef<HTMLDivElement>(null);
+  const [graphExplorerOpen, setGraphExplorerOpen] = useState(false);
 
   // Panel visibility state hook
   const panelState = usePanelState();
@@ -225,6 +228,14 @@ const Index = () => {
       {/* Welcome Tour - First-time user onboarding */}
       <WelcomeTour />
 
+      {/* Knowledge Graph Explorer (God Mode) */}
+      <Suspense fallback={null}>
+        <KnowledgeGraphExplorer 
+          isOpen={graphExplorerOpen} 
+          onClose={() => setGraphExplorerOpen(false)} 
+        />
+      </Suspense>
+
       {/* Command Palette - Cmd+K */}
       <Suspense fallback={null}>
         <CommandPalette
@@ -236,6 +247,7 @@ const Index = () => {
           onAutofillAll={handleAutofillAll}
           onLogout={handleLogout}
           userId={user?.id}
+          onOpenGraph={() => setGraphExplorerOpen(true)}
         />
       </Suspense>
       
@@ -244,6 +256,7 @@ const Index = () => {
         saveStatus={saveStatus}
         currentFormType={formType}
         onFormTypeChange={handleFormTypeChange}
+        onOpenGraph={() => setGraphExplorerOpen(true)}
       />
 
       <main className="flex-1 flex flex-col container mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 overflow-hidden">

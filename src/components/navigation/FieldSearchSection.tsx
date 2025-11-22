@@ -3,12 +3,7 @@ import { FieldSearchBar } from "../FieldSearchBar";
 import { FieldSearchInput } from "./FieldSearchInput";
 import { TemplateManager } from "../TemplateManager";
 import type { FormData, FieldPosition } from "@/types/FormData";
-
-interface Template {
-  name: string;
-  formData: FormData;
-  fieldPositions: Record<string, FieldPosition>;
-}
+import type { FormTemplate } from "@/utils/templateManager";
 
 interface FieldSearchSectionProps {
   showAISearch: boolean;
@@ -20,7 +15,7 @@ interface FieldSearchSectionProps {
   settingsSheetOpen: boolean;
   onSettingsSheetChange: (open: boolean) => void;
   fieldPositions: Record<string, FieldPosition>;
-  onApplyTemplate: (template: Template) => void;
+  onApplyTemplate: (template: FormTemplate) => void;
   onAIQuery: (query: string) => void;
 }
 
@@ -75,4 +70,3 @@ export const FieldSearchSection = ({
     </>
   );
 };
-

@@ -8,6 +8,7 @@ import type {
   PersonalVaultData,
   ValidationErrors,
   ValidationRules,
+  ValidationRule,
 } from "@/types/FormData";
 import type { FormTemplate } from "@/utils/templateManager";
 import type { ThumbnailSidebarProps } from "@/components/PDFThumbnailSidebar";
@@ -47,7 +48,7 @@ interface FieldNavigationPanelInjectedProps {
   onFieldHover: (fieldName: string | null) => void;
   validationRules: ValidationRules;
   validationErrors: ValidationErrors;
-  onSaveValidationRules: (fieldName: keyof FormData, rules: ValidationRules[string]) => void;
+  onSaveValidationRules: (fieldName: string, rules: ValidationRule[]) => void;
   settingsSheetOpen: boolean;
   onSettingsSheetChange: (open: boolean) => void;
   onApplyTemplate: (template: FormTemplate) => void;
@@ -80,7 +81,7 @@ interface DesktopWorkspaceProps {
   onThumbnailResize: (size: number) => void;
   currentPDFPage: number;
   onPageClick: (page: number) => void;
-  getCurrentFieldPositions: () => Record<string, FieldPosition>;
+  getCurrentFieldPositions: () => { top: number; left: number }[];
   showFieldsPanel: boolean;
   showVaultPanel: boolean;
   userId?: string;
@@ -97,7 +98,7 @@ interface DesktopWorkspaceProps {
   setHighlightedField: (field: string | null) => void;
   validationRules: ValidationRules;
   validationErrors: ValidationErrors;
-  onSaveValidationRules: (fieldName: keyof FormData, rules: ValidationRules[string]) => void;
+  onSaveValidationRules: (fieldName: string, rules: ValidationRule[]) => void;
   settingsSheetOpen: boolean;
   onSettingsSheetChange: (open: boolean) => void;
   onApplyTemplate: (template: FormTemplate) => void;
@@ -227,4 +228,3 @@ export const DesktopWorkspace = ({
     </ResizablePanel>
   </ResizablePanelGroup>
 );
-
