@@ -11,7 +11,7 @@ import userEvent from '@testing-library/user-event';
 import { AddressAutocomplete } from '../AddressAutocomplete';
 
 // Mock the Google Maps service
-vi.mock('@/lib/googleMapsService', () => ({
+vi.mock('@/lib/google-maps-service', () => ({
   getAutocompletePredictions: vi.fn(),
   getPlaceDetails: vi.fn(),
   validateAddress: vi.fn(),

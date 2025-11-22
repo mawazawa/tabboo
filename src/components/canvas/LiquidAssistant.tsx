@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Send, Sparkles, X } from '@/icons';
 import { useGroqStream } from '@/hooks/useGroqStream';
 
@@ -46,7 +46,7 @@ export const LiquidAssistant: React.FC<LiquidAssistantProps> = ({ context, isOpe
   }, [messages, isOpen]);
 
   // -- Physics Loop --
-  const animate = () => {
+  const animate = useCallback(() => {
     if (!isDragging) {
       // Apply Physics
       vel.current.x *= friction;
@@ -91,14 +91,14 @@ export const LiquidAssistant: React.FC<LiquidAssistantProps> = ({ context, isOpe
     }
 
     requestRef.current = requestAnimationFrame(animate);
-  };
+  }, [isDragging]);
 
   useEffect(() => {
     requestRef.current = requestAnimationFrame(animate);
     return () => {
       if (requestRef.current) cancelAnimationFrame(requestRef.current);
     };
-  }, [isDragging, isOpen]);
+  }, [animate, isOpen]);
 
   // -- Drag Handlers --
   const handleStart = (clientX: number, clientY: number) => {
@@ -258,7 +258,7 @@ export const LiquidAssistant: React.FC<LiquidAssistantProps> = ({ context, isOpe
                 // Prevent drag from triggering on close button
                 onMouseDown={e => e.stopPropagation()}
                 onTouchStart={e => e.stopPropagation()}
-                onClick={(e) => { e.stopPropagation(); onClose ? onClose() : onToggle(); }}
+                onClick={(e) => { e.stopPropagation(); if (onClose) { onClose(); } else { onToggle(); } }}
                 className="w-6 h-6 rounded-full hover:bg-slate-200/50 flex items-center justify-center text-slate-500"
               >
                 <X size={14} />

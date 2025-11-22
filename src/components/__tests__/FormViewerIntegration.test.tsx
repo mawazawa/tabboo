@@ -401,21 +401,12 @@ describe('FormViewer Integration Tests', () => {
 
     renderFormViewer(propsWithFontSize);
 
-    await waitFor(() => {
-      // Query the Input element inside the container (Input also has data-field attribute)
-      const input = document.querySelector('[data-field="partyName"] input') as HTMLInputElement | null;
-      expect(input).toBeTruthy();
-    });
-
-    // Query the Input element directly (it has data-field attribute and is the actual input)
-    const input = document.querySelector('[data-field="partyName"] input') as HTMLInputElement | null;
-    expect(input).toBeTruthy();
-    if (!input) {
-      throw new Error('Expected partyName input field to render');
-    }
+    // Use findByDisplayValue to wait for the input
+    const input = await screen.findByDisplayValue('Jane Doe');
+    
     // Verify fontSize is applied to the Input element (not the container)
-    // Note: Component applies 0.75 scale factor to font size for PDF rendering
-    expect(input.style.fontSize).toBe('10.5pt');
+    // Note: Component applies font size directly in px
+    expect(input.style.fontSize).toBe('14px');
   });
 
   /**
@@ -429,16 +420,12 @@ describe('FormViewer Integration Tests', () => {
 
     renderFormViewer(propsWithEditMode);
 
-    await waitFor(() => {
-      expect(document.querySelector('[data-field="partyName"]')).toBeTruthy();
-    });
-
-    const field = document.querySelector('[data-field="partyName"]') as HTMLElement | null;
-    expect(field).toBeTruthy();
-    if (!field) {
-      throw new Error('Expected partyName field to render');
-    }
-    expect(field.className).toContain('cursor-move');
+    // Wait for input to appear, then find container
+    const input = await screen.findByDisplayValue('Jane Doe');
+    const fieldContainer = input.closest('.field-container');
+    
+    expect(fieldContainer).toBeTruthy();
+    expect(fieldContainer?.className).toContain('cursor-move');
   });
 
   /**

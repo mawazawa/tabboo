@@ -48,6 +48,7 @@ export const FieldOverlayLayer: React.FC<FieldOverlayLayerProps> = ({
         return (
           <div
             key={field.field}
+            data-field={field.field}
             className={cn(
               "absolute transition-all duration-200 pointer-events-auto field-container",
               isSelected ? "z-30" : "z-10",

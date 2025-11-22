@@ -25,7 +25,8 @@
     "test:visual": "npx playwright test --project=visual-regression",
     "test:visual:update": "npx playwright test --project=visual-regression --update-snapshots",
     "typecheck": "tsc --noEmit",
-    "new-report": "./scripts/new-report.sh"
+    "new-report": "./scripts/new-report.sh",
+    "heal": "node scripts/heal.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

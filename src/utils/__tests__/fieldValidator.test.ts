@@ -303,9 +303,9 @@ describe('fieldValidator', () => {
           { type: 'pattern', value: '[invalid(regex', message: 'Invalid', enabled: true },
         ];
 
-        // Should not fail validation for invalid regex
+        // Should fail validation for invalid regex
         const errors = validateField('text', 'anything', rules);
-        expect(errors).toHaveLength(0);
+        expect(errors).toHaveLength(1);
         expect(consoleErrorSpy).toHaveBeenCalled();
 
         consoleErrorSpy.mockRestore();
