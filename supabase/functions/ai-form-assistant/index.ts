@@ -156,7 +156,11 @@ Always maintain professional tone and remind users to consult with an attorney f
     }
     
     const jsonResponse = await response.json();
-    const message = jsonResponse.candidates[0].content.parts[0].text;
+    const message = jsonResponse.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!message) {
+       throw new Error('Invalid response format from AI provider');
+    }
 
     // Check for clarifying question
     const questionMatch = message.match(/\[question\](.*?)\[\/question\]/);
