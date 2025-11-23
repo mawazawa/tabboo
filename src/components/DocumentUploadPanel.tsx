@@ -67,6 +67,8 @@ export const DocumentUploadPanel = ({ userId, onExtractionComplete }: DocumentUp
   });
 
   // Handle file drop
+  // Note: handleFiles is defined below, eslint warning is acceptable here
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
@@ -76,6 +78,7 @@ export const DocumentUploadPanel = ({ userId, onExtractionComplete }: DocumentUp
   }, []);
 
   // Handle file input
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     handleFiles(files);

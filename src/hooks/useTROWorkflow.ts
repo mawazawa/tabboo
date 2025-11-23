@@ -475,7 +475,7 @@ export function useTROWorkflow(
     await updateWorkflowMutation.mutateAsync({
       currentState: nextState
     });
-  }, [workflow, updateWorkflowMutation]);
+  }, [workflow, updateWorkflowMutation, getNextForm]);
 
   /**
    * Transition to previous form in workflow
@@ -490,7 +490,7 @@ export function useTROWorkflow(
     await updateWorkflowMutation.mutateAsync({
       currentState: previousState
     });
-  }, [workflow, updateWorkflowMutation]);
+  }, [workflow, updateWorkflowMutation, getPreviousForm]);
 
   /**
    * Jump to a specific form
@@ -528,7 +528,7 @@ export function useTROWorkflow(
         currentState: targetState
       });
     },
-    [workflow, updateWorkflowMutation]
+    [workflow, updateWorkflowMutation, areDependenciesMet, getUnmetDependencies]
   );
 
   /**
@@ -560,7 +560,7 @@ export function useTROWorkflow(
       title: 'Workflow Complete',
       description: 'Your TRO packet is ready to file!'
     });
-  }, [workflow, updateWorkflowMutation, toast]);
+  }, [workflow, updateWorkflowMutation, toast, validatePacket]);
 
   /**
    * Reset workflow to start
