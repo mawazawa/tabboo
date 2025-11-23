@@ -28,6 +28,8 @@ const requestSchema = z.object({
     subtype: z.string(),
     mask: z.string(),
   })),
+  // Products enabled for this connection (from Plaid Link initialization)
+  products: z.array(z.string()).optional().default(['transactions', 'assets', 'liabilities']),
 });
 
 // Plaid API configuration
@@ -112,7 +114,7 @@ serve(async (req) => {
       );
     }
 
-    const { publicToken, institutionId, institutionName, accounts } = parsed.data;
+    const { publicToken, institutionId, institutionName, accounts, products } = parsed.data;
 
     // Get Plaid credentials
     const clientId = Deno.env.get('PLAID_CLIENT_ID');
@@ -173,7 +175,7 @@ serve(async (req) => {
         institution_name: institutionName,
         access_token_encrypted: encryptedToken,
         item_id: itemId,
-        products: ['transactions', 'assets', 'liabilities'], // TODO: pass from request
+        products: products,
         status: 'active',
         last_synced_at: new Date().toISOString(),
       }, {

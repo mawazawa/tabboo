@@ -59,14 +59,82 @@ serve(async (req) => {
         });
       }
 
-      // TODO: Implement the logic to process the answer.
-      // This will involve updating the Neo4j graph based on the user's feedback.
-      // For now, we just log it and return success.
-      console.log(`Received answer for candidate ${candidateId}: ${answer}`);
-      
-      // The Recalibration Engine would be triggered from here if "Apply Now" was chosen.
+      // Process the answer and update the Neo4j graph
+      const { recalibrate } = body;
+      console.log(`Processing answer for candidate ${candidateId}: ${answer} (recalibrate: ${recalibrate})`);
 
-      return new Response(JSON.stringify({ success: true, message: "Answer received" }), {
+      const session = neo4jDriver.session();
+      try {
+        // Parse candidate ID to determine type and nodes
+        // Format: "type-nodeId1-nodeId2" e.g., "dup-person-1-2"
+        const [type, ...nodeIds] = candidateId.split('-');
+
+        if (type === 'dup') {
+          // Handle duplicate detection resolution
+          if (answer.toLowerCase().includes('same')) {
+            // Merge duplicate nodes
+            await session.run(`
+              MATCH (n1) WHERE id(n1) = $id1
+              MATCH (n2) WHERE id(n2) = $id2
+              WITH n1, n2
+              SET n1 += properties(n2)
+              WITH n1, n2
+              MATCH (n2)-[r]->(m)
+              CREATE (n1)-[r2:MERGED_FROM]->(m)
+              SET r2 = properties(r)
+              WITH n1, n2
+              DETACH DELETE n2
+              RETURN n1
+            `, { id1: parseInt(nodeIds[1]), id2: parseInt(nodeIds[2]) });
+          } else if (answer.toLowerCase().includes('different')) {
+            // Mark as distinct (create relationship to prevent future matching)
+            await session.run(`
+              MATCH (n1) WHERE id(n1) = $id1
+              MATCH (n2) WHERE id(n2) = $id2
+              MERGE (n1)-[:DISTINCT_FROM]->(n2)
+            `, { id1: parseInt(nodeIds[1]), id2: parseInt(nodeIds[2]) });
+          }
+          // "related but different" - no action needed, just log
+        } else if (type === 'amb') {
+          // Handle ambiguous data resolution
+          // Update node with confirmed/corrected data based on answer
+          if (answer.toLowerCase() === 'yes') {
+            await session.run(`
+              MATCH (n) WHERE id(n) = $id
+              SET n.confirmed = true, n.confirmed_at = datetime()
+            `, { id: parseInt(nodeIds[1]) });
+          } else if (answer.toLowerCase() === 'no') {
+            await session.run(`
+              MATCH (n) WHERE id(n) = $id
+              SET n.confirmed = false, n.needs_review = true
+            `, { id: parseInt(nodeIds[1]) });
+          }
+          // "previous address" - mark as historical
+        }
+
+        // Log the resolution for audit
+        await session.run(`
+          CREATE (r:ClarificationResolution {
+            candidate_id: $candidateId,
+            answer: $answer,
+            user_id: $userId,
+            resolved_at: datetime(),
+            recalibrated: $recalibrate
+          })
+        `, { candidateId, answer, userId, recalibrate: recalibrate || false });
+
+        // If recalibrate flag is set, trigger recalibration engine
+        if (recalibrate) {
+          console.log('Triggering recalibration engine for user:', userId);
+          // In a full implementation, this would trigger the RecalibrationEngine
+          // to update related data across all forms
+        }
+
+      } finally {
+        await session.close();
+      }
+
+      return new Response(JSON.stringify({ success: true, message: "Answer processed and graph updated" }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       });

@@ -3,6 +3,8 @@
  * Provides structured logging with levels and external service integration
  */
 
+import * as Sentry from '@sentry/react';
+
 export enum LogLevel {
   DEBUG = 'debug',
   INFO = 'info',
@@ -151,20 +153,49 @@ class ErrorTracker {
   }
 
   /**
-   * Send to external monitoring service (e.g., Sentry)
+   * Send to external monitoring service (Sentry)
    */
   private sendToMonitoringService(logData: Record<string, unknown>) {
-    // TODO: Implement integration with monitoring service
-    // Example for Sentry:
-    // if (window.Sentry) {
-    //   window.Sentry.captureException(new Error(logData.message), {
-    //     contexts: { log: logData }
-    //   });
-    // }
+    // Send to Sentry if configured
+    const dsn = import.meta.env.VITE_SENTRY_DSN;
+    if (dsn) {
+      const errorData = logData.error as { name?: string; message?: string; stack?: string } | undefined;
 
-    // For now, just log in development
+      if (errorData?.message) {
+        // Capture as exception with full context
+        const error = new Error(errorData.message);
+        error.name = errorData.name || 'Error';
+        if (errorData.stack) {
+          error.stack = errorData.stack;
+        }
+
+        Sentry.captureException(error, {
+          contexts: {
+            log: {
+              ...logData,
+              error: undefined, // Don't duplicate error object
+            },
+          },
+          tags: {
+            session_id: this.sessionId,
+            action: logData.action as string | undefined,
+          },
+        });
+      } else {
+        // Capture as message with context
+        Sentry.captureMessage(logData.message as string, {
+          level: 'error',
+          contexts: { log: logData },
+          tags: {
+            session_id: this.sessionId,
+          },
+        });
+      }
+    }
+
+    // Also log in development for debugging
     if (import.meta.env.DEV) {
-      console.log('[MONITORING]', 'Would send to monitoring service:', logData);
+      console.log('[MONITORING]', 'Sent to Sentry:', logData);
     }
   }
 

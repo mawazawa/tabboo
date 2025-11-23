@@ -1,7 +1,40 @@
 import { createRoot } from "react-dom/client";
+import * as Sentry from "@sentry/react";
 import App from "./App.tsx";
 // import "@liquid-justice/design-system/styles"; // TODO: Build liquid-justice package
 import "./index.css";
+
+// Initialize Sentry for error tracking (production only)
+const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
+if (sentryDsn && import.meta.env.PROD) {
+  Sentry.init({
+    dsn: sentryDsn,
+    environment: import.meta.env.MODE,
+    // Performance monitoring
+    tracesSampleRate: 0.1, // 10% of transactions
+    // Session replay for debugging
+    replaysSessionSampleRate: 0.1, // 10% of sessions
+    replaysOnErrorSampleRate: 1.0, // 100% of sessions with errors
+    // Integrations
+    integrations: [
+      Sentry.browserTracingIntegration(),
+      Sentry.replayIntegration({
+        // Mask all text for privacy (legal data)
+        maskAllText: true,
+        blockAllMedia: true,
+      }),
+    ],
+    // Filter out noisy errors
+    beforeSend(event) {
+      // Don't send errors from localhost
+      if (window.location.hostname === 'localhost') {
+        return null;
+      }
+      return event;
+    },
+  });
+  console.log('[Sentry] Initialized');
+}
 
 // Register service worker for offline support (production only)
 if ('serviceWorker' in navigator) {
