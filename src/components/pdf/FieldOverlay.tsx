@@ -108,6 +108,9 @@ function FieldOverlayComponent({
           onChange={(e) => updateField(field, e.target.value)}
           placeholder={placeholder}
           disabled={isEditMode}
+          aria-label={placeholder || field.replace(/([A-Z])/g, ' $1').trim()}
+          aria-invalid={validationErrors?.[field]?.length ? 'true' : undefined}
+          aria-describedby={validationErrors?.[field]?.length ? `${field}-error` : undefined}
           style={{
             fontSize: `${fieldFontSize * 0.75}pt`,
             height: `${fieldFontSize + 4}px`,
@@ -139,6 +142,9 @@ function FieldOverlayComponent({
           onChange={(e) => updateField(field, e.target.value)}
           placeholder={placeholder}
           disabled={isEditMode}
+          aria-label={placeholder || field.replace(/([A-Z])/g, ' $1').trim()}
+          aria-invalid={validationErrors?.[field]?.length ? 'true' : undefined}
+          aria-describedby={validationErrors?.[field]?.length ? `${field}-error` : undefined}
           style={{
             fontSize: `${fieldFontSize * 0.75}pt`,
             minHeight: `${fieldFontSize * 2}px`,
@@ -179,7 +185,8 @@ function FieldOverlayComponent({
               : 'border-border/40 hover:border-primary/50'
             }
           `}
-          aria-label={placeholder || field}
+          aria-label={placeholder || field.replace(/([A-Z])/g, ' $1').trim()}
+          aria-invalid={validationErrors?.[field]?.length ? true : undefined}
         />
       )}
     </div>
