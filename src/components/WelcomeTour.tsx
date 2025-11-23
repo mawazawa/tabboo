@@ -191,7 +191,7 @@ export const WelcomeTour = () => {
   return (
     <div className="fixed inset-0 z-50 pointer-events-none">
       {/* Overlay with spotlight cutout */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none">
+      <svg className="absolute inset-0 w-full h-full pointer-events-auto">
         <defs>
           <mask id="spotlight-mask">
             {/* White = visible, black = hidden */}
