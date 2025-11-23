@@ -7,6 +7,7 @@ import "fake-indexeddb/auto";
 // Cleanup after each test
 afterEach(() => {
   cleanup();
+  vi.clearAllMocks();
 });
 
 // Polyfill Promise.withResolvers for PDF.js
@@ -23,8 +24,13 @@ if (typeof Promise.withResolvers === 'undefined') {
 }
 
 // Mock environment variables
-import.meta.env.VITE_SUPABASE_URL = 'https://test.supabase.co';
-import.meta.env.VITE_SUPABASE_ANON_KEY = 'test-anon-key';
+vi.stubGlobal('import.meta', {
+  env: {
+    DEV: true,
+    VITE_SUPABASE_URL: 'https://test.supabase.co',
+    VITE_SUPABASE_ANON_KEY: 'test-anon-key',
+  }
+});
 
 // Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {
@@ -33,25 +39,47 @@ global.ResizeObserver = class ResizeObserver {
   disconnect() {}
 };
 
-// Mock react-pdf globally
+// Mock react-pdf global
 vi.mock('react-pdf', async () => {
+  const original = await vi.importActual('react-pdf');
   return {
+    ...original,
     pdfjs: {
       GlobalWorkerOptions: {
         workerSrc: '',
       },
+      version: '4.0.1',
     },
-    Document: ({ children, onLoadSuccess }: any) => {
-      React.useEffect(() => {
-        // Simulate successful load
-        onLoadSuccess?.({ numPages: 1 });
-      }, [onLoadSuccess]);
-      return React.createElement('div', { 'data-testid': 'pdf-document' }, children);
+    Document: ({ children, onLoadSuccess, onLoadError }: any) => {
+        // Simulate async loading
+        React.useEffect(() => {
+            if (onLoadSuccess) {
+                onLoadSuccess({ numPages: 3 });
+            }
+        }, [onLoadSuccess]);
+        return <div>{children}</div>;
     },
-    Page: ({ pageNumber }: any) => React.createElement('div', { 'data-testid': `pdf-page-${pageNumber}` }, `Page ${pageNumber}`),
+    Page: () => <div data-testid="pdf-page">PDF Page</div>,
   };
 });
 
-// Mock URL.createObjectURL
-global.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
+// Mock fetch for PDF files
+global.fetch = vi.fn().mockImplementation((url) => {
+  if (typeof url === 'string' && url.endsWith('.pdf')) {
+    return Promise.resolve({
+      ok: true,
+      status: 200,
+      blob: () => Promise.resolve(new Blob(['%PDF-1.7 dummy content'], { type: 'application/pdf' })),
+    });
+  }
+  return Promise.resolve({
+    ok: false,
+    status: 404,
+    statusText: 'Not Found',
+    blob: () => Promise.resolve(new Blob([])),
+  });
+});
+
+// Mock URL.createObjectURL and revokeObjectURL
+global.URL.createObjectURL = vi.fn(() => 'blob:http://localhost:3000/dummy-blob');
 global.URL.revokeObjectURL = vi.fn();

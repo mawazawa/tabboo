@@ -29,7 +29,7 @@ INSERT INTO judicial_council_forms (
   'Attachment to DV-100 for requesting child custody and visitation orders in domestic violence cases.',
   'https://www.courts.ca.gov/documents/dv105.pdf',
   'https://www.courts.ca.gov/documents/dv105.pdf',
-  'attachment',
+  'request',
   'moderate',
   45,
   ARRAY['Family Code §§ 3048, 3063, 6323, 6323.5'],

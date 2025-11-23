@@ -195,19 +195,21 @@ BEGIN
 
   -- item33_date already exists in Phase 1
 
-  INSERT INTO canonical_fields (field_key, field_label, field_type, category, subcategory, semantic_type, description, is_pii)
-  VALUES ('item33_printName', 'Print your name', 'input', 'signature', 'petitioner', 'name', 'Typed or printed name of petitioner', TRUE)
+  INSERT INTO canonical_fields (field_key, field_label, field_type, category, subcategory, semantic_type, description, vault_field_name, is_pii)
+  VALUES ('item33_printName', 'Type or Print Your Name', 'input', 'signature', 'petitioner_signature', 'person_name', 'Petitioner printed name for signature', 'full_name', TRUE)
   ON CONFLICT (field_key) DO NOTHING;
 
-  INSERT INTO form_field_mappings (form_id, field_id, form_field_name, item_number, page_number, position_top, position_left, field_width, is_required)
-  SELECT v_form_id, (SELECT id FROM canonical_fields WHERE field_key = 'item33_printName'), 'item33_printName', '33', 13, 12.0, 25.0, 45.0, TRUE;
+  -- Already in Phase 1
+  -- INSERT INTO form_field_mappings (form_id, field_id, form_field_name, item_number, page_number, position_top, position_left, field_width, is_required)
+  -- SELECT v_form_id, (SELECT id FROM canonical_fields WHERE field_key = 'item33_printName'), 'item33_printName', '33', 13, 12.0, 25.0, 45.0, TRUE;
 
   INSERT INTO canonical_fields (field_key, field_label, field_type, category, subcategory, semantic_type, description, is_pii)
-  VALUES ('item33_signName', 'Sign your name', 'input', 'signature', 'petitioner', 'signature', 'Signature of petitioner', TRUE)
+  VALUES ('item33_signName', 'Sign Your Name', 'input', 'signature', 'petitioner_signature', 'signature', 'Petitioner handwritten signature', TRUE)
   ON CONFLICT (field_key) DO NOTHING;
 
-  INSERT INTO form_field_mappings (form_id, field_id, form_field_name, item_number, page_number, position_top, position_left, field_width, is_required)
-  SELECT v_form_id, (SELECT id FROM canonical_fields WHERE field_key = 'item33_signName'), 'item33_signName', '33', 13, 15.0, 25.0, 45.0, TRUE;
+  -- Already in Phase 1
+  -- INSERT INTO form_field_mappings (form_id, field_id, form_field_name, item_number, page_number, position_top, position_left, field_width, is_required)
+  -- SELECT v_form_id, (SELECT id FROM canonical_fields WHERE field_key = 'item33_signName'), 'item33_signName', '33', 13, 15.0, 25.0, 45.0, TRUE;
 
   -- ==================================================
   -- ITEM 34: Your Lawyer's Signature (Page 13)
@@ -235,7 +237,3 @@ BEGIN
   SELECT v_form_id, (SELECT id FROM canonical_fields WHERE field_key = 'item34_lawyerSignature'), 'item34_lawyerSignature', '34', 13, 26.0, 25.0, 45.0, FALSE;
 
 END $$;
-
--- Summary: Phase 4 adds approximately 35 fields for Items 23-34
--- Total DV-100 fields across all phases: ~286 fields
--- Remaining fields (optional/repeating patterns) can be added as needed
