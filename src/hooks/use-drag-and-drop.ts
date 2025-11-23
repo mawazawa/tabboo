@@ -7,6 +7,7 @@ interface UseDragAndDropProps {
   fieldPositions: Record<string, FieldPosition>;
   updateFieldPosition: (field: string, position: FieldPosition) => void;
   announce: (message: string) => void;
+  onDragEnd?: (field: string, position: FieldPosition) => void;
 }
 
 interface DragState {
@@ -19,6 +20,7 @@ export function useDragAndDrop({
   fieldPositions,
   updateFieldPosition,
   announce,
+  onDragEnd,
 }: UseDragAndDropProps) {
   const [isDragging, setIsDragging] = useState<string | null>(null);
   const [alignmentGuides, setAlignmentGuides] = useState<{ x: number[]; y: number[] }>({ x: [], y: [] });
@@ -26,6 +28,7 @@ export function useDragAndDrop({
   // Use refs for drag state to avoid re-render storms
   const dragStartPos = useRef<{ x: number; y: number; top: number; left: number }>({ x: 0, y: 0, top: 0, left: 0 });
   const lastGuidesRef = useRef<{ x: number[]; y: number[] }>({ x: [], y: [] });
+  const currentPosRef = useRef<{ top: number; left: number } | null>(null);
 
   // Performance monitoring for drag operations (optional - only logs in dev mode)
   const { startMonitoring, stopMonitoring } = useRAFMonitoring();
@@ -56,6 +59,9 @@ export function useDragAndDrop({
       top: currentTop,
       left: currentLeft
     };
+    
+    // Initialize current position ref
+    currentPosRef.current = { top: currentTop, left: currentLeft };
 
     // Start performance monitoring (dev mode only)
     startMonitoring();
@@ -108,9 +114,12 @@ export function useDragAndDrop({
       setAlignmentGuides(guides);
     }
 
+    const newPos = { top: newTop, left: newLeft };
+    currentPosRef.current = newPos;
+
     // Update position state directly - GPU positioning will handle rendering
     // This runs at 60fps max thanks to throttledRAF
-    updateFieldPosition(field, { top: newTop, left: newLeft });
+    updateFieldPosition(field, newPos);
   });
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
@@ -141,12 +150,18 @@ export function useDragAndDrop({
 
     // Announce field repositioning to screen readers
     announce(`Field ${isDragging} repositioned`);
+    
+    // Call onDragEnd callback with final position if available
+    if (onDragEnd && currentPosRef.current) {
+      onDragEnd(isDragging, currentPosRef.current);
+    }
 
     // Clean up drag state
     setIsDragging(null);
     setAlignmentGuides({ x: [], y: [] });
     lastGuidesRef.current = { x: [], y: [] };
-  }, [isDragging, announce, stopMonitoring]);
+    currentPosRef.current = null;
+  }, [isDragging, announce, stopMonitoring, onDragEnd]);
 
   return {
     isDragging,

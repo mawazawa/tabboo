@@ -127,6 +127,54 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     updateFieldPosition(field, newPosition);
   }, [fieldPositions, fieldOverlays, updateFieldPosition]);
 
+  // Handle saving dragging fields
+  const handleDragEnd = useCallback(async (field: string, position: FieldPosition) => {
+    // Find existing field details
+    let fieldOverlay: any | undefined;
+    let pageNum: number = 1;
+
+    for (const page of fieldOverlays) {
+      const found = page.fields.find(f => f.field === field);
+      if (found) {
+        fieldOverlay = found;
+        pageNum = page.page;
+        break;
+      }
+    }
+
+    if (!fieldOverlay) {
+      console.error("Could not find field for saving:", field);
+      return;
+    }
+
+    // Parse dimensions, removing '%' if present
+    const width = fieldOverlay.width ? parseFloat(fieldOverlay.width.replace('%', '')) : 0;
+    const height = fieldOverlay.height ? parseFloat(fieldOverlay.height.replace('%', '')) : 0;
+
+    try {
+        await saveField({
+            formNumber: formType,
+            name: field,
+            type: fieldOverlay.type,
+            rect: { 
+                top: position.top, 
+                left: position.left, 
+                width, 
+                height,
+                page: pageNum
+            } as any
+        });
+        
+        toast({
+            title: "Position Saved",
+            description: `Updated position for ${field}`,
+            duration: 1000,
+        });
+    } catch (error) {
+        console.error("Failed to save new position:", error);
+    }
+  }, [fieldOverlays, formType, saveField, toast]);
+
   // Drag and drop hook
   const {
     isDragging,
@@ -139,6 +187,7 @@ export const FormViewer = ({ formData, updateField, currentFieldIndex, setCurren
     fieldPositions,
     updateFieldPosition,
     announce,
+    onDragEnd: handleDragEnd,
   });
 
   // Keyboard navigation hook
