@@ -98,15 +98,16 @@ export default defineConfig({
       // No dependencies - runs independently
     },
 
-    // Uncomment to test on more browsers
-    // {
-    //   name: 'firefox',
-    //   use: {
-    //     ...devices['Desktop Firefox'],
-    //     storageState: 'playwright/.auth/user.json',
-    //   },
-    //   dependencies: ['setup'],
-    // },
+    // Firefox browser testing
+    {
+      name: 'firefox',
+      use: {
+        ...devices['Desktop Firefox'],
+        // Use stored authentication state
+        storageState: 'playwright/.auth/user.json',
+      },
+      dependencies: ['setup'],
+    },
     // {
     //   name: 'webkit',
     //   use: {
