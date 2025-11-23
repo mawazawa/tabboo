@@ -211,7 +211,7 @@ export const LiquidAssistant: React.FC<LiquidAssistantProps> = ({ context, isOpe
 
       <div
         ref={containerRef}
-        className="fixed z-[100] touch-none select-none"
+        className="fixed z-[100] touch-none select-none pointer-events-none"
         style={{
           transform: `translate3d(${pos.current.x}px, ${pos.current.y}px, 0)`,
           cursor: isDragging ? 'grabbing' : 'grab'
@@ -228,7 +228,7 @@ export const LiquidAssistant: React.FC<LiquidAssistantProps> = ({ context, isOpe
       >
         {!isOpen ? (
           /* --- CRYSTAL BALL MODE --- */
-          <div className="w-16 h-16 rounded-full glass-ball flex items-center justify-center relative transition-transform active:scale-95">
+          <div className="w-16 h-16 rounded-full glass-ball flex items-center justify-center relative transition-transform active:scale-95 pointer-events-auto">
             {/* The Neon Core */}
             <div
               className="w-4 h-4 rounded-full bg-blue-500"
@@ -246,6 +246,7 @@ export const LiquidAssistant: React.FC<LiquidAssistantProps> = ({ context, isOpe
               rounded-3xl shadow-2xl border border-white/50
               flex flex-col overflow-hidden
               animate-in zoom-in-95 duration-200
+              pointer-events-auto
             "
           >
             {/* Drag Handle Header */}
