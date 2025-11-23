@@ -1,0 +1,1902 @@
+[
+  {
+    "form": "DV-105",
+    "field_name": "item1_relationshipOther",
+    "item": "1",
+    "page": 1,
+    "top": 15,
+    "left": 45,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item1_relationshipOtherDescribe",
+    "item": "1",
+    "page": 1,
+    "top": 15,
+    "left": 55,
+    "width": 40
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item1_name",
+    "item": "1",
+    "page": 1,
+    "top": 12,
+    "left": 15,
+    "width": 50
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item1_relationshipParent",
+    "item": "1",
+    "page": 1,
+    "top": 15,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item1_relationshipGuardian",
+    "item": "1",
+    "page": 1,
+    "top": 15,
+    "left": 20,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item2_name",
+    "item": "2",
+    "page": 1,
+    "top": 20,
+    "left": 15,
+    "width": 50
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item2_relationshipOtherDescribe",
+    "item": "2",
+    "page": 1,
+    "top": 23,
+    "left": 55,
+    "width": 40
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item2_relationshipOther",
+    "item": "2",
+    "page": 1,
+    "top": 23,
+    "left": 45,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item2_relationshipGuardian",
+    "item": "2",
+    "page": 1,
+    "top": 23,
+    "left": 20,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item2_relationshipParent",
+    "item": "2",
+    "page": 1,
+    "top": 23,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item3_needMoreSpace",
+    "item": "3",
+    "page": 1,
+    "top": 42,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item3a_name",
+    "item": "3a",
+    "page": 1,
+    "top": 30,
+    "left": 5,
+    "width": 45
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item3a_dateOfBirth",
+    "item": "3a",
+    "page": 1,
+    "top": 30,
+    "left": 55,
+    "width": 20
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item3b_dateOfBirth",
+    "item": "3b",
+    "page": 1,
+    "top": 33,
+    "left": 55,
+    "width": 20
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item3b_name",
+    "item": "3b",
+    "page": 1,
+    "top": 33,
+    "left": 5,
+    "width": 45
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item3c_dateOfBirth",
+    "item": "3c",
+    "page": 1,
+    "top": 36,
+    "left": 55,
+    "width": 20
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item3c_name",
+    "item": "3c",
+    "page": 1,
+    "top": 36,
+    "left": 5,
+    "width": 45
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item3d_dateOfBirth",
+    "item": "3d",
+    "page": 1,
+    "top": 39,
+    "left": 55,
+    "width": 20
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item3d_name",
+    "item": "3d",
+    "page": 1,
+    "top": 39,
+    "left": 5,
+    "width": 45
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4a_yes",
+    "item": "4a",
+    "page": 1,
+    "top": 48,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4a_no",
+    "item": "4a",
+    "page": 1,
+    "top": 48,
+    "left": 30,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row6_withPerson2",
+    "item": "4b",
+    "page": 1,
+    "top": 69,
+    "left": 80,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row6_withMe",
+    "item": "4b",
+    "page": 1,
+    "top": 69,
+    "left": 74,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row6_keepPrivate",
+    "item": "4b",
+    "page": 1,
+    "top": 69,
+    "left": 68,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row6_location",
+    "item": "4b",
+    "page": 1,
+    "top": 69,
+    "left": 41,
+    "width": 25
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row6_toDate",
+    "item": "4b",
+    "page": 1,
+    "top": 69,
+    "left": 26,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row6_toPresent",
+    "item": "4b",
+    "page": 1,
+    "top": 69,
+    "left": 20,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row6_fromDate",
+    "item": "4b",
+    "page": 1,
+    "top": 69,
+    "left": 5,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row5_withOther",
+    "item": "4b",
+    "page": 1,
+    "top": 66,
+    "left": 86,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row5_withPerson2",
+    "item": "4b",
+    "page": 1,
+    "top": 66,
+    "left": 80,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row5_withMe",
+    "item": "4b",
+    "page": 1,
+    "top": 66,
+    "left": 74,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row5_keepPrivate",
+    "item": "4b",
+    "page": 1,
+    "top": 66,
+    "left": 68,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row5_location",
+    "item": "4b",
+    "page": 1,
+    "top": 66,
+    "left": 41,
+    "width": 25
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row5_toDate",
+    "item": "4b",
+    "page": 1,
+    "top": 66,
+    "left": 26,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row5_toPresent",
+    "item": "4b",
+    "page": 1,
+    "top": 66,
+    "left": 20,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row5_fromDate",
+    "item": "4b",
+    "page": 1,
+    "top": 66,
+    "left": 5,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row4_withOther",
+    "item": "4b",
+    "page": 1,
+    "top": 63,
+    "left": 86,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row4_withPerson2",
+    "item": "4b",
+    "page": 1,
+    "top": 63,
+    "left": 80,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row4_withMe",
+    "item": "4b",
+    "page": 1,
+    "top": 63,
+    "left": 74,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row4_keepPrivate",
+    "item": "4b",
+    "page": 1,
+    "top": 63,
+    "left": 68,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row4_location",
+    "item": "4b",
+    "page": 1,
+    "top": 63,
+    "left": 41,
+    "width": 25
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row4_toDate",
+    "item": "4b",
+    "page": 1,
+    "top": 63,
+    "left": 26,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row4_toPresent",
+    "item": "4b",
+    "page": 1,
+    "top": 63,
+    "left": 20,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row4_fromDate",
+    "item": "4b",
+    "page": 1,
+    "top": 63,
+    "left": 5,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row3_withOther",
+    "item": "4b",
+    "page": 1,
+    "top": 60,
+    "left": 86,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row3_withPerson2",
+    "item": "4b",
+    "page": 1,
+    "top": 60,
+    "left": 80,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row3_withMe",
+    "item": "4b",
+    "page": 1,
+    "top": 60,
+    "left": 74,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row3_keepPrivate",
+    "item": "4b",
+    "page": 1,
+    "top": 60,
+    "left": 68,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row3_location",
+    "item": "4b",
+    "page": 1,
+    "top": 60,
+    "left": 41,
+    "width": 25
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row3_toDate",
+    "item": "4b",
+    "page": 1,
+    "top": 60,
+    "left": 26,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row3_toPresent",
+    "item": "4b",
+    "page": 1,
+    "top": 60,
+    "left": 20,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row2_withOther",
+    "item": "4b",
+    "page": 1,
+    "top": 57,
+    "left": 86,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row2_withPerson2",
+    "item": "4b",
+    "page": 1,
+    "top": 57,
+    "left": 80,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row2_withMe",
+    "item": "4b",
+    "page": 1,
+    "top": 57,
+    "left": 74,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row2_keepPrivate",
+    "item": "4b",
+    "page": 1,
+    "top": 57,
+    "left": 68,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row2_location",
+    "item": "4b",
+    "page": 1,
+    "top": 57,
+    "left": 41,
+    "width": 25
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row2_toPresent",
+    "item": "4b",
+    "page": 1,
+    "top": 57,
+    "left": 20,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row2_toDate",
+    "item": "4b",
+    "page": 1,
+    "top": 57,
+    "left": 26,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row1_fromDate",
+    "item": "4b",
+    "page": 1,
+    "top": 54,
+    "left": 5,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row1_toPresent",
+    "item": "4b",
+    "page": 1,
+    "top": 54,
+    "left": 20,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row1_toDate",
+    "item": "4b",
+    "page": 1,
+    "top": 54,
+    "left": 26,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row1_location",
+    "item": "4b",
+    "page": 1,
+    "top": 54,
+    "left": 41,
+    "width": 25
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row1_keepPrivate",
+    "item": "4b",
+    "page": 1,
+    "top": 54,
+    "left": 68,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row1_withMe",
+    "item": "4b",
+    "page": 1,
+    "top": 54,
+    "left": 74,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row1_withPerson2",
+    "item": "4b",
+    "page": 1,
+    "top": 54,
+    "left": 80,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row1_withOther",
+    "item": "4b",
+    "page": 1,
+    "top": 54,
+    "left": 86,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row2_fromDate",
+    "item": "4b",
+    "page": 1,
+    "top": 57,
+    "left": 5,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row3_fromDate",
+    "item": "4b",
+    "page": 1,
+    "top": 60,
+    "left": 5,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_otherRelationship",
+    "item": "4b",
+    "page": 1,
+    "top": 68,
+    "left": 30,
+    "width": 40
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row7_withOther",
+    "item": "4b",
+    "page": 1,
+    "top": 72,
+    "left": 86,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row7_withPerson2",
+    "item": "4b",
+    "page": 1,
+    "top": 72,
+    "left": 80,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row7_withMe",
+    "item": "4b",
+    "page": 1,
+    "top": 72,
+    "left": 74,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row7_keepPrivate",
+    "item": "4b",
+    "page": 1,
+    "top": 72,
+    "left": 68,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row7_location",
+    "item": "4b",
+    "page": 1,
+    "top": 72,
+    "left": 41,
+    "width": 25
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row7_toDate",
+    "item": "4b",
+    "page": 1,
+    "top": 72,
+    "left": 26,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row7_toPresent",
+    "item": "4b",
+    "page": 1,
+    "top": 72,
+    "left": 20,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row7_fromDate",
+    "item": "4b",
+    "page": 1,
+    "top": 72,
+    "left": 5,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item4b_row6_withOther",
+    "item": "4b",
+    "page": 1,
+    "top": 69,
+    "left": 86,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "dv105_caseNumber",
+    "item": "Header",
+    "page": 1,
+    "top": 5,
+    "left": 70,
+    "width": 25
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item5a_other",
+    "item": "5a",
+    "page": 2,
+    "top": 8,
+    "left": 80,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item5a_guardianship",
+    "item": "5a",
+    "page": 2,
+    "top": 8,
+    "left": 50,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item5a_no",
+    "item": "5a",
+    "page": 2,
+    "top": 5,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item5a_yes",
+    "item": "5a",
+    "page": 2,
+    "top": 5,
+    "left": 20,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item5a_custody",
+    "item": "5a",
+    "page": 2,
+    "top": 8,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item5a_criminal",
+    "item": "5a",
+    "page": 2,
+    "top": 8,
+    "left": 65,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item5a_divorce",
+    "item": "5a",
+    "page": 2,
+    "top": 8,
+    "left": 20,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item5a_juvenile",
+    "item": "5a",
+    "page": 2,
+    "top": 8,
+    "left": 35,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item5b_no",
+    "item": "5b",
+    "page": 2,
+    "top": 14,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item5b_yes",
+    "item": "5b",
+    "page": 2,
+    "top": 14,
+    "left": 20,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item5b_currentOrder",
+    "item": "5b",
+    "page": 2,
+    "top": 17,
+    "left": 5,
+    "width": 90
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item5b_whyChange",
+    "item": "5b",
+    "page": 2,
+    "top": 27,
+    "left": 5,
+    "width": 90
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item5c_name",
+    "item": "5c",
+    "page": 2,
+    "top": 38,
+    "left": 15,
+    "width": 40
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item5c_parent",
+    "item": "5c",
+    "page": 2,
+    "top": 38,
+    "left": 60,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item5c_legalGuardian",
+    "item": "5c",
+    "page": 2,
+    "top": 38,
+    "left": 80,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item6_no",
+    "item": "6",
+    "page": 3,
+    "top": 5,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item6_yes",
+    "item": "6",
+    "page": 3,
+    "top": 5,
+    "left": 20,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item6_county",
+    "item": "6",
+    "page": 3,
+    "top": 8,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item6_countyName",
+    "item": "6",
+    "page": 3,
+    "top": 8,
+    "left": 25,
+    "width": 30
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item6_california",
+    "item": "6",
+    "page": 3,
+    "top": 10,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item6_otherPlaces",
+    "item": "6",
+    "page": 3,
+    "top": 12,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item6_otherPlacesDescribe",
+    "item": "6",
+    "page": 3,
+    "top": 12,
+    "left": 25,
+    "width": 70
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item7_yes",
+    "item": "7",
+    "page": 3,
+    "top": 18,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item7_no",
+    "item": "7",
+    "page": 3,
+    "top": 18,
+    "left": 20,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item7a_onlyThese",
+    "item": "7a",
+    "page": 3,
+    "top": 21,
+    "left": 35,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item7a_allChildren",
+    "item": "7a",
+    "page": 3,
+    "top": 21,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item7a_names",
+    "item": "7a",
+    "page": 3,
+    "top": 21,
+    "left": 55,
+    "width": 40
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item7b_medical",
+    "item": "7b",
+    "page": 3,
+    "top": 25,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item7b_school",
+    "item": "7b",
+    "page": 3,
+    "top": 25,
+    "left": 35,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item7b_extracurricular",
+    "item": "7b",
+    "page": 3,
+    "top": 27,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item7b_employment",
+    "item": "7b",
+    "page": 3,
+    "top": 27,
+    "left": 35,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item7b_other",
+    "item": "7b",
+    "page": 3,
+    "top": 29,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item7b_otherDescribe",
+    "item": "7b",
+    "page": 3,
+    "top": 29,
+    "left": 25,
+    "width": 70
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item8_no",
+    "item": "8",
+    "page": 3,
+    "top": 35,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item8_yes",
+    "item": "8",
+    "page": 3,
+    "top": 35,
+    "left": 20,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item10_yes",
+    "item": "10",
+    "page": 4,
+    "top": 25,
+    "left": 20,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item10_no",
+    "item": "10",
+    "page": 4,
+    "top": 25,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item11_no",
+    "item": "11",
+    "page": 4,
+    "top": 30,
+    "left": 40,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item11_yes",
+    "item": "11",
+    "page": 4,
+    "top": 30,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item9_physicalSoleToPerson2",
+    "item": "9",
+    "page": 4,
+    "top": 17,
+    "left": 25,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item9_physicalOtherDescribe",
+    "item": "9",
+    "page": 4,
+    "top": 19,
+    "left": 5,
+    "width": 90
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item9_legalOtherDescribe",
+    "item": "9",
+    "page": 4,
+    "top": 12,
+    "left": 5,
+    "width": 90
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item9_physicalSoleToMe",
+    "item": "9",
+    "page": 4,
+    "top": 17,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item9_legalOther",
+    "item": "9",
+    "page": 4,
+    "top": 10,
+    "left": 70,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item9_legalJoint",
+    "item": "9",
+    "page": 4,
+    "top": 10,
+    "left": 50,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item9_legalSoleToPerson2",
+    "item": "9",
+    "page": 4,
+    "top": 10,
+    "left": 25,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item9_legalSoleToMe",
+    "item": "9",
+    "page": 4,
+    "top": 10,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item9_yes",
+    "item": "9",
+    "page": 4,
+    "top": 5,
+    "left": 20,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item9_physicalJoint",
+    "item": "9",
+    "page": 4,
+    "top": 17,
+    "left": 50,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item9_physicalOther",
+    "item": "9",
+    "page": 4,
+    "top": 17,
+    "left": 70,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item9_no",
+    "item": "9",
+    "page": 4,
+    "top": 5,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_sundayEnd",
+    "item": "12",
+    "page": 5,
+    "top": 50,
+    "left": 20,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_mondayStart",
+    "item": "12",
+    "page": 5,
+    "top": 32,
+    "left": 5,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_mondayEnd",
+    "item": "12",
+    "page": 5,
+    "top": 32,
+    "left": 20,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_mondayPerson",
+    "item": "12",
+    "page": 5,
+    "top": 32,
+    "left": 35,
+    "width": 25
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_mondayLocation",
+    "item": "12",
+    "page": 5,
+    "top": 32,
+    "left": 63,
+    "width": 32
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_everyWeek",
+    "item": "12",
+    "page": 5,
+    "top": 55,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_everyOtherWeek",
+    "item": "12",
+    "page": 5,
+    "top": 55,
+    "left": 25,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_otherSchedule",
+    "item": "12",
+    "page": 5,
+    "top": 55,
+    "left": 50,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_startDate",
+    "item": "12",
+    "page": 5,
+    "top": 58,
+    "left": 30,
+    "width": 20
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_tuesdayStart",
+    "item": "12",
+    "page": 5,
+    "top": 35,
+    "left": 5,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_tuesdayEnd",
+    "item": "12",
+    "page": 5,
+    "top": 35,
+    "left": 20,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_tuesdayPerson",
+    "item": "12",
+    "page": 5,
+    "top": 35,
+    "left": 35,
+    "width": 25
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_tuesdayLocation",
+    "item": "12",
+    "page": 5,
+    "top": 35,
+    "left": 63,
+    "width": 32
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_wednesdayStart",
+    "item": "12",
+    "page": 5,
+    "top": 38,
+    "left": 5,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_wednesdayEnd",
+    "item": "12",
+    "page": 5,
+    "top": 38,
+    "left": 20,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_wednesdayPerson",
+    "item": "12",
+    "page": 5,
+    "top": 38,
+    "left": 35,
+    "width": 25
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_wednesdayLocation",
+    "item": "12",
+    "page": 5,
+    "top": 38,
+    "left": 63,
+    "width": 32
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_thursdayStart",
+    "item": "12",
+    "page": 5,
+    "top": 41,
+    "left": 5,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_thursdayEnd",
+    "item": "12",
+    "page": 5,
+    "top": 41,
+    "left": 20,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_thursdayPerson",
+    "item": "12",
+    "page": 5,
+    "top": 41,
+    "left": 35,
+    "width": 25
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_thursdayLocation",
+    "item": "12",
+    "page": 5,
+    "top": 41,
+    "left": 63,
+    "width": 32
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_fridayStart",
+    "item": "12",
+    "page": 5,
+    "top": 44,
+    "left": 5,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_fridayEnd",
+    "item": "12",
+    "page": 5,
+    "top": 44,
+    "left": 20,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_fridayPerson",
+    "item": "12",
+    "page": 5,
+    "top": 44,
+    "left": 35,
+    "width": 25
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_fridayLocation",
+    "item": "12",
+    "page": 5,
+    "top": 44,
+    "left": 63,
+    "width": 32
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_saturdayStart",
+    "item": "12",
+    "page": 5,
+    "top": 47,
+    "left": 5,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_saturdayEnd",
+    "item": "12",
+    "page": 5,
+    "top": 47,
+    "left": 20,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_saturdayPerson",
+    "item": "12",
+    "page": 5,
+    "top": 47,
+    "left": 35,
+    "width": 25
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_saturdayLocation",
+    "item": "12",
+    "page": 5,
+    "top": 47,
+    "left": 63,
+    "width": 32
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_sundayStart",
+    "item": "12",
+    "page": 5,
+    "top": 50,
+    "left": 5,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_sundayPerson",
+    "item": "12",
+    "page": 5,
+    "top": 50,
+    "left": 35,
+    "width": 25
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12_sundayLocation",
+    "item": "12",
+    "page": 5,
+    "top": 50,
+    "left": 63,
+    "width": 32
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12a_nonprofessionalName",
+    "item": "12a",
+    "page": 5,
+    "top": 5,
+    "left": 30,
+    "width": 40
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12a_nonprofessional",
+    "item": "12a",
+    "page": 5,
+    "top": 5,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12a_feesOther",
+    "item": "12a",
+    "page": 5,
+    "top": 11,
+    "left": 55,
+    "width": 8
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12a_feesPerson2",
+    "item": "12a",
+    "page": 5,
+    "top": 11,
+    "left": 35,
+    "width": 8
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12a_feesMe",
+    "item": "12a",
+    "page": 5,
+    "top": 11,
+    "left": 15,
+    "width": 8
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12a_professionalName",
+    "item": "12a",
+    "page": 5,
+    "top": 8,
+    "left": 30,
+    "width": 40
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12a_professional",
+    "item": "12a",
+    "page": 5,
+    "top": 8,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12b_other",
+    "item": "12b",
+    "page": 5,
+    "top": 19,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12b_onceWeek",
+    "item": "12b",
+    "page": 5,
+    "top": 15,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12b_onceWeekHours",
+    "item": "12b",
+    "page": 5,
+    "top": 15,
+    "left": 30,
+    "width": 8
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12b_twiceWeek",
+    "item": "12b",
+    "page": 5,
+    "top": 17,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12b_twiceWeekHours",
+    "item": "12b",
+    "page": 5,
+    "top": 17,
+    "left": 45,
+    "width": 8
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12b_otherDescribe",
+    "item": "12b",
+    "page": 5,
+    "top": 21,
+    "left": 5,
+    "width": 90
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item12b_useChart",
+    "item": "12b",
+    "page": 5,
+    "top": 28,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_sundayLocation",
+    "item": "13",
+    "page": 6,
+    "top": 50,
+    "left": 63,
+    "width": 32
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_sundayPerson",
+    "item": "13",
+    "page": 6,
+    "top": 50,
+    "left": 35,
+    "width": 25
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_sundayEnd",
+    "item": "13",
+    "page": 6,
+    "top": 50,
+    "left": 20,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_sundayStart",
+    "item": "13",
+    "page": 6,
+    "top": 50,
+    "left": 5,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_saturdayLocation",
+    "item": "13",
+    "page": 6,
+    "top": 47,
+    "left": 63,
+    "width": 32
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_saturdayPerson",
+    "item": "13",
+    "page": 6,
+    "top": 47,
+    "left": 35,
+    "width": 25
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_saturdayEnd",
+    "item": "13",
+    "page": 6,
+    "top": 47,
+    "left": 20,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_saturdayStart",
+    "item": "13",
+    "page": 6,
+    "top": 47,
+    "left": 5,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_fridayLocation",
+    "item": "13",
+    "page": 6,
+    "top": 44,
+    "left": 63,
+    "width": 32
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_fridayPerson",
+    "item": "13",
+    "page": 6,
+    "top": 44,
+    "left": 35,
+    "width": 25
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_fridayEnd",
+    "item": "13",
+    "page": 6,
+    "top": 44,
+    "left": 20,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_fridayStart",
+    "item": "13",
+    "page": 6,
+    "top": 44,
+    "left": 5,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_thursdayLocation",
+    "item": "13",
+    "page": 6,
+    "top": 41,
+    "left": 63,
+    "width": 32
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_thursdayPerson",
+    "item": "13",
+    "page": 6,
+    "top": 41,
+    "left": 35,
+    "width": 25
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_thursdayEnd",
+    "item": "13",
+    "page": 6,
+    "top": 41,
+    "left": 20,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_thursdayStart",
+    "item": "13",
+    "page": 6,
+    "top": 41,
+    "left": 5,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_wednesdayLocation",
+    "item": "13",
+    "page": 6,
+    "top": 38,
+    "left": 63,
+    "width": 32
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_wednesdayPerson",
+    "item": "13",
+    "page": 6,
+    "top": 38,
+    "left": 35,
+    "width": 25
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_wednesdayEnd",
+    "item": "13",
+    "page": 6,
+    "top": 38,
+    "left": 20,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_wednesdayStart",
+    "item": "13",
+    "page": 6,
+    "top": 38,
+    "left": 5,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_tuesdayLocation",
+    "item": "13",
+    "page": 6,
+    "top": 35,
+    "left": 63,
+    "width": 32
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_tuesdayPerson",
+    "item": "13",
+    "page": 6,
+    "top": 35,
+    "left": 35,
+    "width": 25
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_tuesdayEnd",
+    "item": "13",
+    "page": 6,
+    "top": 35,
+    "left": 20,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_tuesdayStart",
+    "item": "13",
+    "page": 6,
+    "top": 35,
+    "left": 5,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_mondayLocation",
+    "item": "13",
+    "page": 6,
+    "top": 32,
+    "left": 63,
+    "width": 32
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_mondayPerson",
+    "item": "13",
+    "page": 6,
+    "top": 32,
+    "left": 35,
+    "width": 25
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_mondayEnd",
+    "item": "13",
+    "page": 6,
+    "top": 32,
+    "left": 20,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_startDate",
+    "item": "13",
+    "page": 6,
+    "top": 58,
+    "left": 30,
+    "width": 20
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_everyWeek",
+    "item": "13",
+    "page": 6,
+    "top": 55,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13_mondayStart",
+    "item": "13",
+    "page": 6,
+    "top": 32,
+    "left": 5,
+    "width": 12
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13a_professional",
+    "item": "13a",
+    "page": 6,
+    "top": 10,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13a_nonprofessional",
+    "item": "13a",
+    "page": 6,
+    "top": 8,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13a_yes",
+    "item": "13a",
+    "page": 6,
+    "top": 5,
+    "left": 20,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13a_no",
+    "item": "13a",
+    "page": 6,
+    "top": 5,
+    "left": 5,
+    "width": 3
+  },
+  {
+    "form": "DV-105",
+    "field_name": "item13b_describe",
+    "item": "13b",
+    "page": 6,
+    "top": 18,
+    "left": 5,
+    "width": 90
+  }
+]
+
