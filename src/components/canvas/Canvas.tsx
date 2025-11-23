@@ -79,6 +79,7 @@ export const Canvas: React.FC<CanvasProps> = ({ children }) => {
     // Promote to own layer
     transform: 'translateZ(0)',
     pointerEvents: 'none',
+    zIndex: 0,
   };
 
   return (
@@ -122,6 +123,7 @@ export const Canvas: React.FC<CanvasProps> = ({ children }) => {
           animationTime: 200,
           animationType: 'easeOut',
           equalToMove: true,
+          disabled: false,
         }}
         alignmentAnimation={{
           disabled: true,
@@ -138,6 +140,8 @@ export const Canvas: React.FC<CanvasProps> = ({ children }) => {
           wrapperStyle={{
             width: '100%',
             height: '100%',
+            position: 'relative',
+            zIndex: 1,
             cursor: 'grab',
           }}
           contentStyle={{
