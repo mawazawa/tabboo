@@ -53,9 +53,9 @@ describe('WelcomeTour', () => {
         vi.advanceTimersByTime(600);
       });
 
-      // Layer 1: Parent should have pointer-events-none
+      // Layer 1: Parent should have pointer-events-auto to block background clicks
       const parentContainer = document.querySelector('.fixed.inset-0.z-50');
-      expect(parentContainer).toHaveClass('pointer-events-none');
+      expect(parentContainer).toHaveClass('pointer-events-auto');
 
       // Layer 2: SVG should have pointer-events-auto
       const svg = document.querySelector('svg');
