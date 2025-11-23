@@ -129,7 +129,7 @@ export interface VaultUpdateResult {
  * @param addressType - Type of address (current, mailing, employer, etc.)
  * @returns Update result
  */
-export async function saveValidatedAddress(
+async function saveValidatedAddress(
   userId: string,
   address: AddressResult,
   addressType: 'currentAddress' | 'mailingAddress' | 'employerAddress' = 'currentAddress'
@@ -224,7 +224,7 @@ export async function saveValidatedAddress(
  * @param addressType - Type of address to retrieve
  * @returns Vault address or null
  */
-export async function getValidatedAddress(
+async function getValidatedAddress(
   userId: string,
   addressType: 'currentAddress' | 'mailingAddress' | 'employerAddress' = 'currentAddress'
 ): Promise<VaultAddress | null> {
@@ -258,7 +258,7 @@ export async function getValidatedAddress(
  * @param institutionInfo - Institution metadata
  * @returns Update result
  */
-export async function savePlaidFinancialData(
+async function savePlaidFinancialData(
   userId: string,
   financialData: FL150FinancialData,
   institutionInfo?: { id: string; name: string }
@@ -393,7 +393,7 @@ export async function savePlaidFinancialData(
  * @param userId - User ID
  * @returns Vault financial data or null
  */
-export async function getFinancialData(
+async function getFinancialData(
   userId: string
 ): Promise<VaultFinancialData | null> {
   try {
@@ -420,7 +420,7 @@ export async function getFinancialData(
  * @param userId - User ID
  * @returns Expenses formatted for FL-150 form
  */
-export async function getFL150Expenses(
+async function getFL150Expenses(
   userId: string
 ): Promise<FL150ExpenseCategory[] | null> {
   const financial = await getFinancialData(userId);
@@ -444,7 +444,7 @@ export async function getFL150Expenses(
  * @param userId - User ID
  * @returns Object indicating which data types are available
  */
-export async function checkVaultStatus(
+async function checkVaultStatus(
   userId: string
 ): Promise<{
   hasValidatedAddress: boolean;
@@ -488,7 +488,7 @@ export async function checkVaultStatus(
  * @param field - Field path (e.g., 'contact_info.currentAddress')
  * @returns Provenance information or null
  */
-export async function getDataProvenance(
+async function getDataProvenance(
   userId: string,
   field: string
 ): Promise<DataProvenance | null> {
@@ -516,7 +516,7 @@ export async function getDataProvenance(
  * @param userId - User ID
  * @returns Success status
  */
-export async function clearFinancialData(userId: string): Promise<boolean> {
+async function clearFinancialData(userId: string): Promise<boolean> {
   try {
     const { error } = await supabase
       .from('canonical_data_vault')
@@ -543,7 +543,7 @@ export async function clearFinancialData(userId: string): Promise<boolean> {
  * @param userId - User ID
  * @returns All vault data suitable for form auto-fill
  */
-export async function getFormAutoFillData(userId: string): Promise<{
+async function getFormAutoFillData(userId: string): Promise<{
   address: VaultAddress | null;
   financial: VaultFinancialData | null;
   provenance: Record<string, DataProvenance>;
