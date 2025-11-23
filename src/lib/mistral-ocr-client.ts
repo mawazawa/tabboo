@@ -351,7 +351,7 @@ export class MistralOCREngine {
         const tableData = currentTable.map(row =>
           row.split('|').map(cell => cell.trim()).filter(cell => cell)
         );
-        tables.push(tableData.flat());
+        tables.push(tableData);
         currentTable = [];
         inTable = false;
       }
@@ -362,7 +362,7 @@ export class MistralOCREngine {
       const tableData = currentTable.map(row =>
         row.split('|').map(cell => cell.trim()).filter(cell => cell)
       );
-      tables.push(tableData.flat());
+      tables.push(tableData);
     }
 
     return tables;
