@@ -7,6 +7,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ConfidenceCenterController } from "@/components/confidence-center/ConfidenceCenterController";
 
 // Lazy load route components for code splitting
+const Landing = lazy(() => import("./pages/Landing"));
 const Index = lazy(() => import("./pages/Index"));
 const CanvasView = lazy(() => import("./pages/CanvasView"));
 const Auth = lazy(() => import("./pages/Auth"));
@@ -36,6 +37,7 @@ const App = () => (
           <ConfidenceCenterController />
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
+              <Route path="/landing" element={<Landing />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/" element={<CanvasView />} />
               <Route path="/dashboard" element={<Index />} />

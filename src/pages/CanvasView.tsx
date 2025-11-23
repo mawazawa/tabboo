@@ -414,17 +414,39 @@ export default function CanvasView() {
           {viewMode === 'FORM' && (
             <div className="p-8">
               {activeForms.length === 0 && (
-                <div className="flex items-center justify-center h-full w-full">
-                  <div className="text-center text-slate-400 bg-white/50 p-12 rounded-3xl backdrop-blur-sm border border-white/50">
-                    <FileText size={48} className="mx-auto mb-4 opacity-50" />
-                    <h2 className="text-xl font-bold text-slate-600 mb-2">No Forms Open</h2>
-                    <p className="text-sm mb-4">Click "New Form" in the navigation to start filling out a form</p>
-                    <button
-                      onClick={() => openForm('FL-320')}
-                      className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors"
-                    >
-                      Open FL-320 Form
-                    </button>
+                <div className="flex items-center justify-center h-full w-full min-h-[60vh]">
+                  <div className="text-center bg-white/60 p-12 rounded-3xl backdrop-blur-md border border-white/50 shadow-xl max-w-lg">
+                    <div className="rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 p-6 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                      <FileText size={36} className="text-blue-600" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-slate-800 mb-3">Welcome to SwiftFill</h2>
+                    <p className="text-slate-600 mb-6 leading-relaxed">
+                      Start by selecting a California Judicial Council form.
+                      Your progress will be auto-saved and you can autofill from your Personal Data Vault.
+                    </p>
+                    <div className="space-y-3">
+                      <button
+                        onClick={() => openForm('DV-100')}
+                        className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-medium hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02]"
+                      >
+                        Start DV-100 (Restraining Order Request)
+                      </button>
+                      <button
+                        onClick={() => openForm('FL-320')}
+                        className="w-full px-6 py-3 bg-white text-slate-700 rounded-xl font-medium hover:bg-slate-50 transition-colors border border-slate-200"
+                      >
+                        Start FL-320 (Response to RO)
+                      </button>
+                      <button
+                        onClick={() => navigate('/file-tro')}
+                        className="w-full px-4 py-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
+                      >
+                        Or use Guided TRO Workflow →
+                      </button>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-6">
+                      Press Tab to navigate between fields • Cmd+K for command palette
+                    </p>
                   </div>
                 </div>
               )}
