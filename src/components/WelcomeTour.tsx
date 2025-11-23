@@ -220,7 +220,7 @@ export const WelcomeTour = () => {
       {/* Spotlight ring highlight */}
       {spotlightRect && (
         <div
-          className="absolute rounded-lg ring-2 ring-primary ring-offset-2 ring-offset-transparent animate-pulse"
+          className="absolute rounded-lg ring-2 ring-primary ring-offset-2 ring-offset-transparent pointer-events-none animate-pulse"
           style={{
             top: spotlightRect.top,
             left: spotlightRect.left,
