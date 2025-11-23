@@ -189,9 +189,9 @@ export const WelcomeTour = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div className="fixed inset-0 z-50 pointer-events-none">
       {/* Overlay with spotlight cutout */}
-      <svg className="absolute inset-0 w-full h-full" style={{ pointerEvents: 'none' }}>
+      <svg className="absolute inset-0 w-full h-full pointer-events-auto">
         <defs>
           <mask id="spotlight-mask">
             {/* White = visible, black = hidden */}
@@ -232,7 +232,7 @@ export const WelcomeTour = () => {
 
       {/* Tour card */}
       <div
-        className={`${!spotlightRect || step.position === 'center' ? 'flex items-center justify-center h-full' : ''}`}
+        className={`pointer-events-auto ${!spotlightRect || step.position === 'center' ? 'flex items-center justify-center h-full' : ''}`}
         style={spotlightRect && step.position !== 'center' ? getCardStyle() : {}}
       >
         <Card
