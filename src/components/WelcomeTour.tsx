@@ -189,9 +189,9 @@ export const WelcomeTour = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div className="fixed inset-0 z-50 pointer-events-none">
       {/* Overlay with spotlight cutout */}
-      <svg className="absolute inset-0 w-full h-full" style={{ pointerEvents: 'none' }}>
+      <svg className="absolute inset-0 w-full h-full">
         <defs>
           <mask id="spotlight-mask">
             {/* White = visible, black = hidden */}
@@ -220,7 +220,7 @@ export const WelcomeTour = () => {
       {/* Spotlight ring highlight */}
       {spotlightRect && (
         <div
-          className="absolute rounded-lg ring-2 ring-primary ring-offset-2 ring-offset-transparent pointer-events-none animate-pulse"
+          className="absolute rounded-lg ring-2 ring-primary ring-offset-2 ring-offset-transparent animate-pulse"
           style={{
             top: spotlightRect.top,
             left: spotlightRect.left,
@@ -237,7 +237,7 @@ export const WelcomeTour = () => {
       >
         <Card
           ref={cardRef}
-          className="w-full max-w-md mx-4 overflow-hidden shadow-2xl border-2 border-primary/20 bg-background"
+          className="w-full max-w-md mx-4 overflow-hidden shadow-2xl border-2 border-primary/20 bg-background pointer-events-auto"
           style={spotlightRect && step.position !== 'center' ? { margin: 0 } : {}}
         >
           {/* Progress bar */}
