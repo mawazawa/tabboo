@@ -32,11 +32,28 @@ vi.mock('@/lib/pdfConfig', () => ({}));
 // Mock react-pdf to avoid actual PDF loading
 vi.mock('react-pdf', () => ({
   Document: ({ children, onLoadSuccess }: any) => {
-    setTimeout(() => onLoadSuccess?.({ numPages: 4 }), 10);
+    // Use queueMicrotask instead of setTimeout to avoid firing after test cleanup
+    if (onLoadSuccess) {
+      queueMicrotask(() => {
+        try {
+          onLoadSuccess({ numPages: 4 });
+        } catch {
+          // Ignore errors if component unmounted
+        }
+      });
+    }
     return <div data-testid="pdf-document">{children}</div>;
   },
   Page: ({ pageNumber, onLoadSuccess, width }: any) => {
-    setTimeout(() => onLoadSuccess?.({ width: width || 850, height: 1100 }), 10);
+    if (onLoadSuccess) {
+      queueMicrotask(() => {
+        try {
+          onLoadSuccess({ width: width || 850, height: 1100 });
+        } catch {
+          // Ignore errors if component unmounted
+        }
+      });
+    }
     return (
       <div data-testid={`pdf-page-${pageNumber}`} data-page-number={pageNumber}>
         <canvas width={width || 850} height="1100" />

@@ -142,6 +142,9 @@ export const FocusTrap = ({
   useEffect(() => {
     if (!active || !containerRef.current) return;
 
+    // Capture ref values at effect start for cleanup
+    const returnFocusElement = returnFocusRef?.current;
+
     // Store previously focused element
     previouslyFocusedRef.current = document.activeElement as HTMLElement;
 
@@ -227,8 +230,8 @@ export const FocusTrap = ({
       // Return focus to previous element
       if (previouslyFocusedRef.current && document.body.contains(previouslyFocusedRef.current)) {
         previouslyFocusedRef.current.focus();
-      } else if (returnFocusRef?.current) {
-        returnFocusRef.current.focus();
+      } else if (returnFocusElement) {
+        returnFocusElement.focus();
       }
     };
   }, [active, initialFocusRef, returnFocusRef, clickOutsideToDeactivate, escapeToDeactivate, onDeactivate]);

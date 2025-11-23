@@ -321,9 +321,10 @@ export const OverlayLayer: React.FC<OverlayLayerProps> = ({
 
   // Cleanup animation frame on unmount
   useEffect(() => {
+    const animationId = animationRef.current;
     return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
+      if (animationId) {
+        cancelAnimationFrame(animationId);
       }
     };
   }, []);

@@ -37,12 +37,13 @@ export const useDocumentProcessing = ({
 
   // Cleanup all active timers on unmount
   useEffect(() => {
+    const timersMap = activeTimersRef.current;
     return () => {
-      activeTimersRef.current.forEach(({ interval, timeout }) => {
+      timersMap.forEach(({ interval, timeout }) => {
         clearInterval(interval);
         clearTimeout(timeout);
       });
-      activeTimersRef.current.clear();
+      timersMap.clear();
     };
   }, []);
 
