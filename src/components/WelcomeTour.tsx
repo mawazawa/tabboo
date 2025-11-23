@@ -232,7 +232,7 @@ export const WelcomeTour = () => {
 
       {/* Tour card */}
       <div
-        className={`${!spotlightRect || step.position === 'center' ? 'flex items-center justify-center h-full' : ''}`}
+        className={`pointer-events-auto ${!spotlightRect || step.position === 'center' ? 'flex items-center justify-center h-full' : ''}`}
         style={spotlightRect && step.position !== 'center' ? getCardStyle() : {}}
       >
         <Card
