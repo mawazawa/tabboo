@@ -1,0 +1,147 @@
+name: Auto-Create Issues on CI/CD Failures
+
+# This workflow creates Linear issues automatically when main branch CI fails
+# Part of closed-loop bug fixing automation (P2-1)
+# Research-backed: November 2025 DevOps best practices for automated incident management
+
+on:
+  workflow_run:
+    workflows: ["Tests", "Lighthouse CI"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  create-issue-on-failure:
+    name: Create Linear Issue on Failure
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get workflow run details
+        id: workflow
+        run: |
+          echo "workflow_name=${{ github.event.workflow_run.name }}" >> $GITHUB_OUTPUT
+          echo "workflow_id=${{ github.event.workflow_run.id }}" >> $GITHUB_OUTPUT
+          echo "run_url=${{ github.event.workflow_run.html_url }}" >> $GITHUB_OUTPUT
+          echo "commit_sha=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_OUTPUT
+          echo "branch=${{ github.event.workflow_run.head_branch }}" >> $GITHUB_OUTPUT
+          echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_OUTPUT
+
+      - name: Get commit details
+        id: commit
+        run: |
+          COMMIT_MESSAGE=$(git log -1 --pretty=%B ${{ steps.workflow.outputs.commit_sha }})
+          COMMIT_AUTHOR=$(git log -1 --pretty=%an ${{ steps.workflow.outputs.commit_sha }})
+          echo "commit_message<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "commit_author=$COMMIT_AUTHOR" >> $GITHUB_OUTPUT
+
+      - name: Determine issue priority
+        id: priority
+        run: |
+          # High priority if Tests workflow fails (core functionality)
+          # Medium priority if Lighthouse fails (performance regression)
+          if [[ "${{ steps.workflow.outputs.workflow_name }}" == "Tests" ]]; then
+            echo "priority=1" >> $GITHUB_OUTPUT  # Urgent
+            echo "priority_label=critical" >> $GITHUB_OUTPUT
+          else
+            echo "priority=2" >> $GITHUB_OUTPUT  # High
+            echo "priority_label=bug" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Linear issue
+        id: linear
+        run: |
+          RESPONSE=$(curl -s -X POST https://api.linear.app/graphql \
+            -H "Authorization: ${{ secrets.LINEAR_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "query": "mutation CreateIssue($input: IssueCreateInput!) { issueCreate(input: $input) { success issue { id identifier url } } }",
+              "variables": {
+                "input": {
+                  "teamId": "${{ secrets.LINEAR_TEAM_ID }}",
+                  "title": "CI/CD Failure: ${{ steps.workflow.outputs.workflow_name }} on main branch",
+                  "description": "## 🚨 Automated CI/CD Failure Report\n\n**Workflow**: ${{ steps.workflow.outputs.workflow_name }}\n**Status**: FAILED ❌\n**Branch**: ${{ steps.workflow.outputs.branch }}\n**Timestamp**: ${{ steps.workflow.outputs.timestamp }}\n\n### Commit Details\n\n**SHA**: `${{ steps.workflow.outputs.commit_sha }}`\n**Author**: ${{ steps.commit.outputs.commit_author }}\n**Message**:\n```\n${{ steps.commit.outputs.commit_message }}\n```\n\n### Links\n\n- [Failed Workflow Run](${{ steps.workflow.outputs.run_url }})\n- [Commit on GitHub](https://github.com/${{ github.repository }}/commit/${{ steps.workflow.outputs.commit_sha }})\n\n### Next Steps\n\n1. Review workflow logs above\n2. Identify root cause (build, test, lint failure)\n3. Fix issue and push to main\n4. Verify workflow passes\n5. Close this issue with resolution notes\n\n---\n\n**Auto-generated** by closed-loop bug fixing automation (P2-1)\n**Detection Time**: ${{ steps.workflow.outputs.timestamp }}",
+                  "priority": ${{ steps.priority.outputs.priority }},
+                  "labelIds": ["${{ secrets.LINEAR_BUG_LABEL_ID }}"],
+                  "stateId": "${{ secrets.LINEAR_TRIAGE_STATE_ID }}"
+                }
+              }
+            }')
+          
+          ISSUE_ID=$(echo $RESPONSE | jq -r '.data.issueCreate.issue.identifier')
+          ISSUE_URL=$(echo $RESPONSE | jq -r '.data.issueCreate.issue.url')
+          
+          if [ "$ISSUE_ID" != "null" ]; then
+            echo "✅ Created Linear issue: $ISSUE_ID"
+            echo "📋 URL: $ISSUE_URL"
+            echo "issue_id=$ISSUE_ID" >> $GITHUB_OUTPUT
+            echo "issue_url=$ISSUE_URL" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Failed to create Linear issue"
+            echo "$RESPONSE" | jq '.'
+            exit 1
+          fi
+
+      - name: Store in Neo4j Knowledge Graph
+        if: success()
+        run: |
+          # Store CI failure metadata in Neo4j for pattern analysis
+          npx -y @neo4j-labs/mcp-neo4j << 'EOF'
+          MERGE (failure:CIFailure {
+            workflow_name: "${{ steps.workflow.outputs.workflow_name }}",
+            workflow_id: "${{ steps.workflow.outputs.workflow_id }}",
+            commit_sha: "${{ steps.workflow.outputs.commit_sha }}"
+          })
+          SET failure.branch = "${{ steps.workflow.outputs.branch }}",
+              failure.timestamp = datetime("${{ steps.workflow.outputs.timestamp }}"),
+              failure.commit_author = "${{ steps.commit.outputs.commit_author }}",
+              failure.linear_issue = "${{ steps.linear.outputs.issue_id }}",
+              failure.run_url = "${{ steps.workflow.outputs.run_url }}",
+              failure.detected_at = datetime()
+          
+          // Link to commit
+          MERGE (commit:Commit {sha: "${{ steps.workflow.outputs.commit_sha }}"})
+          SET commit.author = "${{ steps.commit.outputs.commit_author }}",
+              commit.branch = "${{ steps.workflow.outputs.branch }}"
+          
+          MERGE (failure)-[:CAUSED_BY]->(commit)
+          
+          // Link to Linear issue
+          MERGE (issue:LinearIssue {identifier: "${{ steps.linear.outputs.issue_id }}"})
+          SET issue.url = "${{ steps.linear.outputs.issue_url }}",
+              issue.type = "ci_failure",
+              issue.created_at = datetime()
+          
+          MERGE (failure)-[:TRACKED_IN]->(issue)
+          EOF
+        env:
+          NEO4J_URI: ${{ secrets.NEO4J_URI }}
+          NEO4J_USERNAME: ${{ secrets.NEO4J_USERNAME }}
+          NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
+
+      - name: Post summary
+        if: always()
+        run: |
+          echo "## 🚨 CI/CD Failure Detected" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Workflow**: ${{ steps.workflow.outputs.workflow_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch**: ${{ steps.workflow.outputs.branch }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit**: \`${{ steps.workflow.outputs.commit_sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.linear.outputs.issue_id }}" != "" ]; then
+            echo "✅ **Linear Issue Created**: [${{ steps.linear.outputs.issue_id }}](${{ steps.linear.outputs.issue_url }})" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Failed to create Linear issue**" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Action**: Automated issue creation via closed-loop bug fixing" >> $GITHUB_STEP_SUMMARY
+

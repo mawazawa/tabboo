@@ -1,0 +1,275 @@
+name: Neo4j CI/CD Analytics & Pattern Detection
+
+# AUTOCATALYTIC DEVOPS FLYWHEEL COMPONENT
+# Stores ALL CI/CD events in Neo4j for pattern analysis and upstream prevention
+# 
+# Purpose: Learn from every test run, build, deployment to detect:
+# - Recurring failure patterns (same files fail repeatedly)
+# - Temporal patterns (failures after specific changes)
+# - Dependency patterns (file A changes → file B tests fail)
+# - Developer patterns (specific authors trigger specific failures)
+# - Root cause clusters (multiple symptoms, single cause)
+#
+# This enables UPSTREAM PREVENTION:
+# - Pre-commit hooks based on historical patterns
+# - Automatic code review focus areas
+# - Proactive refactoring suggestions
+# - Developer-specific guidance
+#
+# Research-backed: November 2025 DevOps intelligence patterns
+
+on:
+  workflow_run:
+    workflows: ["Tests", "Lighthouse CI"]
+    types: [completed]
+  
+  # Also run on manual workflow_dispatch for backfilling
+  workflow_dispatch:
+    inputs:
+      workflow_run_id:
+        description: 'Workflow run ID to analyze (optional, for backfilling)'
+        required: false
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  store-test-analytics:
+    name: Store Test Analytics in Neo4j
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for pattern analysis
+
+      - name: Get workflow run details
+        id: workflow
+        run: |
+          RUN_ID="${{ github.event.workflow_run.id || github.event.inputs.workflow_run_id }}"
+          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+          echo "workflow_name=${{ github.event.workflow_run.name }}" >> $GITHUB_OUTPUT
+          echo "conclusion=${{ github.event.workflow_run.conclusion }}" >> $GITHUB_OUTPUT
+          echo "commit_sha=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_OUTPUT
+          echo "branch=${{ github.event.workflow_run.head_branch }}" >> $GITHUB_OUTPUT
+          echo "actor=${{ github.event.workflow_run.actor.login }}" >> $GITHUB_OUTPUT
+          echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_OUTPUT
+          echo "duration=${{ github.event.workflow_run.updated_at - github.event.workflow_run.created_at }}" >> $GITHUB_OUTPUT
+
+      - name: Get changed files in commit
+        id: files
+        run: |
+          CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r ${{ steps.workflow.outputs.commit_sha }} | jq -R -s -c 'split("\n")[:-1]')
+          echo "changed_files=$CHANGED_FILES" >> $GITHUB_OUTPUT
+          echo "file_count=$(echo $CHANGED_FILES | jq 'length')" >> $GITHUB_OUTPUT
+
+      - name: Get commit metadata
+        id: commit
+        run: |
+          COMMIT_MESSAGE=$(git log -1 --pretty=%B ${{ steps.workflow.outputs.commit_sha }} | head -1)
+          COMMIT_AUTHOR=$(git log -1 --pretty=%an ${{ steps.workflow.outputs.commit_sha }})
+          COMMIT_EMAIL=$(git log -1 --pretty=%ae ${{ steps.workflow.outputs.commit_sha }})
+          
+          # Extract issue references (e.g., JUSTICE-123)
+          ISSUE_REFS=$(echo "$COMMIT_MESSAGE" | grep -oE 'JUSTICE-[0-9]+' | jq -R -s -c 'split("\n")[:-1]' || echo '[]')
+          
+          echo "message<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "author=$COMMIT_AUTHOR" >> $GITHUB_OUTPUT
+          echo "email=$COMMIT_EMAIL" >> $GITHUB_OUTPUT
+          echo "issue_refs=$ISSUE_REFS" >> $GITHUB_OUTPUT
+
+      - name: Store workflow run in Neo4j
+        run: |
+          npx -y @neo4j-labs/mcp-neo4j << 'EOF'
+          // Create or update WorkflowRun node
+          MERGE (run:WorkflowRun {id: "${{ steps.workflow.outputs.run_id }}"})
+          SET run.name = "${{ steps.workflow.outputs.workflow_name }}",
+              run.conclusion = "${{ steps.workflow.outputs.conclusion }}",
+              run.branch = "${{ steps.workflow.outputs.branch }}",
+              run.actor = "${{ steps.workflow.outputs.actor }}",
+              run.timestamp = datetime("${{ steps.workflow.outputs.timestamp }}"),
+              run.duration_seconds = ${{ steps.workflow.outputs.duration }},
+              run.github_url = "https://github.com/${{ github.repository }}/actions/runs/${{ steps.workflow.outputs.run_id }}",
+              run.updated_at = datetime()
+          
+          // Create or update Commit node
+          MERGE (commit:Commit {sha: "${{ steps.workflow.outputs.commit_sha }}"})
+          SET commit.message = $message,
+              commit.author = "${{ steps.commit.outputs.author }}",
+              commit.email = "${{ steps.commit.outputs.email }}",
+              commit.branch = "${{ steps.workflow.outputs.branch }}",
+              commit.timestamp = datetime("${{ steps.workflow.outputs.timestamp }}")
+          
+          // Link WorkflowRun to Commit
+          MERGE (run)-[:TESTED]->(commit)
+          
+          // Create Developer node and link
+          MERGE (dev:Developer {email: "${{ steps.commit.outputs.email }}"})
+          SET dev.name = "${{ steps.commit.outputs.author }}",
+              dev.last_commit = datetime("${{ steps.workflow.outputs.timestamp }}")
+          
+          MERGE (commit)-[:AUTHORED_BY]->(dev)
+          EOF
+        env:
+          NEO4J_URI: ${{ secrets.NEO4J_URI }}
+          NEO4J_USERNAME: ${{ secrets.NEO4J_USERNAME }}
+          NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
+          message: ${{ steps.commit.outputs.message }}
+
+      - name: Store changed files and relationships
+        run: |
+          # Parse changed files JSON array
+          FILES='${{ steps.files.outputs.changed_files }}'
+          
+          # Store each file and create relationships
+          echo "$FILES" | jq -r '.[]' | while read file; do
+            # Detect file type
+            EXTENSION="${file##*.}"
+            
+            # Store in Neo4j
+            npx -y @neo4j-labs/mcp-neo4j << EOF
+          // Create File node
+          MERGE (file:File {path: "$file"})
+          SET file.extension = "$EXTENSION",
+              file.last_modified = datetime("${{ steps.workflow.outputs.timestamp }}"),
+              file.directory = "${file%/*}"
+          
+          // Link to Commit
+          MATCH (commit:Commit {sha: "${{ steps.workflow.outputs.commit_sha }}"})
+          MERGE (commit)-[:MODIFIED]->(file)
+          
+          // Link to WorkflowRun (for failure correlation)
+          MATCH (run:WorkflowRun {id: "${{ steps.workflow.outputs.run_id }}"})
+          MERGE (run)-[:AFFECTED_BY]->(file)
+          EOF
+          done
+        env:
+          NEO4J_URI: ${{ secrets.NEO4J_URI }}
+          NEO4J_USERNAME: ${{ secrets.NEO4J_USERNAME }}
+          NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
+
+      - name: Store failure patterns (if failed)
+        if: steps.workflow.outputs.conclusion == 'failure'
+        run: |
+          npx -y @neo4j-labs/mcp-neo4j << 'EOF'
+          // Mark workflow as failed
+          MATCH (run:WorkflowRun {id: "${{ steps.workflow.outputs.run_id }}"})
+          SET run.failed = true,
+              run.failure_timestamp = datetime("${{ steps.workflow.outputs.timestamp }}")
+          
+          // Link to previous failures for pattern detection
+          MATCH (prev:WorkflowRun {name: "${{ steps.workflow.outputs.workflow_name }}", failed: true})
+          WHERE prev.timestamp < run.timestamp
+          WITH prev, run
+          ORDER BY prev.timestamp DESC
+          LIMIT 10
+          MERGE (prev)-[:PRECEDED_BY_FAILURE]->(run)
+          
+          // Detect recurring failures on same files
+          MATCH (run)-[:AFFECTED_BY]->(file:File)
+          MATCH (prevRun:WorkflowRun {failed: true})-[:AFFECTED_BY]->(file)
+          WHERE prevRun.timestamp < run.timestamp
+          WITH file, count(prevRun) as failure_count
+          WHERE failure_count >= 2
+          SET file.recurring_failure = true,
+              file.failure_count = failure_count,
+              file.last_failure = datetime("${{ steps.workflow.outputs.timestamp }}")
+          
+          // Create FailurePattern node for clustering
+          MERGE (pattern:FailurePattern {
+            workflow: "${{ steps.workflow.outputs.workflow_name }}",
+            file_path: file.path
+          })
+          SET pattern.occurrence_count = failure_count + 1,
+              pattern.last_occurrence = datetime("${{ steps.workflow.outputs.timestamp }}"),
+              pattern.severity = CASE 
+                WHEN failure_count > 5 THEN "critical"
+                WHEN failure_count > 2 THEN "high"
+                ELSE "medium"
+              END
+          
+          MERGE (pattern)-[:MANIFESTS_IN]->(file)
+          MERGE (run)-[:EXHIBITS]->(pattern)
+          EOF
+        env:
+          NEO4J_URI: ${{ secrets.NEO4J_URI }}
+          NEO4J_USERNAME: ${{ secrets.NEO4J_USERNAME }}
+          NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
+
+      - name: Link to Linear issues
+        if: steps.commit.outputs.issue_refs != '[]'
+        run: |
+          ISSUES='${{ steps.commit.outputs.issue_refs }}'
+          
+          echo "$ISSUES" | jq -r '.[]' | while read issue; do
+            npx -y @neo4j-labs/mcp-neo4j << EOF
+          // Create or update LinearIssue node
+          MERGE (issue:LinearIssue {identifier: "$issue"})
+          SET issue.last_referenced = datetime("${{ steps.workflow.outputs.timestamp }}")
+          
+          // Link to Commit
+          MATCH (commit:Commit {sha: "${{ steps.workflow.outputs.commit_sha }}"})
+          MERGE (commit)-[:ADDRESSES]->(issue)
+          
+          // Link to WorkflowRun
+          MATCH (run:WorkflowRun {id: "${{ steps.workflow.outputs.run_id }}"})
+          MERGE (run)-[:VALIDATES]->(issue)
+          EOF
+          done
+        env:
+          NEO4J_URI: ${{ secrets.NEO4J_URI }}
+          NEO4J_USERNAME: ${{ secrets.NEO4J_USERNAME }}
+          NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
+
+      - name: Generate pattern analysis summary
+        id: analysis
+        run: |
+          # Query Neo4j for pattern insights
+          ANALYSIS=$(npx -y @neo4j-labs/mcp-neo4j << 'EOF'
+          // Find files with highest failure rates
+          MATCH (file:File {recurring_failure: true})
+          WITH file
+          ORDER BY file.failure_count DESC
+          LIMIT 5
+          RETURN collect({
+            path: file.path,
+            failures: file.failure_count,
+            last_failure: toString(file.last_failure)
+          }) as high_risk_files
+          EOF
+          )
+          
+          echo "analysis<<EOF" >> $GITHUB_OUTPUT
+          echo "$ANALYSIS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        env:
+          NEO4J_URI: ${{ secrets.NEO4J_URI }}
+          NEO4J_USERNAME: ${{ secrets.NEO4J_USERNAME }}
+          NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
+
+      - name: Post analytics summary
+        run: |
+          echo "## 📊 Neo4j CI/CD Analytics Stored" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Workflow**: ${{ steps.workflow.outputs.workflow_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Conclusion**: ${{ steps.workflow.outputs.conclusion }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit**: \`${{ steps.workflow.outputs.commit_sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Files Changed**: ${{ steps.files.outputs.file_count }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🧠 Knowledge Graph Updated" >> $GITHUB_STEP_SUMMARY
+          echo "- WorkflowRun node created/updated" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit metadata stored" >> $GITHUB_STEP_SUMMARY
+          echo "- File relationships mapped" >> $GITHUB_STEP_SUMMARY
+          echo "- Pattern analysis complete" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ steps.workflow.outputs.conclusion }}" == "failure" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### ⚠️ Failure Patterns Detected" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "${{ steps.analysis.outputs.analysis }}" >> $GITHUB_STEP_SUMMARY
+          fi
+
